@@ -12,13 +12,15 @@ use Livewire\Component;
 
 class ClassIndex extends Component
 {
+    public string $classSearch = '';
+
+    public string $subjectSearch = '';
+
+    public string $chapterSearch = '';
+
+    public string $topicSearch = '';
+
     public ?int $editingClassId = null;
-
-    public ?int $editingSubjectId = null;
-
-    public ?int $editingChapterId = null;
-
-    public ?int $editingTopicId = null;
 
     public string $class_name = '';
 
@@ -27,6 +29,8 @@ class ClassIndex extends Component
     public bool $class_is_active = true;
 
     public bool $class_is_premium = false;
+
+    public ?int $editingSubjectId = null;
 
     public ?int $subject_academic_class_id = null;
 
@@ -40,6 +44,8 @@ class ClassIndex extends Component
 
     public bool $subject_is_premium = false;
 
+    public ?int $editingChapterId = null;
+
     public ?int $chapter_subject_id = null;
 
     public string $chapter_name = '';
@@ -52,6 +58,8 @@ class ClassIndex extends Component
 
     public bool $chapter_is_premium = false;
 
+    public ?int $editingTopicId = null;
+
     public ?int $topic_chapter_id = null;
 
     public string $topic_name = '';
@@ -62,37 +70,14 @@ class ClassIndex extends Component
 
     public bool $topic_is_premium = false;
 
-    public function saveAcademicClass(): void
+    public function openClassModal(): void
     {
-        $validated = $this->validate([
-            'class_name' => ['required', 'string', 'max:255'],
-            'class_description' => ['nullable', 'string'],
-            'class_is_active' => ['boolean'],
-            'class_is_premium' => ['boolean'],
-        ]);
-
-        $data = [
-            'name' => $validated['class_name'],
-            'slug' => $this->uniqueSlug(AcademicClass::class, $validated['class_name'], $this->editingClassId),
-            'description' => $validated['class_description'],
-            'is_active' => $validated['class_is_active'],
-            'is_premium' => $validated['class_is_premium'],
-        ];
-
-        if ($this->editingClassId !== null) {
-            AcademicClass::query()->whereKey($this->editingClassId)->update($data);
-            session()->flash('status', 'Academic class updated successfully.');
-        } else {
-            $data['uuid'] = (string) Str::uuid();
-            $data['order_sequence'] = (AcademicClass::max('order_sequence') ?? 0) + 1;
-            AcademicClass::create($data);
-            session()->flash('status', 'Academic class created successfully.');
-        }
-
         $this->resetClassForm();
+        $this->resetValidation();
+        $this->dispatch('open-class-modal');
     }
 
-    public function editAcademicClass(int $id): void
+    public function editClass(int $id): void
     {
         $academicClass = AcademicClass::query()->findOrFail($id);
 
@@ -101,50 +86,54 @@ class ClassIndex extends Component
         $this->class_description = $academicClass->description;
         $this->class_is_active = (bool) $academicClass->is_active;
         $this->class_is_premium = (bool) $academicClass->is_premium;
+
+        $this->resetValidation();
+        $this->dispatch('open-class-modal');
     }
 
-    public function deleteAcademicClass(int $id): void
-    {
-        AcademicClass::query()->findOrFail($id)->delete();
-        session()->flash('status', 'Academic class deleted successfully.');
-
-        if ($this->editingClassId === $id) {
-            $this->resetClassForm();
-        }
-    }
-
-    public function saveSubject(): void
+    public function saveClass(): void
     {
         $validated = $this->validate([
-            'subject_academic_class_id' => ['required', 'exists:academic_classes,id'],
-            'subject_name' => ['required', 'string', 'max:255'],
-            'subject_code' => ['nullable', 'string', 'max:50'],
-            'subject_description' => ['nullable', 'string'],
-            'subject_is_active' => ['boolean'],
-            'subject_is_premium' => ['boolean'],
+            'class_name' => ['required', 'string', 'max:255'],
+            'class_description' => ['nullable', 'string'],
+            'class_is_active' => ['boolean'],
+            'class_is_premium' => ['boolean'],
         ]);
 
-        $data = [
-            'academic_class_id' => $validated['subject_academic_class_id'],
-            'name' => $validated['subject_name'],
-            'subject_code' => $validated['subject_code'],
-            'slug' => $this->uniqueSlug(Subject::class, $validated['subject_name'], $this->editingSubjectId),
-            'description' => $validated['subject_description'],
-            'is_active' => $validated['subject_is_active'],
-            'is_premium' => $validated['subject_is_premium'],
+        $payload = [
+            'name' => $validated['class_name'],
+            'slug' => $this->uniqueSlug(AcademicClass::class, $validated['class_name'], $this->editingClassId),
+            'description' => $validated['class_description'],
+            'is_active' => $validated['class_is_active'],
+            'is_premium' => $validated['class_is_premium'],
         ];
 
-        if ($this->editingSubjectId !== null) {
-            Subject::query()->whereKey($this->editingSubjectId)->update($data);
-            session()->flash('status', 'Subject updated successfully.');
+        if ($this->editingClassId !== null) {
+            AcademicClass::query()->whereKey($this->editingClassId)->update($payload);
+            $message = 'Academic class updated successfully.';
         } else {
-            $data['uuid'] = (string) Str::uuid();
-            $data['order_sequence'] = (Subject::max('order_sequence') ?? 0) + 1;
-            Subject::create($data);
-            session()->flash('status', 'Subject created successfully.');
+            $payload['uuid'] = (string) Str::uuid();
+            $payload['order_sequence'] = (AcademicClass::query()->max('order_sequence') ?? 0) + 1;
+            AcademicClass::query()->create($payload);
+            $message = 'Academic class created successfully.';
         }
 
+        $this->dispatch('close-class-modal');
+        $this->dispatch('entity-saved', message: $message);
+        $this->resetClassForm();
+    }
+
+    public function deleteClass(int $id): void
+    {
+        AcademicClass::query()->findOrFail($id)->delete();
+        $this->dispatch('entity-deleted', message: 'Academic class deleted successfully.');
+    }
+
+    public function openSubjectModal(): void
+    {
         $this->resetSubjectForm();
+        $this->resetValidation();
+        $this->dispatch('open-subject-modal');
     }
 
     public function editSubject(int $id): void
@@ -158,50 +147,58 @@ class ClassIndex extends Component
         $this->subject_description = $subject->description;
         $this->subject_is_active = (bool) $subject->is_active;
         $this->subject_is_premium = (bool) $subject->is_premium;
+
+        $this->resetValidation();
+        $this->dispatch('open-subject-modal');
+    }
+
+    public function saveSubject(): void
+    {
+        $validated = $this->validate([
+            'subject_academic_class_id' => ['required', 'exists:academic_classes,id'],
+            'subject_name' => ['required', 'string', 'max:255'],
+            'subject_code' => ['nullable', 'string', 'max:50'],
+            'subject_description' => ['nullable', 'string'],
+            'subject_is_active' => ['boolean'],
+            'subject_is_premium' => ['boolean'],
+        ]);
+
+        $payload = [
+            'academic_class_id' => $validated['subject_academic_class_id'],
+            'name' => $validated['subject_name'],
+            'subject_code' => $validated['subject_code'],
+            'slug' => $this->uniqueSlug(Subject::class, $validated['subject_name'], $this->editingSubjectId),
+            'description' => $validated['subject_description'],
+            'is_active' => $validated['subject_is_active'],
+            'is_premium' => $validated['subject_is_premium'],
+        ];
+
+        if ($this->editingSubjectId !== null) {
+            Subject::query()->whereKey($this->editingSubjectId)->update($payload);
+            $message = 'Subject updated successfully.';
+        } else {
+            $payload['uuid'] = (string) Str::uuid();
+            $payload['order_sequence'] = (Subject::query()->max('order_sequence') ?? 0) + 1;
+            Subject::query()->create($payload);
+            $message = 'Subject created successfully.';
+        }
+
+        $this->dispatch('close-subject-modal');
+        $this->dispatch('entity-saved', message: $message);
+        $this->resetSubjectForm();
     }
 
     public function deleteSubject(int $id): void
     {
         Subject::query()->findOrFail($id)->delete();
-        session()->flash('status', 'Subject deleted successfully.');
-
-        if ($this->editingSubjectId === $id) {
-            $this->resetSubjectForm();
-        }
+        $this->dispatch('entity-deleted', message: 'Subject deleted successfully.');
     }
 
-    public function saveChapter(): void
+    public function openChapterModal(): void
     {
-        $validated = $this->validate([
-            'chapter_subject_id' => ['required', 'exists:subjects,id'],
-            'chapter_name' => ['required', 'string', 'max:255'],
-            'chapter_no' => ['nullable', 'string', 'max:50'],
-            'chapter_description' => ['nullable', 'string'],
-            'chapter_is_active' => ['boolean'],
-            'chapter_is_premium' => ['boolean'],
-        ]);
-
-        $data = [
-            'subject_id' => $validated['chapter_subject_id'],
-            'name' => $validated['chapter_name'],
-            'chapter_no' => $validated['chapter_no'],
-            'slug' => $this->uniqueSlug(Chapter::class, $validated['chapter_name'], $this->editingChapterId),
-            'description' => $validated['chapter_description'],
-            'is_active' => $validated['chapter_is_active'],
-            'is_premium' => $validated['chapter_is_premium'],
-        ];
-
-        if ($this->editingChapterId !== null) {
-            Chapter::query()->whereKey($this->editingChapterId)->update($data);
-            session()->flash('status', 'Chapter updated successfully.');
-        } else {
-            $data['uuid'] = (string) Str::uuid();
-            $data['order_sequence'] = (Chapter::max('order_sequence') ?? 0) + 1;
-            Chapter::create($data);
-            session()->flash('status', 'Chapter created successfully.');
-        }
-
         $this->resetChapterForm();
+        $this->resetValidation();
+        $this->dispatch('open-chapter-modal');
     }
 
     public function editChapter(int $id): void
@@ -215,48 +212,58 @@ class ClassIndex extends Component
         $this->chapter_description = $chapter->description;
         $this->chapter_is_active = (bool) $chapter->is_active;
         $this->chapter_is_premium = (bool) $chapter->is_premium;
+
+        $this->resetValidation();
+        $this->dispatch('open-chapter-modal');
+    }
+
+    public function saveChapter(): void
+    {
+        $validated = $this->validate([
+            'chapter_subject_id' => ['required', 'exists:subjects,id'],
+            'chapter_name' => ['required', 'string', 'max:255'],
+            'chapter_no' => ['nullable', 'string', 'max:50'],
+            'chapter_description' => ['nullable', 'string'],
+            'chapter_is_active' => ['boolean'],
+            'chapter_is_premium' => ['boolean'],
+        ]);
+
+        $payload = [
+            'subject_id' => $validated['chapter_subject_id'],
+            'name' => $validated['chapter_name'],
+            'chapter_no' => $validated['chapter_no'],
+            'slug' => $this->uniqueSlug(Chapter::class, $validated['chapter_name'], $this->editingChapterId),
+            'description' => $validated['chapter_description'],
+            'is_active' => $validated['chapter_is_active'],
+            'is_premium' => $validated['chapter_is_premium'],
+        ];
+
+        if ($this->editingChapterId !== null) {
+            Chapter::query()->whereKey($this->editingChapterId)->update($payload);
+            $message = 'Chapter updated successfully.';
+        } else {
+            $payload['uuid'] = (string) Str::uuid();
+            $payload['order_sequence'] = (Chapter::query()->max('order_sequence') ?? 0) + 1;
+            Chapter::query()->create($payload);
+            $message = 'Chapter created successfully.';
+        }
+
+        $this->dispatch('close-chapter-modal');
+        $this->dispatch('entity-saved', message: $message);
+        $this->resetChapterForm();
     }
 
     public function deleteChapter(int $id): void
     {
         Chapter::query()->findOrFail($id)->delete();
-        session()->flash('status', 'Chapter deleted successfully.');
-
-        if ($this->editingChapterId === $id) {
-            $this->resetChapterForm();
-        }
+        $this->dispatch('entity-deleted', message: 'Chapter deleted successfully.');
     }
 
-    public function saveTopic(): void
+    public function openTopicModal(): void
     {
-        $validated = $this->validate([
-            'topic_chapter_id' => ['required', 'exists:chapters,id'],
-            'topic_name' => ['required', 'string', 'max:255'],
-            'topic_description' => ['nullable', 'string'],
-            'topic_is_active' => ['boolean'],
-            'topic_is_premium' => ['boolean'],
-        ]);
-
-        $data = [
-            'chapter_id' => $validated['topic_chapter_id'],
-            'name' => $validated['topic_name'],
-            'slug' => $this->uniqueSlug(Topic::class, $validated['topic_name'], $this->editingTopicId),
-            'description' => $validated['topic_description'],
-            'is_active' => $validated['topic_is_active'],
-            'is_premium' => $validated['topic_is_premium'],
-        ];
-
-        if ($this->editingTopicId !== null) {
-            Topic::query()->whereKey($this->editingTopicId)->update($data);
-            session()->flash('status', 'Topic updated successfully.');
-        } else {
-            $data['uuid'] = (string) Str::uuid();
-            $data['order_sequence'] = (Topic::max('order_sequence') ?? 0) + 1;
-            Topic::create($data);
-            session()->flash('status', 'Topic created successfully.');
-        }
-
         $this->resetTopicForm();
+        $this->resetValidation();
+        $this->dispatch('open-topic-modal');
     }
 
     public function editTopic(int $id): void
@@ -269,25 +276,79 @@ class ClassIndex extends Component
         $this->topic_description = $topic->description;
         $this->topic_is_active = (bool) $topic->is_active;
         $this->topic_is_premium = (bool) $topic->is_premium;
+
+        $this->resetValidation();
+        $this->dispatch('open-topic-modal');
+    }
+
+    public function saveTopic(): void
+    {
+        $validated = $this->validate([
+            'topic_chapter_id' => ['required', 'exists:chapters,id'],
+            'topic_name' => ['required', 'string', 'max:255'],
+            'topic_description' => ['nullable', 'string'],
+            'topic_is_active' => ['boolean'],
+            'topic_is_premium' => ['boolean'],
+        ]);
+
+        $payload = [
+            'chapter_id' => $validated['topic_chapter_id'],
+            'name' => $validated['topic_name'],
+            'slug' => $this->uniqueSlug(Topic::class, $validated['topic_name'], $this->editingTopicId),
+            'description' => $validated['topic_description'],
+            'is_active' => $validated['topic_is_active'],
+            'is_premium' => $validated['topic_is_premium'],
+        ];
+
+        if ($this->editingTopicId !== null) {
+            Topic::query()->whereKey($this->editingTopicId)->update($payload);
+            $message = 'Topic updated successfully.';
+        } else {
+            $payload['uuid'] = (string) Str::uuid();
+            $payload['order_sequence'] = (Topic::query()->max('order_sequence') ?? 0) + 1;
+            Topic::query()->create($payload);
+            $message = 'Topic created successfully.';
+        }
+
+        $this->dispatch('close-topic-modal');
+        $this->dispatch('entity-saved', message: $message);
+        $this->resetTopicForm();
     }
 
     public function deleteTopic(int $id): void
     {
         Topic::query()->findOrFail($id)->delete();
-        session()->flash('status', 'Topic deleted successfully.');
-
-        if ($this->editingTopicId === $id) {
-            $this->resetTopicForm();
-        }
+        $this->dispatch('entity-deleted', message: 'Topic deleted successfully.');
     }
 
     public function render(): View
     {
         return view('livewire.academic-classes.class-index', [
-            'academicClasses' => AcademicClass::query()->latest()->get(),
-            'subjects' => Subject::query()->with('academicClass')->latest()->get(),
-            'chapters' => Chapter::query()->with('subject')->latest()->get(),
-            'topics' => Topic::query()->with('chapter.subject.academicClass')->latest()->get(),
+            'academicClasses' => AcademicClass::query()
+                ->when($this->classSearch, fn ($query) => $query->where('name', 'like', '%'.$this->classSearch.'%'))
+                ->latest()
+                ->get(),
+            'subjects' => Subject::query()
+                ->with('academicClass')
+                ->when($this->subjectSearch, function ($query): void {
+                    $query->where('name', 'like', '%'.$this->subjectSearch.'%')
+                        ->orWhere('subject_code', 'like', '%'.$this->subjectSearch.'%');
+                })
+                ->latest()
+                ->get(),
+            'chapters' => Chapter::query()
+                ->with('subject')
+                ->when($this->chapterSearch, fn ($query) => $query->where('name', 'like', '%'.$this->chapterSearch.'%'))
+                ->latest()
+                ->get(),
+            'topics' => Topic::query()
+                ->with('chapter.subject')
+                ->when($this->topicSearch, fn ($query) => $query->where('name', 'like', '%'.$this->topicSearch.'%'))
+                ->latest()
+                ->get(),
+            'allClasses' => AcademicClass::query()->orderBy('name')->get(),
+            'allSubjects' => Subject::query()->orderBy('name')->get(),
+            'allChapters' => Chapter::query()->orderBy('name')->get(),
         ])->layout('layouts.app', ['title' => 'Academic Content CRUD']);
     }
 
@@ -334,8 +395,8 @@ class ClassIndex extends Component
 
     private function uniqueSlug(string $modelClass, string $name, ?int $ignoreId = null): string
     {
-        $slug = Str::slug($name);
-        $baseSlug = $slug;
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
         $counter = 1;
 
         while ($modelClass::query()

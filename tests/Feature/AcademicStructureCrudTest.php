@@ -12,7 +12,7 @@ test('academic structure can be created from a single livewire page', function (
     Livewire::test(ClassIndex::class)
         ->set('class_name', 'HSC')
         ->set('class_description', 'Higher Secondary')
-        ->call('saveAcademicClass')
+        ->call('saveClass')
         ->assertHasNoErrors();
 
     $academicClass = AcademicClass::query()->first();
@@ -99,7 +99,7 @@ test('academic structure records can be deleted from the page', function () {
     Livewire::test(ClassIndex::class)->call('deleteTopic', $topic->id);
     Livewire::test(ClassIndex::class)->call('deleteChapter', $chapter->id);
     Livewire::test(ClassIndex::class)->call('deleteSubject', $subject->id);
-    Livewire::test(ClassIndex::class)->call('deleteAcademicClass', $academicClass->id);
+    Livewire::test(ClassIndex::class)->call('deleteClass', $academicClass->id);
 
     expect(Topic::withTrashed()->find($topic->id)?->deleted_at)->not->toBeNull();
     expect(Chapter::withTrashed()->find($chapter->id)?->deleted_at)->not->toBeNull();
