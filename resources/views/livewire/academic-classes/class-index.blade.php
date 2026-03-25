@@ -108,8 +108,8 @@
 
     @if($showClassModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeClassModal"></div>
-            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-[fadeIn_.18s_ease-out]" wire:click="closeClassModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl animate-[modalZoomIn_.22s_ease-out] dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</h3></div>
                 <form wire:submit="saveClass" class="space-y-3 px-6 py-6">
                     <input wire:model="class_name" type="text" placeholder="Class name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
@@ -124,8 +124,8 @@
 
     @if($showSubjectModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeSubjectModal"></div>
-            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-[fadeIn_.18s_ease-out]" wire:click="closeSubjectModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl animate-[modalZoomIn_.22s_ease-out] dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingSubjectId ? 'Edit Subject' : 'Create New Subject' }}</h3></div>
                 <form wire:submit="saveSubject" class="space-y-3 px-6 py-6">
                     <select wire:model="subject_academic_class_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select class</option>@foreach($allClasses as $academicClass)<option value="{{ $academicClass->id }}">{{ $academicClass->name }}</option>@endforeach</select>
@@ -143,8 +143,8 @@
 
     @if($showChapterModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeChapterModal"></div>
-            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-[fadeIn_.18s_ease-out]" wire:click="closeChapterModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl animate-[modalZoomIn_.22s_ease-out] dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingChapterId ? 'Edit Chapter' : 'Create New Chapter' }}</h3></div>
                 <form wire:submit="saveChapter" class="space-y-3 px-6 py-6">
                     <select wire:model="chapter_subject_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select subject</option>@foreach($allSubjects as $subject)<option value="{{ $subject->id }}">{{ $subject->name }}</option>@endforeach</select>
@@ -162,8 +162,8 @@
 
     @if($showTopicModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeTopicModal"></div>
-            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-[fadeIn_.18s_ease-out]" wire:click="closeTopicModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl animate-[modalZoomIn_.22s_ease-out] dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingTopicId ? 'Edit Topic' : 'Create New Topic' }}</h3></div>
                 <form wire:submit="saveTopic" class="space-y-3 px-6 py-6">
                     <select wire:model="topic_chapter_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select chapter</option>@foreach($allChapters as $chapter)<option value="{{ $chapter->id }}">{{ $chapter->name }}</option>@endforeach</select>
@@ -193,4 +193,19 @@
         }
     });
 </script>
+@endpush
+
+
+@push('styles')
+<style>
+@keyframes modalZoomIn {
+    0% { transform: scale(.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+</style>
 @endpush
