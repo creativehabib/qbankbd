@@ -107,7 +107,7 @@
     </div>
 
     {{-- Class Modal --}}
-    <div x-data="{ open: false }" x-show="open" x-on:open-class-modal.window="open = true" x-on:close-class-modal.window="open = false" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+    <div x-data="{ open: @entangle('showClassModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
             <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
             <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
@@ -133,7 +133,7 @@
     </div>
 
     {{-- Subject Modal --}}
-    <div x-data="{ open: false }" x-show="open" x-on:open-subject-modal.window="open = true" x-on:close-subject-modal.window="open = false" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+    <div x-data="{ open: @entangle('showSubjectModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
             <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
             <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
@@ -167,7 +167,7 @@
     </div>
 
     {{-- Chapter Modal --}}
-    <div x-data="{ open: false }" x-show="open" x-on:open-chapter-modal.window="open = true" x-on:close-chapter-modal.window="open = false" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+    <div x-data="{ open: @entangle('showChapterModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
             <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
             <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
@@ -201,7 +201,7 @@
     </div>
 
     {{-- Topic Modal --}}
-    <div x-data="{ open: false }" x-show="open" x-on:open-topic-modal.window="open = true" x-on:close-topic-modal.window="open = false" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+    <div x-data="{ open: @entangle('showTopicModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
             <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
             <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>

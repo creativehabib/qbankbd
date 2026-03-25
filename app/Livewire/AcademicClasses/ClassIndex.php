@@ -20,6 +20,14 @@ class ClassIndex extends Component
 
     public string $topicSearch = '';
 
+    public bool $showClassModal = false;
+
+    public bool $showSubjectModal = false;
+
+    public bool $showChapterModal = false;
+
+    public bool $showTopicModal = false;
+
     public ?int $editingClassId = null;
 
     public string $class_name = '';
@@ -74,7 +82,7 @@ class ClassIndex extends Component
     {
         $this->resetClassForm();
         $this->resetValidation();
-        $this->dispatch('open-class-modal');
+        $this->showClassModal = true;
     }
 
     public function editClass(int $id): void
@@ -88,7 +96,7 @@ class ClassIndex extends Component
         $this->class_is_premium = (bool) $academicClass->is_premium;
 
         $this->resetValidation();
-        $this->dispatch('open-class-modal');
+        $this->showClassModal = true;
     }
 
     public function saveClass(): void
@@ -118,7 +126,7 @@ class ClassIndex extends Component
             $message = 'Academic class created successfully.';
         }
 
-        $this->dispatch('close-class-modal');
+        $this->showClassModal = false;
         $this->dispatch('entity-saved', message: $message);
         $this->resetClassForm();
     }
@@ -133,7 +141,7 @@ class ClassIndex extends Component
     {
         $this->resetSubjectForm();
         $this->resetValidation();
-        $this->dispatch('open-subject-modal');
+        $this->showSubjectModal = true;
     }
 
     public function editSubject(int $id): void
@@ -149,7 +157,7 @@ class ClassIndex extends Component
         $this->subject_is_premium = (bool) $subject->is_premium;
 
         $this->resetValidation();
-        $this->dispatch('open-subject-modal');
+        $this->showSubjectModal = true;
     }
 
     public function saveSubject(): void
@@ -183,7 +191,7 @@ class ClassIndex extends Component
             $message = 'Subject created successfully.';
         }
 
-        $this->dispatch('close-subject-modal');
+        $this->showSubjectModal = false;
         $this->dispatch('entity-saved', message: $message);
         $this->resetSubjectForm();
     }
@@ -198,7 +206,7 @@ class ClassIndex extends Component
     {
         $this->resetChapterForm();
         $this->resetValidation();
-        $this->dispatch('open-chapter-modal');
+        $this->showChapterModal = true;
     }
 
     public function editChapter(int $id): void
@@ -214,7 +222,7 @@ class ClassIndex extends Component
         $this->chapter_is_premium = (bool) $chapter->is_premium;
 
         $this->resetValidation();
-        $this->dispatch('open-chapter-modal');
+        $this->showChapterModal = true;
     }
 
     public function saveChapter(): void
@@ -248,7 +256,7 @@ class ClassIndex extends Component
             $message = 'Chapter created successfully.';
         }
 
-        $this->dispatch('close-chapter-modal');
+        $this->showChapterModal = false;
         $this->dispatch('entity-saved', message: $message);
         $this->resetChapterForm();
     }
@@ -263,7 +271,7 @@ class ClassIndex extends Component
     {
         $this->resetTopicForm();
         $this->resetValidation();
-        $this->dispatch('open-topic-modal');
+        $this->showTopicModal = true;
     }
 
     public function editTopic(int $id): void
@@ -278,7 +286,7 @@ class ClassIndex extends Component
         $this->topic_is_premium = (bool) $topic->is_premium;
 
         $this->resetValidation();
-        $this->dispatch('open-topic-modal');
+        $this->showTopicModal = true;
     }
 
     public function saveTopic(): void
@@ -310,7 +318,7 @@ class ClassIndex extends Component
             $message = 'Topic created successfully.';
         }
 
-        $this->dispatch('close-topic-modal');
+        $this->showTopicModal = false;
         $this->dispatch('entity-saved', message: $message);
         $this->resetTopicForm();
     }
@@ -359,6 +367,7 @@ class ClassIndex extends Component
         $this->class_description = null;
         $this->class_is_active = true;
         $this->class_is_premium = false;
+        $this->showClassModal = false;
     }
 
     private function resetSubjectForm(): void
@@ -370,6 +379,7 @@ class ClassIndex extends Component
         $this->subject_description = null;
         $this->subject_is_active = true;
         $this->subject_is_premium = false;
+        $this->showSubjectModal = false;
     }
 
     private function resetChapterForm(): void
@@ -381,6 +391,7 @@ class ClassIndex extends Component
         $this->chapter_description = null;
         $this->chapter_is_active = true;
         $this->chapter_is_premium = false;
+        $this->showChapterModal = false;
     }
 
     private function resetTopicForm(): void
@@ -391,6 +402,7 @@ class ClassIndex extends Component
         $this->topic_description = null;
         $this->topic_is_active = true;
         $this->topic_is_premium = false;
+        $this->showTopicModal = false;
     }
 
     private function uniqueSlug(string $modelClass, string $name, ?int $ignoreId = null): string
