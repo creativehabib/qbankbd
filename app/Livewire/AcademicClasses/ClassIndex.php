@@ -85,6 +85,11 @@ class ClassIndex extends Component
         $this->showClassModal = true;
     }
 
+    public function closeClassModal(): void
+    {
+        $this->showClassModal = false;
+    }
+
     public function editClass(int $id): void
     {
         $academicClass = AcademicClass::query()->findOrFail($id);
@@ -142,6 +147,11 @@ class ClassIndex extends Component
         $this->resetSubjectForm();
         $this->resetValidation();
         $this->showSubjectModal = true;
+    }
+
+    public function closeSubjectModal(): void
+    {
+        $this->showSubjectModal = false;
     }
 
     public function editSubject(int $id): void
@@ -209,6 +219,11 @@ class ClassIndex extends Component
         $this->showChapterModal = true;
     }
 
+    public function closeChapterModal(): void
+    {
+        $this->showChapterModal = false;
+    }
+
     public function editChapter(int $id): void
     {
         $chapter = Chapter::query()->findOrFail($id);
@@ -272,6 +287,11 @@ class ClassIndex extends Component
         $this->resetTopicForm();
         $this->resetValidation();
         $this->showTopicModal = true;
+    }
+
+    public function closeTopicModal(): void
+    {
+        $this->showTopicModal = false;
     }
 
     public function editTopic(int $id): void

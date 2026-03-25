@@ -106,132 +106,77 @@
         </section>
     </div>
 
-    {{-- Class Modal --}}
-    <div x-data="{ open: @entangle('showClassModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-            <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
-            <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-            <div x-show="open" x-transition class="inline-block w-full transform overflow-hidden rounded-xl border border-gray-200 bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:max-w-xl sm:align-middle dark:border-gray-700 dark:bg-gray-800">
-                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</h3>
-                </div>
+    @if($showClassModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeClassModal"></div>
+            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</h3></div>
                 <form wire:submit="saveClass" class="space-y-3 px-6 py-6">
                     <input wire:model="class_name" type="text" placeholder="Class name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     @error('class_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <textarea wire:model="class_description" placeholder="Description" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"></textarea>
-                    <div class="flex gap-4 text-sm">
-                        <label><input type="checkbox" wire:model="class_is_active"> Active</label>
-                        <label><input type="checkbox" wire:model="class_is_premium"> Premium</label>
-                    </div>
-                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700">
-                        <button type="button" @click="open = false" class="rounded border px-3 py-2">Cancel</button>
-                        <button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button>
-                    </div>
+                    <div class="flex gap-4 text-sm"><label><input type="checkbox" wire:model="class_is_active"> Active</label><label><input type="checkbox" wire:model="class_is_premium"> Premium</label></div>
+                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700"><button type="button" wire:click="closeClassModal" class="rounded border px-3 py-2">Cancel</button><button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button></div>
                 </form>
             </div>
         </div>
-    </div>
+    @endif
 
-    {{-- Subject Modal --}}
-    <div x-data="{ open: @entangle('showSubjectModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-            <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
-            <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-            <div x-show="open" x-transition class="inline-block w-full transform overflow-hidden rounded-xl border border-gray-200 bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:max-w-xl sm:align-middle dark:border-gray-700 dark:bg-gray-800">
-                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $editingSubjectId ? 'Edit Subject' : 'Create New Subject' }}</h3>
-                </div>
+    @if($showSubjectModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeSubjectModal"></div>
+            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingSubjectId ? 'Edit Subject' : 'Create New Subject' }}</h3></div>
                 <form wire:submit="saveSubject" class="space-y-3 px-6 py-6">
-                    <select wire:model="subject_academic_class_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700">
-                        <option value="">Select class</option>
-                        @foreach($allClasses as $academicClass)
-                            <option value="{{ $academicClass->id }}">{{ $academicClass->name }}</option>
-                        @endforeach
-                    </select>
+                    <select wire:model="subject_academic_class_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select class</option>@foreach($allClasses as $academicClass)<option value="{{ $academicClass->id }}">{{ $academicClass->name }}</option>@endforeach</select>
                     @error('subject_academic_class_id') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <input wire:model="subject_name" type="text" placeholder="Subject name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     @error('subject_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <input wire:model="subject_code" type="text" placeholder="Subject code" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     <textarea wire:model="subject_description" placeholder="Description" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"></textarea>
-                    <div class="flex gap-4 text-sm">
-                        <label><input type="checkbox" wire:model="subject_is_active"> Active</label>
-                        <label><input type="checkbox" wire:model="subject_is_premium"> Premium</label>
-                    </div>
-                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700">
-                        <button type="button" @click="open = false" class="rounded border px-3 py-2">Cancel</button>
-                        <button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button>
-                    </div>
+                    <div class="flex gap-4 text-sm"><label><input type="checkbox" wire:model="subject_is_active"> Active</label><label><input type="checkbox" wire:model="subject_is_premium"> Premium</label></div>
+                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700"><button type="button" wire:click="closeSubjectModal" class="rounded border px-3 py-2">Cancel</button><button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button></div>
                 </form>
             </div>
         </div>
-    </div>
+    @endif
 
-    {{-- Chapter Modal --}}
-    <div x-data="{ open: @entangle('showChapterModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-            <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
-            <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-            <div x-show="open" x-transition class="inline-block w-full transform overflow-hidden rounded-xl border border-gray-200 bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:max-w-xl sm:align-middle dark:border-gray-700 dark:bg-gray-800">
-                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $editingChapterId ? 'Edit Chapter' : 'Create New Chapter' }}</h3>
-                </div>
+    @if($showChapterModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeChapterModal"></div>
+            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingChapterId ? 'Edit Chapter' : 'Create New Chapter' }}</h3></div>
                 <form wire:submit="saveChapter" class="space-y-3 px-6 py-6">
-                    <select wire:model="chapter_subject_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700">
-                        <option value="">Select subject</option>
-                        @foreach($allSubjects as $subject)
-                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                        @endforeach
-                    </select>
+                    <select wire:model="chapter_subject_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select subject</option>@foreach($allSubjects as $subject)<option value="{{ $subject->id }}">{{ $subject->name }}</option>@endforeach</select>
                     @error('chapter_subject_id') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <input wire:model="chapter_name" type="text" placeholder="Chapter name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     @error('chapter_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <input wire:model="chapter_no" type="text" placeholder="Chapter no" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     <textarea wire:model="chapter_description" placeholder="Description" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"></textarea>
-                    <div class="flex gap-4 text-sm">
-                        <label><input type="checkbox" wire:model="chapter_is_active"> Active</label>
-                        <label><input type="checkbox" wire:model="chapter_is_premium"> Premium</label>
-                    </div>
-                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700">
-                        <button type="button" @click="open = false" class="rounded border px-3 py-2">Cancel</button>
-                        <button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button>
-                    </div>
+                    <div class="flex gap-4 text-sm"><label><input type="checkbox" wire:model="chapter_is_active"> Active</label><label><input type="checkbox" wire:model="chapter_is_premium"> Premium</label></div>
+                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700"><button type="button" wire:click="closeChapterModal" class="rounded border px-3 py-2">Cancel</button><button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button></div>
                 </form>
             </div>
         </div>
-    </div>
+    @endif
 
-    {{-- Topic Modal --}}
-    <div x-data="{ open: @entangle('showTopicModal').live }" x-show="open" x-cloak style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-            <div x-show="open" @click="open = false" x-transition class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
-            <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-            <div x-show="open" x-transition class="inline-block w-full transform overflow-hidden rounded-xl border border-gray-200 bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:max-w-xl sm:align-middle dark:border-gray-700 dark:bg-gray-800">
-                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $editingTopicId ? 'Edit Topic' : 'Create New Topic' }}</h3>
-                </div>
+    @if($showTopicModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeTopicModal"></div>
+            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+                <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingTopicId ? 'Edit Topic' : 'Create New Topic' }}</h3></div>
                 <form wire:submit="saveTopic" class="space-y-3 px-6 py-6">
-                    <select wire:model="topic_chapter_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700">
-                        <option value="">Select chapter</option>
-                        @foreach($allChapters as $chapter)
-                            <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
-                        @endforeach
-                    </select>
+                    <select wire:model="topic_chapter_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select chapter</option>@foreach($allChapters as $chapter)<option value="{{ $chapter->id }}">{{ $chapter->name }}</option>@endforeach</select>
                     @error('topic_chapter_id') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <input wire:model="topic_name" type="text" placeholder="Topic name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                     @error('topic_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     <textarea wire:model="topic_description" placeholder="Description" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"></textarea>
-                    <div class="flex gap-4 text-sm">
-                        <label><input type="checkbox" wire:model="topic_is_active"> Active</label>
-                        <label><input type="checkbox" wire:model="topic_is_premium"> Premium</label>
-                    </div>
-                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700">
-                        <button type="button" @click="open = false" class="rounded border px-3 py-2">Cancel</button>
-                        <button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button>
-                    </div>
+                    <div class="flex gap-4 text-sm"><label><input type="checkbox" wire:model="topic_is_active"> Active</label><label><input type="checkbox" wire:model="topic_is_premium"> Premium</label></div>
+                    <div class="flex justify-end gap-2 border-t pt-4 dark:border-gray-700"><button type="button" wire:click="closeTopicModal" class="rounded border px-3 py-2">Cancel</button><button type="submit" class="rounded bg-indigo-600 px-3 py-2 text-white">Save</button></div>
                 </form>
             </div>
         </div>
-    </div>
+    @endif
 </div>
 
 @push('scripts')
