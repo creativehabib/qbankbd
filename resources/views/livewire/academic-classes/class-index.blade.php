@@ -1,7 +1,7 @@
 <div class="space-y-6">
     <div>
         <flux:heading size="xl">Academic Structure</flux:heading>
-        <flux:subheading>প্রতিটি CRUD form modal design সহ show হবে।</flux:subheading>
+        <flux:subheading>Zoom in/out হলেও modal stable থাকবে।</flux:subheading>
         <flux:separator class="my-6" />
     </div>
 
@@ -15,17 +15,17 @@
             <table class="w-full text-sm">
                 <thead><tr class="border-b"><th class="py-2 text-left">Name</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
-                    @forelse($academicClasses as $academicClass)
-                        <tr class="border-b border-gray-100 dark:border-gray-700">
-                            <td class="py-2">{{ $academicClass->name }}</td>
-                            <td class="space-x-2 py-2 text-right">
-                                <button wire:click="editClass({{ $academicClass->id }})" class="text-indigo-600">Edit</button>
-                                <button wire:click="deleteClass({{ $academicClass->id }})" class="text-red-600">Delete</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="2" class="py-2 text-center text-gray-500">No class found.</td></tr>
-                    @endforelse
+                @forelse($academicClasses as $academicClass)
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2">{{ $academicClass->name }}</td>
+                        <td class="space-x-2 py-2 text-right">
+                            <button wire:click="editClass({{ $academicClass->id }})" class="text-indigo-600">Edit</button>
+                            <button wire:click="deleteClass({{ $academicClass->id }})" class="text-red-600">Delete</button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="2" class="py-2 text-center text-gray-500">No class found.</td></tr>
+                @endforelse
                 </tbody>
             </table>
         </section>
@@ -39,18 +39,18 @@
             <table class="w-full text-sm">
                 <thead><tr class="border-b"><th class="py-2 text-left">Subject</th><th class="text-left">Class</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
-                    @forelse($subjects as $subject)
-                        <tr class="border-b border-gray-100 dark:border-gray-700">
-                            <td class="py-2">{{ $subject->name }} ({{ $subject->subject_code ?? '-' }})</td>
-                            <td>{{ $subject->academicClass?->name }}</td>
-                            <td class="space-x-2 py-2 text-right">
-                                <button wire:click="editSubject({{ $subject->id }})" class="text-indigo-600">Edit</button>
-                                <button wire:click="deleteSubject({{ $subject->id }})" class="text-red-600">Delete</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="3" class="py-2 text-center text-gray-500">No subject found.</td></tr>
-                    @endforelse
+                @forelse($subjects as $subject)
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2">{{ $subject->name }} ({{ $subject->subject_code ?? '-' }})</td>
+                        <td>{{ $subject->academicClass?->name }}</td>
+                        <td class="space-x-2 py-2 text-right">
+                            <button wire:click="editSubject({{ $subject->id }})" class="text-indigo-600">Edit</button>
+                            <button wire:click="deleteSubject({{ $subject->id }})" class="text-red-600">Delete</button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="py-2 text-center text-gray-500">No subject found.</td></tr>
+                @endforelse
                 </tbody>
             </table>
         </section>
@@ -64,18 +64,18 @@
             <table class="w-full text-sm">
                 <thead><tr class="border-b"><th class="py-2 text-left">Chapter</th><th class="text-left">Subject</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
-                    @forelse($chapters as $chapter)
-                        <tr class="border-b border-gray-100 dark:border-gray-700">
-                            <td class="py-2">{{ $chapter->name }}</td>
-                            <td>{{ $chapter->subject?->name }}</td>
-                            <td class="space-x-2 py-2 text-right">
-                                <button wire:click="editChapter({{ $chapter->id }})" class="text-indigo-600">Edit</button>
-                                <button wire:click="deleteChapter({{ $chapter->id }})" class="text-red-600">Delete</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="3" class="py-2 text-center text-gray-500">No chapter found.</td></tr>
-                    @endforelse
+                @forelse($chapters as $chapter)
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2">{{ $chapter->name }}</td>
+                        <td>{{ $chapter->subject?->name }}</td>
+                        <td class="space-x-2 py-2 text-right">
+                            <button wire:click="editChapter({{ $chapter->id }})" class="text-indigo-600">Edit</button>
+                            <button wire:click="deleteChapter({{ $chapter->id }})" class="text-red-600">Delete</button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="py-2 text-center text-gray-500">No chapter found.</td></tr>
+                @endforelse
                 </tbody>
             </table>
         </section>
@@ -89,27 +89,27 @@
             <table class="w-full text-sm">
                 <thead><tr class="border-b"><th class="py-2 text-left">Topic</th><th class="text-left">Chapter</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
-                    @forelse($topics as $topic)
-                        <tr class="border-b border-gray-100 dark:border-gray-700">
-                            <td class="py-2">{{ $topic->name }}</td>
-                            <td>{{ $topic->chapter?->name }}</td>
-                            <td class="space-x-2 py-2 text-right">
-                                <button wire:click="editTopic({{ $topic->id }})" class="text-indigo-600">Edit</button>
-                                <button wire:click="deleteTopic({{ $topic->id }})" class="text-red-600">Delete</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="3" class="py-2 text-center text-gray-500">No topic found.</td></tr>
-                    @endforelse
+                @forelse($topics as $topic)
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2">{{ $topic->name }}</td>
+                        <td>{{ $topic->chapter?->name }}</td>
+                        <td class="space-x-2 py-2 text-right">
+                            <button wire:click="editTopic({{ $topic->id }})" class="text-indigo-600">Edit</button>
+                            <button wire:click="deleteTopic({{ $topic->id }})" class="text-red-600">Delete</button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="py-2 text-center text-gray-500">No topic found.</td></tr>
+                @endforelse
                 </tbody>
             </table>
         </section>
     </div>
 
     @if($showClassModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeClassModal"></div>
-            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeClassModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</h3></div>
                 <form wire:submit="saveClass" class="space-y-3 px-6 py-6">
                     <input wire:model="class_name" type="text" placeholder="Class name" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
@@ -123,9 +123,9 @@
     @endif
 
     @if($showSubjectModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeSubjectModal"></div>
-            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeSubjectModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingSubjectId ? 'Edit Subject' : 'Create New Subject' }}</h3></div>
                 <form wire:submit="saveSubject" class="space-y-3 px-6 py-6">
                     <select wire:model="subject_academic_class_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select class</option>@foreach($allClasses as $academicClass)<option value="{{ $academicClass->id }}">{{ $academicClass->name }}</option>@endforeach</select>
@@ -142,9 +142,9 @@
     @endif
 
     @if($showChapterModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeChapterModal"></div>
-            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeChapterModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingChapterId ? 'Edit Chapter' : 'Create New Chapter' }}</h3></div>
                 <form wire:submit="saveChapter" class="space-y-3 px-6 py-6">
                     <select wire:model="chapter_subject_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select subject</option>@foreach($allSubjects as $subject)<option value="{{ $subject->id }}">{{ $subject->name }}</option>@endforeach</select>
@@ -161,9 +161,9 @@
     @endif
 
     @if($showTopicModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeTopicModal"></div>
-            <div class="relative mx-auto mt-20 w-full max-w-xl rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeTopicModal"></div>
+            <div class="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800">
                 <div class="border-b bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-700/50"><h3 class="text-lg font-bold">{{ $editingTopicId ? 'Edit Topic' : 'Create New Topic' }}</h3></div>
                 <form wire:submit="saveTopic" class="space-y-3 px-6 py-6">
                     <select wire:model="topic_chapter_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700"><option value="">Select chapter</option>@foreach($allChapters as $chapter)<option value="{{ $chapter->id }}">{{ $chapter->name }}</option>@endforeach</select>
