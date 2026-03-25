@@ -26,13 +26,6 @@ return new class extends Migration
             $table->softDeletes(); // ট্র্যাশ বা রিসাইকেল বিন সুবিধার জন্য
             $table->timestamps();
         });
-
-        // ২. পিভট টেবিল (যেটি প্রশ্ন এবং ক্যাটাগরিকে যুক্ত করবে)
-        Schema::create('academic_class_question', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('question_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('academic_class_id')->constrained()->cascadeOnDelete();
-        });
     }
 
     /**
