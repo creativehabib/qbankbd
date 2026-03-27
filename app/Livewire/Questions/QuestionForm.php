@@ -1,0 +1,151 @@
+<?php
+
+namespace App\Livewire\Admin\Questions;
+
+use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\{Subject, Chapter, Topic, Question, Tag};
+
+class QuestionForm extends Component
+{
+    use AuthorizesRequests;
+
+    public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে
+    public $subject_id, $chapter_id, $topic_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
+    public $options = [];
+
+    public function mount($id = null)
+    {
+        $this->subject_id = '';
+        $this->chapter_id = '';
+        $this->topic_id = '';
+
+        if ($id) {
+            $this->questionId = $id;
+            $q = Question::with('options', 'tags')->findOrFail($id);
+
+            $this->authorize('update', $q);
+
+            $this->subject_id = $q->subject_id;
+            $this->chapter_id = $q->chapter_id;
+            $this->topic_id = $q->topic_id;
+            $this->title = $q->title;
+            $this->difficulty = $q->difficulty;
+            $this->question_type = $q->question_type ?? 'mcq';
+            $this->marks = $q->marks ?? 1;
+            $this->tagIds = $q->tags()->pluck('tags.id')->toArray();
+            $this->options = $q->options->toArray();
+        } else {
+            $this->authorize('create', Question::class);
+            $this->options = [
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+            ];
+        }
+    }
+
+    public function updatedQuestionType($value)
+    {
+        if ($value === 'mcq' && empty($this->options)) {
+            $this->options = [
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+            ];
+        }
+
+        if ($value !== 'mcq') {
+            $this->options = [];
+        }
+    }
+
+    public function updatedSubjectId()
+    {
+        $this->chapter_id = '';
+        $this->topic_id = '';
+    }
+
+    public function updatedChapterId()
+    {
+        $this->topic_id = '';
+    }
+
+    public function save()
+    {
+        $rules = [
+            'subject_id' => 'required|exists:subjects,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
+            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
+            'title' => 'required|string',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'question_type' => 'required|in:mcq,cq,short',
+            'marks' => 'required|numeric|min:0',
+            'tagIds' => 'nullable|array',
+        ];
+
+        if ($this->question_type === 'mcq') {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*.option_text'] = 'required|string';
+        }
+
+        $data = $this->validate($rules);
+        $tagIds = collect($this->tagIds)->map(function ($tag) {
+            if (is_numeric($tag)) {
+                return (int) $tag;
+            }
+            return Tag::firstOrCreate(['name' => $tag])->id;
+        })->toArray();
+
+        if ($this->questionId) {
+            $q = Question::findOrFail($this->questionId);
+            $this->authorize('update', $q);
+            $q->update([
+                'subject_id' => $this->subject_id,
+                'chapter_id' => $this->chapter_id ?: null,
+                'topic_id' => $this->topic_id ?: null,
+                'title' => $this->title,
+                'difficulty' => $this->difficulty,
+                'question_type' => $this->question_type,
+                'marks' => $this->marks,
+            ]);
+            $q->tags()->sync($tagIds);
+            $q->options()->delete();
+            if ($this->question_type === 'mcq') {
+                $q->options()->createMany($this->options);
+            }
+        } else {
+            $this->authorize('create', Question::class);
+            $q = Question::create([
+                'subject_id' => $this->subject_id,
+                'chapter_id' => $this->chapter_id ?: null,
+                'topic_id' => $this->topic_id ?: null,
+                'title' => $this->title,
+                'difficulty' => $this->difficulty,
+                'question_type' => $this->question_type,
+                'marks' => $this->marks,
+                'user_id' => auth()->id(),
+            ]);
+            $q->tags()->sync($tagIds);
+            if ($this->question_type === 'mcq') {
+                $q->options()->createMany($this->options);
+            }
+        }
+
+        session()->flash('success', 'Question saved successfully.');
+        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        return redirect()->route($route);
+    }
+
+    public function render()
+    {
+        return view('livewire.admin.questions.question-form', [
+            'subjects' => Subject::all(),
+            'chapters' => $this->subject_id ? Chapter::where('subject_id', $this->subject_id)->get() : collect(),
+            'topics' => $this->chapter_id ? Topic::where('chapter_id', $this->chapter_id)->get() : collect(),
+            'allTags' => Tag::all(),
+        ]);
+    }
+}

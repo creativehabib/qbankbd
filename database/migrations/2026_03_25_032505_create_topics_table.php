@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignId('chapter_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
             $table->string('slug')->unique();

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
-            $table->string('chapter_no')->nullable(); // যেমন: 'অধ্যায়-১' বা 'Chapter-01'
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('image')->nullable();

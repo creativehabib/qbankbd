@@ -2,6 +2,7 @@
 
 use App\Livewire\AcademicClasses\ClassIndex;
 use App\Livewire\Chapters\ChapterIndex;
+use App\Livewire\ExamCategories\ExamCategoriesIndex;
 use App\Livewire\Questions\QuestionIndex;
 use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Topics\TopicIndex;
@@ -15,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
 
     Route::get('/questions', QuestionIndex::class)->name('questions.index');
+    Route::get('/exam-categories', ExamCategoriesIndex::class)->name('exam-categories.index');
     Route::get('/academic-classes', ClassIndex::class)->name('academic-classes.index');
     Route::get('/subjects', SubjectIndex::class)->name('subjects.index');
     Route::get('/chapters', ChapterIndex::class)->name('chapters.index');

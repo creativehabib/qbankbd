@@ -29,6 +29,11 @@ class Topic extends Model
         return $this->belongsTo(Chapter::class);
     }
 
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
     public function questions()
     {
         return $this->hasMany(Question::class);

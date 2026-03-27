@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Chapter extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $guarded = [];
 
@@ -29,6 +29,10 @@ class Chapter extends Model
         return $this->belongsTo(Subject::class);
     }
 
+    public function chapters()
+    {
+        return $this->hasMany(Chapter::class);
+    }
     // রিলেশনশিপ: একটি চ্যাপ্টারের অধীনে অনেক টপিক থাকে
     public function topics()
     {

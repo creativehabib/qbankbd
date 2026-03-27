@@ -2,28 +2,36 @@
 
 namespace App\Livewire\Subjects;
 
-use App\Models\Subject;
 use App\Models\AcademicClass;
+use App\Models\Subject;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class SubjectIndex extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     public $search = '';
 
     // Form Properties
     public $editId = null;
+
     public $academic_class_id = '';
+
     public $name = '';
+
     public $subject_code = '';
+
     public $description = '';
+
     public $is_active = true;
+
     public $is_premium = false;
+
     public $newImage;
+
     public $oldImage;
 
     protected $listeners = ['deleteSubjectConfirmed' => 'delete'];
@@ -38,7 +46,7 @@ class SubjectIndex extends Component
         // ১. আগে ডেটা রিসেট হবে
         $this->reset([
             'editId', 'academic_class_id', 'name', 'subject_code',
-            'description', 'newImage', 'oldImage'
+            'description', 'newImage', 'oldImage',
         ]);
         $this->is_active = true;
         $this->is_premium = false;
@@ -81,7 +89,7 @@ class SubjectIndex extends Component
         $slug = Str::slug($this->name);
         $slugExists = Subject::where('slug', $slug)->where('id', '!=', $this->editId)->exists();
         if ($slugExists) {
-            $slug .= '-' . time();
+            $slug .= '-'.time();
         }
 
         $data = [

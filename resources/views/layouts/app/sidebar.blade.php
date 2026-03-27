@@ -19,11 +19,15 @@
             :heading="__('প্রশ্ন ভান্ডার')"
             icon="rectangle-stack"
             expandable
-            :expanded="request()->routeIs(['questions.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*'])"
+            :expanded="request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*'])"
         >
 
             <flux:sidebar.item icon="document-text" :href="route('questions.index')" :current="request()->routeIs('questions.*')" wire:navigate>
                 {{ __('Questions') }}
+            </flux:sidebar.item>
+
+            <flux:sidebar.item icon="clipboard-document-list" :href="route('exam-categories.index')" :current="request()->routeIs('exam-categories.*')" wire:navigate>
+                {{ __('Exam Categories') }}
             </flux:sidebar.item>
 
             <flux:sidebar.item icon="academic-cap" :href="route('academic-classes.index')" :current="request()->routeIs('academic-classes.*')" wire:navigate>
