@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
@@ -13,38 +15,38 @@ class Question extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_premium' => 'boolean',
+        'extra_content' => 'array',
+    ];
+
     public function uniqueIds(): array
     {
         return ['uuid'];
     }
 
-    protected $casts = [
-        'is_premium' => 'boolean',
-        'extra_content' => 'array', // JSON ডেটাকে Array তে কনভার্ট করবে
-    ];
-
-    /**
-     * Model Event: প্রশ্ন সেভ হওয়ার আগে অটোমেটিক ক্যাটাগরি আইডি বসিয়ে দেওয়া
-     */
-    protected static function booted()
+    protected static function booted(): void
     {
-        static::saving(function ($question) {
+        static::saving(function (Question $question): void {
             if ($question->topic_id) {
-                $topic = Topic::find($question->topic_id);
+                $topic = Topic::query()->find($question->topic_id);
+
                 if ($topic) {
                     $question->chapter_id = $topic->chapter_id;
                 }
             }
 
             if ($question->chapter_id) {
-                $chapter = Chapter::find($question->chapter_id);
+                $chapter = Chapter::query()->find($question->chapter_id);
+
                 if ($chapter) {
                     $question->subject_id = $chapter->subject_id;
                 }
             }
 
             if ($question->subject_id) {
-                $subject = Subject::find($question->subject_id);
+                $subject = Subject::query()->find($question->subject_id);
+
                 if ($subject) {
                     $question->academic_class_id = $subject->academic_class_id;
                 }
@@ -52,30 +54,33 @@ class Question extends Model
         });
     }
 
-    // --- রিলেশনশিপসমূহ ---
-
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function academicClass()
+    public function academicClass(): BelongsTo
     {
         return $this->belongsTo(AcademicClass::class);
     }
 
-    public function subject()
+    public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
     }
 
-    public function chapter()
+    public function chapter(): BelongsTo
     {
         return $this->belongsTo(Chapter::class);
     }
 
-    public function topic()
+    public function topic(): BelongsTo
     {
         return $this->belongsTo(Topic::class);
+    }
+
+    public function examCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(ExamCategory::class, 'exam_category_question');
     }
 }
