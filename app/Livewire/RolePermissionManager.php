@@ -98,9 +98,14 @@ class RolePermissionManager extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
 
+        $permissions = Permission::query()->orderBy('slug')->get();
+
         return view('livewire.role-permission-manager', [
             'roles' => Role::query()->with('permissions')->orderBy('name')->get(),
-            'permissions' => Permission::query()->orderBy('name')->get(),
+            'permissions' => $permissions,
+            'groupedPermissions' => $permissions->groupBy(function (Permission $permission): string {
+                return (string) str($permission->slug)->before('.');
+            }),
         ])->layout('layouts.app', ['title' => 'Roles & Permissions']);
     }
 
@@ -130,5 +135,16 @@ class RolePermissionManager extends Component
         $permission->roles()->detach();
         $permission->users()->detach();
         $permission->delete();
+    }
+
+    public function toggleAllPermissions(bool $selected): void
+    {
+        if ($selected) {
+            $this->selectedPermissions = Permission::query()->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+            return;
+        }
+
+        $this->selectedPermissions = [];
     }
 }

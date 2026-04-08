@@ -93,12 +93,29 @@
 
                 <div>
                     <label class="mb-2 block text-sm text-zinc-300">Assign Permissions</label>
-                    <div class="grid gap-2 md:grid-cols-3">
-                        @foreach($permissions as $permission)
-                            <label class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200">
-                                <input type="checkbox" wire:model="selectedPermissions" value="{{ $permission->id }}" class="rounded border-zinc-600 text-indigo-500" />
-                                <span>{{ $permission->slug }}</span>
-                            </label>
+                    <label class="mb-3 inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200">
+                        <input
+                            type="checkbox"
+                            wire:change="toggleAllPermissions($event.target.checked)"
+                            @checked(count($selectedPermissions) === $permissions->count() && $permissions->count() > 0)
+                            class="rounded border-zinc-600 text-indigo-500"
+                        />
+                        <span>Select all permissions</span>
+                    </label>
+
+                    <div class="space-y-3">
+                        @foreach($groupedPermissions as $group => $groupPermissions)
+                            <div class="rounded-lg border border-zinc-700 bg-zinc-800 p-3">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">{{ $group }}</p>
+                                <div class="grid gap-2 md:grid-cols-3">
+                                    @foreach($groupPermissions as $permission)
+                                        <label class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200">
+                                            <input type="checkbox" wire:model="selectedPermissions" value="{{ $permission->id }}" class="rounded border-zinc-600 text-indigo-500" />
+                                            <span>{{ $permission->slug }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
