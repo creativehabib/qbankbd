@@ -19,9 +19,6 @@ class RolePermissionManager extends Component
     /** @var array<int> */
     public array $selectedPermissions = [];
 
-    public string $permissionName = '';
-
-    public string $permissionSlug = '';
 
     public function createRole(): void
     {
@@ -107,34 +104,6 @@ class RolePermissionManager extends Component
                 return (string) str($permission->slug)->before('.');
             }),
         ])->layout('layouts.app', ['title' => 'Roles & Permissions']);
-    }
-
-    public function createPermission(): void
-    {
-        abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
-
-        $validated = $this->validate([
-            'permissionName' => ['required', 'string', 'max:255'],
-            'permissionSlug' => ['required', 'string', 'max:255', 'unique:permissions,slug'],
-        ]);
-
-        Permission::query()->create([
-            'name' => $validated['permissionName'],
-            'slug' => Str::of($validated['permissionSlug'])->lower()->replace(' ', '.')->value(),
-        ]);
-
-        $this->permissionName = '';
-        $this->permissionSlug = '';
-    }
-
-    public function deletePermission(int $permissionId): void
-    {
-        abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
-
-        $permission = Permission::query()->findOrFail($permissionId);
-        $permission->roles()->detach();
-        $permission->users()->detach();
-        $permission->delete();
     }
 
     public function toggleAllPermissions(bool $selected): void

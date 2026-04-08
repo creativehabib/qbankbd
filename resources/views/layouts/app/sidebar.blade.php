@@ -54,6 +54,9 @@
                     {{ __('User Roles') }}
                 </flux:sidebar.item>
                 @if(auth()->user()->hasPermission('users.manage_permissions'))
+                    <flux:sidebar.item icon="key" :href="route('permissions.index')" :current="request()->routeIs('permissions.*')" wire:navigate>
+                        {{ __('Permissions') }}
+                    </flux:sidebar.item>
                     <flux:sidebar.item icon="lock-closed" :href="route('roles-permissions.index')" :current="request()->routeIs('roles-permissions.*')" wire:navigate>
                         {{ __('Roles & Permissions') }}
                     </flux:sidebar.item>

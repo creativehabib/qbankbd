@@ -58,26 +58,6 @@
         </div>
     </section>
 
-    <section class="rounded-xl border border-zinc-700 bg-zinc-900/80 p-4">
-        <h4 class="mb-3 text-sm font-semibold text-zinc-200">Permission CRUD</h4>
-        <div class="grid gap-2 md:grid-cols-3">
-            <input wire:model="permissionName" type="text" placeholder="Permission name" class="rounded-lg border-zinc-700 bg-zinc-800 text-sm text-zinc-100" />
-            <input wire:model="permissionSlug" type="text" placeholder="permission.slug" class="rounded-lg border-zinc-700 bg-zinc-800 text-sm text-zinc-100" />
-            <button wire:click="createPermission" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white">Create Permission</button>
-        </div>
-        @error('permissionName') <p class="mt-2 text-xs text-red-400">{{ $message }}</p> @enderror
-        @error('permissionSlug') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-
-        <div class="mt-4 flex flex-wrap gap-2">
-            @foreach($permissions as $permission)
-                <span class="inline-flex items-center gap-2 rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-200">
-                    {{ $permission->slug }}
-                    <button wire:click="deletePermission({{ $permission->id }})" class="text-red-400">×</button>
-                </span>
-            @endforeach
-        </div>
-    </section>
-
     <div x-data="{ open: @entangle('showModal') }" x-show="open" style="display:none" class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" role="dialog">
         <div class="flex min-h-screen items-center justify-center p-4">
             <div x-show="open" class="fixed inset-0 bg-black/60" @click="open = false"></div>
