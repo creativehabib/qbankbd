@@ -12,7 +12,8 @@ use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 it('creates updates and deletes a question from the livewire crud screen', function () {
-    $user = User::factory()->create();
+    $teacher = User::factory()->teacher()->create();
+    $admin = User::factory()->admin()->create();
 
     $class = AcademicClass::query()->create([
         'uuid' => (string) Str::uuid(),
@@ -60,7 +61,7 @@ it('creates updates and deletes a question from the livewire crud screen', funct
         'slug' => 'ssc',
     ]);
 
-    Livewire::actingAs($user)
+    Livewire::actingAs($teacher)
         ->test(QuestionIndex::class)
         ->set('subject_id', $subject->id)
         ->set('chapter_id', $chapter->id)
@@ -79,13 +80,15 @@ it('creates updates and deletes a question from the livewire crud screen', funct
 
     expect($question)->not->toBeNull();
     expect($question->slug)->toBe('what-is-x-if-x-2-5');
+    expect($question->status)->toBe('pending');
 
-    Livewire::actingAs($user)
+    Livewire::actingAs($admin)
         ->test(QuestionIndex::class)
         ->call('editQuestion', $question->id)
         ->set('title', 'Updated algebra question')
         ->set('difficulty', 'medium')
         ->set('marks', 2)
+        ->set('status', 'active')
         ->call('saveQuestion')
         ->assertHasNoErrors();
 
@@ -93,8 +96,9 @@ it('creates updates and deletes a question from the livewire crud screen', funct
 
     expect($question->title)->toBe('Updated algebra question');
     expect((float) $question->marks)->toBe(2.0);
+    expect($question->status)->toBe('active');
 
-    Livewire::actingAs($user)
+    Livewire::actingAs($admin)
         ->test(QuestionIndex::class)
         ->call('deleteQuestion', $question->id);
 
