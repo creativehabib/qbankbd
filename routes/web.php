@@ -4,6 +4,7 @@ use App\Livewire\AcademicClasses\ClassIndex;
 use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
 use App\Livewire\Questions\QuestionIndex;
+use App\Livewire\RolePermissionManager;
 use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Topics\TopicIndex;
 use App\Livewire\UserRoleManagement;
@@ -25,6 +26,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/user-roles', UserRoleManagement::class)->name('user-roles.index');
+    });
+
+    Route::middleware('permission:users.manage_permissions')->group(function (): void {
+        Route::get('/roles-permissions', RolePermissionManager::class)->name('roles-permissions.index');
     });
 });
 

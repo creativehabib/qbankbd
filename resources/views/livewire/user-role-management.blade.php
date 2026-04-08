@@ -47,10 +47,9 @@
                                     wire:change="updateRole({{ $user->id }}, $event.target.value)"
                                     class="rounded-lg border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700"
                                 >
-                                    <option value="student" @selected($user->role === 'student')>Student</option>
-                                    <option value="teacher" @selected($user->role === 'teacher')>Teacher</option>
-                                    <option value="admin" @selected($user->role === 'admin')>Admin</option>
-                                    <option value="super_admin" @selected($user->role === 'super_admin')>Super Admin</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}" @selected($user->role_id === $role->id)>{{ $role->name }}</option>
+                                    @endforeach
                                 </select>
                             </td>
                             <td class="py-3">

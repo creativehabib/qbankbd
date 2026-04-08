@@ -53,6 +53,11 @@
                 <flux:sidebar.item icon="users" :href="route('user-roles.index')" :current="request()->routeIs('user-roles.*')" wire:navigate>
                     {{ __('User Roles') }}
                 </flux:sidebar.item>
+                @if(auth()->user()->hasPermission('users.manage_permissions'))
+                    <flux:sidebar.item icon="lock-closed" :href="route('roles-permissions.index')" :current="request()->routeIs('roles-permissions.*')" wire:navigate>
+                        {{ __('Roles & Permissions') }}
+                    </flux:sidebar.item>
+                @endif
             </flux:sidebar.group>
         @endif
 

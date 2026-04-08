@@ -2,6 +2,7 @@
 
 use App\Livewire\UserRoleManagement;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -34,10 +35,11 @@ it('user with direct manage roles permission can access user role page', functio
 it('super admin can assign role to another user', function () {
     $superAdmin = User::factory()->superAdmin()->create();
     $targetUser = User::factory()->create(['role' => 'student']);
+    $teacherRoleId = Role::query()->where('slug', 'teacher')->value('id');
 
     Livewire::actingAs($superAdmin)
         ->test(UserRoleManagement::class)
-        ->call('updateRole', $targetUser->id, 'teacher')
+        ->call('updateRole', $targetUser->id, (string) $teacherRoleId)
         ->assertHasNoErrors();
 
     expect($targetUser->fresh()->role)->toBe('teacher');
@@ -58,10 +60,11 @@ it('super admin can assign direct permissions to user', function () {
 
 it('super admin cannot demote own role', function () {
     $superAdmin = User::factory()->superAdmin()->create();
+    $adminRoleId = Role::query()->where('slug', 'admin')->value('id');
 
     Livewire::actingAs($superAdmin)
         ->test(UserRoleManagement::class)
-        ->call('updateRole', $superAdmin->id, 'admin')
+        ->call('updateRole', $superAdmin->id, (string) $adminRoleId)
         ->assertHasErrors('role');
 
     expect($superAdmin->fresh()->role)->toBe('super_admin');

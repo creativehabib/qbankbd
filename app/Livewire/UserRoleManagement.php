@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -23,17 +24,19 @@ class UserRoleManagement extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
 
-        abort_unless(in_array($role, ['student', 'teacher', 'admin', 'super_admin'], true), 422);
-
         $targetUser = User::query()->findOrFail($userId);
+        $roleModel = Role::query()->findOrFail((int) $role);
 
-        if ($targetUser->id === auth()->id() && $role !== 'super_admin') {
+        if ($targetUser->id === auth()->id() && $roleModel->slug !== 'super_admin') {
             $this->addError('role', 'নিজের Super Admin role নামানো যাবে না।');
 
             return;
         }
 
-        $targetUser->update(['role' => $role]);
+        $targetUser->update([
+            'role' => $roleModel->slug,
+            'role_id' => $roleModel->id,
+        ]);
 
         $this->dispatch('entity-saved', message: 'User role updated successfully.');
     }
@@ -68,6 +71,7 @@ class UserRoleManagement extends Component
         return view('livewire.user-role-management', [
             'users' => $users,
             'permissions' => Permission::query()->orderBy('name')->get(),
+            'roles' => Role::query()->orderBy('name')->get(),
             'canManagePermissions' => auth()->user()?->hasPermission('users.manage_permissions') ?? false,
         ])->layout('layouts.app', ['title' => 'Manage User Roles']);
     }

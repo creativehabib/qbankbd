@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +32,20 @@ class AccessControlSeeder extends Seeder
             );
         }
 
+        $roles = [
+            ['name' => 'Student', 'slug' => 'student'],
+            ['name' => 'Teacher', 'slug' => 'teacher'],
+            ['name' => 'Admin', 'slug' => 'admin'],
+            ['name' => 'Super Admin', 'slug' => 'super_admin'],
+        ];
+
+        foreach ($roles as $role) {
+            Role::query()->updateOrCreate(
+                ['slug' => $role['slug']],
+                ['name' => $role['name'], 'guard' => 'web']
+            );
+        }
+
         $roleMap = [
             'student' => ['questions.read'],
             'teacher' => ['questions.read', 'questions.create', 'questions.update', 'questions.delete'],
@@ -41,15 +56,18 @@ class AccessControlSeeder extends Seeder
         DB::table('role_permissions')->delete();
 
         $permissionIds = Permission::query()->pluck('id', 'slug');
+        $roleIds = Role::query()->pluck('id', 'slug');
         $now = now();
 
         foreach ($roleMap as $role => $permissionSlugs) {
             foreach ($permissionSlugs as $permissionSlug) {
                 $permissionId = $permissionIds[$permissionSlug] ?? null;
+                $roleId = $roleIds[$role] ?? null;
 
-                if ($permissionId !== null) {
+                if ($permissionId !== null && $roleId !== null) {
                     DB::table('role_permissions')->insert([
                         'role' => $role,
+                        'role_id' => $roleId,
                         'permission_id' => $permissionId,
                         'created_at' => $now,
                         'updated_at' => $now,

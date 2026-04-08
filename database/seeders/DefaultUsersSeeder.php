@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,6 +15,7 @@ class DefaultUsersSeeder extends Seeder
     public function run(): void
     {
         $defaultPassword = 'password';
+        $roleIds = Role::query()->pluck('id', 'slug');
 
         User::query()->updateOrCreate(
             ['email' => 'superadmin@qbank.test'],
@@ -21,6 +23,7 @@ class DefaultUsersSeeder extends Seeder
                 'name' => 'Super Admin',
                 'password' => Hash::make($defaultPassword),
                 'role' => 'super_admin',
+                'role_id' => $roleIds['super_admin'] ?? null,
                 'email_verified_at' => now(),
             ]
         );
@@ -31,6 +34,7 @@ class DefaultUsersSeeder extends Seeder
                 'name' => 'Admin User',
                 'password' => Hash::make($defaultPassword),
                 'role' => 'admin',
+                'role_id' => $roleIds['admin'] ?? null,
                 'email_verified_at' => now(),
             ]
         );
@@ -41,6 +45,7 @@ class DefaultUsersSeeder extends Seeder
                 'name' => 'Teacher User',
                 'password' => Hash::make($defaultPassword),
                 'role' => 'teacher',
+                'role_id' => $roleIds['teacher'] ?? null,
                 'email_verified_at' => now(),
             ]
         );
@@ -51,6 +56,7 @@ class DefaultUsersSeeder extends Seeder
                 'name' => 'Student User',
                 'password' => Hash::make($defaultPassword),
                 'role' => 'student',
+                'role_id' => $roleIds['student'] ?? null,
                 'email_verified_at' => now(),
             ]
         );
