@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('chapters', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('subject_id');
 
             $table->string('name');
             $table->string('slug')->unique();
@@ -27,6 +27,8 @@ return new class extends Migration
 
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('subject_id');
         });
     }
 

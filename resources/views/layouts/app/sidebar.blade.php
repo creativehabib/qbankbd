@@ -48,6 +48,22 @@
 
         </flux:sidebar.group>
 
+        @if(auth()->user()->hasPermission('users.manage_roles'))
+            <flux:sidebar.group :heading="__('Administration')" icon="shield-check">
+                <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                    {{ __('User Management') }}
+                </flux:sidebar.item>
+                @if(auth()->user()->hasPermission('users.manage_permissions'))
+                    <flux:sidebar.item icon="key" :href="route('permissions.index')" :current="request()->routeIs('permissions.*')" wire:navigate>
+                        {{ __('Permissions') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="lock-closed" :href="route('roles-permissions.index')" :current="request()->routeIs('roles-permissions.*')" wire:navigate>
+                        {{ __('Roles & Permissions') }}
+                    </flux:sidebar.item>
+                @endif
+            </flux:sidebar.group>
+        @endif
+
         <flux:spacer />
 
     </flux:sidebar.nav>
