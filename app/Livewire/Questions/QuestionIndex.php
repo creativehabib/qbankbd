@@ -80,6 +80,7 @@ class QuestionIndex extends Component
 
     public function openModal(): void
     {
+        $this->ensureCanWrite();
         $this->resetForm();
         $this->resetValidation();
         $this->showModal = true;
@@ -92,7 +93,8 @@ class QuestionIndex extends Component
 
     public function editQuestion(int $id): void
     {
-        $question = Question::query()->findOrFail($id);
+        $this->ensureCanWrite();
+        $question = $this->resolveManageableQuestion($id);
 
         $this->editingQuestionId = $question->id;
         $this->subject_id = $question->subject_id;
@@ -114,6 +116,8 @@ class QuestionIndex extends Component
 
     public function saveQuestion(): void
     {
+        $this->ensureCanWrite();
+
         $validated = $this->validate([
             'subject_id' => ['required', 'exists:subjects,id'],
             'chapter_id' => ['nullable', 'exists:chapters,id'],
@@ -144,7 +148,7 @@ class QuestionIndex extends Component
             'difficulty' => $validated['difficulty'],
             'question_type' => $validated['question_type'],
             'marks' => $validated['marks'],
-            'status' => $validated['status'],
+            'status' => $this->resolveQuestionStatus($validated['status']),
             'is_premium' => $validated['is_premium'],
             'academic_class_id' => Subject::query()->find($validated['subject_id'])?->academic_class_id,
         ];
@@ -168,7 +172,8 @@ class QuestionIndex extends Component
 
     public function deleteQuestion(int $id): void
     {
-        $question = Question::query()->findOrFail($id);
+        $this->ensureCanWrite();
+        $question = $this->resolveManageableQuestion($id);
         $question->examCategories()->detach();
         $question->delete();
 
@@ -178,8 +183,14 @@ class QuestionIndex extends Component
 
     public function render(): View
     {
+        $user = auth()->user();
+
         $questions = Question::query()
             ->with(['subject', 'topic'])
+            ->when(! $user?->hasPermission('questions.read_all'), fn ($query) => $query->where(function ($limitedQuery) use ($user): void {
+                $limitedQuery->where('status', 'active')
+                    ->orWhere('user_id', $user?->id);
+            }))
             ->when($this->search, function ($query): void {
                 $searchTerm = '%'.$this->search.'%';
                 $query->where(function ($innerQuery) use ($searchTerm): void {
@@ -196,6 +207,8 @@ class QuestionIndex extends Component
 
         return view('livewire.questions.question-index', [
             'questions' => $questions,
+            'canWriteQuestions' => $this->canWriteQuestions(),
+            'canPublishQuestions' => $this->canPublishQuestions(),
             'subjects' => Subject::query()->orderBy('name')->get(),
             'chapters' => Chapter::query()->when($this->subject_id, fn ($query) => $query->where('subject_id', $this->subject_id))->orderBy('name')->get(),
             'topics' => Topic::query()->when($this->chapter_id, fn ($query) => $query->where('chapter_id', $this->chapter_id))->orderBy('name')->get(),
@@ -236,5 +249,44 @@ class QuestionIndex extends Component
         }
 
         return $slug;
+    }
+
+    private function canWriteQuestions(): bool
+    {
+        $user = auth()->user();
+
+        return (bool) $user && $user->hasPermission('questions.create');
+    }
+
+    private function canPublishQuestions(): bool
+    {
+        $user = auth()->user();
+
+        return (bool) $user && $user->hasPermission('questions.publish');
+    }
+
+    private function ensureCanWrite(): void
+    {
+        if (! $this->canWriteQuestions()) {
+            abort(403);
+        }
+    }
+
+    private function resolveQuestionStatus(string $requestedStatus): string
+    {
+        if (! $this->canPublishQuestions()) {
+            return 'pending';
+        }
+
+        return $requestedStatus;
+    }
+
+    private function resolveManageableQuestion(int $questionId): Question
+    {
+        $user = auth()->user();
+
+        return Question::query()
+            ->when(! $user?->hasPermission('questions.read_all'), fn ($query) => $query->where('user_id', $user?->id))
+            ->findOrFail($questionId);
     }
 }
