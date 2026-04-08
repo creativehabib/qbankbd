@@ -26,9 +26,11 @@
                 @endforeach
             </select>
 
-            <button wire:click="openModal" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
-                New Question
-            </button>
+            @if($canWriteQuestions)
+                <button wire:click="openModal" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
+                    New Question
+                </button>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
@@ -64,8 +66,12 @@
                             </span>
                         </td>
                         <td class="space-x-2 py-3 text-right">
-                            <button wire:click="editQuestion({{ $question->id }})" class="text-indigo-600 hover:text-indigo-800">Edit</button>
-                            <button wire:click="deleteQuestion({{ $question->id }})" class="text-red-600 hover:text-red-800">Delete</button>
+                            @if($canWriteQuestions)
+                                <button wire:click="editQuestion({{ $question->id }})" class="text-indigo-600 hover:text-indigo-800">Edit</button>
+                                <button wire:click="deleteQuestion({{ $question->id }})" class="text-red-600 hover:text-red-800">Delete</button>
+                            @else
+                                <span class="text-xs text-gray-400">Read only</span>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -167,14 +173,21 @@
                             <input wire:model="marks" type="number" step="0.25" min="0.25" class="w-full rounded-lg border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700" />
                             @error('marks') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
-                        <div>
-                            <label class="mb-1 block text-sm">Status</label>
-                            <select wire:model="status" class="w-full rounded-lg border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700">
-                                <option value="active">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                        @if($canPublishQuestions)
+                            <div>
+                                <label class="mb-1 block text-sm">Status</label>
+                                <select wire:model="status" class="w-full rounded-lg border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700">
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        @else
+                            <div>
+                                <label class="mb-1 block text-sm">Status</label>
+                                <input type="text" value="Pending (Admin review required)" disabled class="w-full rounded-lg border-gray-300 bg-gray-100 text-sm dark:border-gray-600 dark:bg-gray-700" />
+                            </div>
+                        @endif
                     </div>
 
                     <div>
