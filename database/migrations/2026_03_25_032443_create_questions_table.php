@@ -39,7 +39,7 @@ return new class extends Migration
             $table->foreignId('academic_class_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
             $table->foreignId('chapter_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('topic_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('topic_id')->nullable();
 
             $table->softDeletes();
             $table->timestamps();
@@ -48,6 +48,7 @@ return new class extends Migration
             $table->index(['academic_class_id', 'subject_id', 'chapter_id']);
             $table->index(['status', 'is_premium']);
             $table->index('question_type');
+            $table->index('topic_id');
         });
     }
 
