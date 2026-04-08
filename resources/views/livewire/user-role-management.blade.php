@@ -1,17 +1,17 @@
 <div class="space-y-6">
     <div>
-        <flux:heading size="xl">User Role Management</flux:heading>
-        <flux:subheading>Super Admin এখান থেকে user role assign/update করতে পারবে।</flux:subheading>
+        <flux:heading size="xl">User Management</flux:heading>
+        <flux:subheading>এখান থেকে user role এবং direct permission manage করতে পারবেন।</flux:subheading>
         <flux:separator class="my-6" />
     </div>
 
-    <section class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
         <div class="mb-4">
             <input
                 wire:model.live.debounce.300ms="search"
                 type="text"
                 placeholder="Search by name or email"
-                class="w-full rounded-lg border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                class="w-full rounded-lg border-zinc-300 text-sm dark:border-zinc-700 dark:bg-zinc-800 focus:border-indigo-500 focus:ring-indigo-500"
             />
         </div>
 
@@ -21,10 +21,10 @@
             </div>
         @enderror
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-700">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b dark:border-gray-700">
+                    <tr class="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-700 text-zinc-500">
                         <th class="py-2 text-left">Name</th>
                         <th class="py-2 text-left">Email</th>
                         <th class="py-2 text-left">Current Role</th>
@@ -34,9 +34,9 @@
                 </thead>
                 <tbody>
                     @forelse($users as $user)
-                        <tr class="border-b border-gray-100 dark:border-gray-700">
-                            <td class="py-3 font-medium text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
-                            <td class="py-3 text-gray-600 dark:text-gray-300">{{ $user->email }}</td>
+                        <tr class="border-b border-zinc-100 dark:border-zinc-700">
+                            <td class="py-3 font-medium text-zinc-900 dark:text-zinc-100">{{ $user->name }}</td>
+                            <td class="py-3 text-zinc-600 dark:text-zinc-300">{{ $user->email }}</td>
                             <td class="py-3">
                                 <span class="rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-700">
                                     {{ str($user->role)->replace('_', ' ')->title() }}
@@ -54,9 +54,9 @@
                             </td>
                             <td class="py-3">
                                 @if($canManagePermissions)
-                                    <div class="grid grid-cols-1 gap-1">
+                                    <div class="grid grid-cols-1 gap-1 max-h-44 overflow-y-auto pr-2">
                                         @foreach($permissions as $permission)
-                                            <label class="inline-flex items-center gap-2 text-xs">
+                                            <label class="inline-flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-200">
                                                 <input
                                                     type="checkbox"
                                                     @checked($user->permissions->contains('id', $permission->id))
@@ -68,13 +68,13 @@
                                         @endforeach
                                     </div>
                                 @else
-                                    <span class="text-xs text-gray-400">Permission নেই</span>
+                                    <span class="text-xs text-zinc-400">Permission নেই</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-gray-500">No users found.</td>
+                            <td colspan="5" class="py-8 text-center text-zinc-500">No users found.</td>
                         </tr>
                     @endforelse
                 </tbody>

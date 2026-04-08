@@ -73,6 +73,6 @@ class UserRoleManagement extends Component
             'permissions' => Permission::query()->orderBy('name')->get(),
             'roles' => Role::query()->orderBy('name')->get(),
             'canManagePermissions' => auth()->user()?->hasPermission('users.manage_permissions') ?? false,
-        ])->layout('layouts.app', ['title' => 'Manage User Roles']);
+        ])->layout('layouts.app', ['title' => 'User Management']);
     }
 }

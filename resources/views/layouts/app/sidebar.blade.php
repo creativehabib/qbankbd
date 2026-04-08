@@ -50,8 +50,8 @@
 
         @if(auth()->user()->hasPermission('users.manage_roles'))
             <flux:sidebar.group :heading="__('Administration')" icon="shield-check">
-                <flux:sidebar.item icon="users" :href="route('user-roles.index')" :current="request()->routeIs('user-roles.*')" wire:navigate>
-                    {{ __('User Roles') }}
+                <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                    {{ __('User Management') }}
                 </flux:sidebar.item>
                 @if(auth()->user()->hasPermission('users.manage_permissions'))
                     <flux:sidebar.item icon="key" :href="route('permissions.index')" :current="request()->routeIs('permissions.*')" wire:navigate>

@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/topics', TopicIndex::class)->name('topics.index');
 
     Route::middleware('permission:users.manage_roles')->group(function (): void {
-        Route::get('/user-roles', UserRoleManagement::class)->name('user-roles.index');
+        Route::get('/users', UserRoleManagement::class)->name('users.index');
     });
 
     Route::middleware('permission:users.manage_permissions')->group(function (): void {
