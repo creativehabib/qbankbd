@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Questions\Create;
 use App\Livewire\Questions\QuestionIndex;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
@@ -103,4 +104,18 @@ it('creates updates and deletes a question from the livewire crud screen', funct
         ->call('deleteQuestion', $question->id);
 
     expect(Question::withTrashed()->find($question->id)?->deleted_at)->not->toBeNull();
+});
+
+
+it('applies border styles to slug difficulty type and marks inputs on create form', function () {
+    $admin = User::factory()->admin()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Create::class)
+        ->assertSeeHtml('id="slug_input"')
+        ->assertSeeHtml('class="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm transition-colors dark:border-gray-600 dark:text-white"')
+        ->assertSeeHtml('wire:model="difficulty" class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200 appearance-none"')
+        ->assertSeeHtml('wire:model.live="question_type" class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200"')
+        ->assertSeeHtml('wire:model.live="marks"')
+        ->assertSeeHtml('class="block w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:text-gray-200 pr-12"');
 });
