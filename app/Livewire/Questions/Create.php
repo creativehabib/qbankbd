@@ -7,6 +7,7 @@ use App\Models\Chapter;
 use App\Models\ExamCategory; // Image Upload এর জন্য
 use App\Models\Question;
 use App\Models\Subject;
+use App\Models\Tag;
 use App\Models\Topic;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
@@ -244,7 +245,7 @@ class Create extends Component
             }
         });
 
-        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        $route = auth()->user()->isTeacher() ? 'questions.index' : 'admin.questions.index';
 
         return redirect()->route($route)->with('success', 'Question created successfully.');
     }
@@ -259,6 +260,6 @@ class Create extends Component
             'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),
             'allExamCategories' => ExamCategory::all(), // টার্গেট ক্যাটাগরি পাঠানো হলো
-        ])->layout($layout, ['title' => 'Create Question']);
+        ])->layout('layouts.app', ['title' => 'Manage Questions']);
     }
 }

@@ -98,6 +98,6 @@ class Questions extends Component
             'topics' => Topic::when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
                 ->orderBy('name')
                 ->get(),
-        ])->layout($user->isAdmin() ? 'layouts.admin' : 'layouts.panel', ['title' => 'Manage Questions']);
+        ])->layout('layouts.app', ['title' => 'All Questions']);
     }
 }

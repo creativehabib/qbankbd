@@ -1,26 +1,55 @@
 <?php
 
-namespace App\Livewire\Admin\Questions;
+namespace App\Livewire\Questions;
 
 use App\Livewire\Traits\SlugValidationTrait;
-use Livewire\Component;
-use Livewire\WithFileUploads; // Image Upload এর জন্য
+use App\Models\Chapter;
+use App\Models\ExamCategory; // Image Upload এর জন্য
+use App\Models\Question;
+use App\Models\Subject;
+use App\Models\Tag;
+use App\Models\Topic;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, Chapter, Topic, Question, Tag, ExamCategory};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage; // Image delete এর জন্য
+use Livewire\Component;
+use Livewire\WithFileUploads; // Image delete এর জন্য
 
 class Edit extends Component
 {
     use AuthorizesRequests, SlugValidationTrait, WithFileUploads; // WithFileUploads যুক্ত করা হলো
 
     public Question $question;
-    public $subject_id, $chapter_id, $topic_id, $title, $description, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
+
+    public $subject_id;
+
+    public $chapter_id;
+
+    public $topic_id;
+
+    public $title;
+
+    public $description;
+
+    public $difficulty;
+
+    public $question_type = 'mcq';
+
+    public $marks = 1;
+
+    public $tagIds = [];
+
+    public $options = [];
+
     public $cq = [];
+
     public $slug;
+
     public $exam_category_ids = [];
+
     public $image; // নতুন ইমেজ আপলোডের জন্য
+
     public $existingImage = null; // ডাটাবেজে থাকা ইমেজের জন্য
 
     public function mount(Question $question)
@@ -44,16 +73,20 @@ class Edit extends Component
         $extraData = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
 
         if ($this->question_type === 'cq') {
-            $this->cq = is_array($extraData) && !empty($extraData) ? $extraData : [];
-            if (empty($this->cq)) $this->setCqDefaults();
+            $this->cq = is_array($extraData) && ! empty($extraData) ? $extraData : [];
+            if (empty($this->cq)) {
+                $this->setCqDefaults();
+            }
             $this->resetToMcq();
         } elseif ($this->question_type === 'mcq') {
-            if (is_array($extraData) && !empty($extraData)) {
+            if (is_array($extraData) && ! empty($extraData)) {
                 $this->options = $extraData;
             } else {
                 $this->options = $question->options->toArray();
             }
-            if (empty($this->options)) $this->resetToMcq();
+            if (empty($this->options)) {
+                $this->resetToMcq();
+            }
             $this->setCqDefaults();
         } elseif ($this->question_type === 'written') {
             $this->existingImage = $extraData['image'] ?? null; // বিদ্যমান ইমেজ লোড করা হলো
@@ -139,10 +172,10 @@ class Edit extends Component
                 'required',
                 'string',
                 'max:255',
-                \Illuminate\Validation\Rule::unique('questions', 'slug')->ignore($this->question->id ?? null)
+                Rule::unique('questions', 'slug')->ignore($this->question->id ?? null),
             ],
         ], [
-            'slug.unique' => 'এই স্লাগটি আগে থেকেই ব্যবহৃত হচ্ছে। দয়া করে একটু পরিবর্তন করুন।'
+            'slug.unique' => 'এই স্লাগটি আগে থেকেই ব্যবহৃত হচ্ছে। দয়া করে একটু পরিবর্তন করুন।',
         ]);
     }
 
@@ -150,9 +183,13 @@ class Edit extends Component
     {
         if ($value === 'mcq') {
             $this->marks = 1;
-            if (empty($this->options)) $this->resetToMcq();
+            if (empty($this->options)) {
+                $this->resetToMcq();
+            }
         } elseif ($value === 'cq') {
-            if (empty($this->cq)) $this->setCqDefaults();
+            if (empty($this->cq)) {
+                $this->setCqDefaults();
+            }
             $this->calculateCqMarks();
             $this->options = [];
         } else {
@@ -166,7 +203,7 @@ class Edit extends Component
     {
         $this->chapter_id = null;
         $this->topic_id = null;
-        $chapters = Chapter::where('subject_id', $value)->get()->map(fn($s) => ['value' => $s->id, 'text' => $s->name])->all();
+        $chapters = Chapter::where('subject_id', $value)->get()->map(fn ($s) => ['value' => $s->id, 'text' => $s->name])->all();
         $this->dispatch('chaptersUpdated', chapters: $chapters);
         $this->dispatch('topicsUpdated', topics: []);
     }
@@ -174,7 +211,7 @@ class Edit extends Component
     public function updatedChapterId($value)
     {
         $this->topic_id = null;
-        $topics = $value ? Topic::where('chapter_id', $value)->get()->map(fn($c) => ['value' => $c->id, 'text' => $c->name])->all() : [];
+        $topics = $value ? Topic::where('chapter_id', $value)->get()->map(fn ($c) => ['value' => $c->id, 'text' => $c->name])->all() : [];
         $this->dispatch('topicsUpdated', topics: $topics);
     }
 
@@ -247,11 +284,11 @@ class Edit extends Component
             ]);
 
             // Tags আপডেট
-            $tagIds = collect($this->tagIds)->map(fn($tag) => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => $tag])->id)->toArray();
+            $tagIds = collect($this->tagIds)->map(fn ($tag) => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => $tag])->id)->toArray();
             $this->question->tags()->sync($tagIds);
 
             // Exam Categories আপডেট
-            if (!empty($this->exam_category_ids)) {
+            if (! empty($this->exam_category_ids)) {
                 $this->question->examCategories()->sync($this->exam_category_ids);
             }
 
@@ -259,18 +296,20 @@ class Edit extends Component
         });
 
         $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+
         return redirect()->route($route)->with('success', 'Question updated successfully.');
     }
 
     public function render()
     {
         $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
+
         return view('livewire.admin.questions.edit', [
             'subjects' => Subject::all(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),
             'allExamCategories' => ExamCategory::all(), // টার্গেট ক্যাটাগরি পাঠানো হলো
-        ])->layout($layout, ['title' => 'Edit Question']);
+        ])->layout('layouts.app', ['title' => 'Edit Questions']);
     }
 }

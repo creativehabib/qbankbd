@@ -1,17 +1,37 @@
 <?php
 
-namespace App\Livewire\Admin\Questions;
+namespace App\Livewire\Questions;
 
-use Livewire\Component;
+use App\Models\Chapter;
+use App\Models\Question;
+use App\Models\Subject;
+use App\Models\Tag;
+use App\Models\Topic;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, Chapter, Topic, Question, Tag};
+use Livewire\Component;
 
 class QuestionForm extends Component
 {
     use AuthorizesRequests;
 
     public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে
-    public $subject_id, $chapter_id, $topic_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
+
+    public $subject_id;
+
+    public $chapter_id;
+
+    public $topic_id;
+
+    public $title;
+
+    public $difficulty = 'easy';
+
+    public $question_type = 'mcq';
+
+    public $marks = 1;
+
+    public $tagIds = [];
+
     public $options = [];
 
     public function mount($id = null)
@@ -96,6 +116,7 @@ class QuestionForm extends Component
             if (is_numeric($tag)) {
                 return (int) $tag;
             }
+
             return Tag::firstOrCreate(['name' => $tag])->id;
         })->toArray();
 
@@ -136,6 +157,7 @@ class QuestionForm extends Component
 
         session()->flash('success', 'Question saved successfully.');
         $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+
         return redirect()->route($route);
     }
 

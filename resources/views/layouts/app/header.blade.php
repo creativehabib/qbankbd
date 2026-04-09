@@ -2,7 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
-        <script src="/ckeditor/ckeditor.js" type="text/javascript"></script>
         @stack('styles')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -83,6 +82,5 @@
             };
         </script>
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
-    @stack('scripts')
     </body>
 </html>
