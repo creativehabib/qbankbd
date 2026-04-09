@@ -39,23 +39,49 @@ it('super admin can assign role to another user', function () {
 
     Livewire::actingAs($superAdmin)
         ->test(UserRoleManagement::class)
-        ->call('updateRole', $targetUser->id, (string) $teacherRoleId)
+        ->call('editUser', $targetUser->id)
+        ->set('selectedRole', (string) $teacherRoleId)
+        ->set('name', $targetUser->name)
+        ->set('email', $targetUser->email)
+        ->call('saveUser')
         ->assertHasNoErrors();
 
     expect($targetUser->fresh()->role)->toBe('teacher');
 });
 
-it('super admin can assign direct permissions to user', function () {
+it('super admin can edit user profile details', function () {
     $superAdmin = User::factory()->superAdmin()->create();
-    $targetUser = User::factory()->create(['role' => 'student']);
-    $permissionId = \App\Models\Permission::query()->where('slug', 'questions.publish')->value('id');
+    $targetUser = User::factory()->create([
+        'role' => 'student',
+        'email' => 'student@example.com',
+    ]);
+    $adminRoleId = Role::query()->where('slug', 'admin')->value('id');
 
     Livewire::actingAs($superAdmin)
         ->test(UserRoleManagement::class)
-        ->call('togglePermission', $targetUser->id, $permissionId, true)
+        ->call('editUser', $targetUser->id)
+        ->set('name', 'Updated User')
+        ->set('email', 'updated-user@example.com')
+        ->set('selectedRole', (string) $adminRoleId)
+        ->call('saveUser')
         ->assertHasNoErrors();
 
-    expect($targetUser->fresh()->hasPermission('questions.publish'))->toBeTrue();
+    expect($targetUser->fresh())
+        ->name->toBe('Updated User')
+        ->email->toBe('updated-user@example.com')
+        ->role->toBe('admin');
+});
+
+it('super admin can delete another user', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $targetUser = User::factory()->create();
+
+    Livewire::actingAs($superAdmin)
+        ->test(UserRoleManagement::class)
+        ->call('deleteUser', $targetUser->id)
+        ->assertHasNoErrors();
+
+    $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
 });
 
 it('super admin cannot demote own role', function () {
@@ -64,8 +90,21 @@ it('super admin cannot demote own role', function () {
 
     Livewire::actingAs($superAdmin)
         ->test(UserRoleManagement::class)
-        ->call('updateRole', $superAdmin->id, (string) $adminRoleId)
+        ->call('editUser', $superAdmin->id)
+        ->set('selectedRole', (string) $adminRoleId)
+        ->set('name', $superAdmin->name)
+        ->set('email', $superAdmin->email)
+        ->call('saveUser')
         ->assertHasErrors('role');
 
     expect($superAdmin->fresh()->role)->toBe('super_admin');
+});
+
+it('user management page does not show direct permissions column', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+
+    $this->actingAs($superAdmin)
+        ->get(route('users.index'))
+        ->assertSee('ACTIONS')
+        ->assertDontSee('DIRECT PERMISSIONS');
 });
