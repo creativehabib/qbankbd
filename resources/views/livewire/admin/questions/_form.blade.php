@@ -1,4 +1,4 @@
-<div x-data="{ questionType: @entangle('question_type') }" class="max-w-5xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300">
+<div x-data="{ questionType: @entangle('question_type') }" class="max-w-5xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
 
     <div class="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $formTitle }}</h2>
@@ -55,7 +55,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Difficulty Level</label>
                 <div class="relative">
-                    <select wire:model="difficulty" class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200 appearance-none">
+                    <select wire:model="difficulty" class="block w-full px-2 py-1.5 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200 appearance-none">
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
@@ -65,7 +65,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Question Type</label>
-                <select wire:model.live="question_type" class="block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
+                <select wire:model.live="question_type" class="block w-full px-2 py-1.5 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
                     <option value="mcq">Multiple Choice (MCQ)</option>
                     <option value="cq">Creative Question (CQ)</option>
                     <option value="short">Short Question</option>
@@ -79,7 +79,7 @@
                     <input type="number" step="0.5" min="0" wire:model.live="marks"
                            x-bind:readonly="questionType === 'cq'"
                            x-bind:class="questionType === 'cq' ? 'bg-gray-100 dark:bg-gray-600 text-gray-500 cursor-not-allowed' : 'bg-white dark:bg-gray-700'"
-                           class="block w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:text-gray-200 pr-12" />
+                           class="block w-full px-2 py-1.5 rounded-md border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:text-gray-200 pr-12" />
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">Pts</span>
                     </div>
@@ -113,7 +113,7 @@
 
         <div>
             <label class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 border-b pb-1">Main Question / Stimulus (উদ্দীপক) <span class="text-red-500">*</span></label>
-            <div wire:ignore class="rounded-md focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
+            <div wire:ignore class="rounded-md focus-within:ring-1 focus-within:ring-indigo-500">
                 <textarea id="editor">{!! $title !!}</textarea>
             </div>
             @error('title')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
@@ -124,20 +124,20 @@
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1.2em" width="1.2em" xmlns="http://www.w3.org/2000/svg" class="text-indigo-500"><path d="M432 112V96a48.14 48.14 0 0 0-48-48H64a48.14 48.14 0 0 0-48 48v256a48.14 48.14 0 0 0 48 48h16v16a48.14 48.14 0 0 0 48 48h320a48.14 48.14 0 0 0 48-48V160a48.14 48.14 0 0 0-48-48zM96 128h272.24l-37.81-48.4a15.89 15.89 0 0 0-25-.63L234.62 170.81l-40.42-37.2a15.87 15.87 0 0 0-22.18 1.14l-81.82 93V96a16 16 0 0 1 16-16h320a16 16 0 0 1 16 16v224H128a48.06 48.06 0 0 0-32 12.31V144a16 16 0 0 1 0-16zM464 416a16 16 0 0 1-16 16H128a16 16 0 0 1-16-16V160a16 16 0 0 1 16-16h320a16 16 0 0 1 16 16z"></path><circle cx="336" cy="192" r="32"></circle></svg>
                 Reference Image / Attachment <span class="text-xs font-normal text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full ml-1">Optional</span>
             </label>
-            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-indigo-500 transition-colors bg-gray-50 dark:bg-gray-800">
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-indigo-500 bg-gray-50 dark:bg-gray-800">
                 <div class="space-y-1 text-center w-full">
 
                     @if ($image)
                         <div class="relative w-max mx-auto mb-4 group">
                             <img src="{{ $image->temporaryUrl() }}" class="mx-auto h-48 object-contain rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-                            <button type="button" wire:click="$set('image', null)" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm transition-colors opacity-0 group-hover:opacity-100">
+                            <button type="button" wire:click="$set('image', null)" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm opacity-0 group-hover:opacity-100">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
                     @elseif(!empty($existingImage))
                         <div class="relative w-max mx-auto mb-4 group">
                             <img src="{{ Storage::url($existingImage) }}" class="mx-auto h-48 object-contain rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-                            <button type="button" wire:click="removeExistingImage" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm transition-colors opacity-0 group-hover:opacity-100" title="Remove Image">
+                            <button type="button" wire:click="removeExistingImage" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm opacity-0 group-hover:opacity-100" title="Remove Image">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -148,7 +148,7 @@
                     @endif
 
                     <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center mt-4">
-                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 shadow-sm focus-within:outline-none transition-colors">
+                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 shadow-sm focus-within:outline-none">
                             <span>Upload a file</span>
                             <input id="file-upload" wire:model="image" type="file" class="sr-only" accept="image/png, image/jpeg, image/jpg, image/webp">
                         </label>
@@ -169,7 +169,7 @@
                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.9 177.9L218 339.8c-7.4 7.4-19.4 7.4-26.9 0l-83-83c-7.4-7.4-7.4-19.4 0-26.9l22.6-22.6c7.4-7.4 19.4-7.4 26.9 0l47 47 131-131c7.4-7.4 19.4-7.4 26.9 0l22.6 22.6c7.4 7.5 7.4 19.5 0 26.9z"></path></svg>
                     MCQ Options (বহুনির্বাচনী অপশন)
                 </label>
-                <button type="button" wire:click="addOption" class="flex items-center gap-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-all text-sm font-semibold">
+                <button type="button" wire:click="addOption" class="flex items-center gap-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg text-sm font-semibold">
                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg> Add Option
                 </button>
             </div>
@@ -178,9 +178,9 @@
                 @php $mcqLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ']; @endphp
 
                 @foreach($options as $i => $opt)
-                    <div wire:key="opt-{{ $i }}" class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm relative transition-all duration-200 hover:shadow-md hover:border-blue-400 group">
+                    <div wire:key="opt-{{ $i }}" class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm relative duration-200 hover:shadow-md hover:border-blue-400 group">
 
-                        <button type="button" wire:click="removeOption({{ $i }})" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-2 shadow-sm transition-colors opacity-0 group-hover:opacity-100">
+                        <button type="button" wire:click="removeOption({{ $i }})" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100">
                             <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 352 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
                         </button>
 
@@ -192,13 +192,13 @@
                                 </span>
                             </div>
 
-                            <label class="flex items-center gap-2 sm:ml-auto cursor-pointer bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-4 py-1.5 rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-400 transition-colors">
+                            <label class="flex items-center gap-2 sm:ml-auto cursor-pointer bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-4 py-1.5 rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-400">
                                 <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded text-green-500 focus:ring-green-400 h-5 w-5 border-gray-300" @if(!empty($opt['is_correct']) && $opt['is_correct']) checked @endif>
                                 <span class="text-sm font-bold text-gray-700 dark:text-gray-300 select-none uppercase tracking-wide">Correct Answer</span>
                             </label>
                         </div>
 
-                        <div wire:ignore class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 focus-within:border-blue-500 transition-all">
+                        <div wire:ignore class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 focus-within:border-blue-500">
                             <textarea id="opt_editor_{{ $i }}">{!! $opt['option_text'] ?? '' !!}</textarea>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                     Creative Questions (সৃজনশীল অংশ)
                 </label>
-                <button type="button" wire:click="addCqPart" class="flex items-center gap-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-all text-sm font-semibold">
+                <button type="button" wire:click="addCqPart" class="flex items-center gap-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg text-sm font-semibold">
                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg> Add Part
                 </button>
             </div>

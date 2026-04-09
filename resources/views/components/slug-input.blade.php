@@ -67,7 +67,7 @@
                        }
                    "
                    :class="isSlugEditable ? 'bg-white focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 text-gray-900' : 'bg-gray-100 text-gray-500 pointer-events-none select-none dark:bg-gray-600'"
-                   class="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm transition-colors dark:border-gray-600 dark:text-white"
+                   class="block w-full px-2 py-1.5 rounded-md border border-gray-300 shadow-sm sm:text-sm dark:border-gray-600 dark:text-white"
                    placeholder="auto-generated-slug-will-appear-here" />
         </div>
 
@@ -81,7 +81,7 @@
                         checkSlugAvailability();
                     }
                 "
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 transition-colors shrink-0">
+                class="inline-flex items-center px-4 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 shrink-0">
 
             <svg x-show="!isSlugEditable" class="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -95,7 +95,7 @@
         </button>
     </div>
 
-    <div class="mt-1.5 flex items-center min-h-[20px] transition-all">
+    <div class="mt-1.5 flex items-center min-h-[20px]">
         <div x-show="checkStatus === 'checking'" style="display: none;" class="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
             <svg class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Checking availability...
