@@ -67,7 +67,7 @@
                        }
                    "
                    :class="isSlugEditable ? 'bg-white focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 text-gray-900' : 'bg-gray-100 text-gray-500 pointer-events-none select-none dark:bg-gray-600'"
-                   class="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm transition-colors dark:border-gray-600 dark:text-white"
+                   class="block w-full rounded-md border border-gray-300 shadow-sm sm:text-sm transition-colors dark:border-gray-600 dark:text-white"
                    placeholder="auto-generated-slug-will-appear-here" />
         </div>
 
