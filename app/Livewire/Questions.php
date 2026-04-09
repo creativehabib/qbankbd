@@ -64,7 +64,11 @@ class Questions extends Component
     {
         $question = Question::with(['tags', 'options'])->findOrFail($id);
 
-        $this->authorize('delete', $question);
+        abort_unless(auth()->user()?->hasPermission('questions.delete'), 403);
+
+        if (auth()->user()?->isTeacher() && (int) $question->user_id !== (int) auth()->id()) {
+            abort(404);
+        }
 
         $question->tags()->detach();
         $question->options()->delete();
