@@ -25,9 +25,27 @@ class UserRoleManagement extends Component
 
     public string $selectedRole = '';
 
+    public string $password = '';
+
+    public string $password_confirmation = '';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function createUser(): void
+    {
+        abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
+
+        $this->editingUserId = null;
+        $this->name = '';
+        $this->email = '';
+        $this->selectedRole = '';
+        $this->password = '';
+        $this->password_confirmation = '';
+        $this->resetValidation();
+        $this->showEditModal = true;
     }
 
     public function editUser(int $userId): void
@@ -39,6 +57,8 @@ class UserRoleManagement extends Component
         $this->name = $targetUser->name;
         $this->email = $targetUser->email;
         $this->selectedRole = (string) $targetUser->role_id;
+        $this->password = '';
+        $this->password_confirmation = '';
         $this->resetValidation();
         $this->showEditModal = true;
     }
@@ -47,18 +67,37 @@ class UserRoleManagement extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
 
-        if ($this->editingUserId === null) {
-            return;
-        }
-
-        $validated = $this->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email:rfc,dns', 'max:255', Rule::unique('users', 'email')->ignore($this->editingUserId)],
             'selectedRole' => ['required', 'exists:roles,id'],
-        ]);
+        ];
+
+        if ($this->editingUserId === null) {
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        $validated = $this->validate($rules);
+
+        $roleModel = Role::query()->findOrFail((int) $validated['selectedRole']);
+
+        if ($this->editingUserId === null) {
+            User::query()->create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'role' => $roleModel->slug,
+                'role_id' => $roleModel->id,
+            ]);
+
+            $this->showEditModal = false;
+            $this->dispatch('entity-saved', message: 'User created successfully.');
+            $this->reset(['name', 'email', 'selectedRole', 'password', 'password_confirmation']);
+
+            return;
+        }
 
         $targetUser = User::query()->findOrFail($this->editingUserId);
-        $roleModel = Role::query()->findOrFail((int) $validated['selectedRole']);
 
         if ($targetUser->id === auth()->id() && $roleModel->slug !== 'super_admin') {
             $this->addError('role', 'নিজের Super Admin role নামানো যাবে না।');
@@ -75,6 +114,7 @@ class UserRoleManagement extends Component
 
         $this->showEditModal = false;
         $this->dispatch('entity-saved', message: 'User updated successfully.');
+        $this->reset(['password', 'password_confirmation']);
     }
 
     public function deleteUser(int $userId): void

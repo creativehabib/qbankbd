@@ -49,6 +49,28 @@ it('super admin can assign role to another user', function () {
     expect($targetUser->fresh()->role)->toBe('teacher');
 });
 
+it('super admin can create a new user', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $teacherRoleId = Role::query()->where('slug', 'teacher')->value('id');
+
+    Livewire::actingAs($superAdmin)
+        ->test(UserRoleManagement::class)
+        ->call('createUser')
+        ->set('name', 'Created User')
+        ->set('email', 'created-user@example.com')
+        ->set('password', 'password123')
+        ->set('password_confirmation', 'password123')
+        ->set('selectedRole', (string) $teacherRoleId)
+        ->call('saveUser')
+        ->assertHasNoErrors();
+
+    $this->assertDatabaseHas('users', [
+        'name' => 'Created User',
+        'email' => 'created-user@example.com',
+        'role' => 'teacher',
+    ]);
+});
+
 it('super admin can edit user profile details', function () {
     $superAdmin = User::factory()->superAdmin()->create();
     $targetUser = User::factory()->create([
@@ -105,6 +127,7 @@ it('user management page does not show direct permissions column', function () {
 
     $this->actingAs($superAdmin)
         ->get(route('users.index'))
+        ->assertSee('Create User')
         ->assertSee('ACTIONS')
         ->assertDontSee('DIRECT PERMISSIONS');
 });

@@ -14,6 +14,9 @@
                     placeholder="Search by name or email..."
                 />
             </div>
+            <flux:button wire:click="createUser" variant="primary" icon="plus">
+                Create User
+            </flux:button>
         </div>
 
         <flux:table>
@@ -76,8 +79,10 @@
 
     <flux:modal wire:model="showEditModal" class="md:w-[620px] max-w-2xl space-y-6">
         <div>
-            <flux:heading size="lg">Edit User</flux:heading>
-            <flux:text class="mt-2 text-sm text-zinc-500">Update user information and assign a role.</flux:text>
+            <flux:heading size="lg">{{ $editingUserId ? 'Edit User' : 'Create User' }}</flux:heading>
+            <flux:text class="mt-2 text-sm text-zinc-500">
+                {{ $editingUserId ? 'Update user information and assign a role.' : 'Create a new user with name, email, password and role.' }}
+            </flux:text>
         </div>
 
         @error('role')
@@ -107,6 +112,22 @@
                 placeholder="Enter email address"
             />
 
+            @if(!$editingUserId)
+                <flux:input
+                    wire:model="password"
+                    type="password"
+                    label="Password *"
+                    placeholder="Enter password"
+                />
+
+                <flux:input
+                    wire:model="password_confirmation"
+                    type="password"
+                    label="Confirm Password *"
+                    placeholder="Confirm password"
+                />
+            @endif
+
             <div>
                 <label class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Assign Role *</label>
                 <select
@@ -123,7 +144,7 @@
 
         <div class="flex justify-end gap-2">
             <flux:button wire:click="$set('showEditModal', false)" variant="ghost">Cancel</flux:button>
-            <flux:button wire:click="saveUser" variant="primary">Update</flux:button>
+            <flux:button wire:click="saveUser" variant="primary">{{ $editingUserId ? 'Update' : 'Create' }}</flux:button>
         </div>
     </flux:modal>
 </div>
