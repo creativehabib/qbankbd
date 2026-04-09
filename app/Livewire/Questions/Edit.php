@@ -291,11 +291,9 @@ class Edit extends Component
             if (! empty($this->exam_category_ids)) {
                 $this->question->examCategories()->sync($this->exam_category_ids);
             }
-
-            $this->question->options()->delete(); // পুরনো রিলেশনাল অপশন ক্লিনআপ (যদি থাকে)
         });
 
-        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'questions.index';
 
         return redirect()->route($route)->with('success', 'Question updated successfully.');
     }

@@ -81,7 +81,10 @@ class Question extends Model
     {
         return $this->belongsTo(Topic::class);
     }
-
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
     public function examCategories(): BelongsToMany
     {
         return $this->belongsToMany(ExamCategory::class, 'exam_category_question');

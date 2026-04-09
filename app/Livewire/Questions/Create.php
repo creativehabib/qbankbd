@@ -245,9 +245,7 @@ class Create extends Component
             }
         });
 
-        $route = auth()->user()->isTeacher() ? 'questions.index' : 'admin.questions.index';
-
-        return redirect()->route($route)->with('success', 'Question created successfully.');
+        return redirect()->route('questions.index')->with('success', 'Question created successfully.');
     }
 
     public function render()

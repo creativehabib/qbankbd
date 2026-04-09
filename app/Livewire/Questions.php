@@ -62,12 +62,11 @@ class Questions extends Component
      */
     public function deleteQuestion(int $id): void
     {
-        $question = Question::with(['tags', 'options'])->findOrFail($id);
+        $question = Question::with(['tags'])->findOrFail($id);
 
         $this->authorize('delete', $question);
 
         $question->tags()->detach();
-        $question->options()->delete();
 
         $question->forceDelete();
 
