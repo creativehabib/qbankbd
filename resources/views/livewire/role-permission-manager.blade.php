@@ -94,7 +94,7 @@
                 />
             </div>
 
-            <div class="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+            <div class="space-y-3 pr-2">
                 @foreach($groupedPermissions as $group => $groupPermissions)
                     <flux:card class="!p-4">
                         <flux:subheading class="mb-3 uppercase tracking-wide">{{ $group }}</flux:subheading>
@@ -112,9 +112,9 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-2 mt-4">
-            <flux:button wire:click="$set('showModal', false)" variant="ghost">Cancel</flux:button>
-            <flux:button wire:click="saveRole" variant="primary">Save Role</flux:button>
+        <div class="flex justify-end gap-2">
+            <flux:button wire:click="$set('showModal', false)" @class('cursor-pointer') variant="ghost">Cancel</flux:button>
+            <flux:button wire:click="saveRole" variant="primary" @class('cursor-pointer')>Save Role</flux:button>
         </div>
     </flux:modal>
 </div>
