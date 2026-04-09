@@ -67,7 +67,10 @@ class RolePermissionManager extends Component
 
         Role::query()->whereKey($role->id)->update(['slug' => $role->slug ?: $slug]);
 
-        $role->permissions()->sync($validated['selectedPermissions'] ?? []);
+        $role->permissions()->syncWithPivotValues(
+            $validated['selectedPermissions'] ?? [],
+            ['role' => $role->slug]
+        );
 
         $this->dispatch('entity-saved', message: 'Role saved successfully.');
         $this->showModal = false;
