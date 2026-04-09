@@ -4,107 +4,117 @@
             <flux:heading size="xl">Roles & Permissions</flux:heading>
             <flux:subheading>Role CRUD এবং permission assign system.</flux:subheading>
         </div>
-        <button wire:click="createRole" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">+ Create role</button>
+        <flux:button wire:click="createRole" variant="primary" icon="plus">
+            Create role
+        </flux:button>
     </div>
 
     @error('roleName')
-        <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{{ $message }}</div>
+    <div class="rounded-md border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+        {{ $message }}
+    </div>
     @enderror
 
-    <section class="rounded-xl border border-zinc-700 bg-zinc-900/80 shadow-sm">
-        <div class="border-b border-zinc-800 px-4 py-3 text-sm text-zinc-300">Role overview and assigned permissions</div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-zinc-200">
-                <thead>
-                    <tr class="border-b border-zinc-800 text-left text-zinc-400">
-                        <th class="px-4 py-3">NAME</th>
-                        <th class="px-4 py-3">PERMISSIONS</th>
-                        <th class="px-4 py-3 text-right">ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($roles as $role)
-                        <tr class="border-b border-zinc-800/60">
-                            <td class="px-4 py-3">
-                                <div class="font-semibold">{{ $role->name }}</div>
-                                <div class="text-xs text-zinc-500">Guard: {{ $role->guard }}</div>
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex flex-wrap gap-2">
-                                    @forelse($role->permissions->take(5) as $permission)
-                                        <span class="rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-300">{{ $permission->slug }}</span>
-                                    @empty
-                                        <span class="text-zinc-500">None</span>
-                                    @endforelse
-
-                                    @if($role->permissions->count() > 5)
-                                        <span class="rounded-full bg-zinc-200 px-2 py-1 text-xs text-zinc-900">+{{ $role->permissions->count() - 5 }}</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-right">
-                                <button wire:click="editRole({{ $role->id }})" class="rounded-lg border border-zinc-600 px-3 py-1.5 text-xs text-zinc-200">Edit</button>
-                                <button wire:click="deleteRole({{ $role->id }})" class="rounded-lg border border-red-500 px-3 py-1.5 text-xs text-red-400">Delete</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-4 py-8 text-center text-zinc-500">No roles found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    <flux:card>
+        <div class="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+            Role overview and assigned permissions
         </div>
-    </section>
 
-    <div x-data="{ open: @entangle('showModal') }" x-show="open" style="display:none" class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" role="dialog">
-        <div class="flex min-h-screen items-center justify-center p-4">
-            <div x-show="open" class="fixed inset-0 bg-black/60" @click="open = false"></div>
+        <flux:table>
+            <flux:table.columns>
+                <flux:table.column>NAME</flux:table.column>
+                <flux:table.column>PERMISSIONS</flux:table.column>
+                <flux:table.column align="right">ACTIONS</flux:table.column>
+            </flux:table.columns>
 
-            <div x-show="open" class="relative z-10 w-full max-w-4xl rounded-xl border border-zinc-700 bg-zinc-900 p-6">
-                <h3 class="mb-4 text-lg font-semibold text-zinc-100">{{ $editingRoleId ? 'Edit Role' : 'Create Role' }}</h3>
+            <flux:table.rows>
+                @forelse($roles as $role)
+                    <flux:table.row>
+                        <flux:table.cell>
+                            <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $role->name }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">Guard: {{ $role->guard }}</div>
+                        </flux:table.cell>
 
-                <div class="mb-4">
-                    <label class="mb-1 block text-sm text-zinc-300">Role Name *</label>
-                    <input wire:model="roleName" type="text" class="w-full rounded-lg border-zinc-700 bg-zinc-800 text-sm text-zinc-100" />
-                    @error('roleName') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                </div>
+                        <flux:table.cell>
+                            <div class="flex flex-wrap gap-2">
+                                @forelse($role->permissions->take(5) as $permission)
+                                    <flux:badge size="sm" variant="outline">{{ $permission->slug }}</flux:badge>
+                                @empty
+                                    <span class="text-sm text-zinc-500 dark:text-zinc-400">None</span>
+                                @endforelse
 
-                <div>
-                    <label class="mb-2 block text-sm text-zinc-300">Assign Permissions</label>
-                    <label class="mb-3 inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200">
-                        <input
-                            type="checkbox"
-                            wire:change="toggleAllPermissions($event.target.checked)"
-                            @checked(count($selectedPermissions) === $permissions->count() && $permissions->count() > 0)
-                            class="rounded border-zinc-600 text-indigo-500"
-                        />
-                        <span>Select all permissions</span>
-                    </label>
-
-                    <div class="space-y-3">
-                        @foreach($groupedPermissions as $group => $groupPermissions)
-                            <div class="rounded-lg border border-zinc-700 bg-zinc-800 p-3">
-                                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">{{ $group }}</p>
-                                <div class="grid gap-2 md:grid-cols-3">
-                                    @foreach($groupPermissions as $permission)
-                                        <label class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200">
-                                            <input type="checkbox" wire:model="selectedPermissions" value="{{ $permission->id }}" class="rounded border-zinc-600 text-indigo-500" />
-                                            <span>{{ $permission->slug }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
+                                @if($role->permissions->count() > 5)
+                                    <flux:badge size="sm" variant="solid">
+                                        +{{ $role->permissions->count() - 5 }}
+                                    </flux:badge>
+                                @endif
                             </div>
-                        @endforeach
-                    </div>
-                </div>
+                        </flux:table.cell>
 
-                <div class="mt-6 flex justify-end gap-2">
-                    <button type="button" @click="open = false" class="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-200">Cancel</button>
-                    <button type="button" wire:click="saveRole" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white">Save Role</button>
-                </div>
+                        <flux:table.cell align="right">
+                            <div class="flex justify-end gap-2">
+                                <flux:button size="sm" variant="outline" wire:click="editRole({{ $role->id }})">
+                                    Edit
+                                </flux:button>
+                                <flux:button size="sm" variant="danger" wire:click="deleteRole({{ $role->id }})">
+                                    Delete
+                                </flux:button>
+                            </div>
+                        </flux:table.cell>
+                    </flux:table.row>
+                @empty
+                    <flux:table.row>
+                        <flux:table.cell colspan="3" class="py-8 text-center text-zinc-500 dark:text-zinc-400">
+                            No roles found.
+                        </flux:table.cell>
+                    </flux:table.row>
+                @endforelse
+            </flux:table.rows>
+        </flux:table>
+    </flux:card>
+
+    <flux:modal wire:model="showModal" class="md:w-[800px] max-w-4xl space-y-6">
+        <div>
+            <flux:heading size="lg">{{ $editingRoleId ? 'Edit Role' : 'Create Role' }}</flux:heading>
+        </div>
+
+        <flux:input
+            wire:model="roleName"
+            label="Role Name *"
+            placeholder="Enter role name"
+        />
+
+        <div class="space-y-4">
+            <div>
+                <flux:heading size="sm" class="mb-3">Assign Permissions</flux:heading>
+                <flux:checkbox
+                    wire:change="toggleAllPermissions($event.target.checked)"
+                    :checked="count($selectedPermissions) === $permissions->count() && $permissions->count() > 0"
+                    label="Select all permissions"
+                />
+            </div>
+
+            <div class="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                @foreach($groupedPermissions as $group => $groupPermissions)
+                    <flux:card class="!p-4">
+                        <flux:subheading class="mb-3 uppercase tracking-wide">{{ $group }}</flux:subheading>
+                        <div class="grid gap-3 md:grid-cols-3">
+                            @foreach($groupPermissions as $permission)
+                                <flux:checkbox
+                                    wire:model="selectedPermissions"
+                                    value="{{ $permission->id }}"
+                                    label="{{ $permission->slug }}"
+                                />
+                            @endforeach
+                        </div>
+                    </flux:card>
+                @endforeach
             </div>
         </div>
-    </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <flux:button wire:click="$set('showModal', false)" variant="ghost">Cancel</flux:button>
+            <flux:button wire:click="saveRole" variant="primary">Save Role</flux:button>
+        </div>
+    </flux:modal>
 </div>
