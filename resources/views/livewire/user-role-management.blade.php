@@ -1,7 +1,7 @@
 <div class="space-y-6">
     <div>
         <flux:heading size="xl">User Management</flux:heading>
-        <flux:subheading>এখান থেকে user role এবং direct permission manage করতে পারবেন।</flux:subheading>
+        <flux:subheading>এখান থেকে user edit, role update এবং user delete করতে পারবেন।</flux:subheading>
         <flux:separator class="my-6" />
     </div>
 
@@ -14,21 +14,17 @@
                     placeholder="Search by name or email..."
                 />
             </div>
+            <flux:button wire:click="createUser" variant="primary" icon="plus">
+                Create User
+            </flux:button>
         </div>
-
-        @error('role')
-        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
-            {{ $message }}
-        </div>
-        @enderror
 
         <flux:table>
             <flux:table.columns>
                 <flux:table.column>NAME</flux:table.column>
                 <flux:table.column>EMAIL</flux:table.column>
                 <flux:table.column>CURRENT ROLE</flux:table.column>
-                <flux:table.column>ASSIGN ROLE</flux:table.column>
-                <flux:table.column>DIRECT PERMISSIONS</flux:table.column>
+                <flux:table.column align="right">ACTIONS</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
@@ -48,39 +44,25 @@
                             </flux:badge>
                         </flux:table.cell>
 
-                        <flux:table.cell>
-                            <select
-                                wire:change="updateRole({{ $user->id }}, $event.target.value)"
-                                class="block w-full min-w-[140px] rounded-lg border-zinc-200 py-1.5 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                            >
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" @selected($user->role_id === $role->id)>
-                                        {{ $role->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </flux:table.cell>
-
-                        <flux:table.cell>
-                            @if($canManagePermissions)
-                                <div class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-2 rounded-md border border-zinc-100 p-2 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-800/30">
-                                    @foreach($permissions as $permission)
-                                        <flux:checkbox
-                                            wire:change="togglePermission({{ $user->id }}, {{ $permission->id }}, $event.target.checked)"
-                                            :checked="$user->permissions->contains('id', $permission->id)"
-                                            label="{{ $permission->name }}"
-                                            size="sm"
-                                        />
-                                    @endforeach
-                                </div>
-                            @else
-                                <span class="text-xs text-zinc-400 italic">Permission নেই</span>
-                            @endif
+                        <flux:table.cell align="right">
+                            <div class="flex justify-end gap-2">
+                                <flux:button size="sm" variant="outline" wire:click="editUser({{ $user->id }})">
+                                    Edit
+                                </flux:button>
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    wire:click="deleteUser({{ $user->id }})"
+                                    wire:confirm="Are you sure you want to delete this user?"
+                                >
+                                    Delete
+                                </flux:button>
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="5" class="py-8 text-center text-zinc-500">
+                        <flux:table.cell colspan="4" class="py-8 text-center text-zinc-500">
                             No users found.
                         </flux:table.cell>
                     </flux:table.row>
@@ -94,4 +76,75 @@
             </div>
         @endif
     </flux:card>
+
+    <flux:modal wire:model="showEditModal" class="md:w-[620px] max-w-2xl space-y-6">
+        <div>
+            <flux:heading size="lg">{{ $editingUserId ? 'Edit User' : 'Create User' }}</flux:heading>
+            <flux:text class="mt-2 text-sm text-zinc-500">
+                {{ $editingUserId ? 'Update user information and assign a role.' : 'Create a new user with name, email, password and role.' }}
+            </flux:text>
+        </div>
+
+        @error('role')
+            <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
+                {{ $message }}
+            </div>
+        @enderror
+
+        @error('deleteUser')
+            <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
+                {{ $message }}
+            </div>
+        @enderror
+
+        <div class="grid gap-4">
+            <flux:input
+                wire:model="name"
+                label="Name *"
+                placeholder="Enter name"
+                autofocus
+            />
+
+            <flux:input
+                wire:model="email"
+                type="email"
+                label="Email *"
+                placeholder="Enter email address"
+            />
+
+            @if(!$editingUserId)
+                <flux:input
+                    wire:model="password"
+                    type="password"
+                    label="Password *"
+                    placeholder="Enter password"
+                />
+
+                <flux:input
+                    wire:model="password_confirmation"
+                    type="password"
+                    label="Confirm Password *"
+                    placeholder="Confirm password"
+                />
+            @endif
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Assign Role *</label>
+                <select
+                    wire:model="selectedRole"
+                    class="block w-full rounded-lg border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                >
+                    <option value="">Select role</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <flux:button wire:click="$set('showEditModal', false)" variant="ghost">Cancel</flux:button>
+            <flux:button wire:click="saveUser" variant="primary">{{ $editingUserId ? 'Update' : 'Create' }}</flux:button>
+        </div>
+    </flux:modal>
 </div>
