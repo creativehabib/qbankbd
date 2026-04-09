@@ -54,7 +54,11 @@ class Edit extends Component
 
     public function mount(Question $question)
     {
-        $this->authorize('update', $question);
+        abort_unless(auth()->user()?->hasPermission('questions.update'), 403);
+
+        if (auth()->user()?->isTeacher() && (int) $question->user_id !== (int) auth()->id()) {
+            abort(404);
+        }
         $this->question = $question;
 
         $this->subject_id = $question->subject_id;
@@ -226,7 +230,11 @@ class Edit extends Component
 
     public function save()
     {
-        $this->authorize('update', $this->question);
+        abort_unless(auth()->user()?->hasPermission('questions.update'), 403);
+
+        if (auth()->user()?->isTeacher() && (int) $this->question->user_id !== (int) auth()->id()) {
+            abort(404);
+        }
 
         $rules = [
             'subject_id' => 'required|exists:subjects,id',

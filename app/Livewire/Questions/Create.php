@@ -178,7 +178,7 @@ class Create extends Component
 
     public function save()
     {
-        $this->authorize('create', Question::class);
+        abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
 
         $rules = [
             'subject_id' => 'required|exists:subjects,id',
