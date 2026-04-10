@@ -29,6 +29,21 @@ class Questions extends Component
     public $topicId = '';
 
     /**
+     * Selected status filter.
+     */
+    public $statusFilter = '';
+
+    /**
+     * Selected question type filter.
+     */
+    public $questionTypeFilter = '';
+
+    /**
+     * Quick tab filter.
+     */
+    public $quickFilter = 'all';
+
+    /**
      * Refresh the component when a question is deleted.
      *
      * @var array
@@ -36,6 +51,7 @@ class Questions extends Component
     protected $listeners = [
         'questionDeleted' => '$refresh',
         'deleteQuestionConfirmed' => 'deleteQuestion',
+        'toggleQuestionStatusConfirmed' => 'toggleQuestionStatus',
     ];
 
     /**
@@ -54,6 +70,22 @@ class Questions extends Component
 
     public function updatingTopicId(): void
     {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingQuestionTypeFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function setQuickFilter(string $filter): void
+    {
+        $this->quickFilter = $filter;
         $this->resetPage();
     }
 
@@ -78,12 +110,41 @@ class Questions extends Component
         $this->resetPage();
     }
 
+    public function toggleQuestionStatus(int $id): void
+    {
+        abort_unless(auth()->user()?->hasPermission('questions.publish'), 403);
+
+        $question = Question::query()->findOrFail($id);
+        $nextStatus = $question->status === 'active' ? 'pending' : 'active';
+        $question->update(['status' => $nextStatus]);
+
+        $message = $nextStatus === 'active'
+            ? 'Question approved successfully.'
+            : 'Question moved back to pending successfully.';
+
+        $this->dispatch('questionStatusUpdated', message: $message);
+        $this->resetPage();
+    }
+
     public function render()
     {
         $user = auth()->user();
 
-        $questions = Question::with('subject', 'topic')
+        $baseQuery = Question::query()
+            ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id));
+
+        $allQuestionsCount = (clone $baseQuery)->count();
+        $mineQuestionsCount = (clone $baseQuery)->where('user_id', $user->id)->count();
+        $publishedQuestionsCount = (clone $baseQuery)->where('status', 'active')->count();
+        $stickyQuestionsCount = (clone $baseQuery)->where('status', 'pending')->count();
+        $activeQuestionsCount = (clone $baseQuery)->where('status', 'active')->count();
+        $inactiveQuestionsCount = (clone $baseQuery)->where('status', 'inactive')->count();
+
+        $questions = Question::with('subject', 'topic', 'user')
             ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id))
+            ->when($this->quickFilter === 'mine', fn ($q) => $q->where('user_id', $user->id))
+            ->when($this->quickFilter === 'published', fn ($q) => $q->where('status', 'active'))
+            ->when($this->quickFilter === 'sticky', fn ($q) => $q->where('status', 'pending'))
             ->when($this->search, function ($q) {
                 $search = '%'.$this->search.'%';
                 $q->where('title', 'like', $search)
@@ -92,6 +153,8 @@ class Questions extends Component
             })
             ->when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->topicId, fn ($q) => $q->where('topic_id', $this->topicId))
+            ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
+            ->when($this->questionTypeFilter, fn ($q) => $q->where('question_type', $this->questionTypeFilter))
             ->latest()
             ->paginate(10);
 
@@ -101,6 +164,12 @@ class Questions extends Component
             'topics' => Topic::when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
                 ->orderBy('name')
                 ->get(),
+            'allQuestionsCount' => $allQuestionsCount,
+            'mineQuestionsCount' => $mineQuestionsCount,
+            'publishedQuestionsCount' => $publishedQuestionsCount,
+            'stickyQuestionsCount' => $stickyQuestionsCount,
+            'activeQuestionsCount' => $activeQuestionsCount,
+            'inactiveQuestionsCount' => $inactiveQuestionsCount,
         ])->layout('layouts.app', ['title' => 'All Questions']);
     }
 }
