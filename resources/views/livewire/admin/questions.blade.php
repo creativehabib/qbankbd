@@ -74,6 +74,15 @@
                 </span>
             </div>
         </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                Active: {{ $activeQuestionsCount }}
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                Inactive: {{ $inactiveQuestionsCount }}
+            </span>
+        </div>
     </div>
 
     <div class="overflow-x-auto">
