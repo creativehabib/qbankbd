@@ -9,6 +9,7 @@ use App\Livewire\Questions\Create;
 use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
 use App\Livewire\Subjects\SubjectIndex;
+use App\Livewire\Tags\Index as TagIndex;
 use App\Livewire\Topics\TopicIndex;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/subjects', SubjectIndex::class)->name('subjects.index');
     Route::get('/chapters', ChapterIndex::class)->name('chapters.index');
     Route::get('/topics', TopicIndex::class)->name('topics.index');
+
+    Route::middleware('permission:tags.create|tags.update|tags.delete')->group(function (): void {
+        Route::get('/tags', TagIndex::class)->name('tags.index');
+    });
 
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/users', UserRoleManagement::class)->name('users.index');

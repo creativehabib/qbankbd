@@ -46,6 +46,12 @@
                 {{ __('Topics') }}
             </flux:sidebar.item>
 
+            @if(auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete']))
+                <flux:sidebar.item icon="tag" :href="route('tags.index')" :current="request()->routeIs('tags.*')" wire:navigate>
+                    {{ __('Tags') }}
+                </flux:sidebar.item>
+            @endif
+
         </flux:sidebar.group>
 
         @if(auth()->user()->hasPermission('users.manage_roles'))

@@ -2,12 +2,15 @@
     <div class="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
         <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search tags..."
                class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-        <form wire:submit.prevent="save" class="flex gap-2">
-            <input type="text" wire:model="name" placeholder="Tag name"
-                   class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-            <button type="submit"
-                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Add</button>
-        </form>
+
+        @if($canCreate)
+            <form wire:submit.prevent="save" class="flex gap-2">
+                <input type="text" wire:model="name" placeholder="Tag name"
+                       class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+                <button type="submit"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Add</button>
+            </form>
+        @endif
     </div>
 
     <div class="overflow-x-auto">
@@ -38,10 +41,15 @@
                     </td>
                     <td class="px-4 py-2 space-x-2">
                         @if($editingId !== $tag->id)
-                            <button wire:click="edit({{ $tag->id }})"
-                                    class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</button>
-                            <button type="button" onclick="confirmDelete({{ $tag->id }})"
-                                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                            @if($canUpdate)
+                                <button wire:click="edit({{ $tag->id }})"
+                                        class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</button>
+                            @endif
+
+                            @if($canDelete)
+                                <button type="button" onclick="confirmDelete({{ $tag->id }})"
+                                        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                            @endif
                         @endif
                     </td>
                 </tr>
@@ -85,18 +93,6 @@
             }
         });
     }
-
-    window.sessionSuccess = @json(session('success'));
-
-    function handleSessionToast() {
-        if (window.sessionSuccess) {
-            showToast(window.sessionSuccess);
-            window.sessionSuccess = null;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', handleSessionToast);
-    document.addEventListener('livewire:navigated', handleSessionToast);
 
     window.addEventListener('tagSaved', e => {
         showToast(e.detail.message || 'Tag added successfully.');
