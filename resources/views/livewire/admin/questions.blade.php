@@ -7,22 +7,32 @@
     @endphp
     <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
         <div class="flex flex-col gap-4">
-            <div class="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-300">
-                <button wire:click="setQuickFilter('all')" class="{{ $quickFilter === 'all' ? $activeTabClass : $tabClass }}">
-                    All ({{ $allQuestionsCount }})
-                </button>
-                <span>|</span>
-                <button wire:click="setQuickFilter('mine')" class="{{ $quickFilter === 'mine' ? $activeTabClass : $tabClass }}">
-                    Mine ({{ $mineQuestionsCount }})
-                </button>
-                <span>|</span>
-                <button wire:click="setQuickFilter('published')" class="{{ $quickFilter === 'published' ? $activeTabClass : $tabClass }}">
-                    Published ({{ $publishedQuestionsCount }})
-                </button>
-                <span>|</span>
-                <button wire:click="setQuickFilter('pending')" class="{{ $quickFilter === 'pending' ? $activeTabClass : $tabClass }}">
-                    Pending ({{ $pendingQuestionsCount }})
-                </button>
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <button wire:click="setQuickFilter('all')" class="{{ $quickFilter === 'all' ? $activeTabClass : $tabClass }}">
+                        All ({{ $allQuestionsCount }})
+                    </button>
+                    <span>|</span>
+                    <button wire:click="setQuickFilter('mine')" class="{{ $quickFilter === 'mine' ? $activeTabClass : $tabClass }}">
+                        Mine ({{ $mineQuestionsCount }})
+                    </button>
+                    <span>|</span>
+                    <button wire:click="setQuickFilter('published')" class="{{ $quickFilter === 'published' ? $activeTabClass : $tabClass }}">
+                        Published ({{ $publishedQuestionsCount }})
+                    </button>
+                    <span>|</span>
+                    <button wire:click="setQuickFilter('pending')" class="{{ $quickFilter === 'pending' ? $activeTabClass : $tabClass }}">
+                        Pending ({{ $pendingQuestionsCount }})
+                    </button>
+                </div>
+
+                <div class="relative w-full lg:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search questions..."
+                           class="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
