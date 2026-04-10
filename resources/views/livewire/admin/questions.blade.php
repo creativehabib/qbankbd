@@ -30,6 +30,14 @@
                         <option value="{{ $ch->id }}">{{ $ch->name }}</option>
                     @endforeach
                 </select>
+
+                <select wire:model.live="statusFilter"
+                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
             </div>
 
             @if($canCreateQuestion)
@@ -39,6 +47,15 @@
                     New Question
                 </a>
             @endif
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                Active: {{ $activeQuestionsCount }}
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                Inactive: {{ $inactiveQuestionsCount }}
+            </span>
         </div>
     </div>
 

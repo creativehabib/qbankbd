@@ -29,6 +29,11 @@ class Questions extends Component
     public $topicId = '';
 
     /**
+     * Selected status filter.
+     */
+    public $statusFilter = '';
+
+    /**
      * Refresh the component when a question is deleted.
      *
      * @var array
@@ -54,6 +59,11 @@ class Questions extends Component
     }
 
     public function updatingTopicId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
     {
         $this->resetPage();
     }
@@ -99,6 +109,12 @@ class Questions extends Component
     {
         $user = auth()->user();
 
+        $baseQuery = Question::query()
+            ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id));
+
+        $activeQuestionsCount = (clone $baseQuery)->where('status', 'active')->count();
+        $inactiveQuestionsCount = (clone $baseQuery)->where('status', 'inactive')->count();
+
         $questions = Question::with('subject', 'topic', 'user')
             ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id))
             ->when($this->search, function ($q) {
@@ -109,6 +125,7 @@ class Questions extends Component
             })
             ->when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->topicId, fn ($q) => $q->where('topic_id', $this->topicId))
+            ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->latest()
             ->paginate(10);
 
@@ -118,6 +135,8 @@ class Questions extends Component
             'topics' => Topic::when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
                 ->orderBy('name')
                 ->get(),
+            'activeQuestionsCount' => $activeQuestionsCount,
+            'inactiveQuestionsCount' => $inactiveQuestionsCount,
         ])->layout('layouts.app', ['title' => 'All Questions']);
     }
 }

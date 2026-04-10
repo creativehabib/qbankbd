@@ -150,3 +150,59 @@ it('allows admin to toggle question status from the question list', function () 
 
     expect($question->fresh()->status)->toBe('pending');
 });
+
+it('filters questions by status and shows active/inactive counts', function () {
+    $admin = User::factory()->admin()->create();
+    [$subject, $chapter, $topic] = createQuestionDependencies();
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'Pending question for review',
+        'slug' => 'pending-question-for-review',
+        'difficulty' => 'easy',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'pending',
+        'user_id' => $admin->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'topic_id' => $topic->id,
+    ]);
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'Active question now',
+        'slug' => 'active-question-now',
+        'difficulty' => 'easy',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'active',
+        'user_id' => $admin->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'topic_id' => $topic->id,
+    ]);
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'Inactive archived question',
+        'slug' => 'inactive-archived-question',
+        'difficulty' => 'easy',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'inactive',
+        'user_id' => $admin->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'topic_id' => $topic->id,
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test(Questions::class)
+        ->assertSee('Active: 1')
+        ->assertSee('Inactive: 1')
+        ->set('statusFilter', 'pending')
+        ->assertSee('Pending question for review')
+        ->assertDontSee('Active question now')
+        ->assertDontSee('Inactive archived question');
+});
