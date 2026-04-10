@@ -178,7 +178,9 @@ class Create extends Component
 
     public function save()
     {
-        abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
+        $currentUser = auth()->user();
+
+        abort_unless($currentUser?->hasPermission('questions.create'), 403);
 
         $rules = [
             'subject_id' => 'required|exists:subjects,id',
@@ -229,8 +231,9 @@ class Create extends Component
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
+                'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
                 'extra_content' => $extraData,
-                'user_id' => auth()->id(),
+                'user_id' => $currentUser?->id,
             ]);
 
             // Tags যুক্ত করা
