@@ -122,7 +122,7 @@ it('stores questions as active when creator has publish permission', function ()
     expect($question->status)->toBe('active');
 });
 
-it('allows admin to approve pending questions', function () {
+it('allows admin to toggle question status from the question list', function () {
     $admin = User::factory()->admin()->create();
 
     $question = Question::query()->create([
@@ -138,8 +138,15 @@ it('allows admin to approve pending questions', function () {
 
     Livewire::actingAs($admin)
         ->test(Questions::class)
-        ->call('approveQuestion', $question->id)
+        ->call('toggleQuestionStatus', $question->id)
         ->assertHasNoErrors();
 
     expect($question->fresh()->status)->toBe('active');
+
+    Livewire::actingAs($admin)
+        ->test(Questions::class)
+        ->call('toggleQuestionStatus', $question->id)
+        ->assertHasNoErrors();
+
+    expect($question->fresh()->status)->toBe('pending');
 });

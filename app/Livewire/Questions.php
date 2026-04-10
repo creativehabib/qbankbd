@@ -36,7 +36,7 @@ class Questions extends Component
     protected $listeners = [
         'questionDeleted' => '$refresh',
         'deleteQuestionConfirmed' => 'deleteQuestion',
-        'approveQuestionConfirmed' => 'approveQuestion',
+        'toggleQuestionStatusConfirmed' => 'toggleQuestionStatus',
     ];
 
     /**
@@ -79,14 +79,19 @@ class Questions extends Component
         $this->resetPage();
     }
 
-    public function approveQuestion(int $id): void
+    public function toggleQuestionStatus(int $id): void
     {
         abort_unless(auth()->user()?->hasPermission('questions.publish'), 403);
 
         $question = Question::query()->findOrFail($id);
-        $question->update(['status' => 'active']);
+        $nextStatus = $question->status === 'active' ? 'pending' : 'active';
+        $question->update(['status' => $nextStatus]);
 
-        $this->dispatch('questionApproved', message: 'Question approved successfully.');
+        $message = $nextStatus === 'active'
+            ? 'Question approved successfully.'
+            : 'Question moved back to pending successfully.';
+
+        $this->dispatch('questionStatusUpdated', message: $message);
         $this->resetPage();
     }
 

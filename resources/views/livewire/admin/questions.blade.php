@@ -124,13 +124,18 @@
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
                         $canDeleteQuestion = $currentUser?->hasPermission('questions.delete')
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
-                        $canApproveQuestion = $currentUser?->hasPermission('questions.publish') && $q->status === 'pending';
+                        $canToggleQuestionStatus = $currentUser?->hasPermission('questions.publish');
                     @endphp
                     <td class="px-6 py-4 text-right space-x-1">
-                        @if($canApproveQuestion)
-                            <button type="button" onclick="confirmApprove({{ $q->id }})"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md text-emerald-500 hover:text-white hover:bg-emerald-500 transition-colors border border-emerald-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-emerald-600" title="Approve Question">
-                                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        @if($canToggleQuestionStatus)
+                            <button type="button" onclick="confirmStatusToggle({{ $q->id }}, '{{ $q->status }}')"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
+                                    title="{{ $q->status === 'pending' ? 'Approve Question' : 'Move to Pending' }}">
+                                @if($q->status === 'pending')
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                @else
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                @endif
                             </button>
                         @endif
 
@@ -209,16 +214,19 @@
             });
         }
 
-        function confirmApprove(id) {
+        function confirmStatusToggle(id, currentStatus) {
             if (!window.Swal) return;
+            const isPending = currentStatus === 'pending';
             Swal.fire({
-                title: 'Approve this question?',
-                text: 'This question will become visible as an active question.',
+                title: isPending ? 'Approve this question?' : 'Move this question to pending?',
+                text: isPending
+                    ? 'This question will become visible as an active question.'
+                    : 'This question will be moved back to pending for review.',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#10b981',
+                confirmButtonColor: isPending ? '#10b981' : '#f59e0b',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, approve it!',
+                confirmButtonText: isPending ? 'Yes, approve it!' : 'Yes, move it!',
                 cancelButtonText: 'Cancel',
                 reverseButtons: true,
                 customClass: {
@@ -227,7 +235,7 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.dispatch('approveQuestionConfirmed', { id: id });
+                    Livewire.dispatch('toggleQuestionStatusConfirmed', { id: id });
                 }
             });
         }
@@ -248,8 +256,8 @@
             showToast(e.detail.message || 'Question has been deleted successfully.');
         });
 
-        window.addEventListener('questionApproved', e => {
-            showToast(e.detail.message || 'Question has been approved successfully.');
+        window.addEventListener('questionStatusUpdated', e => {
+            showToast(e.detail.message || 'Question status has been updated successfully.');
         });
     </script>
 @endpush
