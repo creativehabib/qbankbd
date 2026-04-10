@@ -205,7 +205,7 @@ class Create extends Component
 
         $this->validate($rules);
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($currentUser) {
             $extraData = null;
 
             // টাইপ অনুযায়ী extra_content এ ডাটা সেট
