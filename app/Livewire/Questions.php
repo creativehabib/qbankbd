@@ -36,6 +36,7 @@ class Questions extends Component
     protected $listeners = [
         'questionDeleted' => '$refresh',
         'deleteQuestionConfirmed' => 'deleteQuestion',
+        'approveQuestionConfirmed' => 'approveQuestion',
     ];
 
     /**
@@ -78,11 +79,22 @@ class Questions extends Component
         $this->resetPage();
     }
 
+    public function approveQuestion(int $id): void
+    {
+        abort_unless(auth()->user()?->hasPermission('questions.publish'), 403);
+
+        $question = Question::query()->findOrFail($id);
+        $question->update(['status' => 'active']);
+
+        $this->dispatch('questionApproved', message: 'Question approved successfully.');
+        $this->resetPage();
+    }
+
     public function render()
     {
         $user = auth()->user();
 
-        $questions = Question::with('subject', 'topic')
+        $questions = Question::with('subject', 'topic', 'user')
             ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id))
             ->when($this->search, function ($q) {
                 $search = '%'.$this->search.'%';

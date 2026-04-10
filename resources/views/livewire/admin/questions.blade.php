@@ -50,6 +50,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs w-1/3">Question Title</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Taxonomy</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Type</th>
+                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Marks</th>
                 <th class="px-6 py-4 text-right font-semibold uppercase tracking-wider text-xs">Actions</th>
             </tr>
@@ -99,6 +100,18 @@
                                 {{ $type }}
                             </span>
                     </td>
+                    <td class="px-6 py-4 text-center">
+                        @php
+                            $statusClass = match($q->status) {
+                                'active' => 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+                                'pending' => 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
+                                default => 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+                            };
+                        @endphp
+                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-xs font-bold border {{ $statusClass }}">
+                            {{ strtoupper($q->status ?? 'pending') }}
+                        </span>
+                    </td>
 
                     <td class="px-6 py-4 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold text-sm dark:bg-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 shadow-sm">
@@ -111,8 +124,16 @@
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
                         $canDeleteQuestion = $currentUser?->hasPermission('questions.delete')
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
+                        $canApproveQuestion = $currentUser?->hasPermission('questions.publish') && $q->status === 'pending';
                     @endphp
                     <td class="px-6 py-4 text-right space-x-1">
+                        @if($canApproveQuestion)
+                            <button type="button" onclick="confirmApprove({{ $q->id }})"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md text-emerald-500 hover:text-white hover:bg-emerald-500 transition-colors border border-emerald-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-emerald-600" title="Approve Question">
+                                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                        @endif
+
                         @if($canEditQuestion)
                             <a wire:navigate href="{{ route('questions.edit', $q) }}"
                                class="inline-flex items-center justify-center w-8 h-8 rounded-md text-indigo-500 hover:text-white hover:bg-indigo-500 transition-colors border border-indigo-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-indigo-600" title="Edit Question">
@@ -130,7 +151,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center">
+                    <td colspan="7" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="mb-3 text-gray-300 dark:text-gray-600" height="3em" width="3em" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             <p class="text-lg font-medium">No questions found</p>
@@ -188,6 +209,29 @@
             });
         }
 
+        function confirmApprove(id) {
+            if (!window.Swal) return;
+            Swal.fire({
+                title: 'Approve this question?',
+                text: 'This question will become visible as an active question.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, approve it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-md px-4 py-2 font-medium',
+                    cancelButton: 'rounded-md px-4 py-2 font-medium'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('approveQuestionConfirmed', { id: id });
+                }
+            });
+        }
+
         window.sessionSuccess = @json(session('success'));
 
         function handleSessionToast() {
@@ -202,6 +246,10 @@
 
         window.addEventListener('questionDeleted', e => {
             showToast(e.detail.message || 'Question has been deleted successfully.');
+        });
+
+        window.addEventListener('questionApproved', e => {
+            showToast(e.detail.message || 'Question has been approved successfully.');
         });
     </script>
 @endpush
