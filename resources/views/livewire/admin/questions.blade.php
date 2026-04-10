@@ -92,7 +92,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
             @forelse($questions as $q)
-                <tr class="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors group">
+                <tr class="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 group">
 
                     <td class="px-6 py-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
