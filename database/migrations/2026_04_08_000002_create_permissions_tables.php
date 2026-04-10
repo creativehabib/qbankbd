@@ -14,26 +14,27 @@ return new class extends Migration
         Schema::create('permissions', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('guard_name');
             $table->timestamps();
+
+            $table->unique(['name', 'guard_name']);
         });
 
-        Schema::create('role_permissions', function (Blueprint $table): void {
-            $table->id();
-            $table->string('role');
-            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
-            $table->timestamps();
+        Schema::create('model_has_permissions', function (Blueprint $table): void {
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+            $table->index(['model_id', 'model_type'], 'model_has_permissions_model_id_model_type_index');
 
-            $table->unique(['role', 'permission_id']);
-        });
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on('permissions')
+                ->cascadeOnDelete();
 
-        Schema::create('user_permissions', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
-            $table->timestamps();
-
-            $table->unique(['user_id', 'permission_id']);
+            $table->primary(
+                ['permission_id', 'model_id', 'model_type'],
+                'model_has_permissions_permission_model_type_primary'
+            );
         });
 
     }
@@ -43,8 +44,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_permissions');
-        Schema::dropIfExists('role_permissions');
+        Schema::dropIfExists('model_has_permissions');
         Schema::dropIfExists('permissions');
     }
 };

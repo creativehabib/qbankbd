@@ -29,12 +29,18 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => 'student',
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->assignRole('student');
+        });
     }
 
     /**
@@ -61,22 +67,22 @@ class UserFactory extends Factory
 
     public function teacher(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'teacher',
-        ]);
+        return $this->afterCreating(function (User $user): void {
+            $user->syncRoles(['teacher']);
+        });
     }
 
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'admin',
-        ]);
+        return $this->afterCreating(function (User $user): void {
+            $user->syncRoles(['admin']);
+        });
     }
 
     public function superAdmin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'super_admin',
-        ]);
+        return $this->afterCreating(function (User $user): void {
+            $user->syncRoles(['super_admin']);
+        });
     }
 }

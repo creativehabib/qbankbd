@@ -32,15 +32,15 @@
                         </flux:table.cell>
 
                         <flux:table.cell>
-                            <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $permission->slug }}</p>
+                            <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ $permission->name }}</p>
                             <div class="mt-1 flex items-center gap-1 text-xs text-zinc-500">
-                                System key: <flux:badge size="sm" variant="outline">{{ $permission->slug }}</flux:badge>
+                                System key: <flux:badge size="sm" variant="outline">{{ $permission->name }}</flux:badge>
                             </div>
                         </flux:table.cell>
 
                         <flux:table.cell>
                             <flux:badge variant="primary" size="sm">
-                                {{ str($permission->slug)->before('.')->replace('_', ' ')->title() }}
+                                {{ str($permission->name)->before('.')->replace('_', ' ')->title() }}
                             </flux:badge>
                         </flux:table.cell>
 
