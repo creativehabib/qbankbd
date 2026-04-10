@@ -26,25 +26,35 @@
                 {{ __('Questions') }}
             </flux:sidebar.item>
 
-            <flux:sidebar.item icon="clipboard-document-list" :href="route('exam-categories.index')" :current="request()->routeIs('exam-categories.*')" wire:navigate>
-                {{ __('Exam Categories') }}
-            </flux:sidebar.item>
+            @if(auth()->user()->hasPermission('exam_categories.manage'))
+                <flux:sidebar.item icon="clipboard-document-list" :href="route('exam-categories.index')" :current="request()->routeIs('exam-categories.*')" wire:navigate>
+                    {{ __('Exam Categories') }}
+                </flux:sidebar.item>
+            @endif
 
-            <flux:sidebar.item icon="academic-cap" :href="route('academic-classes.index')" :current="request()->routeIs('academic-classes.*')" wire:navigate>
-                {{ __('Academic Class') }}
-            </flux:sidebar.item>
+            @if(auth()->user()->hasPermission('academic_classes.manage'))
+                <flux:sidebar.item icon="academic-cap" :href="route('academic-classes.index')" :current="request()->routeIs('academic-classes.*')" wire:navigate>
+                    {{ __('Academic Class') }}
+                </flux:sidebar.item>
+            @endif
 
-            <flux:sidebar.item icon="book-open" :href="route('subjects.index')" :current="request()->routeIs('subjects.*')" wire:navigate>
-                {{ __('Subjects') }}
-            </flux:sidebar.item>
+            @if(auth()->user()->hasPermission('subjects.manage'))
+                <flux:sidebar.item icon="book-open" :href="route('subjects.index')" :current="request()->routeIs('subjects.*')" wire:navigate>
+                    {{ __('Subjects') }}
+                </flux:sidebar.item>
+            @endif
 
-            <flux:sidebar.item icon="bookmark" :href="route('chapters.index')" :current="request()->routeIs('chapters.*')" wire:navigate>
-                {{ __('Chapter') }}
-            </flux:sidebar.item>
+            @if(auth()->user()->hasPermission('chapters.manage'))
+                <flux:sidebar.item icon="bookmark" :href="route('chapters.index')" :current="request()->routeIs('chapters.*')" wire:navigate>
+                    {{ __('Chapter') }}
+                </flux:sidebar.item>
+            @endif
 
-            <flux:sidebar.item icon="hashtag" :href="route('topics.index')" :current="request()->routeIs('topics.*')" wire:navigate>
-                {{ __('Topics') }}
-            </flux:sidebar.item>
+            @if(auth()->user()->hasPermission('topics.manage'))
+                <flux:sidebar.item icon="hashtag" :href="route('topics.index')" :current="request()->routeIs('topics.*')" wire:navigate>
+                    {{ __('Topics') }}
+                </flux:sidebar.item>
+            @endif
 
             @if(auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete']))
                 <flux:sidebar.item icon="tag" :href="route('tags.index')" :current="request()->routeIs('tags.*')" wire:navigate>
