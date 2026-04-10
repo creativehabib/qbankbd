@@ -30,6 +30,14 @@
                         <option value="{{ $ch->id }}">{{ $ch->name }}</option>
                     @endforeach
                 </select>
+
+                <select wire:model.live="statusFilter"
+                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
             </div>
 
             @if($canCreateQuestion)
@@ -39,6 +47,15 @@
                     New Question
                 </a>
             @endif
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                Active: {{ $activeQuestionsCount }}
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                Inactive: {{ $inactiveQuestionsCount }}
+            </span>
         </div>
     </div>
 
@@ -50,6 +67,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs w-1/3">Question Title</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Taxonomy</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Type</th>
+                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Marks</th>
                 <th class="px-6 py-4 text-right font-semibold uppercase tracking-wider text-xs">Actions</th>
             </tr>
@@ -99,6 +117,18 @@
                                 {{ $type }}
                             </span>
                     </td>
+                    <td class="px-6 py-4 text-center">
+                        @php
+                            $statusClass = match($q->status) {
+                                'active' => 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+                                'pending' => 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
+                                default => 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+                            };
+                        @endphp
+                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-xs font-bold border {{ $statusClass }}">
+                            {{ strtoupper($q->status ?? 'pending') }}
+                        </span>
+                    </td>
 
                     <td class="px-6 py-4 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold text-sm dark:bg-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 shadow-sm">
@@ -111,8 +141,21 @@
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
                         $canDeleteQuestion = $currentUser?->hasPermission('questions.delete')
                             && (! $currentUser->isTeacher() || (int) $q->user_id === (int) $currentUser->id);
+                        $canToggleQuestionStatus = $currentUser?->hasPermission('questions.publish');
                     @endphp
                     <td class="px-6 py-4 text-right space-x-1">
+                        @if($canToggleQuestionStatus)
+                            <button type="button" onclick="confirmStatusToggle({{ $q->id }}, '{{ $q->status }}')"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
+                                    title="{{ $q->status === 'pending' ? 'Approve Question' : 'Move to Pending' }}">
+                                @if($q->status === 'pending')
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                @else
+                                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                @endif
+                            </button>
+                        @endif
+
                         @if($canEditQuestion)
                             <a wire:navigate href="{{ route('questions.edit', $q) }}"
                                class="inline-flex items-center justify-center w-8 h-8 rounded-md text-indigo-500 hover:text-white hover:bg-indigo-500 transition-colors border border-indigo-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-indigo-600" title="Edit Question">
@@ -130,7 +173,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center">
+                    <td colspan="7" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="mb-3 text-gray-300 dark:text-gray-600" height="3em" width="3em" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             <p class="text-lg font-medium">No questions found</p>
@@ -188,6 +231,32 @@
             });
         }
 
+        function confirmStatusToggle(id, currentStatus) {
+            if (!window.Swal) return;
+            const isPending = currentStatus === 'pending';
+            Swal.fire({
+                title: isPending ? 'Approve this question?' : 'Move this question to pending?',
+                text: isPending
+                    ? 'This question will become visible as an active question.'
+                    : 'This question will be moved back to pending for review.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: isPending ? '#10b981' : '#f59e0b',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: isPending ? 'Yes, approve it!' : 'Yes, move it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-md px-4 py-2 font-medium',
+                    cancelButton: 'rounded-md px-4 py-2 font-medium'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('toggleQuestionStatusConfirmed', { id: id });
+                }
+            });
+        }
+
         window.sessionSuccess = @json(session('success'));
 
         function handleSessionToast() {
@@ -202,6 +271,10 @@
 
         window.addEventListener('questionDeleted', e => {
             showToast(e.detail.message || 'Question has been deleted successfully.');
+        });
+
+        window.addEventListener('questionStatusUpdated', e => {
+            showToast(e.detail.message || 'Question status has been updated successfully.');
         });
     </script>
 @endpush
