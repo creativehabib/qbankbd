@@ -2,51 +2,77 @@
     @php
         $currentUser = auth()->user();
         $canCreateQuestion = $currentUser?->hasPermission('questions.create');
+        $tabClass = 'text-sm hover:text-indigo-600 transition-colors';
+        $activeTabClass = 'text-indigo-600 font-semibold';
     @endphp
     <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-300">
+                <button wire:click="setQuickFilter('all')" class="{{ $quickFilter === 'all' ? $activeTabClass : $tabClass }}">
+                    All ({{ $allQuestionsCount }})
+                </button>
+                <span>|</span>
+                <button wire:click="setQuickFilter('mine')" class="{{ $quickFilter === 'mine' ? $activeTabClass : $tabClass }}">
+                    Mine ({{ $mineQuestionsCount }})
+                </button>
+                <span>|</span>
+                <button wire:click="setQuickFilter('published')" class="{{ $quickFilter === 'published' ? $activeTabClass : $tabClass }}">
+                    Published ({{ $publishedQuestionsCount }})
+                </button>
+                <span>|</span>
+                <button wire:click="setQuickFilter('sticky')" class="{{ $quickFilter === 'sticky' ? $activeTabClass : $tabClass }}">
+                    Sticky ({{ $stickyQuestionsCount }})
+                </button>
+            </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 flex-1">
-                <div class="relative flex-1 max-w-md">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
-                    </div>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search questions..."
-                           class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 transition-shadow text-sm" />
-                </div>
-
-                <select wire:model.live="subjectId"
-                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
-                    <option value="">All Subjects</option>
+            <div class="flex flex-wrap items-center gap-2">
+                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option>Bulk Actions</option>
+                </select>
+                <button type="button" class="px-4 py-2 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    Apply
+                </button>
+                <select class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option>All dates</option>
+                </select>
+                <select wire:model.live="subjectId" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option value="">All Categories</option>
                     @foreach($subjects as $sub)
                         <option value="{{ $sub->id }}">{{ $sub->name }}</option>
                     @endforeach
                 </select>
-
-                <select wire:model.live="topicId"
-                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
-                    <option value="">All Topics</option>
-                    @foreach($topics as $ch)
-                        <option value="{{ $ch->id }}">{{ $ch->name }}</option>
-                    @endforeach
+                <select wire:model.live="questionTypeFilter" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option value="">All formats</option>
+                    <option value="mcq">MCQ</option>
+                    <option value="cq">CQ</option>
+                    <option value="short">Short</option>
+                    <option value="written">Written</option>
                 </select>
-
-                <select wire:model.live="statusFilter"
-                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
-                    <option value="">All Status</option>
+                <select wire:model.live="statusFilter" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option value="">All status</option>
                     <option value="pending">Pending</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
+                <button type="button" wire:click="$refresh" class="px-4 py-2 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    Filter
+                </button>
+                @if($canCreateQuestion)
+                    <a wire:navigate href="{{ route('questions.create') }}"
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-md shadow-sm hover:bg-indigo-700 transition-all">
+                        New Question
+                    </a>
+                @endif
             </div>
 
-            @if($canCreateQuestion)
-                <a wire:navigate href="{{ route('questions.create') }}"
-                   class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg shadow-sm hover:bg-indigo-700 hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1.1em" width="1.1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
-                    New Question
-                </a>
-            @endif
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    Active: {{ $activeQuestionsCount }}
+                </span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                    Inactive: {{ $inactiveQuestionsCount }}
+                </span>
+            </div>
         </div>
 
         <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
