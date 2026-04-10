@@ -164,7 +164,7 @@
                     <td class="px-6 py-4 text-right space-x-1">
                         @if($canToggleQuestionStatus)
                             <button type="button" onclick="confirmStatusToggle({{ $q->id }}, '{{ $q->status }}')"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md cursor-pointer {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
                                     title="{{ $q->status === 'pending' ? 'Approve Question' : 'Move to Pending' }}">
                                 @if($q->status === 'pending')
                                     <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>

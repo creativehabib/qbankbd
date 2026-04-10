@@ -55,7 +55,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Difficulty Level</label>
                 <div class="relative">
-                    <select wire:model="difficulty" class="block w-full px-2 py-1.5 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200 appearance-none">
+                    <select wire:model="difficulty" class="block w-full px-2 py-1.5 text-sm rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200 appearance-none">
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
@@ -65,7 +65,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Question Type</label>
-                <select wire:model.live="question_type" class="block w-full px-2 py-1.5 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
+                <select wire:model.live="question_type" class="block w-full text-sm px-2 py-1.5 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
                     <option value="mcq">Multiple Choice (MCQ)</option>
                     <option value="cq">Creative Question (CQ)</option>
                     <option value="short">Short Question</option>

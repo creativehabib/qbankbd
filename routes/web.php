@@ -10,6 +10,11 @@ use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
 use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Tags\Index as TagIndex;
+use App\Livewire\Teacher\CreateQuestionSet;
+use App\Livewire\Teacher\GeneratedQuestionSetPage;
+use App\Livewire\Teacher\QuestionGenerator;
+use App\Livewire\Teacher\QuestionPaper;
+use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +61,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/permissions', PermissionManager::class)->name('permissions.index');
         Route::get('/roles-permissions', RolePermissionManager::class)->name('roles-permissions.index');
     });
+
+    Route::get('/teacher/question-set-create', CreateQuestionSet::class)->name('questions.set.create');
+    Route::get('/teacher/create-question/generated-qset/{qset}', GeneratedQuestionSetPage::class)->name('qset.generated');
+    Route::get('/teacher/view-questions', ViewQuestions::class)->name('questions.view');
+    Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
+    Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
 });
 
 require __DIR__.'/settings.php';

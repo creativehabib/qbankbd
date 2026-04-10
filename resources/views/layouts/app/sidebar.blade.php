@@ -62,6 +62,9 @@
 
         </flux:sidebar.group>
 
+        <flux:sidebar.item icon="tag" :href="route('questions.set.create')" :current="request()->routeIs('questions.set.create.*')" wire:navigate>
+            {{ __('Question Create') }}
+        </flux:sidebar.item>
         @if(auth()->user()->hasPermission('users.manage_roles'))
             <flux:sidebar.group :heading="__('Administration')" icon="shield-check">
                 <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
