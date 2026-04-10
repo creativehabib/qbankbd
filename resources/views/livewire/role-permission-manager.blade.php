@@ -32,13 +32,13 @@
                     <flux:table.row>
                         <flux:table.cell>
                             <div class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $role->name }}</div>
-                            <div class="text-xs text-zinc-500 dark:text-zinc-400">Guard: {{ $role->guard }}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400">Guard: {{ $role->guard_name }}</div>
                         </flux:table.cell>
 
                         <flux:table.cell>
                             <div class="flex flex-wrap gap-2">
                                 @forelse($role->permissions->take(5) as $permission)
-                                    <flux:badge size="sm" variant="outline">{{ $permission->slug }}</flux:badge>
+                                    <flux:badge size="sm" variant="outline">{{ $permission->name }}</flux:badge>
                                 @empty
                                     <span class="text-sm text-zinc-500 dark:text-zinc-400">None</span>
                                 @endforelse
@@ -103,7 +103,7 @@
                                 <flux:checkbox
                                     wire:model="selectedPermissions"
                                     value="{{ $permission->id }}"
-                                    label="{{ $permission->slug }}"
+                                    label="{{ $permission->name }}"
                                 />
                             @endforeach
                         </div>

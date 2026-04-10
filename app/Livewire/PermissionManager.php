@@ -6,6 +6,7 @@ use App\Models\Permission;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionManager extends Component
 {
@@ -35,8 +36,8 @@ class PermissionManager extends Component
         $permission = Permission::query()->findOrFail($permissionId);
 
         $this->editingPermissionId = $permission->id;
-        $this->name = $permission->name;
-        $this->slug = $permission->slug;
+        $this->name = Str::of($permission->name)->replace('.', ' ')->title()->value();
+        $this->slug = $permission->name;
         $this->resetValidation();
         $this->showModal = true;
     }
@@ -47,16 +48,18 @@ class PermissionManager extends Component
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'unique:permissions,slug,'.($this->editingPermissionId ?? 'null')],
+            'slug' => ['required', 'string', 'max:255', 'unique:permissions,name,'.($this->editingPermissionId ?? 'null')],
         ]);
 
         Permission::query()->updateOrCreate(
             ['id' => $this->editingPermissionId],
             [
-                'name' => $validated['name'],
-                'slug' => Str::of($validated['slug'])->lower()->replace(' ', '.')->value(),
+                'name' => Str::of($validated['slug'])->lower()->replace(' ', '.')->value(),
+                'guard_name' => 'web',
             ]
         );
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->showModal = false;
         $this->dispatch('entity-saved', message: 'Permission saved successfully.');
@@ -67,10 +70,8 @@ class PermissionManager extends Component
         abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
 
         $permission = Permission::query()->findOrFail($permissionId);
-
-        $permission->roles()->detach();
-        $permission->users()->detach();
         $permission->delete();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-deleted', message: 'Permission deleted successfully.');
     }
@@ -79,7 +80,7 @@ class PermissionManager extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
 
-        $permissions = Permission::query()->orderBy('slug')->get();
+        $permissions = Permission::query()->orderBy('name')->get();
 
         return view('livewire.permission-manager', [
             'permissions' => $permissions,

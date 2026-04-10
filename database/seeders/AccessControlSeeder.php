@@ -4,8 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\PermissionRegistrar;
 
 class AccessControlSeeder extends Seeder
 {
@@ -14,35 +15,28 @@ class AccessControlSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = [
-            ['name' => 'Read Questions', 'slug' => 'questions.read'],
-            ['name' => 'Read All Questions', 'slug' => 'questions.read_all'],
-            ['name' => 'Create Questions', 'slug' => 'questions.create'],
-            ['name' => 'Update Questions', 'slug' => 'questions.update'],
-            ['name' => 'Delete Questions', 'slug' => 'questions.delete'],
-            ['name' => 'Publish Questions', 'slug' => 'questions.publish'],
-            ['name' => 'Manage Roles', 'slug' => 'users.manage_roles'],
-            ['name' => 'Manage Permissions', 'slug' => 'users.manage_permissions'],
+        $permissionSlugs = [
+            'questions.read',
+            'questions.read_all',
+            'questions.create',
+            'questions.update',
+            'questions.delete',
+            'questions.publish',
+            'users.manage_roles',
+            'users.manage_permissions',
         ];
 
-        foreach ($permissions as $permission) {
+        foreach ($permissionSlugs as $permissionSlug) {
             Permission::query()->updateOrCreate(
-                ['slug' => $permission['slug']],
-                ['name' => $permission['name']]
+                ['name' => $permissionSlug, 'guard_name' => 'web']
             );
         }
 
-        $roles = [
-            ['name' => 'Student', 'slug' => 'student'],
-            ['name' => 'Teacher', 'slug' => 'teacher'],
-            ['name' => 'Admin', 'slug' => 'admin'],
-            ['name' => 'Super Admin', 'slug' => 'super_admin'],
-        ];
+        $roles = ['student', 'teacher', 'admin', 'super_admin'];
 
-        foreach ($roles as $role) {
+        foreach ($roles as $roleName) {
             Role::query()->updateOrCreate(
-                ['slug' => $role['slug']],
-                ['name' => $role['name'], 'guard' => 'web']
+                ['name' => $roleName, 'guard_name' => 'web']
             );
         }
 
@@ -53,27 +47,18 @@ class AccessControlSeeder extends Seeder
             'super_admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'users.manage_roles', 'users.manage_permissions'],
         ];
 
-        DB::table('role_permissions')->delete();
+        foreach ($roleMap as $roleName => $permissions) {
+            Role::findByName($roleName, 'web')->syncPermissions($permissions);
+        }
 
-        $permissionIds = Permission::query()->pluck('id', 'slug');
-        $roleIds = Role::query()->pluck('id', 'slug');
-        $now = now();
-
-        foreach ($roleMap as $role => $permissionSlugs) {
-            foreach ($permissionSlugs as $permissionSlug) {
-                $permissionId = $permissionIds[$permissionSlug] ?? null;
-                $roleId = $roleIds[$role] ?? null;
-
-                if ($permissionId !== null && $roleId !== null) {
-                    DB::table('role_permissions')->insert([
-                        'role' => $role,
-                        'role_id' => $roleId,
-                        'permission_id' => $permissionId,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+        User::query()->chunkById(100, function ($users): void {
+            foreach ($users as $user) {
+                if (! $user->roles()->exists()) {
+                    $user->assignRole('student');
                 }
             }
-        }
+        });
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

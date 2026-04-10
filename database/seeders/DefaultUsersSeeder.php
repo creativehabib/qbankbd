@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,50 +14,25 @@ class DefaultUsersSeeder extends Seeder
     public function run(): void
     {
         $defaultPassword = 'password';
-        $roleIds = Role::query()->pluck('id', 'slug');
 
-        User::query()->updateOrCreate(
-            ['email' => 'superadmin@qbank.test'],
-            [
-                'name' => 'Super Admin',
-                'password' => Hash::make($defaultPassword),
-                'role' => 'super_admin',
-                'role_id' => $roleIds['super_admin'] ?? null,
-                'email_verified_at' => now(),
-            ]
-        );
+        $users = [
+            ['email' => 'superadmin@qbank.test', 'name' => 'Super Admin', 'role' => 'super_admin'],
+            ['email' => 'admin@qbank.test', 'name' => 'Admin User', 'role' => 'admin'],
+            ['email' => 'teacher@qbank.test', 'name' => 'Teacher User', 'role' => 'teacher'],
+            ['email' => 'student@qbank.test', 'name' => 'Student User', 'role' => 'student'],
+        ];
 
-        User::query()->updateOrCreate(
-            ['email' => 'admin@qbank.test'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make($defaultPassword),
-                'role' => 'admin',
-                'role_id' => $roleIds['admin'] ?? null,
-                'email_verified_at' => now(),
-            ]
-        );
+        foreach ($users as $userData) {
+            $user = User::query()->updateOrCreate(
+                ['email' => $userData['email']],
+                [
+                    'name' => $userData['name'],
+                    'password' => Hash::make($defaultPassword),
+                    'email_verified_at' => now(),
+                ]
+            );
 
-        User::query()->updateOrCreate(
-            ['email' => 'teacher@qbank.test'],
-            [
-                'name' => 'Teacher User',
-                'password' => Hash::make($defaultPassword),
-                'role' => 'teacher',
-                'role_id' => $roleIds['teacher'] ?? null,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        User::query()->updateOrCreate(
-            ['email' => 'student@qbank.test'],
-            [
-                'name' => 'Student User',
-                'password' => Hash::make($defaultPassword),
-                'role' => 'student',
-                'role_id' => $roleIds['student'] ?? null,
-                'email_verified_at' => now(),
-            ]
-        );
+            $user->syncRoles([$userData['role']]);
+        }
     }
 }

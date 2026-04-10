@@ -6,10 +6,10 @@ use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
 
-it('stores legacy role slug when syncing role permissions', function () {
+it('syncs role permissions via spatie pivot table', function () {
     $superAdmin = User::factory()->superAdmin()->create();
     $permissionIds = Permission::query()
-        ->whereIn('slug', ['questions.read', 'questions.create'])
+        ->whereIn('name', ['questions.read', 'questions.create'])
         ->pluck('id')
         ->all();
 
@@ -23,10 +23,9 @@ it('stores legacy role slug when syncing role permissions', function () {
     $role = Role::query()->where('name', 'Content Reviewer')->firstOrFail();
 
     foreach ($permissionIds as $permissionId) {
-        $this->assertDatabaseHas('role_permissions', [
+        $this->assertDatabaseHas('role_has_permissions', [
             'role_id' => $role->id,
             'permission_id' => $permissionId,
-            'role' => $role->slug,
         ]);
     }
 });

@@ -5,8 +5,8 @@ namespace App\Livewire;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Str;
 use Livewire\Component;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionManager extends Component
 {
@@ -18,7 +18,6 @@ class RolePermissionManager extends Component
 
     /** @var array<int> */
     public array $selectedPermissions = [];
-
 
     public function createRole(): void
     {
@@ -54,23 +53,16 @@ class RolePermissionManager extends Component
             'selectedPermissions.*' => ['exists:permissions,id'],
         ]);
 
-        $slug = Str::slug($validated['roleName'], '_');
-
         $role = Role::query()->updateOrCreate(
             ['id' => $this->editingRoleId],
             [
                 'name' => $validated['roleName'],
-                'slug' => $this->editingRoleId ? Role::query()->find($this->editingRoleId)?->slug : $slug,
-                'guard' => 'web',
+                'guard_name' => 'web',
             ]
         );
 
-        Role::query()->whereKey($role->id)->update(['slug' => $role->slug ?: $slug]);
-
-        $role->permissions()->syncWithPivotValues(
-            $validated['selectedPermissions'] ?? [],
-            ['role' => $role->slug]
-        );
+        $role->syncPermissions($validated['selectedPermissions'] ?? []);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-saved', message: 'Role saved successfully.');
         $this->showModal = false;
@@ -82,14 +74,14 @@ class RolePermissionManager extends Component
 
         $role = Role::query()->findOrFail($roleId);
 
-        if (in_array($role->slug, ['student', 'teacher', 'admin', 'super_admin'], true)) {
+        if (in_array($role->name, ['student', 'teacher', 'admin', 'super_admin'], true)) {
             $this->addError('roleName', 'Default role delete করা যাবে না।');
 
             return;
         }
 
-        $role->permissions()->detach();
         $role->delete();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-deleted', message: 'Role deleted successfully.');
     }
@@ -98,13 +90,13 @@ class RolePermissionManager extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_permissions'), 403);
 
-        $permissions = Permission::query()->orderBy('slug')->get();
+        $permissions = Permission::query()->orderBy('name')->get();
 
         return view('livewire.role-permission-manager', [
             'roles' => Role::query()->with('permissions')->orderBy('name')->get(),
             'permissions' => $permissions,
             'groupedPermissions' => $permissions->groupBy(function (Permission $permission): string {
-                return (string) str($permission->slug)->before('.');
+                return (string) str($permission->name)->before('.');
             }),
         ])->layout('layouts.app', ['title' => 'Roles & Permissions']);
     }

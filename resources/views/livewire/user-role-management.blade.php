@@ -40,7 +40,7 @@
 
                         <flux:table.cell>
                             <flux:badge variant="primary" size="sm">
-                                {{ str($user->role)->replace('_', ' ')->title() }}
+                                {{ str(optional($user->roles->first())->name)->replace('_', ' ')->title() }}
                             </flux:badge>
                         </flux:table.cell>
 
