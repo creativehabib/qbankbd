@@ -205,8 +205,7 @@ it('filters questions by status and shows active/inactive counts', function () {
         ->set('quickFilter', 'published')
         ->assertSee('Active question now')
         ->assertDontSee('Pending question for review')
-        ->set('quickFilter', 'all')
-        ->set('statusFilter', 'pending')
+        ->set('quickFilter', 'pending')
         ->assertSee('Pending question for review')
         ->assertDontSee('Active question now')
         ->assertDontSee('Inactive archived question');

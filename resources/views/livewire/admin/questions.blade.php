@@ -36,9 +36,15 @@
                     <option>All dates</option>
                 </select>
                 <select wire:model.live="subjectId" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                    <option value="">All Subjects</option>
+                    <option value="">All Categories</option>
                     @foreach($subjects as $sub)
                         <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                    @endforeach
+                </select>
+                <select wire:model.live="topicId" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                    <option value="">All Topics</option>
+                    @foreach($topics as $topic)
+                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                     @endforeach
                 </select>
                 <select wire:model.live="questionTypeFilter" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
@@ -48,18 +54,12 @@
                     <option value="short">Short</option>
                     <option value="written">Written</option>
                 </select>
-                <select wire:model.live="statusFilter" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                    <option value="">All status</option>
-                    <option value="pending">Pending</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
                 <button type="button" wire:click="$refresh" class="px-4 py-2 text-sm border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
                     Filter
                 </button>
                 @if($canCreateQuestion)
                     <a wire:navigate href="{{ route('questions.create') }}"
-                       class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-md shadow-sm hover:bg-indigo-700">
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-md shadow-sm hover:bg-indigo-700 transition-all">
                         New Question
                     </a>
                 @endif
@@ -154,7 +154,7 @@
                     <td class="px-6 py-4 text-right space-x-1">
                         @if($canToggleQuestionStatus)
                             <button type="button" onclick="confirmStatusToggle({{ $q->id }}, '{{ $q->status }}')"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md cursor-pointer {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
                                     title="{{ $q->status === 'pending' ? 'Approve Question' : 'Move to Pending' }}">
                                 @if($q->status === 'pending')
                                     <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>

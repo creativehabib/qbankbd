@@ -29,11 +29,6 @@ class Questions extends Component
     public $topicId = '';
 
     /**
-     * Selected status filter.
-     */
-    public $statusFilter = '';
-
-    /**
      * Selected question type filter.
      */
     public $questionTypeFilter = '';
@@ -69,11 +64,6 @@ class Questions extends Component
     }
 
     public function updatingTopicId(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingStatusFilter(): void
     {
         $this->resetPage();
     }
@@ -151,7 +141,6 @@ class Questions extends Component
             })
             ->when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->topicId, fn ($q) => $q->where('topic_id', $this->topicId))
-            ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->when($this->questionTypeFilter, fn ($q) => $q->where('question_type', $this->questionTypeFilter))
             ->latest()
             ->paginate(10);
