@@ -61,7 +61,11 @@ class RolePermissionManager extends Component
             ]
         );
 
-        $role->syncPermissions($validated['selectedPermissions'] ?? []);
+        $permissionIds = collect($validated['selectedPermissions'] ?? [])
+            ->map(fn (int|string $permissionId): int => (int) $permissionId)
+            ->all();
+
+        $role->syncPermissions($permissionIds);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-saved', message: 'Role saved successfully.');

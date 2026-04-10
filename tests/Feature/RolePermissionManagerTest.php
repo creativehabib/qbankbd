@@ -13,10 +13,12 @@ it('syncs role permissions via spatie pivot table', function () {
         ->pluck('id')
         ->all();
 
+    $permissionIdsAsStrings = array_map(fn (int $permissionId): string => (string) $permissionId, $permissionIds);
+
     Livewire::actingAs($superAdmin)
         ->test(RolePermissionManager::class)
         ->set('roleName', 'Content Reviewer')
-        ->set('selectedPermissions', $permissionIds)
+        ->set('selectedPermissions', $permissionIdsAsStrings)
         ->call('saveRole')
         ->assertHasNoErrors();
 
