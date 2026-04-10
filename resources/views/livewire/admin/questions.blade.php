@@ -36,7 +36,7 @@
                     <option>All dates</option>
                 </select>
                 <select wire:model.live="subjectId" class="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                    <option value="">All Categories</option>
+                    <option value="">All Subjects</option>
                     @foreach($subjects as $sub)
                         <option value="{{ $sub->id }}">{{ $sub->name }}</option>
                     @endforeach
@@ -59,7 +59,7 @@
                 </button>
                 @if($canCreateQuestion)
                     <a wire:navigate href="{{ route('questions.create') }}"
-                       class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-md shadow-sm hover:bg-indigo-700 transition-all">
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-md shadow-sm hover:bg-indigo-700">
                         New Question
                     </a>
                 @endif
@@ -154,7 +154,7 @@
                     <td class="px-6 py-4 text-right space-x-1">
                         @if($canToggleQuestionStatus)
                             <button type="button" onclick="confirmStatusToggle({{ $q->id }}, '{{ $q->status }}')"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md cursor-pointer {{ $q->status === 'pending' ? 'text-emerald-500 hover:bg-emerald-500 border border-emerald-100 dark:hover:bg-emerald-600' : 'text-amber-500 hover:bg-amber-500 border border-amber-100 dark:hover:bg-amber-600' }} hover:text-white transition-colors hover:border-transparent dark:border-gray-600"
                                     title="{{ $q->status === 'pending' ? 'Approve Question' : 'Move to Pending' }}">
                                 @if($q->status === 'pending')
                                     <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -173,7 +173,7 @@
 
                         @if($canDeleteQuestion)
                             <button type="button" onclick="confirmDelete({{ $q->id }})"
-                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md text-red-500 hover:text-white hover:bg-red-500 transition-colors border border-red-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-red-600" title="Delete Question">
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md cursor-pointer text-red-500 hover:text-white hover:bg-red-500 transition-colors border border-red-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-red-600" title="Delete Question">
                                 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         @endif
