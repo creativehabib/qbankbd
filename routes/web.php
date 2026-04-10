@@ -24,11 +24,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/questions/create', Create::class)->name('questions.create');
     Route::get('/questions/{question}/edit', Edit::class)->name('questions.edit');
 
-    Route::get('/exam-categories', ExamCategoriesIndex::class)->name('exam-categories.index');
-    Route::get('/academic-classes', ClassIndex::class)->name('academic-classes.index');
-    Route::get('/subjects', SubjectIndex::class)->name('subjects.index');
-    Route::get('/chapters', ChapterIndex::class)->name('chapters.index');
-    Route::get('/topics', TopicIndex::class)->name('topics.index');
+    Route::middleware('permission:exam_categories.manage')->group(function (): void {
+        Route::get('/exam-categories', ExamCategoriesIndex::class)->name('exam-categories.index');
+    });
+
+    Route::middleware('permission:academic_classes.manage')->group(function (): void {
+        Route::get('/academic-classes', ClassIndex::class)->name('academic-classes.index');
+    });
+
+    Route::middleware('permission:subjects.manage')->group(function (): void {
+        Route::get('/subjects', SubjectIndex::class)->name('subjects.index');
+    });
+
+    Route::middleware('permission:chapters.manage')->group(function (): void {
+        Route::get('/chapters', ChapterIndex::class)->name('chapters.index');
+    });
+
+    Route::middleware('permission:topics.manage')->group(function (): void {
+        Route::get('/topics', TopicIndex::class)->name('topics.index');
+    });
 
     Route::middleware('permission:tags.create|tags.update|tags.delete')->group(function (): void {
         Route::get('/tags', TagIndex::class)->name('tags.index');
