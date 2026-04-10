@@ -136,15 +136,13 @@ class Questions extends Component
         $allQuestionsCount = (clone $baseQuery)->count();
         $mineQuestionsCount = (clone $baseQuery)->where('user_id', $user->id)->count();
         $publishedQuestionsCount = (clone $baseQuery)->where('status', 'active')->count();
-        $stickyQuestionsCount = (clone $baseQuery)->where('status', 'pending')->count();
-        $activeQuestionsCount = (clone $baseQuery)->where('status', 'active')->count();
-        $inactiveQuestionsCount = (clone $baseQuery)->where('status', 'inactive')->count();
+        $pendingQuestionsCount = (clone $baseQuery)->where('status', 'pending')->count();
 
         $questions = Question::with('subject', 'topic', 'user')
             ->when($user->isTeacher(), fn ($q) => $q->where('user_id', $user->id))
             ->when($this->quickFilter === 'mine', fn ($q) => $q->where('user_id', $user->id))
             ->when($this->quickFilter === 'published', fn ($q) => $q->where('status', 'active'))
-            ->when($this->quickFilter === 'sticky', fn ($q) => $q->where('status', 'pending'))
+            ->when($this->quickFilter === 'pending', fn ($q) => $q->where('status', 'pending'))
             ->when($this->search, function ($q) {
                 $search = '%'.$this->search.'%';
                 $q->where('title', 'like', $search)
@@ -167,9 +165,7 @@ class Questions extends Component
             'allQuestionsCount' => $allQuestionsCount,
             'mineQuestionsCount' => $mineQuestionsCount,
             'publishedQuestionsCount' => $publishedQuestionsCount,
-            'stickyQuestionsCount' => $stickyQuestionsCount,
-            'activeQuestionsCount' => $activeQuestionsCount,
-            'inactiveQuestionsCount' => $inactiveQuestionsCount,
+            'pendingQuestionsCount' => $pendingQuestionsCount,
         ])->layout('layouts.app', ['title' => 'All Questions']);
     }
 }
