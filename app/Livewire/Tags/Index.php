@@ -1,19 +1,22 @@
 <?php
 
-namespace App\Livewire\Admin\Tags;
+namespace App\Livewire\Tags;
 
+use App\Models\Tag;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Tag;
 
 class Index extends Component
 {
     use WithPagination;
 
-    public $name = '';
-    public $editingId = null;
-    public $editingName = '';
-    public $search = '';
+    public string $name = '';
+
+    public ?int $editingId = null;
+
+    public string $editingName = '';
+
+    public string $search = '';
 
     protected $listeners = [
         'tagDeleted' => '$refresh',
@@ -25,13 +28,15 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function save()
+    public function save(): void
     {
+        abort_unless(auth()->user()?->hasPermission('tags.create'), 403);
+
         $this->validate([
             'name' => 'required|string|unique:tags,name',
         ]);
 
-        Tag::create([
+        Tag::query()->create([
             'name' => $this->name,
         ]);
 
@@ -40,35 +45,41 @@ class Index extends Component
         $this->dispatch('tagSaved', message: 'Tag added successfully.');
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
-        Tag::findOrFail($id)->delete();
+        abort_unless(auth()->user()?->hasPermission('tags.delete'), 403);
+
+        Tag::query()->findOrFail($id)->delete();
 
         $this->resetPage();
         $this->dispatch('tagDeleted', message: 'Tag deleted successfully.');
     }
 
-    public function edit($id)
+    public function edit(int $id): void
     {
-        $tag = Tag::findOrFail($id);
+        abort_unless(auth()->user()?->hasPermission('tags.update'), 403);
+
+        $tag = Tag::query()->findOrFail($id);
         $this->editingId = $tag->id;
         $this->editingName = $tag->name;
     }
 
-    public function update()
+    public function update(): void
     {
+        abort_unless(auth()->user()?->hasPermission('tags.update'), 403);
+
         $this->validate([
-            'editingName' => 'required|string|unique:tags,name,' . $this->editingId,
+            'editingName' => 'required|string|unique:tags,name,'.$this->editingId,
         ]);
 
-        Tag::findOrFail($this->editingId)->update(['name' => $this->editingName]);
+        Tag::query()->findOrFail($this->editingId)->update(['name' => $this->editingName]);
 
         $this->editingId = null;
         $this->editingName = '';
         $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
     }
 
-    public function cancelEdit()
+    public function cancelEdit(): void
     {
         $this->editingId = null;
         $this->editingName = '';
@@ -76,14 +87,21 @@ class Index extends Component
 
     public function render()
     {
-        $tags = Tag::when($this->search, fn($q) =>
-                $q->where('name', 'like', '%'.$this->search.'%')
-            )
+        abort_unless(
+            auth()->user()?->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete']),
+            403
+        );
+
+        $tags = Tag::query()
+            ->when($this->search, fn ($query) => $query->where('name', 'like', '%'.$this->search.'%'))
             ->orderBy('name')
             ->paginate(10);
 
         return view('livewire.admin.tags.index', [
             'tags' => $tags,
-        ])->layout('layouts.admin', ['title' => 'Tags']);
+            'canCreate' => auth()->user()?->hasPermission('tags.create') ?? false,
+            'canUpdate' => auth()->user()?->hasPermission('tags.update') ?? false,
+            'canDelete' => auth()->user()?->hasPermission('tags.delete') ?? false,
+        ])->layout('layouts.app', ['title' => 'Manage Tags']);
     }
 }

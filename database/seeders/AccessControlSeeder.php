@@ -24,6 +24,9 @@ class AccessControlSeeder extends Seeder
             'questions.publish',
             'users.manage_roles',
             'users.manage_permissions',
+            'tags.create',
+            'tags.update',
+            'tags.delete',
         ];
 
         foreach ($permissionSlugs as $permissionSlug) {
@@ -42,9 +45,9 @@ class AccessControlSeeder extends Seeder
 
         $roleMap = [
             'student' => ['questions.read'],
-            'teacher' => ['questions.read', 'questions.create', 'questions.update', 'questions.delete'],
-            'admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish'],
-            'super_admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'users.manage_roles', 'users.manage_permissions'],
+            'teacher' => ['questions.read', 'questions.create', 'questions.update', 'questions.delete', 'tags.create', 'tags.update', 'tags.delete'],
+            'admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'tags.create', 'tags.update', 'tags.delete'],
+            'super_admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'users.manage_roles', 'users.manage_permissions', 'tags.create', 'tags.update', 'tags.delete'],
         ];
 
         foreach ($roleMap as $roleName => $permissions) {
