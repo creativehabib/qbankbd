@@ -79,18 +79,8 @@
     }
 
     function confirmDelete(id) {
-        if (!window.Swal) return;
-        Swal.fire({
-            title: 'Delete this tag?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.dispatch('deleteTagConfirmed', { id: id });
-            }
+        window.confirmDeleteAction(() => {
+            Livewire.dispatch('deleteTagConfirmed', { id: id });
         });
     }
 
