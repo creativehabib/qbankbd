@@ -20,7 +20,13 @@
                         <td class="py-2">{{ $academicClass->name }}</td>
                         <td class="space-x-2 py-2 text-right">
                             <button wire:click="editClass({{ $academicClass->id }})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Edit</button>
-                            <button wire:click="deleteClass({{ $academicClass->id }})" class="text-red-600 hover:text-red-800 dark:text-red-400">Delete</button>
+                            <button
+                                x-data
+                                x-on:click="window.confirmDeleteAction(() => $wire.deleteClass({{ $academicClass->id }}))"
+                                class="text-red-600 hover:text-red-800 dark:text-red-400"
+                            >
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 @empty
