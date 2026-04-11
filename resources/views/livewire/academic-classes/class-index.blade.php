@@ -5,35 +5,75 @@
         <flux:separator class="my-6" />
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-2">
-        <section class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-            <div class="mb-3 flex items-center justify-between gap-3">
-                <h2 class="text-lg font-semibold">Academic Class</h2>
-                <button wire:click="openClassModal" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700">New Class</button>
+    <div class="grid gap-6">
+        <section class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Academic Class</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Create, search and manage classes from one place.</p>
+                    </div>
+                    <button wire:click="openClassModal" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+                        New Class
+                    </button>
+                </div>
+
+                <div class="mt-4">
+                    <input
+                        wire:model.live.debounce.300ms="classSearch"
+                        type="text"
+                        placeholder="Search class..."
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                    />
+                </div>
             </div>
-            <input wire:model.live.debounce.300ms="classSearch" type="text" placeholder="Search class" class="mb-3 w-full px-2 py-1.5 rounded-lg border border-gray-300 text-sm dark:border-gray-600 dark:bg-gray-700 focus:ring-indigo-500 focus:border-indigo-500" />
-            <table class="w-full text-sm">
-                <thead><tr class="border-b dark:border-gray-700"><th class="py-2 text-left">Name</th><th class="text-right">Action</th></tr></thead>
-                <tbody>
-                @forelse($academicClasses as $academicClass)
-                    <tr class="border-b border-gray-100 dark:border-gray-700">
-                        <td class="py-2">{{ $academicClass->name }}</td>
-                        <td class="space-x-2 py-2 text-right">
-                            <button wire:click="editClass({{ $academicClass->id }})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">Edit</button>
-                            <button
-                                x-data
-                                x-on:click="window.confirmDeleteAction(() => $wire.deleteClass({{ $academicClass->id }}))"
-                                class="text-red-600 hover:text-red-800 dark:text-red-400"
-                            >
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr><td colspan="2" class="py-2 text-center text-gray-500">No class found.</td></tr>
-                @endforelse
-                </tbody>
-            </table>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-700/40 dark:text-gray-300">
+                        <tr>
+                            <th class="px-5 py-3 text-left font-semibold">Class</th>
+                            <th class="px-5 py-3 text-left font-semibold">ID</th>
+                            <th class="px-5 py-3 text-right font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @forelse($academicClasses as $academicClass)
+                            <tr class="transition hover:bg-indigo-50/40 dark:hover:bg-gray-700/30">
+                                <td class="px-5 py-3">
+                                    <div class="font-medium text-gray-900 dark:text-gray-100">{{ $academicClass->name }}</div>
+                                </td>
+                                <td class="px-5 py-3">
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                        #{{ $academicClass->id }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button wire:click="editClass({{ $academicClass->id }})" class="app-icon-btn-edit" title="Edit class">
+                                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        </button>
+                                        <button
+                                            x-data
+                                            x-on:click="window.confirmDeleteAction(() => $wire.deleteClass({{ $academicClass->id }}))"
+                                            class="app-icon-btn-delete"
+                                            title="Delete class"
+                                        >
+                                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    No class found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </section>
     </div>
 
