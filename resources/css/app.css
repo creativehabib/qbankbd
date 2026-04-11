@@ -113,8 +113,6 @@ select:focus[data-flux-control] {
     .dark body {
         @apply text-slate-100;
         background-color: var(--app-dark-bg);
-        background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12), transparent 35%),
-            radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.08), transparent 30%);
     }
 
     .dark flux\:main,
