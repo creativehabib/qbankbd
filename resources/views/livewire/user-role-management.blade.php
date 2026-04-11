@@ -132,7 +132,7 @@
                 <label class="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Assign Role *</label>
                 <select
                     wire:model="selectedRole"
-                    class="block w-full rounded-lg border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    class="app-form-select"
                 >
                     <option value="">Select role</option>
                     @foreach($roles as $role)
