@@ -52,8 +52,8 @@
                                 <flux:button
                                     size="sm"
                                     variant="danger"
-                                    wire:click="deleteUser({{ $user->id }})"
-                                    wire:confirm="Are you sure you want to delete this user?"
+                                    x-data
+                                    x-on:click="window.confirmDeleteAction(() => $wire.deleteUser({{ $user->id }}))"
                                 >
                                     Delete
                                 </flux:button>

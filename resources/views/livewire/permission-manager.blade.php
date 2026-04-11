@@ -49,8 +49,12 @@
                                 <flux:button size="sm" variant="outline" wire:click="editPermission({{ $permission->id }})">
                                     Edit
                                 </flux:button>
-                                <flux:button size="sm" variant="danger" wire:click="deletePermission({{ $permission->id }})"
-                                    wire:confirm="Are you sure you want to delete this permission?">
+                                <flux:button
+                                    size="sm"
+                                    variant="danger"
+                                    x-data
+                                    x-on:click="window.confirmDeleteAction(() => $wire.deletePermission({{ $permission->id }}))"
+                                >
                                     Delete
                                 </flux:button>
                             </div>
