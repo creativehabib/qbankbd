@@ -28,6 +28,12 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+
+    --app-dark-bg: #020a1f;
+    --app-dark-panel: #0b1428;
+    --app-dark-border: rgba(6, 182, 212, 0.2);
+    --app-dark-active-bg: rgba(6, 182, 212, 0.15);
+    --app-dark-active-text: #cffafe;
 }
 
 @layer theme {
@@ -63,6 +69,34 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+@layer components {
+    .dark body {
+        @apply text-slate-100;
+        background-color: var(--app-dark-bg);
+        background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12), transparent 35%),
+            radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.08), transparent 30%);
+    }
+
+    .dark flux\:main,
+    .dark [data-flux-main] {
+        @apply bg-transparent;
+    }
+
+    .dark flux\:header,
+    .dark [data-flux-header] {
+        @apply backdrop-blur;
+        border-color: var(--app-dark-border);
+        background-color: color-mix(in srgb, var(--app-dark-panel) 95%, transparent);
+    }
+
+    .dark flux\:sidebar,
+    .dark [data-flux-sidebar] {
+        border-color: var(--app-dark-border);
+        background-color: var(--app-dark-panel);
+    }
+
+    .dark [data-flux-sidebar] [data-current] {
+        background-color: var(--app-dark-active-bg);
+        color: var(--app-dark-active-text);
+    }
+}
