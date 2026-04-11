@@ -33,23 +33,23 @@ new #[Title('Appearance settings')] class extends Component {
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <label class="space-y-2">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Background') }}</span>
-                        <input type="color" x-model="theme.darkBg" @input="applyTheme()" class="h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700" />
+                        <input type="color" x-model="theme.darkBg" @input="applyTheme()" class="app-color-input" />
                     </label>
                     <label class="space-y-2">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Panel') }}</span>
-                        <input type="color" x-model="theme.darkPanel" @input="applyTheme()" class="h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700" />
+                        <input type="color" x-model="theme.darkPanel" @input="applyTheme()" class="app-color-input" />
                     </label>
                     <label class="space-y-2">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Border') }}</span>
-                        <input type="color" x-model="theme.darkBorder" @input="applyTheme()" class="h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700" />
+                        <input type="color" x-model="theme.darkBorder" @input="applyTheme()" class="app-color-input" />
                     </label>
                     <label class="space-y-2">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Active Item') }}</span>
-                        <input type="color" x-model="theme.darkActiveBg" @input="applyTheme()" class="h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700" />
+                        <input type="color" x-model="theme.darkActiveBg" @input="applyTheme()" class="app-color-input" />
                     </label>
                     <label class="space-y-2 sm:col-span-2">
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Active Text') }}</span>
-                        <input type="color" x-model="theme.darkActiveText" @input="applyTheme()" class="h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700" />
+                        <input type="color" x-model="theme.darkActiveText" @input="applyTheme()" class="app-color-input" />
                     </label>
                 </div>
 

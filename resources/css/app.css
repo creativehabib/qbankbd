@@ -82,6 +82,34 @@ select:focus[data-flux-control] {
         @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
     }
 
+    .app-form-control {
+        @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
+    }
+
+    .app-search-input {
+        @apply block w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+    }
+
+    .app-primary-action-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+    }
+
+    .app-primary-submit-btn {
+        @apply inline-flex items-center gap-2 rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+    }
+
+    .app-icon-btn-edit {
+        @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-indigo-100 text-indigo-500 transition-colors hover:border-transparent hover:bg-indigo-500 hover:text-white dark:border-gray-600 dark:hover:bg-indigo-600;
+    }
+
+    .app-icon-btn-delete {
+        @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-100 text-red-500 transition-colors hover:border-transparent hover:bg-red-500 hover:text-white dark:border-gray-600 dark:hover:bg-red-600;
+    }
+
+    .app-color-input {
+        @apply h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700;
+    }
+
     .dark body {
         @apply text-slate-100;
         background-color: var(--app-dark-bg);
