@@ -70,6 +70,18 @@ select:focus[data-flux-control] {
 }
 
 @layer components {
+    .app-form-input {
+        @apply block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
+    }
+
+    .app-form-select {
+        @apply block w-full rounded-lg border border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white;
+    }
+
+    .app-form-button {
+        @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+    }
+
     .dark body {
         @apply text-slate-100;
         background-color: var(--app-dark-bg);
