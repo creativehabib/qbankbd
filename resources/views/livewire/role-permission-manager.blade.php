@@ -56,7 +56,8 @@
                                 <flux:button size="sm" variant="outline" wire:click="editRole({{ $role->id }})">
                                     Edit
                                 </flux:button>
-                                <flux:button size="sm" variant="danger" wire:click="deleteRole({{ $role->id }})">
+                                <flux:button size="sm" variant="danger" wire:click="deleteRole({{ $role->id }})"
+                                    wire:confirm="Are you sure you want to delete this role?">
                                     Delete
                                 </flux:button>
                             </div>
