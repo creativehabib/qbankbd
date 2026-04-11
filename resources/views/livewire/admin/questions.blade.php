@@ -227,24 +227,12 @@
         }
 
         function confirmDelete(id) {
-            if (!window.Swal) return;
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true,
+            window.confirmDeleteAction(() => {
+                Livewire.dispatch('deleteQuestionConfirmed', { id: id });
+            }, {
                 customClass: {
                     confirmButton: 'rounded-md px-4 py-2 font-medium',
                     cancelButton: 'rounded-md px-4 py-2 font-medium'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Livewire.dispatch('deleteQuestionConfirmed', { id: id });
                 }
             });
         }
