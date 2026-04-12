@@ -21,6 +21,8 @@ class ChapterIndex extends Component
 
     public string $subject_id = '';
 
+    public string $academic_class_id = '';
+
     public string $name = '';
 
     public string $description = '';
@@ -45,7 +47,7 @@ class ChapterIndex extends Component
         // ১. আগে ডেটা রিসেট হবে
         $this->reset([
             'editId', 'subject_id', 'name',
-            'description', 'newImage', 'oldImage',
+            'academic_class_id', 'description', 'newImage', 'oldImage',
         ]);
         $this->is_active = true;
         $this->is_premium = false;
@@ -58,15 +60,16 @@ class ChapterIndex extends Component
     public function edit($id)
     {
         $this->resetValidation();
-        $subject = Chapter::findOrFail($id);
+        $chapter = Chapter::with('subject.academicClass')->findOrFail($id);
 
-        $this->editId = $subject->id;
-        $this->subject_id = $subject->subject_id;
-        $this->name = $subject->name;
-        $this->description = $subject->description;
-        $this->is_active = $subject->is_active;
-        $this->is_premium = $subject->is_premium;
-        $this->oldImage = $subject->image;
+        $this->editId = $chapter->id;
+        $this->subject_id = (string) $chapter->subject_id;
+        $this->academic_class_id = (string) ($chapter->subject?->academic_class_id ?? '');
+        $this->name = $chapter->name;
+        $this->description = $chapter->description;
+        $this->is_active = $chapter->is_active;
+        $this->is_premium = $chapter->is_premium;
+        $this->oldImage = $chapter->image;
 
         // ডেটা লোড হওয়ার পর মডাল ওপেন হবে
         $this->dispatch('open-chapter-modal');
@@ -74,7 +77,8 @@ class ChapterIndex extends Component
 
     public function save()
     {
-        $this->validate([
+        $validated = $this->validate([
+            'academic_class_id' => 'required|exists:academic_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -83,6 +87,17 @@ class ChapterIndex extends Component
             'newImage' => 'nullable|image|max:2048',
         ]);
 
+        $subject = Subject::query()
+            ->whereKey($validated['subject_id'])
+            ->where('academic_class_id', $validated['academic_class_id'])
+            ->first();
+
+        if (! $subject) {
+            $this->addError('subject_id', 'Please select a subject from the selected class.');
+
+            return;
+        }
+
         $slug = Str::slug($this->name);
         $slugExists = Chapter::where('slug', $slug)->where('id', '!=', $this->editId)->exists();
         if ($slugExists) {
@@ -90,7 +105,7 @@ class ChapterIndex extends Component
         }
 
         $data = [
-            'subject_id' => $this->subject_id,
+            'subject_id' => $subject->id,
             'name' => $this->name,
             'slug' => $slug,
             'description' => $this->description,
@@ -127,19 +142,33 @@ class ChapterIndex extends Component
         }
     }
 
+    public function updatedAcademicClassId(): void
+    {
+        $this->subject_id = '';
+    }
+
     public function render()
     {
-        $chapters = Chapter::with('subject')
+        $chapters = Chapter::with('subject.academicClass')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%')
-                    ->orWhere('like', '%'.$this->search.'%');
+                    ->orWhere('description', 'like', '%'.$this->search.'%');
             })
             ->orderBy('name')
             ->paginate(10);
 
-        $subjects = Subject::orderBy('name')->get();
+        $subjects = Subject::query()
+            ->with('academicClass')
+            ->when($this->academic_class_id !== '', function ($query): void {
+                $query->where('academic_class_id', $this->academic_class_id);
+            })
+            ->orderBy(AcademicClass::query()->select('name')->whereColumn('academic_classes.id', 'subjects.academic_class_id'))
+            ->orderBy('name')
+            ->get();
 
-        return view('livewire.chapters.chapter-index', compact('chapters', 'subjects'))
+        $classes = AcademicClass::query()->orderBy('name')->get();
+
+        return view('livewire.chapters.chapter-index', compact('chapters', 'subjects', 'classes'))
             ->layout('layouts.app', ['title' => 'Manage Chapters']);
     }
 }

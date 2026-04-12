@@ -23,7 +23,16 @@
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" class="text-indigo-500"><path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 8-8h22.758c5.441-26.657 20.301-49.851 40.718-67.653C104.992 40.404 115.309 32 128 32h256c12.691 0 23.008 8.404 40.524 20.347C444.941 70.149 459.801 93.343 465.242 120H488a8 8 0 0 1 8 8zM176 80c-8.837 0-16 7.163-16 16v16h256v-16c0-8.837-7.163-16-16-16H176zm-56 304h272v108c0 6.627-5.373 12-12 12H132c-6.627 0-12-5.373-12-12V384zm316-208H76c-6.627 0-12 5.373-12 12v152c0 6.627 5.373 12 12 12h360c6.627 0 12-5.373 12-12V188c0-6.627-5.373-12-12-12z"></path></svg>
                 Categorization
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                <div wire:ignore wire:key="class-select-{{ $question->id ?? 'create' }}">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
+                    <select id="academic_class" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
+                        <option value="">-- Select Class --</option>
+                        @foreach($classes as $class) <option value="{{ $class->id }}" @selected($class->id == $academic_class_id)>{{ $class->name }}</option> @endforeach
+                    </select>
+                    @error('academic_class_id')<span class="text-xs text-red-500 mt-1 block">{{ $message }}</span>@enderror
+                </div>
+
                 <div wire:ignore wire:key="subject-select-{{ $question->id ?? 'create' }}">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
                     <select id="subject" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
@@ -400,6 +409,10 @@
                 initCkEditor4(el.id, `cq.${dIndex}.text`);
             });
 
+            if (window.tsClass) { window.tsClass.destroy(); window.tsClass = null; }
+            const classEl = document.getElementById('academic_class');
+            if (classEl) window.tsClass = new TomSelect(classEl, { onChange: (v) => @this.set('academic_class_id', v) });
+
             if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
             const subjectEl = document.getElementById('subject');
             if (subjectEl) window.tsSubject = new TomSelect(subjectEl, { onChange: (v) => @this.set('subject_id', v) });
@@ -428,6 +441,15 @@
         }
 
         if (!window.hasRegisteredQuestionEvents) {
+            window.addEventListener('subjectsUpdated', e => {
+                if (window.tsSubject) {
+                    window.tsSubject.clear(true);
+                    window.tsSubject.clearOptions();
+                    window.tsSubject.addOption({value: '', text: '-- Select Subject --'});
+                    window.tsSubject.addOptions(e.detail.subjects);
+                    window.tsSubject.refreshOptions(false);
+                }
+            });
 
             window.addEventListener('chaptersUpdated', e => {
                 if (window.tsChapter) {
@@ -450,6 +472,7 @@
             });
 
             window.addEventListener('reset-selects', () => {
+                window.tsClass?.clear(true);
                 window.tsSubject?.clear(true);
                 window.tsChapter?.clear(true);
                 window.tsTopic?.clear(true);
@@ -468,6 +491,7 @@
                 }
 
                 if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
+                if (window.tsClass) { window.tsClass.destroy(); window.tsClass = null; }
                 if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
                 if (window.tsTopic) { window.tsTopic.destroy(); window.tsTopic = null; }
                 if (window.tsTags) { window.tsTags.destroy(); window.tsTags = null; }

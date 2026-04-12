@@ -3,6 +3,7 @@
 namespace App\Livewire\Questions;
 
 use App\Livewire\Traits\SlugValidationTrait;
+use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\ExamCategory; // Image Upload এর জন্য
 use App\Models\Question;
@@ -23,6 +24,8 @@ class Edit extends Component
     public Question $question;
 
     public $subject_id;
+
+    public $academic_class_id;
 
     public $chapter_id;
 
@@ -62,6 +65,7 @@ class Edit extends Component
         $this->question = $question;
 
         $this->subject_id = $question->subject_id;
+        $this->academic_class_id = $question->subject?->academic_class_id;
         $this->chapter_id = $question->chapter_id;
         $this->topic_id = $question->topic_id;
         $this->title = $question->title;
@@ -212,6 +216,24 @@ class Edit extends Component
         $this->dispatch('topicsUpdated', topics: []);
     }
 
+    public function updatedAcademicClassId($value): void
+    {
+        $this->subject_id = null;
+        $this->chapter_id = null;
+        $this->topic_id = null;
+
+        $subjects = Subject::query()
+            ->where('academic_class_id', $value)
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($subject) => ['value' => $subject->id, 'text' => $subject->name])
+            ->all();
+
+        $this->dispatch('subjectsUpdated', subjects: $subjects);
+        $this->dispatch('chaptersUpdated', chapters: []);
+        $this->dispatch('topicsUpdated', topics: []);
+    }
+
     public function updatedChapterId($value)
     {
         $this->topic_id = null;
@@ -237,6 +259,7 @@ class Edit extends Component
         }
 
         $rules = [
+            'academic_class_id' => 'required|exists:academic_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'nullable|exists:chapters,id',
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
@@ -257,9 +280,20 @@ class Edit extends Component
             $rules['options.*.option_text'] = 'required|string';
         }
 
-        $this->validate($rules);
+        $validated = $this->validate($rules);
 
-        DB::transaction(function () {
+        $subject = Subject::query()
+            ->whereKey($validated['subject_id'])
+            ->where('academic_class_id', $validated['academic_class_id'])
+            ->first();
+
+        if (! $subject) {
+            $this->addError('subject_id', 'Please select a subject from the selected class.');
+
+            return;
+        }
+
+        DB::transaction(function () use ($subject) {
             $extraData = null;
 
             if ($this->question_type === 'cq') {
@@ -279,7 +313,7 @@ class Edit extends Component
             }
 
             $this->question->update([
-                'subject_id' => $this->subject_id,
+                'subject_id' => $subject->id,
                 'chapter_id' => $this->chapter_id ?: null,
                 'topic_id' => $this->topic_id ?: null,
                 'title' => $this->title,
@@ -311,7 +345,13 @@ class Edit extends Component
         $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
 
         return view('livewire.admin.questions.edit', [
-            'subjects' => Subject::all(),
+            'classes' => AcademicClass::query()->orderBy('name')->get(),
+            'subjects' => $this->academic_class_id
+                ? Subject::query()
+                    ->where('academic_class_id', $this->academic_class_id)
+                    ->orderBy('name')
+                    ->get()
+                : collect(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),

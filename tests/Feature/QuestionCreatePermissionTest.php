@@ -20,6 +20,7 @@ it('allows teachers to access question create action without authorization error
         ->test(Create::class)
         ->call('save')
         ->assertHasErrors([
+            'academic_class_id',
             'subject_id',
             'title',
             'question_type',
