@@ -36,6 +36,9 @@
                 <tr class="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors group">
                     <td class="px-6 py-4 text-gray-600 dark:text-gray-300">
                         {{ $chapter->subject?->name ?? 'N/A' }}
+                        @if($chapter->subject?->academicClass?->name)
+                            <span class="text-xs text-gray-500">({{ $chapter->subject->academicClass->name }})</span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                         <div class="flex items-center gap-2">
@@ -125,11 +128,24 @@
                     <div class="px-6 py-6 space-y-5">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
+                                <select wire:model.live="academic_class_id" class="app-form-control">
+                                    <option value="">Select Class</option>
+                                    @foreach($classes as $class)
+                                        <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('academic_class_id') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
-                                <select wire:model="subject_id" class="app-form-control">
+                                <select wire:model="subject_id" class="app-form-control" @disabled($academic_class_id === '')>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                        <option value="{{ $subject->id }}">
+                                            {{ $subject->name }} @if($subject->academicClass?->name)({{ $subject->academicClass->name }})@endif
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('subject_id') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
