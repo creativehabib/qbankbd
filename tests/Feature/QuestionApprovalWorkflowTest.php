@@ -60,15 +60,16 @@ function createQuestionDependencies(): array
         'slug' => 'ssc',
     ]);
 
-    return [$subject, $chapter, $topic, $examCategory];
+    return [$class, $subject, $chapter, $topic, $examCategory];
 }
 
 it('stores teacher created questions as pending', function () {
     $teacher = User::factory()->teacher()->create();
-    [$subject, $chapter, $topic, $examCategory] = createQuestionDependencies();
+    [$class, $subject, $chapter, $topic, $examCategory] = createQuestionDependencies();
 
     Livewire::actingAs($teacher)
         ->test(Create::class)
+        ->set('academic_class_id', $class->id)
         ->set('subject_id', $subject->id)
         ->set('chapter_id', $chapter->id)
         ->set('topic_id', $topic->id)
@@ -95,10 +96,11 @@ it('stores teacher created questions as pending', function () {
 it('stores questions as active when creator has publish permission', function () {
     $teacher = User::factory()->teacher()->create();
     $teacher->givePermissionTo('questions.publish');
-    [$subject, $chapter, $topic, $examCategory] = createQuestionDependencies();
+    [$class, $subject, $chapter, $topic, $examCategory] = createQuestionDependencies();
 
     Livewire::actingAs($teacher)
         ->test(Create::class)
+        ->set('academic_class_id', $class->id)
         ->set('subject_id', $subject->id)
         ->set('chapter_id', $chapter->id)
         ->set('topic_id', $topic->id)
@@ -153,7 +155,7 @@ it('allows admin to toggle question status from the question list', function () 
 
 it('filters questions by status and shows active/inactive counts', function () {
     $admin = User::factory()->admin()->create();
-    [$subject, $chapter, $topic] = createQuestionDependencies();
+    [, $subject, $chapter, $topic] = createQuestionDependencies();
 
     Question::query()->create([
         'uuid' => (string) Str::uuid(),
@@ -209,4 +211,41 @@ it('filters questions by status and shows active/inactive counts', function () {
         ->assertSee('Pending question for review')
         ->assertDontSee('Active question now')
         ->assertDontSee('Inactive archived question');
+});
+
+it('rejects question creation when class and subject do not match', function () {
+    $teacher = User::factory()->teacher()->create();
+
+    [$class, $subject, $chapter, $topic, $examCategory] = createQuestionDependencies();
+
+    $anotherClass = AcademicClass::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Class 9',
+        'slug' => 'class-9',
+        'order_sequence' => 2,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    Livewire::actingAs($teacher)
+        ->test(Create::class)
+        ->set('academic_class_id', $anotherClass->id)
+        ->set('subject_id', $subject->id)
+        ->set('chapter_id', $chapter->id)
+        ->set('topic_id', $topic->id)
+        ->set('title', 'Mismatch class question')
+        ->set('slug', 'mismatch-class-question')
+        ->set('description', 'Should fail due to mismatch')
+        ->set('difficulty', 'easy')
+        ->set('question_type', 'mcq')
+        ->set('marks', 1)
+        ->set('options', [
+            ['option_text' => 'A', 'is_correct' => true],
+            ['option_text' => 'B', 'is_correct' => false],
+        ])
+        ->set('exam_category_ids', [$examCategory->id])
+        ->call('save')
+        ->assertHasErrors(['subject_id']);
+
+    expect($class->id)->not->toBe($anotherClass->id);
 });

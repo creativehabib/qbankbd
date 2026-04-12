@@ -3,6 +3,7 @@
 namespace App\Livewire\Questions;
 
 use App\Livewire\Traits\SlugValidationTrait;
+use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\ExamCategory; // Image Upload এর জন্য
 use App\Models\Question;
@@ -20,6 +21,8 @@ class Create extends Component
     use AuthorizesRequests, SlugValidationTrait, WithFileUploads; // WithFileUploads যুক্ত করা হলো
 
     public $subject_id;
+
+    public $academic_class_id;
 
     public $chapter_id;
 
@@ -54,7 +57,7 @@ class Create extends Component
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'chapter_id', 'topic_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq', 'slug', 'exam_category_ids', 'image');
+        $this->reset('academic_class_id', 'subject_id', 'chapter_id', 'topic_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq', 'slug', 'exam_category_ids', 'image');
         $this->difficulty = 'easy';
         $this->question_type = 'mcq';
         $this->marks = 1;
@@ -169,6 +172,24 @@ class Create extends Component
         $this->dispatch('topicsUpdated', topics: []);
     }
 
+    public function updatedAcademicClassId($value): void
+    {
+        $this->subject_id = null;
+        $this->chapter_id = null;
+        $this->topic_id = null;
+
+        $subjects = Subject::query()
+            ->where('academic_class_id', $value)
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($subject) => ['value' => $subject->id, 'text' => $subject->name])
+            ->all();
+
+        $this->dispatch('subjectsUpdated', subjects: $subjects);
+        $this->dispatch('chaptersUpdated', chapters: []);
+        $this->dispatch('topicsUpdated', topics: []);
+    }
+
     public function updatedChapterId($value)
     {
         $this->topic_id = null;
@@ -183,6 +204,7 @@ class Create extends Component
         abort_unless($currentUser?->hasPermission('questions.create'), 403);
 
         $rules = [
+            'academic_class_id' => 'required|exists:academic_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'nullable|exists:chapters,id',
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
@@ -203,9 +225,20 @@ class Create extends Component
             $rules['options.*.option_text'] = 'required|string';
         }
 
-        $this->validate($rules);
+        $validated = $this->validate($rules);
 
-        DB::transaction(function () use ($currentUser) {
+        $subject = Subject::query()
+            ->whereKey($validated['subject_id'])
+            ->where('academic_class_id', $validated['academic_class_id'])
+            ->first();
+
+        if (! $subject) {
+            $this->addError('subject_id', 'Please select a subject from the selected class.');
+
+            return;
+        }
+
+        DB::transaction(function () use ($currentUser, $subject) {
             $extraData = null;
 
             // টাইপ অনুযায়ী extra_content এ ডাটা সেট
@@ -222,7 +255,7 @@ class Create extends Component
             }
 
             $question = Question::create([
-                'subject_id' => $this->subject_id,
+                'subject_id' => $subject->id,
                 'chapter_id' => $this->chapter_id ?: null,
                 'topic_id' => $this->topic_id ?: null,
                 'title' => $this->title,
@@ -256,7 +289,13 @@ class Create extends Component
         $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
 
         return view('livewire.admin.questions.create', [
-            'subjects' => Subject::all(),
+            'classes' => AcademicClass::query()->orderBy('name')->get(),
+            'subjects' => $this->academic_class_id
+                ? Subject::query()
+                    ->where('academic_class_id', $this->academic_class_id)
+                    ->orderBy('name')
+                    ->get()
+                : collect(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),
