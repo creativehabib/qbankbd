@@ -16,13 +16,14 @@ use App\Livewire\Teacher\QuestionGenerator;
 use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
+use App\Http\Controllers\DashboardController;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
     Route::get('/questions', Questions::class)->name('questions.index');
