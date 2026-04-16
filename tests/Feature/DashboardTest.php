@@ -13,7 +13,7 @@ test('student sees student dashboard', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Student Dashboard');
+        ->assertSee('Student Panel');
 });
 
 test('teacher sees teacher dashboard', function () {
@@ -22,7 +22,7 @@ test('teacher sees teacher dashboard', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Teacher Dashboard');
+        ->assertSee('Teacher Panel');
 });
 
 test('admin sees admin dashboard', function () {
@@ -31,7 +31,7 @@ test('admin sees admin dashboard', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Admin Dashboard');
+        ->assertSee('Admin Panel');
 });
 
 test('super admin sees super admin dashboard', function () {
@@ -40,5 +40,5 @@ test('super admin sees super admin dashboard', function () {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Super Admin Dashboard');
+        ->assertSee('Super Admin Panel');
 });

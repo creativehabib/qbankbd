@@ -1,8 +1,6 @@
-<x-layouts::app :title="__('Super Admin Dashboard')">
-    <div class="space-y-4">
-        <flux:heading size="xl">{{ __('Super Admin Dashboard') }}</flux:heading>
-        <flux:text>
-            {{ __('আপনি Super Admin হিসেবে লগইন করেছেন। ইউজার, রোল ও পারমিশনসহ সব কনফিগারেশন এখান থেকে নিয়ন্ত্রণ করতে পারবেন।') }}
-        </flux:text>
-    </div>
-</x-layouts::app>
+<x-dashboards.partials.main
+    panel-title="Super Admin Panel"
+    welcome-title="অনলাইন ডিজিটাল স্কুল"
+    welcome-subtitle="রোল: সুপার অ্যাডমিন"
+    description="সকল ইউজার, রোল, পারমিশন ও সিস্টেম কনফিগারেশন মনিটর করার জন্য এই প্যানেল ব্যবহার করুন।"
+/>
