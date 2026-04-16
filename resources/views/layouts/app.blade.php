@@ -7,9 +7,9 @@
         @isset($header)
             {{ $header }}
         @else
-            <div class="px-6 py-4">
+            <div class="px-6 py-2">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
+                    <h1 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
 
                     <div class="flex items-center gap-2">
                         <flux:button variant="ghost" icon="moon" size="sm">{{ __('Theme') }}</flux:button>
