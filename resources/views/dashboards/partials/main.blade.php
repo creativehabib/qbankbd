@@ -6,8 +6,8 @@
 @endphp
 
 <x-layouts::app :title="$panelTitle">
-    <div class="space-y-5">
-        <section class="rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+    <x-slot:header>
+        <div class="px-6 py-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $panelTitle }}</h1>
@@ -19,8 +19,10 @@
                     <flux:avatar :name="auth()->user()->name" :initials="auth()->user()->initials()" />
                 </div>
             </div>
-        </section>
+        </div>
+    </x-slot:header>
 
+    <div class="space-y-5">
         <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="space-y-1">
