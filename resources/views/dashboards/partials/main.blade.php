@@ -1,9 +1,9 @@
-@props([
-    'panelTitle',
-    'welcomeTitle',
-    'welcomeSubtitle',
-    'description',
-])
+@php
+    $panelTitle = $panelTitle ?? 'Dashboard Panel';
+    $welcomeTitle = $welcomeTitle ?? 'অনলাইন ডিজিটাল স্কুল';
+    $welcomeSubtitle = $welcomeSubtitle ?? 'রোল: ব্যবহারকারী';
+    $description = $description ?? 'ড্যাশবোর্ড তথ্য';
+@endphp
 
 <x-layouts::app :title="$panelTitle">
     <div class="space-y-5">
