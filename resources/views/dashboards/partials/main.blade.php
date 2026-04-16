@@ -11,11 +11,10 @@
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $panelTitle }}</h1>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Role based main dashboard') }}</p>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <flux:button variant="ghost" icon="moon" size="sm">{{ __('Theme') }}</flux:button>
+                    <flux:button variant="ghost" icon="moon" size="sm"></flux:button>
                     <flux:avatar :name="auth()->user()->name" :initials="auth()->user()->initials()" />
                 </div>
             </div>
