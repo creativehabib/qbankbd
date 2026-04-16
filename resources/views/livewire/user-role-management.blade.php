@@ -1,10 +1,4 @@
 <div class="space-y-6">
-    <div>
-        <flux:heading size="xl">User Management</flux:heading>
-        <flux:subheading>এখান থেকে user edit, role update এবং user delete করতে পারবেন।</flux:subheading>
-        <flux:separator class="my-6" />
-    </div>
-
     <flux:card>
         <div class="mb-6 flex items-center justify-between gap-4">
             <div class="w-full sm:w-96">
