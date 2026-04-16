@@ -23,16 +23,6 @@
     </x-slot:header>
 
     <div class="space-y-4 sm:space-y-5">
-        <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 lg:hidden">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <h1 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ $panelTitle }}</h1>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('Role based main dashboard') }}</p>
-                </div>
-                <flux:avatar :name="auth()->user()->name" :initials="auth()->user()->initials()" />
-            </div>
-        </section>
-
         <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div class="space-y-1">
