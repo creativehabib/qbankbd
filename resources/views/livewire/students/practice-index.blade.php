@@ -1,19 +1,17 @@
-<div class="flex flex-col lg:flex-row gap-6">
+<div x-data="{ filterOpen: false }" @keydown.escape.window="if(filterOpen) { filterOpen = false; } else if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')" class="flex flex-col lg:flex-row gap-6">
 
     <!-- বাম সাইড: মূল কন্টেন্ট -->
     <div class="flex-1 min-w-0">
-        <div
-            x-data
-            @keydown.escape.window="if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')"
-            class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative"
-        >
+        <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative">
+
             <!-- লোডিং ওভারলে -->
-            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm dark:bg-zinc-900/60">
+            <div wire:loading.remove="hidden" class="hidden absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm dark:bg-zinc-900/60">
                 <div class="flex flex-col items-center gap-2">
                     <flux:icon.arrow-path class="size-8 animate-spin text-emerald-600" />
                     <span class="text-xs font-medium text-zinc-600 dark:text-zinc-300">লোড হচ্ছে...</span>
                 </div>
             </div>
+
             <!-- Tabs -->
             <div class="border-b border-zinc-200 dark:border-zinc-700">
                 <div class="grid grid-cols-2">
@@ -59,29 +57,19 @@
                             <!-- অ্যাক্টিভ ফিল্টার পিলস -->
                             <div class="flex flex-wrap gap-2">
                                 @foreach($filterQuestionTypes as $type)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
-                                        {{ strtoupper($type) }}
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">{{ strtoupper($type) }}</span>
                                 @endforeach
                                 @foreach($filterClasses as $id)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">
-                                        {{ $filterOptions['classes'][$id] ?? '' }}
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">{{ $filterOptions['classes'][$id] ?? '' }}</span>
                                 @endforeach
                                 @foreach($filterSubjects as $id)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
-                                        {{ $filterOptions['subjects'][$id] ?? '' }}
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">{{ $filterOptions['subjects'][$id] ?? '' }}</span>
                                 @endforeach
                                 @foreach($filterTeachers as $id)
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
-                                        {{ $filterOptions['teachers'][$id] ?? '' }}
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">{{ $filterOptions['teachers'][$id] ?? '' }}</span>
                                 @endforeach
                                 @if(filled($filterSearch))
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
-                                        "{{ $filterSearch }}"
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">"{{ $filterSearch }}"</span>
                                 @endif
                             </div>
 
@@ -261,12 +249,62 @@
         </div>
     </div>
 
-    <!-- ডান সাইড: ফিল্টার সাইডবার -->
+    <!-- ডান সাইড: ফিল্টার সেকশন (মোবাইল ড্রয়ার ও ডেস্কটপ স্ট্যাটিক) -->
     @if($level === 'questions' || $level === 'filtered-questions')
-        <div class="w-full lg:w-80 shrink-0">
-            <div class="rounded-xl border p-5 shadow-sm sticky top-6 transition-colors duration-300 dark:bg-zinc-900 {{ $level === 'filtered-questions' ? 'bg-emerald-50/50 border-emerald-300 dark:border-emerald-700' : 'bg-white border-zinc-200 dark:border-zinc-700' }}">
 
-                <div class="flex items-center justify-between mb-5">
+        <!-- মোবাইল ফ্লোটিং বাটন (শুধুমাত্র ছোট স্ক্রিনে দেখাবে) -->
+        <button
+            @click="filterOpen = true"
+            class="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl transition hover:bg-emerald-700 lg:hidden"
+        >
+            <flux:icon.adjustments-horizontal class="size-6" />
+            @if($level === 'filtered-questions')
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+            @endif
+        </button>
+
+        <!-- মোবাইল ব্যাকড্রপ (ছোট স্ক্রিনে ড্রয়ার খোলা থাকলে পেছনে কালো শ্যাডো) -->
+        <div
+            x-show="filterOpen"
+            x-transition:enter="transition-opacity ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="filterOpen = false"
+            class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            style="display:none;"
+        ></div>
+
+        <!-- মূল ফিল্টার কন্টেইনার -->
+        <div
+            x-show="filterOpen"
+            x-transition:enter="transform transition ease-in-out duration-300"
+            x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transform transition ease-in-out duration-300"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="translate-x-full"
+            class="fixed top-0 right-0 z-50 h-full w-[320px] max-w-[85vw] shrink-0 overflow-y-auto bg-white dark:bg-zinc-900 shadow-2xl lg:static lg:h-auto lg:w-80 lg:max-w-none lg:translate-x-0 lg:shadow-none lg:block"
+            style="display:none;"
+        >
+
+            <!-- মোবাইলের জন্য হেডার বাটন (ছোট স্ক্রিনে ড্রয়ার বন্ধ করতে) -->
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900 lg:hidden">
+                <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">ফিল্টার</h3>
+                <button @click="filterOpen = false" class="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <flux:icon.x-mark class="size-5" />
+                </button>
+            </div>
+
+            <div class="rounded-none lg:rounded-xl border-0 lg:border border-zinc-200 p-5 shadow-none lg:shadow-sm dark:bg-zinc-900 {{ $level === 'filtered-questions' ? 'bg-emerald-50/50 lg:border-emerald-300 dark:border-emerald-700' : 'bg-white lg:border-zinc-200 dark:border-zinc-700' }} lg:sticky lg:top-6 transition-colors duration-300">
+
+                <!-- ডেস্কটপের জন্য হেডার (বড় স্ক্রিনে দেখাবে) -->
+                <div class="hidden lg:flex items-center justify-between mb-5">
                     <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">ফিল্টার</h3>
                     @if($level === 'filtered-questions')
                         <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
@@ -377,3 +415,11 @@
     @endif
 
 </div>
+
+@push('scripts')
+    <script>
+        Livewire.on('scroll-to-top', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+@endpush
