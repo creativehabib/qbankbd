@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 
-test('student can access practice menu page and see class selector', function () {
+test('student can access practice page and see class folders', function () {
     $student = User::factory()->create();
 
     $class = AcademicClass::query()->create([
@@ -25,11 +25,11 @@ test('student can access practice menu page and see class selector', function ()
         ->get(route('students.practice.index'))
         ->assertOk()
         ->assertSeeLivewire(PracticeIndex::class)
-        ->assertSee('শ্রেণি নির্বাচন করুন')
+        ->assertSee('Select Topics for Practice')
         ->assertSee($class->name);
 });
 
-test('subject list is shown after selecting a class', function () {
+test('subject list is shown after opening a class folder', function () {
     $student = User::factory()->create();
 
     $classTen = AcademicClass::query()->create([
@@ -86,13 +86,13 @@ test('subject list is shown after selecting a class', function () {
 
     Livewire::actingAs($student)
         ->test(PracticeIndex::class)
-        ->set('selectedClassId', $classTen->id)
+        ->call('openClass', $classTen->id)
         ->assertSee('গণিত')
         ->assertSee('0/1 MCQ')
         ->assertDontSee('বাংলা');
 });
 
-test('chapter list is shown after selecting a subject', function () {
+test('chapter list is shown after opening a subject folder', function () {
     $student = User::factory()->create();
 
     $classTen = AcademicClass::query()->create([
@@ -151,8 +151,8 @@ test('chapter list is shown after selecting a subject', function () {
 
     Livewire::actingAs($student)
         ->test(PracticeIndex::class)
-        ->set('selectedClassId', $classTen->id)
-        ->call('selectSubject', $subject->id)
+        ->call('openClass', $classTen->id)
+        ->call('openSubject', $subject->id)
         ->assertSee('চ্যাপ্টার নির্বাচন করুন')
         ->assertSee('বাস্তব সংখ্যা')
         ->assertSee('0/1 MCQ')
