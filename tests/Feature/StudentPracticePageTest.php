@@ -75,6 +75,7 @@ test('subject list is shown after opening a class folder', function () {
         'title' => 'Sample MCQ Question',
         'slug' => 'sample-mcq-question',
         'difficulty' => 'easy',
+        'description' => null,
         'question_type' => 'mcq',
         'marks' => 1,
         'status' => 'active',
@@ -222,6 +223,7 @@ test('latest mcq questions are shown after opening a chapter folder', function (
         'title' => 'সর্বশেষ এমসিকিউ প্রশ্ন',
         'slug' => 'latest-mcq-question',
         'difficulty' => 'medium',
+        'description' => 'এটি একটি ব্যাখ্যা।',
         'question_type' => 'mcq',
         'marks' => 1,
         'status' => 'active',
@@ -246,7 +248,10 @@ test('latest mcq questions are shown after opening a chapter folder', function (
         ->assertSee('সর্বশেষ এমসিকিউ প্রশ্ন')
         ->assertSee('বাংলা')
         ->assertSee('ইংরেজি')
-        ->assertSee('পুরনো এমসিকিউ প্রশ্ন');
+        ->assertSee('পুরনো এমসিকিউ প্রশ্ন')
+        ->assertSee('DES')
+        ->assertSee('No explanation yet')
+        ->assertSee('এটি একটি ব্যাখ্যা।');
 });
 
 test('teacher cannot access student practice page', function () {
