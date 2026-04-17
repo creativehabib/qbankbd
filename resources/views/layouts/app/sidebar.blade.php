@@ -65,6 +65,12 @@
         <flux:sidebar.item icon="tag" :href="route('questions.set.create')" :current="request()->routeIs('questions.set.create.*')" wire:navigate>
             {{ __('Question Create') }}
         </flux:sidebar.item>
+
+        @if(auth()->user()->isStudent())
+            <flux:sidebar.item icon="book-open-text" :href="route('students.practice.index')" :current="request()->routeIs('students.practice.*')" wire:navigate>
+                {{ __('Practice') }}
+            </flux:sidebar.item>
+        @endif
         @if(auth()->user()->hasPermission('users.manage_roles'))
             <flux:sidebar.group :heading="__('Administration')" icon="shield-check">
                 <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
