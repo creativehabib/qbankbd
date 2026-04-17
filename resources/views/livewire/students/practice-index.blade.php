@@ -191,6 +191,10 @@
                         </article>
                     @endforeach
                 </div>
+
+                <div class="pt-2">
+                    {{ $latestQuestions->links() }}
+                </div>
             @endif
         @endif
     </div>
