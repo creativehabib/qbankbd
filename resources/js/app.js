@@ -6,6 +6,35 @@ window.Swal = Swal;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 
+window.renderMathJax = function (root = document) {
+    if (!window.MathJax?.typesetPromise) {
+        return;
+    }
+
+    const scope = root instanceof Element || root instanceof Document ? root : document;
+    const mathElements = scope.querySelectorAll('[data-math-content]');
+
+    if (mathElements.length > 0) {
+        window.MathJax.typesetPromise(Array.from(mathElements));
+
+        return;
+    }
+
+    window.MathJax.typesetPromise();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.renderMathJax();
+});
+
+document.addEventListener('livewire:navigated', () => {
+    window.renderMathJax();
+});
+
+window.addEventListener('practice-content-updated', () => {
+    window.renderMathJax();
+});
+
 
 window.confirmDeleteAction = async function (callback, options = {}) {
     const isDarkMode = document.documentElement.classList.contains('dark')
