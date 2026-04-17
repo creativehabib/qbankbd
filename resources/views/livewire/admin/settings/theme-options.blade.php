@@ -56,8 +56,36 @@
     <script>
         const FONT_JSON_URL = 'https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json';
 
+        function normalizeFontPayload(payload) {
+            if (Array.isArray(payload)) {
+                return payload.map((font) => ({
+                    family: font.family ?? font.name ?? '',
+                    variants: font.variants ?? [],
+                })).filter((font) => font.family !== '');
+            }
+
+            return Object.entries(payload ?? {}).map(([family, value]) => ({
+                family,
+                variants: Array.isArray(value?.variants)
+                    ? value.variants
+                    : Array.isArray(value)
+                        ? value
+                        : [],
+            }));
+        }
+
+        function normalizeWeightVariants(variants) {
+            return (variants ?? [])
+                .map((variant) => String(variant))
+                .map((variant) => variant === 'regular' ? '400' : variant)
+                .map((variant) => variant === 'italic' ? '400' : variant)
+                .map((variant) => variant.replace('italic', ''))
+                .filter((variant) => /^[1-9]00$/.test(variant));
+        }
+
         function bootThemeFontChoices() {
             const select = document.getElementById('primary_font');
+            const weightInput = document.getElementById('font_weights');
 
             if (!select || typeof window.Choices === 'undefined') {
                 return;
@@ -75,15 +103,22 @@
                 itemSelectText: '',
                 placeholder: true,
                 placeholderValue: 'Select font',
+                duplicateItemsAllowed: false,
+                addItems: true,
+                addChoices: true,
             });
 
             fetch(FONT_JSON_URL)
                 .then((response) => response.json())
-                .then((fonts) => {
-                    const values = Object.keys(fonts).map((fontName) => ({
-                        value: fontName,
-                        label: fontName,
-                        selected: fontName === @js($primaryFont),
+                .then((fontsPayload) => {
+                    const fonts = normalizeFontPayload(fontsPayload);
+                    const fontMap = new Map(fonts.map((font) => [font.family, font]));
+                    select.dataset.fontMap = JSON.stringify(Object.fromEntries(fontMap));
+
+                    const values = fonts.map((font) => ({
+                        value: font.family,
+                        label: font.family,
+                        selected: font.family === @js($primaryFont),
                     }));
 
                     choices.setChoices(values, 'value', 'label', true);
@@ -93,6 +128,17 @@
             select.addEventListener('change', (event) => {
                 const selectedFont = event.target.value;
                 window.Livewire.dispatch('theme-font-selected', { font: selectedFont });
+
+                try {
+                    const fontMap = JSON.parse(select.dataset.fontMap ?? '{}');
+                    const variants = normalizeWeightVariants(fontMap[selectedFont]?.variants ?? []);
+
+                    if (variants.length > 0 && weightInput) {
+                        const joinedWeights = [...new Set(variants)].join(';');
+                        weightInput.value = joinedWeights;
+                        weightInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                } catch {}
             });
         }
 

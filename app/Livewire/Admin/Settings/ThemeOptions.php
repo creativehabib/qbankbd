@@ -26,14 +26,10 @@ class ThemeOptions extends Component
 
         $settings = SettingsStore::group('typography');
 
-        if (isset($settings['theme_options']) && is_array($settings['theme_options'])) {
-            $themeOptions = $settings['theme_options'];
-
-            $this->primaryFont = (string) ($themeOptions['primary_font'] ?? $this->primaryFont);
-            $this->fontWeights = (string) ($themeOptions['font_weights'] ?? $this->fontWeights);
-            $this->bodyFontSize = (string) ($themeOptions['body_font_size'] ?? $this->bodyFontSize);
-            $this->autoload = (bool) ($themeOptions['autoload'] ?? $this->autoload);
-        }
+        $this->primaryFont = (string) ($settings['primary_font'] ?? $this->primaryFont);
+        $this->fontWeights = (string) ($settings['primary_font_weights'] ?? $this->fontWeights);
+        $this->bodyFontSize = (string) ($settings['body_font_size'] ?? $this->bodyFontSize);
+        $this->autoload = (bool) ($settings['autoload'] ?? $this->autoload);
     }
 
     public function setPrimaryFont(string $font): void
@@ -53,12 +49,10 @@ class ThemeOptions extends Component
         ]);
 
         SettingsStore::saveGroup('typography', [
-            'theme_options' => [
-                'primary_font' => $validated['primaryFont'],
-                'font_weights' => $validated['fontWeights'],
-                'body_font_size' => $validated['bodyFontSize'],
-                'autoload' => $validated['autoload'],
-            ],
+            'primary_font' => $validated['primaryFont'],
+            'primary_font_weights' => $validated['fontWeights'],
+            'body_font_size' => $validated['bodyFontSize'],
+            'autoload' => $validated['autoload'] ? '1' : '0',
         ], $validated['autoload']);
 
         $this->dispatch('theme-options-saved', message: 'Typography settings saved successfully.');

@@ -13,7 +13,7 @@ it('authorized users can access theme options page', function () {
         ->assertOk();
 });
 
-it('stores typography settings as grouped json with autoload flag', function () {
+it('stores typography settings as separate keys with autoload flag', function () {
     $superAdmin = User::factory()->superAdmin()->create();
 
     Livewire::actingAs($superAdmin)
@@ -25,17 +25,12 @@ it('stores typography settings as grouped json with autoload flag', function () 
         ->call('save')
         ->assertHasNoErrors();
 
-    $setting = Setting::query()
-        ->where('group', 'typography')
-        ->where('key', 'theme_options')
-        ->first();
+    $primaryFont = Setting::query()->where('group', 'typography')->where('key', 'primary_font')->first();
+    $fontWeights = Setting::query()->where('group', 'typography')->where('key', 'primary_font_weights')->first();
+    $bodyFontSize = Setting::query()->where('group', 'typography')->where('key', 'body_font_size')->first();
 
-    expect($setting)->not()->toBeNull();
-    expect($setting?->autoload)->toBeTrue();
-
-    $value = json_decode((string) $setting?->value, true);
-
-    expect($value)->toBeArray();
-    expect($value['primary_font'])->toBe('Poppins');
-    expect($value['body_font_size'])->toBe('16px');
+    expect($primaryFont?->value)->toBe('Poppins');
+    expect($fontWeights?->value)->toBe('300;400;500;600;700');
+    expect($bodyFontSize?->value)->toBe('16px');
+    expect($primaryFont?->autoload)->toBeTrue();
 });

@@ -11,10 +11,26 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        @if(filled($themeTypography['google_fonts_url'] ?? null))
-            <link href="{{ $themeTypography['google_fonts_url'] }}" rel="stylesheet" />
+        @if($primaryFont = setting('primary_font'))
+            @php
+                $primaryFont = trim($primaryFont);
+                $primaryFontWeights = trim((string) setting('primary_font_weights', '300;400;500;600;700'));
+                $googleFontHref = null;
+
+                if ($primaryFont !== '' && ! str_contains($primaryFont, ',')) {
+                    $googleFontHref = 'https://fonts.googleapis.com/css2?family='.urlencode($primaryFont).':wght@'.$primaryFontWeights.'&display=swap';
+                }
+            @endphp
+
+            @if($googleFontHref)
+                <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+                <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+                <link rel="preload" as="style" href="{{ $googleFontHref }}" fetchpriority="high">
+                <link href="{{ $googleFontHref }}" rel="stylesheet" media="print" onload="this.media='all'">
+                <noscript><link href="{{ $googleFontHref }}" rel="stylesheet"></noscript>
+            @endif
         @endif
         <script>
             window.MathJax = {
@@ -30,16 +46,17 @@
         </script>
         <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-        <style>
-            :root {
-                --font-sans: {!! $themeTypography['css_font_family'] ?? "'Instrument Sans', ui-sans-serif, system-ui, sans-serif" !!};
-                --app-body-font-size: {{ $themeTypography['body_font_size'] ?? '16px' }};
-            }
-
-            body {
-                font-size: var(--app-body-font-size);
-            }
-        </style>
+        @if($primaryFont = setting('primary_font'))
+            <style>
+                :root { --font-sans: "{{ trim($primaryFont) }}", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+            </style>
+        @endif
+        @if($bodyFontSize = setting('body_font_size'))
+            <style>
+                :root { --body-font-size: {{ trim($bodyFontSize) }}; }
+                body { font-size: var(--body-font-size); }
+            </style>
+        @endif
 
         <!-- Styles -->
         <style>
