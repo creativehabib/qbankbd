@@ -59,11 +59,13 @@
         function normalizeFontPayload(payload) {
             const rawFonts = Array.isArray(payload)
                 ? payload
-                : Array.isArray(payload?.items)
-                    ? payload.items
-                    : typeof payload === 'object' && payload !== null
-                        ? Object.entries(payload).map(([family, value]) => ({ family, ...value }))
-                        : [];
+                : Array.isArray(payload?.fonts)
+                    ? payload.fonts
+                    : Array.isArray(payload?.items)
+                        ? payload.items
+                        : typeof payload === 'object' && payload !== null
+                            ? Object.entries(payload).map(([family, value]) => ({ family, ...value }))
+                            : [];
 
             const mappedFonts = rawFonts.map((font) => ({
                 family: String(font.family ?? font.name ?? '').trim(),
