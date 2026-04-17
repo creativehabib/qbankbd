@@ -24,7 +24,7 @@
                         <button
                             type="button"
                             wire:click="openClass({{ $class->id }})"
-                            class="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
+                            class="flex items-center justify-between cursor-pointer gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
                         >
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
@@ -61,7 +61,7 @@
                         <button
                             type="button"
                             wire:click="openSubject({{ $subject->id }})"
-                            class="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
+                            class="flex items-center justify-between gap-3 rounded-xl border cursor-pointer border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
                         >
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
@@ -98,7 +98,7 @@
                         <button
                             type="button"
                             wire:click="openChapter({{ $chapter->id }})"
-                            class="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
+                            class="flex items-center justify-between gap-3 rounded-xl cursor-pointer border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
                         >
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
@@ -136,9 +136,9 @@
                         @php($options = collect($question->extra_content ?? [])->take(4))
                         @php($questionTitle = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                         <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
-                            <h4 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h4>
+                            <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h5>
 
-                            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                            <div class="mt-2 flex flex-wrap gap-া2 text-xs">
                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->chapter?->name }}</span>
