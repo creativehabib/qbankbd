@@ -18,11 +18,11 @@ it('stores typography settings as separate keys with autoload flag', function ()
 
     Livewire::actingAs($superAdmin)
         ->test(ThemeOptions::class)
-        ->set('primaryFont', 'Poppins')
-        ->set('fontWeights', '300;400;500;600;700')
-        ->set('bodyFontSize', '16px')
+        ->set('primary_font', 'Poppins')
+        ->set('primary_font_weights', '300;400;500;600;700')
+        ->set('body_font_size', '16px')
         ->set('autoload', true)
-        ->call('save')
+        ->call('saveTypography')
         ->assertHasNoErrors();
 
     $primaryFont = Setting::query()->where('group', 'typography')->where('key', 'primary_font')->first();
