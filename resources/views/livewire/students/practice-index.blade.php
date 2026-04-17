@@ -95,9 +95,10 @@
             @else
                 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                     @foreach($chapters as $chapter)
-                        <a
-                            href="{{ route('questions.index', ['subject' => $selectedSubjectId, 'chapter' => $chapter->id]) }}"
-                            class="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
+                        <button
+                            type="button"
+                            wire:click="openChapter({{ $chapter->id }})"
+                            class="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60"
                         >
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
@@ -110,7 +111,53 @@
                             </div>
 
                             <flux:icon.chevron-right class="size-5 text-zinc-400" />
-                        </a>
+                        </button>
+                    @endforeach
+                </div>
+            @endif
+        @endif
+
+        @if($level === 'questions')
+            <div class="flex items-center gap-3">
+                <button type="button" wire:click="back" class="rounded-md p-1 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                    <flux:icon.arrow-left class="size-5" />
+                </button>
+                <h3 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{{ $selectedChapterName }}</h3>
+            </div>
+
+            @if($latestQuestions->isEmpty())
+                <div class="rounded-lg border border-dashed border-zinc-300 p-5 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                    {{ __('এই চ্যাপ্টারে এখনো কোনো MCQ পাওয়া যায়নি।') }}
+                </div>
+            @else
+                @php($labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'])
+                <div class="space-y-4">
+                    @foreach($latestQuestions as $question)
+                        @php($options = collect($question->extra_content ?? [])->take(4))
+                        <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
+                            <h4 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">{{ $loop->iteration }}. {{ strip_tags($question->title) }}</h4>
+
+                            <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
+                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
+                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->chapter?->name }}</span>
+                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->difficulty) }}</span>
+                            </div>
+
+                            <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
+                                @foreach($options as $index => $option)
+                                    <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ !empty($option['is_correct']) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
+                                        <span class="flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$index] ?? $index + 1 }}</span>
+                                        <span class="text-sm text-zinc-800 dark:text-zinc-100">{{ strip_tags($option['option_text'] ?? '') }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-3 flex items-center justify-end gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+                                <span class="inline-flex items-center gap-1"><flux:icon.eye class="size-4" />{{ $question->views }}</span>
+                                <span class="inline-flex items-center gap-1"><flux:icon.calendar-days class="size-4" />{{ $question->created_at?->format('d M Y') }}</span>
+                            </div>
+                        </article>
                     @endforeach
                 </div>
             @endif

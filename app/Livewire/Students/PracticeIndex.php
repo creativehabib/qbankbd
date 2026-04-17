@@ -4,6 +4,7 @@ namespace App\Livewire\Students;
 
 use App\Models\AcademicClass;
 use App\Models\Chapter;
+use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +18,8 @@ class PracticeIndex extends Component
     public ?int $selectedClassId = null;
 
     public ?int $selectedSubjectId = null;
+
+    public ?int $selectedChapterId = null;
 
     public function mount(): void
     {
@@ -33,6 +36,7 @@ class PracticeIndex extends Component
         if ($isValidClass) {
             $this->selectedClassId = $classId;
             $this->selectedSubjectId = null;
+            $this->selectedChapterId = null;
             $this->level = 'subjects';
         }
     }
@@ -47,14 +51,37 @@ class PracticeIndex extends Component
 
         if ($isValidSubject) {
             $this->selectedSubjectId = $subjectId;
+            $this->selectedChapterId = null;
             $this->level = 'chapters';
+        }
+    }
+
+    public function openChapter(int $chapterId): void
+    {
+        $isValidChapter = Chapter::query()
+            ->whereKey($chapterId)
+            ->where('subject_id', $this->selectedSubjectId)
+            ->where('is_active', true)
+            ->exists();
+
+        if ($isValidChapter) {
+            $this->selectedChapterId = $chapterId;
+            $this->level = 'questions';
         }
     }
 
     public function back(): void
     {
+        if ($this->level === 'questions') {
+            $this->selectedChapterId = null;
+            $this->level = 'chapters';
+
+            return;
+        }
+
         if ($this->level === 'chapters') {
             $this->selectedSubjectId = null;
+            $this->selectedChapterId = null;
             $this->level = 'subjects';
 
             return;
@@ -63,6 +90,7 @@ class PracticeIndex extends Component
         if ($this->level === 'subjects') {
             $this->selectedClassId = null;
             $this->selectedSubjectId = null;
+            $this->selectedChapterId = null;
             $this->level = 'classes';
         }
     }
@@ -125,17 +153,39 @@ class PracticeIndex extends Component
             ->get(['id', 'name', 'slug']);
     }
 
+    /**
+     * @return Collection<int, Question>
+     */
+    protected function latestQuestions(): Collection
+    {
+        if ($this->selectedChapterId === null) {
+            return collect();
+        }
+
+        return Question::query()
+            ->where('question_type', 'mcq')
+            ->where('status', 'active')
+            ->where('chapter_id', $this->selectedChapterId)
+            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
+            ->latest('id')
+            ->limit(20)
+            ->get();
+    }
+
     public function render(): View
     {
         $selectedClassName = AcademicClass::query()->whereKey($this->selectedClassId)->value('name');
         $selectedSubjectName = Subject::query()->whereKey($this->selectedSubjectId)->value('name');
+        $selectedChapterName = Chapter::query()->whereKey($this->selectedChapterId)->value('name');
 
         return view('livewire.students.practice-index', [
             'classes' => $this->classes(),
             'subjects' => $this->subjects(),
             'chapters' => $this->chapters(),
+            'latestQuestions' => $this->latestQuestions(),
             'selectedClassName' => $selectedClassName,
             'selectedSubjectName' => $selectedSubjectName,
+            'selectedChapterName' => $selectedChapterName,
         ])->layout('layouts.app', ['title' => 'Practice']);
     }
 }

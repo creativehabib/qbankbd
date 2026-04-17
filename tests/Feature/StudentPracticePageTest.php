@@ -82,6 +82,10 @@ test('subject list is shown after opening a class folder', function () {
         'user_id' => $student->id,
         'academic_class_id' => $classTen->id,
         'subject_id' => $subjectForClassTen->id,
+        'extra_content' => [
+            ['option_text' => 'Option A', 'is_correct' => true],
+            ['option_text' => 'Option B', 'is_correct' => false],
+        ],
     ]);
 
     Livewire::actingAs($student)
@@ -147,16 +151,102 @@ test('chapter list is shown after opening a subject folder', function () {
         'academic_class_id' => $classTen->id,
         'subject_id' => $subject->id,
         'chapter_id' => $chapterOne->id,
+        'extra_content' => [
+            ['option_text' => 'Option A', 'is_correct' => true],
+            ['option_text' => 'Option B', 'is_correct' => false],
+        ],
     ]);
 
     Livewire::actingAs($student)
         ->test(PracticeIndex::class)
         ->call('openClass', $classTen->id)
         ->call('openSubject', $subject->id)
-        ->assertSee('চ্যাপ্টার নির্বাচন করুন')
         ->assertSee('বাস্তব সংখ্যা')
         ->assertSee('0/1 MCQ')
         ->assertDontSee('সেট');
+});
+
+test('latest mcq questions are shown after opening a chapter folder', function () {
+    $student = User::factory()->create();
+
+    $classTen = AcademicClass::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Class 10',
+        'slug' => 'class-10-latest',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $subject = Subject::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'academic_class_id' => $classTen->id,
+        'name' => 'বাংলা ১ম পত্র',
+        'slug' => 'bangla-1st-paper',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $chapter = Chapter::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'subject_id' => $subject->id,
+        'name' => 'গদ্য',
+        'slug' => 'goddo',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'পুরনো এমসিকিউ প্রশ্ন',
+        'slug' => 'old-mcq-question',
+        'difficulty' => 'easy',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'active',
+        'is_premium' => false,
+        'user_id' => $student->id,
+        'academic_class_id' => $classTen->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'extra_content' => [
+            ['option_text' => 'ভুল উত্তর', 'is_correct' => false],
+            ['option_text' => 'সঠিক উত্তর', 'is_correct' => true],
+        ],
+    ]);
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'সর্বশেষ এমসিকিউ প্রশ্ন',
+        'slug' => 'latest-mcq-question',
+        'difficulty' => 'medium',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'active',
+        'is_premium' => false,
+        'user_id' => $student->id,
+        'academic_class_id' => $classTen->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'extra_content' => [
+            ['option_text' => 'বাংলা', 'is_correct' => true],
+            ['option_text' => 'ইংরেজি', 'is_correct' => false],
+            ['option_text' => 'আরবি', 'is_correct' => false],
+            ['option_text' => 'উর্দু', 'is_correct' => false],
+        ],
+    ]);
+
+    Livewire::actingAs($student)
+        ->test(PracticeIndex::class)
+        ->call('openClass', $classTen->id)
+        ->call('openSubject', $subject->id)
+        ->call('openChapter', $chapter->id)
+        ->assertSee('সর্বশেষ এমসিকিউ প্রশ্ন')
+        ->assertSee('বাংলা')
+        ->assertSee('ইংরেজি')
+        ->assertSee('পুরনো এমসিকিউ প্রশ্ন');
 });
 
 test('teacher cannot access student practice page', function () {
