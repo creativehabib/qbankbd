@@ -262,3 +262,66 @@ test('teacher cannot access student practice page', function () {
         ->get(route('students.practice.index'))
         ->assertForbidden();
 });
+
+test('mcq question list shows pagination after 20 questions', function () {
+    $student = User::factory()->create();
+
+    $classTen = AcademicClass::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Class 10',
+        'slug' => 'class-10-pagination',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $subject = Subject::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'academic_class_id' => $classTen->id,
+        'name' => 'জীববিজ্ঞান',
+        'slug' => 'biology-pagination',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $chapter = Chapter::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'subject_id' => $subject->id,
+        'name' => 'কোষ ও টিস্যু',
+        'slug' => 'cell-and-tissue',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    foreach (range(1, 21) as $sequence) {
+        Question::query()->create([
+            'uuid' => (string) Str::uuid(),
+            'title' => "Pagination MCQ {$sequence}",
+            'slug' => "pagination-mcq-{$sequence}",
+            'difficulty' => 'easy',
+            'question_type' => 'mcq',
+            'marks' => 1,
+            'status' => 'active',
+            'is_premium' => false,
+            'user_id' => $student->id,
+            'academic_class_id' => $classTen->id,
+            'subject_id' => $subject->id,
+            'chapter_id' => $chapter->id,
+            'extra_content' => [
+                ['option_text' => 'Option A', 'is_correct' => true],
+                ['option_text' => 'Option B', 'is_correct' => false],
+            ],
+        ]);
+    }
+
+    Livewire::actingAs($student)
+        ->test(PracticeIndex::class)
+        ->call('openClass', $classTen->id)
+        ->call('openSubject', $subject->id)
+        ->call('openChapter', $chapter->id)
+        ->assertSee('Pagination MCQ 21')
+        ->assertDontSee('Pagination MCQ 1')
+        ->assertSee('Next');
+});

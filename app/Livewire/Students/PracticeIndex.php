@@ -8,11 +8,15 @@ use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class PracticeIndex extends Component
 {
+    use WithPagination;
+
     public string $level = 'classes';
 
     public ?int $selectedClassId = null;
@@ -38,6 +42,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'subjects';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
         }
     }
@@ -54,6 +59,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = $subjectId;
             $this->selectedChapterId = null;
             $this->level = 'chapters';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
         }
     }
@@ -69,6 +75,7 @@ class PracticeIndex extends Component
         if ($isValidChapter) {
             $this->selectedChapterId = $chapterId;
             $this->level = 'questions';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
         }
     }
@@ -78,6 +85,7 @@ class PracticeIndex extends Component
         if ($this->level === 'questions') {
             $this->selectedChapterId = null;
             $this->level = 'chapters';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
 
             return;
@@ -87,6 +95,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'subjects';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
 
             return;
@@ -97,6 +106,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'classes';
+            $this->resetPage();
             $this->dispatch('practice-content-updated');
         }
     }
@@ -160,12 +170,12 @@ class PracticeIndex extends Component
     }
 
     /**
-     * @return Collection<int, Question>
+     * @return LengthAwarePaginator<int, Question>
      */
-    protected function latestQuestions(): Collection
+    protected function latestQuestions(): LengthAwarePaginator
     {
         if ($this->selectedChapterId === null) {
-            return collect();
+            return new LengthAwarePaginator([], 0, 20, 1);
         }
 
         return Question::query()
@@ -174,8 +184,7 @@ class PracticeIndex extends Component
             ->where('chapter_id', $this->selectedChapterId)
             ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
             ->latest('id')
-            ->limit(20)
-            ->get();
+            ->paginate(20);
     }
 
     public function render(): View
