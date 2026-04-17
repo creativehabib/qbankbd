@@ -38,6 +38,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'subjects';
+            $this->dispatch('practice-content-updated');
         }
     }
 
@@ -53,6 +54,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = $subjectId;
             $this->selectedChapterId = null;
             $this->level = 'chapters';
+            $this->dispatch('practice-content-updated');
         }
     }
 
@@ -67,6 +69,7 @@ class PracticeIndex extends Component
         if ($isValidChapter) {
             $this->selectedChapterId = $chapterId;
             $this->level = 'questions';
+            $this->dispatch('practice-content-updated');
         }
     }
 
@@ -75,6 +78,7 @@ class PracticeIndex extends Component
         if ($this->level === 'questions') {
             $this->selectedChapterId = null;
             $this->level = 'chapters';
+            $this->dispatch('practice-content-updated');
 
             return;
         }
@@ -83,6 +87,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'subjects';
+            $this->dispatch('practice-content-updated');
 
             return;
         }
@@ -92,6 +97,7 @@ class PracticeIndex extends Component
             $this->selectedSubjectId = null;
             $this->selectedChapterId = null;
             $this->level = 'classes';
+            $this->dispatch('practice-content-updated');
         }
     }
 

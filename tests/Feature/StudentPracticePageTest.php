@@ -220,7 +220,7 @@ test('latest mcq questions are shown after opening a chapter folder', function (
 
     Question::query()->create([
         'uuid' => (string) Str::uuid(),
-        'title' => 'সর্বশেষ এমসিকিউ প্রশ্ন',
+        'title' => '3+6+12+24+&hellip;+384 ধারাটির পদসংখ্যা কত ?',
         'slug' => 'latest-mcq-question',
         'difficulty' => 'medium',
         'description' => 'এটি একটি ব্যাখ্যা।',
@@ -245,7 +245,8 @@ test('latest mcq questions are shown after opening a chapter folder', function (
         ->call('openClass', $classTen->id)
         ->call('openSubject', $subject->id)
         ->call('openChapter', $chapter->id)
-        ->assertSee('সর্বশেষ এমসিকিউ প্রশ্ন')
+        ->assertSee('3+6+12+24+…+384 ধারাটির পদসংখ্যা কত ?')
+        ->assertDontSee('&hellip;')
         ->assertSee('বাংলা')
         ->assertSee('ইংরেজি')
         ->assertSee('পুরনো এমসিকিউ প্রশ্ন')
