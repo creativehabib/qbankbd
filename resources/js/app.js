@@ -1,7 +1,9 @@
 import Swal from 'sweetalert2';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
+import {collapse} from "@alpinejs/collapse";
 
+Alpine.plugin(collapse)
 window.Swal = Swal;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
