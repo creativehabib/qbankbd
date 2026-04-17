@@ -134,8 +134,9 @@
                 <div class="space-y-4">
                     @foreach($latestQuestions as $question)
                         @php($options = collect($question->extra_content ?? [])->take(4))
+                        @php($questionTitle = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                         <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
-                            <h4 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . html_entity_decode($question->title) !!}</h4>
+                            <h4 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h4>
 
                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
@@ -148,7 +149,8 @@
                                 @foreach($options as $index => $option)
                                     <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ !empty($option['is_correct']) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
                                         <span class="flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$index] ?? $index + 1 }}</span>
-                                        <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! html_entity_decode($option['option_text'] ?? '') !!}</span>
+                                        @php($optionText = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? ''))
+                                        <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! $optionText !!}</span>
                                     </div>
                                 @endforeach
                             </div>
