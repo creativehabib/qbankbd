@@ -76,6 +76,9 @@
                 <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
                     {{ __('User Management') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item icon="swatch" :href="route('admin.theme-options')" :current="request()->routeIs('admin.theme-options')" wire:navigate>
+                    {{ __('Theme Options') }}
+                </flux:sidebar.item>
                 @if(auth()->user()->hasPermission('users.manage_permissions'))
                     <flux:sidebar.item icon="key" :href="route('permissions.index')" :current="request()->routeIs('permissions.*')" wire:navigate>
                         {{ __('Permissions') }}

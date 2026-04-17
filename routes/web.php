@@ -17,8 +17,11 @@ use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
 use App\Http\Controllers\DashboardController;
+use App\Livewire\Admin\Settings\ThemeOptions;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\UserRoleManagement;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -57,6 +60,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/users', UserRoleManagement::class)->name('users.index');
+        Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
+        Route::get('/admin/theme-options/fonts', function () {
+            return Cache::remember('theme-options-fonts', now()->addHours(12), function () {
+                $response = Http::timeout(20)->get('https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json');
+
+                if (! $response->successful()) {
+                    return [];
+                }
+
+                return $response->json();
+            });
+        })->name('admin.theme-options.fonts');
     });
 
     Route::middleware('permission:users.manage_permissions')->group(function (): void {
