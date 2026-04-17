@@ -11,8 +11,11 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        @if(filled($themeTypography['google_fonts_url'] ?? null))
+            <link href="{{ $themeTypography['google_fonts_url'] }}" rel="stylesheet" />
+        @endif
         <script>
             window.MathJax = {
                 tex: {
@@ -26,6 +29,17 @@
             };
         </script>
         <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <style>
+            :root {
+                --font-sans: {!! $themeTypography['css_font_family'] ?? "'Instrument Sans', ui-sans-serif, system-ui, sans-serif" !!};
+                --app-body-font-size: {{ $themeTypography['body_font_size'] ?? '16px' }};
+            }
+
+            body {
+                font-size: var(--app-body-font-size);
+            }
+        </style>
 
         <!-- Styles -->
         <style>

@@ -9,8 +9,23 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<link rel="preconnect" href="https://fonts.bunny.net">
-<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+@if(filled($themeTypography['google_fonts_url'] ?? null))
+    <link href="{{ $themeTypography['google_fonts_url'] }}" rel="stylesheet" />
+@endif
+
+<style>
+    :root {
+        --font-sans: {!! $themeTypography['css_font_family'] ?? "'Instrument Sans', ui-sans-serif, system-ui, sans-serif" !!};
+        --app-body-font-size: {{ $themeTypography['body_font_size'] ?? '16px' }};
+    }
+
+    body {
+        font-size: var(--app-body-font-size);
+    }
+</style>
+
 <script src="/ckeditor/ckeditor.js" type="text/javascript"></script>
 <script>
     window.MathJax = {
