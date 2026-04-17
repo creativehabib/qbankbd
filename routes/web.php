@@ -70,13 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
 
-    Route::middleware(static function ($request, $next) {
-        abort_unless($request->user()?->isStudent(), 403);
-
-        return $next($request);
-    })->group(function (): void {
-        Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
-    });
+    Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
 });
 
 require __DIR__.'/settings.php';

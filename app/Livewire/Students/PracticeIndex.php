@@ -9,6 +9,12 @@ use Livewire\Component;
 
 class PracticeIndex extends Component
 {
+
+    public function mount(): void
+    {
+        abort_unless(auth()->user()?->isStudent(), 403);
+    }
+
     public function render(): View
     {
         $subjects = Subject::query()
