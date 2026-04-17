@@ -54,24 +54,37 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        const FONT_JSON_URL = 'https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json';
+        const FONT_JSON_URL = @js(route('admin.theme-options.fonts'));
 
         function normalizeFontPayload(payload) {
-            if (Array.isArray(payload)) {
-                return payload.map((font) => ({
-                    family: font.family ?? font.name ?? '',
-                    variants: font.variants ?? [],
-                })).filter((font) => font.family !== '');
-            }
+            const rawFonts = Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload?.items)
+                    ? payload.items
+                    : typeof payload === 'object' && payload !== null
+                        ? Object.entries(payload).map(([family, value]) => ({ family, ...value }))
+                        : [];
 
-            return Object.entries(payload ?? {}).map(([family, value]) => ({
-                family,
-                variants: Array.isArray(value?.variants)
-                    ? value.variants
-                    : Array.isArray(value)
-                        ? value
+            const mappedFonts = rawFonts.map((font) => ({
+                family: String(font.family ?? font.name ?? '').trim(),
+                variants: Array.isArray(font.variants)
+                    ? font.variants
+                    : Array.isArray(font.weights)
+                        ? font.weights
                         : [],
-            }));
+            })).filter((font) => font.family !== '');
+
+            const seen = new Set();
+
+            return mappedFonts.filter((font) => {
+                if (seen.has(font.family)) {
+                    return false;
+                }
+
+                seen.add(font.family);
+
+                return true;
+            });
         }
 
         function normalizeWeightVariants(variants) {
@@ -106,6 +119,8 @@
                 duplicateItemsAllowed: false,
                 addItems: true,
                 addChoices: true,
+                renderChoiceLimit: -1,
+                searchResultLimit: 2000,
             });
 
             fetch(FONT_JSON_URL)
@@ -114,6 +129,10 @@
                     const fonts = normalizeFontPayload(fontsPayload);
                     const fontMap = new Map(fonts.map((font) => [font.family, font]));
                     select.dataset.fontMap = JSON.stringify(Object.fromEntries(fontMap));
+
+                    if (fonts.length === 0) {
+                        return;
+                    }
 
                     const values = fonts.map((font) => ({
                         value: font.family,
