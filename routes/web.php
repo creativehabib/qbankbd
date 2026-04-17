@@ -17,6 +17,7 @@ use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
 use App\Http\Controllers\DashboardController;
+use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/view-questions', ViewQuestions::class)->name('questions.view');
     Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
+
+    Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
 });
 
 require __DIR__.'/settings.php';
