@@ -1,22 +1,5 @@
-@php
-    $fontClassMap = [
-        'Bangla' => 'qp-font-bangla',
-        'HindSiliguri' => 'qp-font-hind-siliguri',
-        'SolaimanLipi' => 'qp-font-solaiman',
-        'Kalpurush' => 'qp-font-kalpurush',
-        'Shurjo' => 'qp-font-shurjo',
-        'roman' => 'qp-font-roman',
-    ];
-    $fontClass = $fontClassMap[$fontFamily ?? 'Bangla'] ?? 'qp-font-bangla';
-
-    // পেপার সাইজের ডাইনামিক মাপ
-    $paperWidths = ['A4' => '210mm', 'Letter' => '215.9mm', 'Legal' => '215.9mm', 'A5' => '148mm'];
-    $paperMinHeights = ['A4' => '297mm', 'Letter' => '279.4mm', 'Legal' => '355.6mm', 'A5' => '210mm'];
-@endphp
-
 <div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
-    <!-- Added lg:items-start so the sidebar and paper align to the top properly -->
-    <div class="bangla flex flex-col lg:flex-row lg:items-start justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
+    <div class="bangla flex flex-col lg:flex-row lg:items-start justify-center gap-5 print:gap-0 mx-4 print:mx-0">
 
         <!-- বাম সাইড: মূল কন্টেন্ট -->
         <div class="print:hidden flex gap-x-2 justify-between sticky top-12 lg:hidden p-2 text-center z-10 bg-white">
@@ -39,8 +22,7 @@
 
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
 
-        <!-- REMOVED min-w-screen, ADDED w-full lg:shrink-0 to prevent layout breaking -->
-        <div class="print-area relative w-full md:overflow-auto lg:w-[210mm] lg:shrink-0 {{ $fontClass }}">
+        <div class="print-area relative w-full md:overflow-auto lg:w-[210mm] lg:shrink-0">
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class="p-2">

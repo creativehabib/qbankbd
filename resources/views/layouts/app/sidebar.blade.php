@@ -105,7 +105,7 @@
     <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
 </flux:sidebar>
 
-<flux:header class="lg:hidden">
+<flux:header class="lg:hidden print:hidden">
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
     <flux:spacer />
