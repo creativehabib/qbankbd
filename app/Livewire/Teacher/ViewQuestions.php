@@ -2,8 +2,14 @@
 
 namespace App\Livewire\Teacher;
 
+use App\Models\AcademicClass;
+use App\Models\Chapter;
+use App\Models\ExamCategory;
 use App\Models\Question;
 use App\Models\QuestionSet;
+use App\Models\Subject;
+use App\Models\Tag;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Livewire\Component;
 
@@ -18,114 +24,216 @@ class ViewQuestions extends Component
 
     public $selectedQuestions = [];
 
-    // Filter Properties
+    // Base Criteria (QuestionSet থেকে আসবে)
+    public $baseType;
+
+    public $baseSubjectId;
+
+    public $baseChapterId;
+
+    public $baseTopicId;
+
+    public $baseClassId;
+
+    // Search Properties
     public $searchKeyword = '';
 
-    public $specialFilters = [];
+    // Cascading Dropdown Properties
+    public $selectedClassId = null;
+
+    public $selectedSubjectId = null;
+
+    public $selectedChapterId = null;
+
+    // Checkbox Filter Properties
+    public $selectedTypes = [];
+
+    public $selectedDifficulties = [];
 
     public $selectedTopics = [];
 
-    public $allTopics = []; // To hold topics for the filter sidebar
+    public $selectedTags = [];
+
+    public $selectedExamCategories = [];
+
+    // Available Options for Filter Sidebar
+    public $availableClasses = [];
+
+    public $availableSubjects = [];
+
+    public $availableChapters = [];
+
+    public $availableTopics = [];
+
+    public $availableTags = [];
+
+    public $availableExamCategories = [];
+
+    public $activeTagIds = [];
+
+    public $activeExamCategoryIds = [];
 
     public function mount(Request $request)
     {
         $qsetId = $request->query('qset');
-
-        // ১. QuestionSet লোড করুন এবং এর সাথে যুক্ত প্রশ্নগুলোও নিয়ে আসুন
         $this->questionSet = QuestionSet::findOrFail($qsetId);
 
         $this->selectedQuestions = $this->questionSet->questions->pluck('id')->map(fn ($id) => (string) $id)->toArray();
 
-        // ৩. generation_criteria থেকে শর্তগুলো বের করুন
         $criteria = $this->questionSet->generation_criteria;
-        $type = $criteria['type'] ?? 'mcq';
-        $quantity = $criteria['quantity'] ?? 100;
-        $subjectId = $criteria['subject_id'] ?? null;
-        $chapterId = $criteria['chapter_id'] ?? null;
-        $topicId = $criteria['topic_id'] ?? null;
+        $this->baseType = $criteria['type'] ?? null;
+        $this->baseClassId = $criteria['academic_class_id'] ?? null;
+        $this->baseSubjectId = $criteria['subject_id'] ?? null;
+        $this->baseChapterId = $criteria['chapter_id'] ?? null;
+        $this->baseTopicId = $criteria['topic_id'] ?? null;
 
-        // ৪. শর্ত অনুযায়ী প্রশ্ন খুঁজুন
-        $this->availableQuestions = Question::query()
-            ->with('tags') // options রাখা হয়েছে শুধুমাত্র পুরানো ডাটা সাপোর্ট করার জন্য
-            ->when($type, function ($q) use ($type) {
-                // ✅ Combine/Composite এর জন্য স্মার্ট ফিল্টার লজিক
-                if ($type === 'mcq') {
-                    $q->where('question_type', 'mcq');
-                } elseif ($type === 'creative' || $type === 'cq') {
-                    $q->where('question_type', 'cq');
-                } elseif ($type === 'short') {
-                    $q->where('question_type', 'short');
-                } elseif (in_array($type, ['composite', 'combine'])) {
-                    // 'combine' সিলেক্ট করলে ডাটাবেজ থেকে সব ধরনের প্রশ্ন (MCQ, CQ, Short) নিয়ে আসবে
-                    $q->whereIn('question_type', ['mcq', 'cq', 'short']);
-                } else {
-                    $q->where('question_type', $type);
-                }
-            })
-            ->when($subjectId, fn ($q) => $q->where('subject_id', $subjectId))
-            ->when($chapterId, fn ($q) => $q->where('chapter_id', $chapterId))
-            ->when($topicId, fn ($q) => $q->where('topic_id', $topicId))
-            ->inRandomOrder()
-            ->limit($quantity)
-            ->get();
+        $this->selectedClassId = $this->baseClassId;
+        $this->selectedSubjectId = $this->baseSubjectId;
+        $this->selectedChapterId = $this->baseChapterId;
+
+        $this->loadFilterOptions();
     }
 
-    /**
-     * "Select All" বাটনে ক্লিক করলে এই মেথডটি কাজ করবে
-     */
+    public function loadFilterOptions()
+    {
+        $this->availableClasses = AcademicClass::where('is_active', true)->orderBy('name')->pluck('name', 'id')->toArray();
+
+        $subjectQuery = Subject::where('is_active', true);
+        if ($this->selectedClassId) {
+            $subjectQuery->where('academic_class_id', $this->selectedClassId);
+        }
+        $this->availableSubjects = $subjectQuery->orderBy('name')->pluck('name', 'id')->toArray();
+
+        $chapterQuery = Chapter::where('is_active', true);
+        if ($this->selectedSubjectId) {
+            $chapterQuery->where('subject_id', $this->selectedSubjectId);
+        }
+        $this->availableChapters = $chapterQuery->orderBy('order_sequence')->pluck('name', 'id')->toArray();
+
+        $topicQuery = Topic::where('is_active', true);
+        if ($this->selectedChapterId) {
+            $topicQuery->where('chapter_id', $this->selectedChapterId);
+        } elseif ($this->selectedSubjectId) {
+            $topicQuery->where('subject_id', $this->selectedSubjectId);
+        }
+        $this->availableTopics = $topicQuery->orderBy('name')->pluck('name', 'id')->toArray();
+
+        $this->availableTags = Tag::orderBy('name')->pluck('name', 'id')->toArray();
+        $this->availableExamCategories = ExamCategory::orderBy('name')->pluck('name', 'id')->toArray();
+    }
+
+    public function updatedSelectedClassId()
+    {
+        $this->selectedSubjectId = null;
+        $this->selectedChapterId = null;
+        $this->selectedTopics = [];
+        $this->loadFilterOptions();
+    }
+
+    public function updatedSelectedSubjectId()
+    {
+        $this->selectedChapterId = null;
+        $this->selectedTopics = [];
+        $this->loadFilterOptions();
+    }
+
+    public function updatedSelectedChapterId()
+    {
+        $this->selectedTopics = [];
+        $this->loadFilterOptions();
+    }
+
     public function toggleSelectAll()
     {
         if (count($this->selectedQuestions) === count($this->availableQuestions)) {
-            $this->selectedQuestions = []; // সব সিলেক্ট করা থাকলে, সব আনসিলেক্ট করুন
+            $this->selectedQuestions = [];
         } else {
-            // সব প্রশ্ন সিলেক্ট করুন
-            $this->selectedQuestions = $this->availableQuestions->pluck('id')->toArray();
+            $this->selectedQuestions = $this->availableQuestions->pluck('id')->map(fn ($id) => (string) $id)->toArray();
         }
     }
 
     public function toggleExplanation($questionId)
     {
-        if ($this->showExplanationFor === $questionId) {
-            $this->showExplanationFor = null;
-        } else {
-            $this->showExplanationFor = $questionId;
-        }
+        $this->showExplanationFor = $this->showExplanationFor === $questionId ? null : $questionId;
     }
 
     public function toggleSelection($questionId)
     {
-        // প্রশ্নটির আইডি int হিসেবে কনভার্ট করে নিন
-        $questionId = (int) $questionId;
-
-        // চেক করুন আইডিটি ইতোমধ্যে সিলেক্টেড অ্যারেতে আছে কি না
+        $questionId = (string) $questionId;
         if (in_array($questionId, $this->selectedQuestions)) {
-            // যদি থাকে, তাহলে অ্যারে থেকে বাদ দিন (আনসিলেক্ট)
             $this->selectedQuestions = array_diff($this->selectedQuestions, [$questionId]);
         } else {
-            // যদি না থাকে, তাহলে অ্যারেতে যোগ করুন (সিলেক্ট)
             $this->selectedQuestions[] = $questionId;
         }
     }
 
     public function saveSelection()
     {
-        // ১. sync করার জন্য ডেটাটিকে সঠিক ফরম্যাটে সাজিয়ে নিন
         $dataToSync = [];
         $order = 1;
-
         foreach ($this->selectedQuestions as $questionId) {
             $dataToSync[$questionId] = ['order' => $order++];
         }
-
-        // ২. sync() মেথডে নতুন ফরম্যাটের ডেটা পাস করুন
-        // এটি question_set_items টেবিলে question_id এর সাথে order ও সেভ করবে
         $this->questionSet->questions()->sync($dataToSync);
-
         session()->flash('success', count($this->selectedQuestions).'টি প্রশ্ন সফলভাবে সেভ করা হয়েছে!');
     }
 
     public function render()
     {
+        $activeClassId = $this->selectedClassId ?? $this->baseClassId;
+        $activeSubjectId = $this->selectedSubjectId ?? $this->baseSubjectId;
+        $activeChapterId = $this->selectedChapterId ?? $this->baseChapterId;
+
+        // চেক করা হচ্ছে ইউজার কি ট্যাগ বা এক্সাম ক্যাটাগরি সিলেক্ট করেছে?
+        $isGlobalFilterActive = count($this->selectedTags) > 0 || count($this->selectedExamCategories) > 0;
+
+        $query = Question::query()
+            ->with(['tags', 'examCategories'])
+            ->when($this->baseType, function ($q) {
+                if (in_array($this->baseType, ['composite', 'combine'])) {
+                    $q->whereIn('question_type', ['mcq', 'cq', 'short']);
+                } else {
+                    $q->where('question_type', $this->baseType);
+                }
+            })
+
+            // ক্লাস ফিল্টার (সবসময় থাকবে)
+            ->when($activeClassId, fn ($q) => $q->where('academic_class_id', $activeClassId))
+
+            // বিষয় এবং অধ্যায় ফিল্টার (ট্যাগ বা এক্সাম ক্যাটাগরি সিলেক্ট করা থাকলে এগুলো কাজ করবে না)
+            ->when(!$isGlobalFilterActive && $activeSubjectId, fn ($q) => $q->where('subject_id', $activeSubjectId))
+            ->when(!$isGlobalFilterActive && $activeChapterId, fn ($q) => $q->where('chapter_id', $activeChapterId))
+
+            // অন্যান্য ফিল্টার
+            ->when($this->searchKeyword, fn ($q) => $q->where('title', 'LIKE', '%' . $this->searchKeyword . '%'))
+            ->when(count($this->selectedTypes) > 0, fn ($q) => $q->whereIn('question_type', $this->selectedTypes))
+            ->when(count($this->selectedDifficulties) > 0, fn ($q) => $q->whereIn('difficulty', $this->selectedDifficulties))
+            ->when(count($this->selectedTopics) > 0, fn ($q) => $q->whereIn('topic_id', $this->selectedTopics))
+
+            // ট্যাগ ফিল্টার (OR লজিক)
+            ->when(count($this->selectedTags) > 0, function ($q) {
+                $tagIds = array_map('intval', $this->selectedTags);
+                $q->whereHas('tags', fn ($q2) => $q2->whereIn('tags.id', $tagIds));
+            })
+
+            // এক্সাম ক্যাটাগরি ফিল্টার (OR লজিক)
+            ->when(count($this->selectedExamCategories) > 0, function ($q) {
+                $catIds = array_map('intval', $this->selectedExamCategories);
+                $q->whereHas('examCategories', fn ($q2) => $q2->whereIn('exam_categories.id', $catIds));
+            })
+
+            ->orderBy('topic_id', 'asc')->orderBy('id', 'asc');
+
+        $this->availableQuestions = $query->get();
+
+        if ($this->availableQuestions->isNotEmpty()) {
+            $this->activeTagIds = $this->availableQuestions->flatMap->tags->pluck('id')->unique()->values()->toArray();
+            $this->activeExamCategoryIds = $this->availableQuestions->flatMap->examCategories->pluck('id')->unique()->values()->toArray();
+        } else {
+            $this->activeTagIds = [];
+            $this->activeExamCategoryIds = [];
+        }
+
         return view('livewire.teacher.view-questions')
             ->layout('layouts.app');
     }
