@@ -93,7 +93,7 @@ class QuestionPaper extends Component
     {
         return view('livewire.teacher.question-paper', [
             'fontOptions' => Fonts::options(),
-        ])->layout('layouts.app');
+        ])->layout('layouts.app', ['title' => $this->instituteName]);
     }
 
     public function updatedFontFamily(string $value): void

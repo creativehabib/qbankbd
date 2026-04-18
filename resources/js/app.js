@@ -2,9 +2,12 @@ import Swal from 'sweetalert2';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import {collapse} from "@alpinejs/collapse";
+import Choices from 'choices.js';
+import 'choices.js/public/assets/styles/choices.min.css';
 
 Alpine.plugin(collapse)
 window.Swal = Swal;
+window.Choices = Choices;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 

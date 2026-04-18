@@ -15,37 +15,46 @@
 @endphp
 
 <div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
-    <div class="bangla flex flex-col lg:flex-row justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
-        <div class="print:hidden  flex gap-x-2 justify-between sticky top-12 lg:hidden  p-2 text-center z-10 bg-white">
+    <!-- Added lg:items-start so the sidebar and paper align to the top properly -->
+    <div class="bangla flex flex-col lg:flex-row lg:items-start justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
+
+        <!-- বাম সাইড: মূল কন্টেন্ট -->
+        <div class="print:hidden flex gap-x-2 justify-between sticky top-12 lg:hidden p-2 text-center z-10 bg-white">
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"></path>
-                </svg><span>সেটিংস</span></button>
+                </svg><span>সেটিংস</span>
+            </button>
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z"></path>
-                </svg><span>উত্তরমালা</span></button>া
+                </svg><span>উত্তরমালা</span>
+            </button> <!-- Removed stray 'া' -->
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"></path>
-                </svg><span>ডাউনলোড</span></button>
+                </svg><span>ডাউনলোড</span>
+            </button>
         </div>
+
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
-        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm] {{ $fontClass }}">
+
+        <!-- REMOVED min-w-screen, ADDED w-full lg:shrink-0 to prevent layout breaking -->
+        <div class="print-area relative w-full md:overflow-auto lg:w-[210mm] lg:shrink-0 {{ $fontClass }}">
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
-                <div class=" p-2">
+                <div class="p-2">
                     <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="bg-emerald-600 hover:opacity-90 px-2 py-1 text-white ">+ আরও প্রশ্ন যুক্ত করুন</a>
                 </div>
             </div>
-            <div class=" w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
+            <div class="w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
                 <div class="relative py-2 print:py-0">
                     <h1 class="text-xl font-bold text-center">{{ $instituteName }}</h1>
                     @if($previewOptions['showExamName'])
                         <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline-dashed hover:outline-gray-400 editable-effect" data-listener-added_19a1dacd="true">{{ $questionSet->name }}</p>
                     @endif
                     <div class="relative">
-                        <p contenteditable="true" class="text-center text-lg">{{ $subject->name }}</p>
+                        <p contenteditable="true" class="text-center text-lg">{{ $subject->name ?? 'N/A' }}</p>
                         @if($previewOptions['showChapter'] && ! empty($chapter->name))
                             <p contenteditable="true" class="text-center">{{ $chapter->name }}</p>
                         @endif
@@ -54,7 +63,7 @@
                         @endif
                         @if($previewOptions['showSetCode'])
                             <div class="absolute -top-1 right-0 flex">
-                                <p class="border-y border-l  pl-1 border-black" contenteditable="true">সেট -</p>
+                                <p class="border-y border-l pl-1 border-black" contenteditable="true">সেট -</p>
                                 <p contenteditable="true" class="border-y border-r px-1 border-black font-bold">{{ $setCode }}</p>
                             </div>
                         @endif
@@ -80,11 +89,7 @@
                         <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center pointer-events-none z-10">
                             <p
                                 class="text-gray-400 transform -rotate-45 font-bold text-center"
-                                style="
-                opacity: {{ $watermarkOpacity / 100 }};
-                font-size: {{ $watermarkSize }}px;
-            "
-                            >
+                                style="opacity: {{ $watermarkOpacity / 100 }}; font-size: {{ $watermarkSize }}px;">
                                 {{ $instituteName }}
                             </p>
                         </div>
@@ -93,7 +98,7 @@
                         <div class="relative w-full mt-4" style="column-count: {{ $columnCount }}; {{ ($previewOptions['showColumnDivider'] ?? true) && $columnCount > 1 ? 'column-rule: 1px solid rgba(0,0,0,0.3);' : 'column-rule: none;' }} column-gap: 8mm;">
                             @forelse ($questions as $question)
                                 <div class="false bg-white relative p-0.5 hover:bg-gray-50 rounded group">
-                                    <div class=" flex items-baseline justify-between gap-x-2">
+                                    <div class="flex items-baseline justify-between gap-x-2">
                                         <div class="flex items-baseline gap-x-2 w-full">
                                             <span contenteditable="true">{{ $loop->iteration }}.</span>
                                             <div class="flex flex-wrap justify-between items-center w-full">
@@ -107,9 +112,7 @@
                                         @endif
                                     </div>
 
-                                    {{-- ============================================== --}}
-                                    {{-- MCQ (বহুনির্বাচনী) অপশন শো করার লজিক (Updated) --}}
-                                    {{-- ============================================== --}}
+                                    {{-- MCQ (বহুনির্বাচনী) অপশন শো করার লজিক --}}
                                     @php
                                         $mcqOptions = [];
                                         if ($question->question_type === 'mcq') {
@@ -117,7 +120,7 @@
                                                 $parsed = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
                                                 if (is_array($parsed)) $mcqOptions = $parsed;
                                             } elseif ($question->options && $question->options->isNotEmpty()) {
-                                                $mcqOptions = $question->options->toArray(); // পুরানো ডাটার জন্য Backward Compatibility
+                                                $mcqOptions = $question->options->toArray();
                                             }
                                         }
                                     @endphp
@@ -148,9 +151,7 @@
                                         </div>
                                     @endif
 
-                                    {{-- ============================================== --}}
-                                    {{-- CQ (সৃজনশীল) অপশন এবং মার্কস শো করার লজিক     --}}
-                                    {{-- ============================================== --}}
+                                    {{-- CQ (সৃজনশীল) অপশন এবং মার্কস শো করার লজিক --}}
                                     @if($question->question_type === 'cq' && !empty($question->extra_content))
                                         @php
                                             $cqParts = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
@@ -199,9 +200,11 @@
                 </div>
             </div>
         </div>
+
+        <!-- ডান সাইড: সেটিংস সাইডবার -->
         <div class="hidden select-none fixed top-0 right-0 z-[1000] lg:z-0 bg-white lg:bg-none lg:sticky lg:block lg:top-16 h-screen w-72 google-shadow print:hidden overflow-y-scroll sidebar">
             <div class="relative overflow-hidden">
-                <div class=" bg-white backdrop-blur-lg p-2">
+                <div class="bg-white backdrop-blur-lg p-2">
                     <h1 class="py-2 flex items-center gap-2 justify-center rounded text-center bg-gray-50 mb-2 shadow"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-500 text-sm" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"></path></svg> <span class="text-lg">সেটিংস</span></h1>
                     <button onclick="window.print()" class="hover:bg-primary-400 bg-emerald-600 transition-all py-2 rounded w-full text-center text-white flex items-center gap-2 justify-center">
                         <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
@@ -210,8 +213,8 @@
                     <div class="my-4 ">
                         <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">প্রশ্নে সংযুক্তি</p>
                         <div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">উত্তরপত্র</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">উত্তরপত্র</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.attachAnswerSheet">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
@@ -224,31 +227,31 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">গুরুত্বপূর্ণ প্রশ্ন </span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">গুরুত্বপূর্ণ প্রশ্ন </span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
 
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">প্রশ্নের মান (Marks)</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">প্রশ্নের মান (Marks)</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showMarksBox">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
 
                             <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">প্রশ্নের তথ্য</span>
-                                <label class="relative inline-flex  items-center  cursor-pointer">
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" value="">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div class="relative rounded">
                                 <div class="bg-gray-100 p-2 rounded flex justify-between items-center"><span class="bangla">শিক্ষার্থীর তথ্য</span>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                     </label>
                                 </div>
                             </div>
@@ -256,52 +259,52 @@
                                 <div class="bg-gray-100 p-2 rounded flex justify-between items-center"><span class="bangla"> প্রাপ্ত নম্বর ঘর </span>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class=" my-5">
+                    <div class="my-5">
                         <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">প্রশ্নের মেটাডাটা</p>
                         <div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showChapter">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">অধ্যায়ের নাম</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">অধ্যায়ের নাম</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showTopic">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">সেট কোড </span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">সেট কোড </span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSetCode">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">প্রোগ্রাম/পরিক্ষার নাম</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">প্রোগ্রাম/পরিক্ষার নাম</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showExamName">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">নির্দেশনা</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">নির্দেশনা</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showInstructions">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                         </div>
                     </div>
-                    <div class=" my-5">
+                    <div class="my-5">
                         <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">ডকুমেন্ট কাস্টমাইজেসন</p>
                         <div>
-                            <div class="bg-gray-100 p-2 rounded  my-1">
-                                <div class=" flex justify-between items-center"><span class="bangla"> এডিটিং মোড </span>
+                            <div class="bg-gray-100 p-2 rounded my-1">
+                                <div class="flex justify-between items-center"><span class="bangla"> এডিটিং মোড </span>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="sr-only peer">
                                         <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -314,24 +317,16 @@
                                 </div>
                                 <div class="flex gap-2 py-1">
                                     <button wire:click="setTextAlign('left')" class="p-2 rounded {{ $textAlign === 'left' ? 'bg-emerald-600 shadow text-white' : 'text-gray-500 hover:text-gray-800' }}" title="left">
-                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12.83 352h262.34A12.82 12.82 0 0 0 288 339.17v-38.34A12.82 12.82 0 0 0 275.17 288H12.83A12.82 12.82 0 0 0 0 300.83v38.34A12.82 12.82 0 0 0 12.83 352zm0-256h262.34A12.82 12.82 0 0 0 288 83.17V44.83A12.82 12.82 0 0 0 275.17 32H12.83A12.82 12.82 0 0 0 0 44.83v38.34A12.82 12.82 0 0 0 12.83 96zM432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"></path>
-                                        </svg>
+                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12.83 352h262.34A12.82 12.82 0 0 0 288 339.17v-38.34A12.82 12.82 0 0 0 275.17 288H12.83A12.82 12.82 0 0 0 0 300.83v38.34A12.82 12.82 0 0 0 12.83 352zm0-256h262.34A12.82 12.82 0 0 0 288 83.17V44.83A12.82 12.82 0 0 0 275.17 32H12.83A12.82 12.82 0 0 0 0 44.83v38.34A12.82 12.82 0 0 0 12.83 96zM432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"></path></svg>
                                     </button>
                                     <button wire:click="setTextAlign('center')" class="p-2 rounded {{ $textAlign === 'center' ? 'bg-emerald-600 shadow text-white' : 'text-gray-500 hover:text-gray-800' }}" title="center">
-                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M352 64c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32zm96 128c0-17.7-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32-14.3 32-32zM0 448c0 17.7 14.3 32 32 32H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H32c-17.7 0-32 14.3-32 32zM352 320c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32z"></path>
-                                        </svg>
+                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M352 64c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32zm96 128c0-17.7-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32-14.3 32-32zM0 448c0 17.7 14.3 32 32 32H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H32c-17.7 0-32 14.3-32 32zM352 320c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32z"></path></svg>
                                     </button>
                                     <button wire:click="setTextAlign('right')" class="p-2 rounded {{ $textAlign === 'right' ? 'bg-emerald-600 shadow text-white' : 'text-gray-500 hover:text-gray-800' }}" title="right">
-                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M16 224h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm416 192H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm3.17-384H172.83A12.82 12.82 0 0 0 160 44.83v38.34A12.82 12.82 0 0 0 172.83 96h262.34A12.82 12.82 0 0 0 448 83.17V44.83A12.82 12.82 0 0 0 435.17 32zm0 256H172.83A12.82 12.82 0 0 0 160 300.83v38.34A12.82 12.82 0 0 0 172.83 352h262.34A12.82 12.82 0 0 0 448 339.17v-38.34A12.82 12.82 0 0 0 435.17 288z"></path>
-                                        </svg>
+                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16 224h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm416 192H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm3.17-384H172.83A12.82 12.82 0 0 0 160 44.83v38.34A12.82 12.82 0 0 0 172.83 96h262.34A12.82 12.82 0 0 0 448 83.17V44.83A12.82 12.82 0 0 0 435.17 32zm0 256H172.83A12.82 12.82 0 0 0 160 300.83v38.34A12.82 12.82 0 0 0 172.83 352h262.34A12.82 12.82 0 0 0 448 339.17v-38.34A12.82 12.82 0 0 0 435.17 288z"></path></svg>
                                     </button>
                                     <button wire:click="setTextAlign('justify')" class="p-2 rounded {{ $textAlign === 'justify' ? 'bg-emerald-600 shadow text-white' : 'text-gray-500 hover:text-gray-800' }}" title="justify">
-                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M432 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
-                                        </svg>
+                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M432 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
                                     </button>
                                 </div>
                             </div>
@@ -351,7 +346,7 @@
                             <div class="relative bg-gray-100 p-2 rounded my-1">
                                 <p class="bangla mb-2">অপশন স্টাইল</p>
                                 <div class="flex gap-2">
-                                    <div wire:click="setOptionStyle('circle')"  class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'circle' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">
+                                    <div wire:click="setOptionStyle('circle')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'circle' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">
                                         <div class="h-5 w-5 border {{ ($optionStyle ?? 'circle') === 'circle' ? 'border-white' : 'border-gray-500' }} rounded-full bg-white"></div>
                                     </div>
                                     <div wire:click="setOptionStyle('dot')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'dot' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">.</div>
@@ -369,7 +364,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">ফন্ট সাইজ </span>
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">ফন্ট সাইজ </span>
                                 <div class="flex items-center gap-1">
                                     <button wire:click="decreaseFontSize" class="hover:bg-white px-2 rounded text-lg">-</button>
                                     <p class="border rounded p-0.5 px-1.5 bg-white">{{ $fontSize }}</p>
@@ -390,7 +385,7 @@
                                             <div class="w-4 h-6 bg-gray-300"></div>
                                         </div>
                                     </div>
-                                    <div class="{{ $columnCount === 3 ? 'border border-black' : 'hover:border-gray-500' }}  rounded py-2 px-3 flex-1 cursor-pointer">
+                                    <div class="{{ $columnCount === 3 ? 'border border-black' : 'hover:border-gray-500' }} rounded py-2 px-3 flex-1 cursor-pointer">
                                         <div wire:click="setColumnCount(3)" class="flex justify-center gap-0.5 items-center">
                                             <div class="w-4 h-6 bg-gray-300"></div>
                                             <div class="w-4 h-6 bg-gray-300"></div>
@@ -399,10 +394,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">কলাম ডিভাইডার</span>
-                                <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer"wire:model.live="previewOptions.showColumnDivider" checked="">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">কলাম ডিভাইডার</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showColumnDivider" checked="">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -422,7 +417,8 @@
                             <div>
                                 <div class="relative bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">শীট</span>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" class="sr-only peer">া
+                                        <!-- Removed stray 'া' from here -->
+                                        <input type="checkbox" class="sr-only peer">
                                         <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                     </label>
                                 </div>
@@ -430,14 +426,12 @@
                             <div>
                                 <div wire:click="shuffleQuestions" class="cursor-pointer bg-gray-100 hover:bg-emerald-600 hover:text-white flex justify-between items-center p-2 rounded my-1">
                                     <p>শাফল (সেট কোড তৈরী) </p>
-                                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M403.8 34.4c12-5 25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160H352c-10.1 0-19.6 4.7-25.6 12.8L284 229.3 244 176l31.2-41.6C293.3 110.2 321.8 96 352 96h32V64c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64zM164 282.7L204 336l-31.2 41.6C154.7 401.8 126.2 416 96 416H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c10.1 0 19.6-4.7 25.6-12.8L164 282.7zm274.6 188c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V416H352c-30.2 0-58.7-14.2-76.8-38.4L121.6 172.8c-6-8.1-15.5-12.8-25.6-12.8H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c30.2 0 58.7 14.2 76.8 38.4L326.4 339.2c6 8.1 15.5 12.8 25.6 12.8h32V320c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64z"></path>
-                                    </svg>
+                                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M403.8 34.4c12-5 25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160H352c-10.1 0-19.6 4.7-25.6 12.8L284 229.3 244 176l31.2-41.6C293.3 110.2 321.8 96 352 96h32V64c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64zM164 282.7L204 336l-31.2 41.6C154.7 401.8 126.2 416 96 416H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c10.1 0 19.6-4.7 25.6-12.8L164 282.7zm274.6 188c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V416H352c-30.2 0-58.7-14.2-76.8-38.4L121.6 172.8c-6-8.1-15.5-12.8-25.6-12.8H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c30.2 0 58.7 14.2 76.8 38.4L326.4 339.2c6 8.1 15.5 12.8 25.6 12.8h32V320c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64z"></path></svg>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class=" my-5">
+                    <div class="my-5">
                         <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">ব্রান্ডিং</p>
                         <div>
                             <div>
@@ -448,31 +442,27 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="bg-gray-100  my-1  p-2">
+                            <div class="bg-gray-100 my-1 p-2">
                                 <div class="rounded flex justify-between items-center"><span class="bangla">জলছাপ</span>
-                                    <label class="relative inline-flex  items-center  cursor-pointer">
+                                    <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showWatermark">
-                                        <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                     </label>
                                 </div>
                             </div>
                             @if($previewOptions['showWatermark'])
                                 <div class="p-2 border border-dashed border-gray-400 rounded-lg mt-2">
-
                                     <div class="mt-2 p-1 bg-gray-100 rounded flex justify-between items-center">
                                         <span class="bangla">Opacity</span>
                                         <input type="range" min="10" max="50" step="5" wire:model.live="watermarkOpacity">
                                         <span>{{ $watermarkOpacity }}</span>
                                     </div>
-
                                     <div class="bg-gray-100 rounded flex justify-between items-center mt-1">
                                         <span class="bangla">Size</span>
                                         <input type="range" min="15" max="50" step="5" wire:model.live="watermarkSize">
                                         <span>{{ $watermarkSize }}</span>
                                     </div>
-
                                     <textarea class="mt-2 w-full" wire:model.live="instituteName"></textarea>
-
                                 </div>
                             @endif
                         </div>
