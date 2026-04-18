@@ -1,7 +1,7 @@
-<div x-data="{ filterOpen: false }" @keydown.escape.window="if(filterOpen) { filterOpen = false; } else if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')" class="flex flex-col lg:flex-row gap-6">
+<div x-data="{ filterOpen: false }" @keydown.escape.window="if(filterOpen) { filterOpen = false; } else if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')" class="relative flex flex-col lg:flex-row gap-5 lg:gap-6">
 
     <!-- বাম সাইড: মূল কন্টেন্ট -->
-    <div class="flex-1 min-w-0">
+    <div class="w-full min-w-0 lg:flex-1">
         <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative">
 
             <!-- লোডিং ওভারলে -->
@@ -76,14 +76,14 @@
                             @if($filteredQuestions->isEmpty())
                                 <div class="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                                     <flux:icon.folder-open class="mx-auto mb-2 size-8 text-zinc-300 dark:text-zinc-600" />
-                                    {{ __('এই ফিল্টার অনুযায়ী কোনো প্রশ্ন পাওয়া যায়নি।') }}
+                                    {{ __('এই ফিল্টার অনুযায়ী কোনো প্রশ্ন পাওয়া যায়নি।') }}
                                 </div>
                             @else
                                 @php($labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'])
                                 <div class="space-y-4">
                                     @foreach($filteredQuestions as $question)
                                         @php($options = collect($question->extra_content ?? [])->take(4))
-                                        @php($questionTitle = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
+                                        @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                         <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
                                             <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h5>
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
@@ -92,10 +92,11 @@
                                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->question_type) }}</span>
                                             </div>
                                             <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
-                                                @foreach($options as $index => $option)
+                                                @foreach($options as $option)
                                                     <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ !empty($option['is_correct']) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
-                                                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$index] ?? $index + 1 }}</span>
-                                                        <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! html_entity_decode($option['option_text'] ?? '') !!}</span>
+                                                        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$loop->index] ?? $loop->index + 1 }}</span>
+                                                        @php($optionText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? ''))
+                                                        <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! $optionText !!}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -189,14 +190,14 @@
                                 @if($latestQuestions->isEmpty())
                                     <div class="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                                         <flux:icon.folder-open class="mx-auto mb-2 size-8 text-zinc-300 dark:text-zinc-600" />
-                                        {{ __('এই চ্যাপ্টারে এখনো কোনো MCQ পাওয়া যায়নি।') }}
+                                        {{ __('এই চ্যাপ্টারে এখনো কোনো MCQ পাওয়া যায়নি।') }}
                                     </div>
                                 @else
                                     @php($labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'])
                                     <div class="space-y-4">
                                         @foreach($latestQuestions as $question)
                                             @php($options = collect($question->extra_content ?? [])->take(4))
-                                            @php($questionTitle = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
+                                            @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                             <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
                                                 <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h5>
                                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
@@ -205,11 +206,10 @@
                                                     <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->difficulty) }}</span>
                                                 </div>
                                                 <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
-                                                    @foreach($options as $index => $option)
+                                                    @foreach($options as $option)
                                                         <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ !empty($option['is_correct']) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
-                                                            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$index] ?? $index + 1 }}</span>
-                                                            @php($optionText = preg_replace('/^\s*<p>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? ''))
-                                                            <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! $optionText !!}</span>
+                                                            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold {{ !empty($option['is_correct']) ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">{{ $labels[$loop->index] ?? $loop->index + 1 }}</span>
+                                                            <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! html_entity_decode($option['option_text'] ?? '') !!}</span>
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -249,13 +249,13 @@
         </div>
     </div>
 
-    <!-- ডান সাইড: ফিল্টার সেকশন (মোবাইল ড্রয়ার ও ডেস্কটপ স্ট্যাটিক) -->
+    <!-- ডান সাইড: ফিল্টার সেকশন (সব স্ক্রিনে ড্রয়ার হিসেবে কাজ করবে) -->
     @if($level === 'questions' || $level === 'filtered-questions')
 
-        <!-- মোবাইল ফ্লোটিং বাটন (শুধুমাত্র ছোট স্ক্রিনে দেখাবে) -->
+        <!-- ফ্লোটিং বাটন (মোবাইল/ট্যাবলেটে দেখাবে) -->
         <button
-            @click="filterOpen = true"
-            class="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl transition hover:bg-emerald-700 lg:hidden"
+            @click="filterOpen = !filterOpen"
+            class="fixed bottom-6 right-6 z-40 flex lg:hidden h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl transition hover:bg-emerald-700"
         >
             <flux:icon.adjustments-horizontal class="size-6" />
             @if($level === 'filtered-questions')
@@ -266,7 +266,7 @@
             @endif
         </button>
 
-        <!-- মোবাইল ব্যাকড্রপ (ছোট স্ক্রিনে ড্রয়ার খোলা থাকলে পেছনে কালো শ্যাডো) -->
+        <!-- ব্যাকড্রপ (মোবাইল/ট্যাবলেটে কাজ করবে) -->
         <div
             x-show="filterOpen"
             x-transition:enter="transition-opacity ease-out duration-300"
@@ -276,11 +276,11 @@
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             @click="filterOpen = false"
-            class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            class="fixed lg:hidden inset-0 z-40 bg-black/50"
             style="display:none;"
         ></div>
 
-        <!-- মূল ফিল্টার কন্টেইনার -->
+        <!-- মোবাইল ড্রয়ার (ছোট স্ক্রিনে স্লাইড ইন হবে) -->
         <div
             x-show="filterOpen"
             x-transition:enter="transform transition ease-in-out duration-300"
@@ -289,27 +289,25 @@
             x-transition:leave="transform transition ease-in-out duration-300"
             x-transition:leave-start="translate-x-0"
             x-transition:leave-end="translate-x-full"
-            class="fixed top-0 right-0 z-50 h-full w-[320px] max-w-[85vw] shrink-0 overflow-y-auto bg-white dark:bg-zinc-900 shadow-2xl lg:static lg:h-auto lg:w-80 lg:max-w-none lg:translate-x-0 lg:shadow-none lg:block"
+            class="fixed lg:hidden top-0 right-0 z-50 h-full w-[320px] shrink-0 overflow-y-auto bg-white dark:bg-zinc-900 shadow-2xl border-l border-zinc-200 dark:border-zinc-700"
             style="display:none;"
         >
 
-            <!-- মোবাইলের জন্য হেডার বাটন (ছোট স্ক্রিনে ড্রয়ার বন্ধ করতে) -->
-            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900 lg:hidden">
-                <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">ফিল্টার</h3>
-                <button @click="filterOpen = false" class="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <!-- মোবাইল হেডার -->
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white/80 backdrop-blur-md p-4 dark:border-zinc-700 dark:bg-zinc-900/80">
+                <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <flux:icon.adjustments-horizontal class="size-5 text-emerald-600" />
+                    ফিল্টার
+                    @if($level === 'filtered-questions')
+                        <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+                    @endif
+                </h3>
+                <button @click="filterOpen = false" class="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
                     <flux:icon.x-mark class="size-5" />
                 </button>
             </div>
 
-            <div class="rounded-none lg:rounded-xl border-0 lg:border border-zinc-200 p-5 shadow-none lg:shadow-sm dark:bg-zinc-900 {{ $level === 'filtered-questions' ? 'bg-emerald-50/50 lg:border-emerald-300 dark:border-emerald-700' : 'bg-white lg:border-zinc-200 dark:border-zinc-700' }} lg:sticky lg:top-6 transition-colors duration-300">
-
-                <!-- ডেস্কটপের জন্য হেডার (বড় স্ক্রিনে দেখাবে) -->
-                <div class="hidden lg:flex items-center justify-between mb-5">
-                    <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">ফিল্টার</h3>
-                    @if($level === 'filtered-questions')
-                        <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
-                    @endif
-                </div>
+            <div class="p-5 {{ $level === 'filtered-questions' ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : 'bg-white dark:bg-zinc-900' }} transition-colors duration-300">
 
                 <div class="relative mb-5">
                     <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
@@ -359,10 +357,10 @@
 
                     <hr class="border-zinc-200 dark:border-zinc-700">
 
-                    <!-- বিষয় -->
+                    <!-- বিষয় -->
                     <div x-data="{ open: true }">
                         <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                            বিষয় নির্বাচন
+                            বিষয় নির্বাচন
                             <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
                         </button>
                         <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3 max-h-40 overflow-y-auto pr-1">
@@ -412,14 +410,125 @@
                 </div>
             </div>
         </div>
+
+        <!-- ডেস্কটপ সাইডবার (lg স্ক্রিনে দেখাবে) -->
+        <div class="hidden lg:block w-80 shrink-0 h-fit sticky top-5">
+            <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+
+                <!-- ডেস্কটপ হেডার -->
+                <div class="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-700">
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        <flux:icon.adjustments-horizontal class="size-5 text-emerald-600" />
+                        ফিল্টার
+                        @if($level === 'filtered-questions')
+                            <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+                        @endif
+                    </h3>
+                </div>
+
+                <div class="{{ $level === 'filtered-questions' ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : 'bg-white dark:bg-zinc-900' }} transition-colors duration-300 -mx-5 -mb-5 p-5 rounded-b-xl">
+
+                    <div class="relative mb-5">
+                        <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
+                        <input type="text" wire:model.live.debounce.250ms="filterSearch" placeholder="প্রশ্ন লিখে খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                    </div>
+
+                    <div class="max-h-[calc(100vh-400px)] space-y-5 overflow-y-auto pr-1">
+                        <!-- প্রশ্নের ধরন -->
+                        <div x-data="{ open: true }">
+                            <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                                প্রশ্নের ধরন
+                                <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" value="mcq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">বহুনির্বাচনী (MCQ)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" value="cq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">রচনামূলক (CQ)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" value="mcq+cq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">MCQ + CQ</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="border-zinc-200 dark:border-zinc-700">
+
+                        <!-- শ্রেণি -->
+                        <div x-data="{ open: true }">
+                            <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                                শ্রেণি নির্বাচন
+                                <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3 max-h-40 overflow-y-auto pr-1">
+                                @foreach($filterOptions['classes'] as $id => $name)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="{{ $id }}" wire:model.live="filterClasses" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                        <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <hr class="border-zinc-200 dark:border-zinc-700">
+
+                        <!-- বিষয় -->
+                        <div x-data="{ open: true }">
+                            <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                                বিষয় নির্বাচন
+                                <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3 max-h-40 overflow-y-auto pr-1">
+                                @foreach($filterOptions['subjects'] as $id => $name)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="{{ $id }}" wire:model.live="filterSubjects" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                        <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <hr class="border-zinc-200 dark:border-zinc-700">
+
+                        <!-- শিক্ষক -->
+                        <div x-data="{ open: true }">
+                            <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                                শিক্ষক নির্বাচন
+                                <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3 max-h-40 overflow-y-auto pr-1">
+                                @foreach($filterOptions['teachers'] as $id => $name)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="{{ $id }}" wire:model.live="filterTeachers" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
+                                        <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- রিসেট বাটন -->
+                    <div class="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-700">
+                        <button
+                            type="button"
+                            onclick="confirmDeleteAction(() => @this.resetFilter(), {
+                                title: 'ফিল্টার মুছুন?',
+                                text: 'ফিল্টার মুছে মূল চ্যাপ্টারে ফিরে যাবেন।',
+                                confirmButtonText: 'হ্যাঁ, মুছুন',
+                                confirmButtonColor: '#10b981'
+                            })"
+                            class="w-full flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        >
+                            <flux:icon.arrow-path class="size-4" />
+                            সব ফিল্টার মুছুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endif
-
 </div>
-
-@push('scripts')
-    <script>
-        Livewire.on('scroll-to-top', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    </script>
-@endpush

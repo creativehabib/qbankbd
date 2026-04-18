@@ -205,7 +205,6 @@ class PracticeIndex extends Component
     protected function filteredQuestions(): LengthAwarePaginator
     {
         return Question::query()
-            // গুরুত্বপূর্ণ: when ব্যবহার করা হয়েছে, যাতে ফাঁকা থাকলে এরর না দেখায়
             ->when(! empty($this->filterQuestionTypes), function (Builder $query): void {
                 $query->whereIn('question_type', $this->filterQuestionTypes);
             })
