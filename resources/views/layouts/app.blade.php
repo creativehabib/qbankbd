@@ -4,7 +4,7 @@
 
 <x-layouts::app.sidebar :title="$title ?? null">
     <!-- স্টিকি হেডার (সব পেজে থাকবে) -->
-    <div class="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/95">
+    <div class="sticky top-0 z-30 hidden border-b border-zinc-200 bg-white/95 backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/95 lg:block">
         <div class="px-6 py-2">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <!-- বাম: পেজ টাইটেল -->

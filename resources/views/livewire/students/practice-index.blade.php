@@ -15,10 +15,10 @@
             <!-- Tabs -->
             <div class="border-b border-zinc-200 dark:border-zinc-700">
                 <div class="grid grid-cols-2">
-                    <button type="button" wire:click="$set('activeTab', 'fast')" class="border-b-2 px-4 py-3 text-base font-semibold transition {{ $activeTab === 'fast' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
-                        {{ __('Fast Practice') }}
+                    <button type="button" wire:click="$set('activeTab', 'fast')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer transition {{ $activeTab === 'fast' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
+                        {{ __('দ্রুত অনুশীলন') }}
                     </button>
-                    <button type="button" wire:click="$set('activeTab', 'mock')" class="border-b-2 px-4 py-3 text-base font-semibold transition {{ $activeTab === 'mock' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
+                    <button type="button" wire:click="$set('activeTab', 'mock')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer transition {{ $activeTab === 'mock' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
                         {{ __('Mock Test') }}
                     </button>
                 </div>
