@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Support\QuestionTextParser;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -64,8 +65,13 @@ class BulkUpload extends Component
     {
         $rawText = trim($this->rawText);
 
+        if ($rawText === '' && $this->sourceImage) {
+            $rawText = $this->extractRawTextFromImage();
+            $this->rawText = $rawText;
+        }
+
         if ($rawText === '') {
-            $this->addError('rawText', 'অনুগ্রহ করে OCR / Raw প্রশ্ন টেক্সট দিন, তারপর Process Questions ক্লিক করুন।');
+            $this->addError('rawText', 'অনুগ্রহ করে প্রশ্নের টেক্সট দিন অথবা একটি ইমেজ আপলোড করুন, তারপর Process Questions ক্লিক করুন।');
 
             return;
         }
@@ -89,6 +95,58 @@ class BulkUpload extends Component
         session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। OCR / Raw প্রশ্ন টেক্সট বক্সে দেখুন, তারপর Submit করুন।');
     }
 
+    protected function extractRawTextFromImage(): string
+    {
+        $this->validate([
+            'sourceImage' => 'nullable|image|max:4096',
+        ]);
+
+        if (! $this->sourceImage) {
+            return '';
+        }
+
+        $response = Http::asMultipart()
+            ->timeout(30)
+            ->post('https://api.ocr.space/parse/image', [
+                [
+                    'name' => 'apikey',
+                    'contents' => 'helloworld',
+                ],
+                [
+                    'name' => 'language',
+                    'contents' => 'ben',
+                ],
+                [
+                    'name' => 'isOverlayRequired',
+                    'contents' => 'false',
+                ],
+                [
+                    'name' => 'file',
+                    'contents' => file_get_contents($this->sourceImage->getRealPath()) ?: '',
+                    'filename' => $this->sourceImage->getClientOriginalName(),
+                ],
+            ]);
+
+        if (! $response->successful()) {
+            $this->addError('sourceImage', 'ইমেজ OCR করা যায়নি। আবার চেষ্টা করুন বা টেক্সট ম্যানুয়ালি পেস্ট করুন।');
+
+            return '';
+        }
+
+        $parsedResults = data_get($response->json(), 'ParsedResults', []);
+        $ocrText = collect($parsedResults)
+            ->pluck('ParsedText')
+            ->filter(fn ($text) => is_string($text) && trim($text) !== '')
+            ->implode(PHP_EOL);
+
+        if (trim($ocrText) === '') {
+            $this->addError('sourceImage', 'আপলোডকৃত ইমেজ থেকে OCR টেক্সট পাওয়া যায়নি।');
+
+            return '';
+        }
+
+        return trim($ocrText);
+    }
 
     protected function formatProcessedQuestionsForTextarea(): string
     {
