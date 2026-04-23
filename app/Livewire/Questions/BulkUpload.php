@@ -62,8 +62,18 @@ class BulkUpload extends Component
 
     public function processQuestions(): void
     {
+        $rawText = trim($this->rawText);
+
+        if ($rawText === '') {
+            $this->addError('rawText', 'অনুগ্রহ করে OCR / Raw প্রশ্ন টেক্সট দিন, তারপর Process Questions ক্লিক করুন।');
+
+            return;
+        }
+
         $validated = $this->validate([
-            'rawText' => 'required|string|min:20',
+            'rawText' => 'string|min:20',
+        ], [
+            'rawText.min' => 'কমপক্ষে ২০ অক্ষরের প্রশ্ন টেক্সট দিন।',
         ]);
 
         $this->processedQuestions = QuestionTextParser::parseMcqText($validated['rawText']);
