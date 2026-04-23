@@ -37,6 +37,11 @@ class BulkUpload extends Component
 
     public string $rawText = '';
 
+    /**
+     * @var array<int, array{title: string, options: array<int, array{option_text: string, is_correct: bool}>}>
+     */
+    public array $processedQuestions = [];
+
     public function updatedAcademicClassId($value): void
     {
         $this->subject_id = null;
@@ -55,7 +60,24 @@ class BulkUpload extends Component
         $this->topic_id = null;
     }
 
-    public function saveBulkQuestions(): void
+    public function processQuestions(): void
+    {
+        $validated = $this->validate([
+            'rawText' => 'required|string|min:20',
+        ]);
+
+        $this->processedQuestions = QuestionTextParser::parseMcqText($validated['rawText']);
+
+        if (empty($this->processedQuestions)) {
+            $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি। নম্বর + (ক)/(খ)/(গ)/(ঘ) ফরম্যাটে দিন।');
+
+            return;
+        }
+
+        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। নিচে দেখে Submit করুন।');
+    }
+
+    public function submitProcessedQuestions(): void
     {
         abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
 
@@ -69,7 +91,10 @@ class BulkUpload extends Component
             'exam_category_ids' => 'required|array|min:1',
             'exam_category_ids.*' => 'required|exists:exam_categories,id',
             'sourceImage' => 'nullable|image|max:4096',
-            'rawText' => 'required|string|min:20',
+            'processedQuestions' => 'required|array|min:1',
+            'processedQuestions.*.title' => 'required|string',
+            'processedQuestions.*.options' => 'required|array|min:2',
+            'processedQuestions.*.options.*.option_text' => 'required|string',
         ]);
 
         $subject = Subject::query()
@@ -83,19 +108,11 @@ class BulkUpload extends Component
             return;
         }
 
-        $parsedQuestions = QuestionTextParser::parseMcqText($validated['rawText']);
-
-        if (empty($parsedQuestions)) {
-            $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি। নম্বর + (ক)/(খ)/(গ)/(ঘ) ফরম্যাটে দিন।');
-
-            return;
-        }
-
         $currentUser = auth()->user();
         $storedImagePath = $this->sourceImage?->store('questions/bulk-source', 'public');
 
-        DB::transaction(function () use ($subject, $parsedQuestions, $storedImagePath, $currentUser): void {
-            foreach ($parsedQuestions as $parsedQuestion) {
+        DB::transaction(function () use ($subject, $validated, $storedImagePath, $currentUser): void {
+            foreach ($validated['processedQuestions'] as $parsedQuestion) {
                 $question = Question::query()->create([
                     'subject_id' => $subject->id,
                     'chapter_id' => $this->chapter_id,
@@ -118,7 +135,7 @@ class BulkUpload extends Component
             }
         });
 
-        session()->flash('success', count($parsedQuestions).'টি প্রশ্ন সফলভাবে যোগ করা হয়েছে।');
+        session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে ডাটাবেজে সাবমিট করা হয়েছে।');
         $this->redirectRoute('questions.index', navigate: true);
     }
 
