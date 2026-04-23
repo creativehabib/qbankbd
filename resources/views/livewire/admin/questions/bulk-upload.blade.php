@@ -3,7 +3,7 @@
         <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
             <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">প্রশ্ন ছবি/টেক্সট থেকে Bulk Upload</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Step 1: MCQ টেক্সট দিন অথবা প্রশ্নপত্রের ইমেজ আপলোড করুন, তারপর <strong>Process Questions</strong> ক্লিক করুন। Step 2: Processed প্রশ্নগুলো OCR / Raw টেক্সটে ও নিচে রিভিউ করে <strong>Submit to Database</strong> দিন।
+                Step 1: MCQ টেক্সট দিন অথবা প্রশ্নপত্রের পরিষ্কার/সোজা ইমেজ আপলোড করুন, তারপর <strong>Process Questions</strong> ক্লিক করুন। Step 2: Processed প্রশ্নগুলো OCR / Raw টেক্সটে ও নিচে রিভিউ করে <strong>Submit to Database</strong> দিন।
             </p>
         </div>
 

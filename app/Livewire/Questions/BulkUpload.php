@@ -113,7 +113,7 @@ class BulkUpload extends Component
             return '';
         }
 
-        $languages = ['ben', 'eng'];
+        $languages = ['ben', 'ben+eng'];
         $ocrErrors = [];
 
         foreach ($languages as $language) {
@@ -149,6 +149,12 @@ class BulkUpload extends Component
                 ->implode(PHP_EOL);
 
             if (trim($ocrText) !== '') {
+                if ($this->isLowQualityOcrText($ocrText)) {
+                    $ocrErrors[] = 'OCR text quality is too low for language '.$language;
+
+                    continue;
+                }
+
                 return trim($ocrText);
             }
 
@@ -164,10 +170,33 @@ class BulkUpload extends Component
 
         $this->addError(
             'sourceImage',
-            'আপলোডকৃত ইমেজ থেকে OCR টেক্সট পাওয়া যায়নি। পরিষ্কার/সোজা ছবি দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'.(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
+            'আপলোডকৃত ইমেজ থেকে ভালো OCR টেক্সট পাওয়া যায়নি। স্ক্যান করা পরিষ্কার/সোজা ছবি (ছায়া ছাড়া) দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'.(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
         );
 
         return '';
+    }
+
+    protected function isLowQualityOcrText(string $text): bool
+    {
+        $trimmedText = trim($text);
+
+        if ($trimmedText === '') {
+            return true;
+        }
+
+        preg_match_all('/[\x{0980}-\x{09FF}]/u', $trimmedText, $banglaMatches);
+        preg_match_all('/[\p{L}]/u', $trimmedText, $letterMatches);
+
+        $banglaCount = count($banglaMatches[0]);
+        $letterCount = count($letterMatches[0]);
+
+        if ($letterCount === 0) {
+            return true;
+        }
+
+        $banglaRatio = $banglaCount / $letterCount;
+
+        return $banglaCount < 20 || $banglaRatio < 0.25;
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
