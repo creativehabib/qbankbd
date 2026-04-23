@@ -1,10 +1,11 @@
 <?php
 
-test('landing page shows question bank messaging for teachers and learners', function () {
+test('landing page shows requested sections and theme toggle', function () {
     $response = $this->get(route('home'));
 
     $response->assertOk();
-    $response->assertSee('শিক্ষকদের জন্য পাওয়ারফুল টুলস');
-    $response->assertSee('শিক্ষার্থী ও চাকরিপ্রার্থীদের জন্য স্মার্ট প্র্যাকটিস');
+    $response->assertSee('বাংলাদেশের প্রথম AI-চালিত প্রশ্নব্যাংক');
+    $response->assertSee('কেন প্রশ্নব্যাংক বেছে নেবেন?');
     $response->assertSee('id="theme-toggle"', false);
+    $response->assertSee('id="pricing"', false);
 });
