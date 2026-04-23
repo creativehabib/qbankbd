@@ -105,47 +105,69 @@ class BulkUpload extends Component
             return '';
         }
 
-        $response = Http::asMultipart()
-            ->timeout(30)
-            ->post('https://api.ocr.space/parse/image', [
-                [
-                    'name' => 'apikey',
-                    'contents' => 'helloworld',
-                ],
-                [
-                    'name' => 'language',
-                    'contents' => 'ben',
-                ],
-                [
-                    'name' => 'isOverlayRequired',
-                    'contents' => 'false',
-                ],
-                [
-                    'name' => 'file',
-                    'contents' => file_get_contents($this->sourceImage->getRealPath()) ?: '',
-                    'filename' => $this->sourceImage->getClientOriginalName(),
-                ],
-            ]);
+        $imagePath = $this->sourceImage->getRealPath();
 
-        if (! $response->successful()) {
-            $this->addError('sourceImage', 'ইমেজ OCR করা যায়নি। আবার চেষ্টা করুন বা টেক্সট ম্যানুয়ালি পেস্ট করুন।');
+        if (! $imagePath || ! is_readable($imagePath)) {
+            $this->addError('sourceImage', 'ইমেজ ফাইলটি পড়া যাচ্ছে না। আবার আপলোড করুন।');
 
             return '';
         }
 
-        $parsedResults = data_get($response->json(), 'ParsedResults', []);
-        $ocrText = collect($parsedResults)
-            ->pluck('ParsedText')
-            ->filter(fn ($text) => is_string($text) && trim($text) !== '')
-            ->implode(PHP_EOL);
+        $languages = ['ben', 'eng'];
+        $ocrErrors = [];
 
-        if (trim($ocrText) === '') {
-            $this->addError('sourceImage', 'আপলোডকৃত ইমেজ থেকে OCR টেক্সট পাওয়া যায়নি।');
+        foreach ($languages as $language) {
+            $fileStream = fopen($imagePath, 'r');
 
-            return '';
+            if ($fileStream === false) {
+                continue;
+            }
+
+            $response = Http::timeout(45)
+                ->attach('file', $fileStream, $this->sourceImage->getClientOriginalName())
+                ->post('https://api.ocr.space/parse/image', [
+                    'apikey' => 'helloworld',
+                    'language' => $language,
+                    'isOverlayRequired' => 'false',
+                    'OCREngine' => '2',
+                ]);
+
+            fclose($fileStream);
+
+            if (! $response->successful()) {
+                $ocrErrors[] = 'OCR server response failed ('.$language.').';
+
+                continue;
+            }
+
+            $json = $response->json();
+            $parsedResults = data_get($json, 'ParsedResults', []);
+
+            $ocrText = collect($parsedResults)
+                ->pluck('ParsedText')
+                ->filter(fn ($text) => is_string($text) && trim($text) !== '')
+                ->implode(PHP_EOL);
+
+            if (trim($ocrText) !== '') {
+                return trim($ocrText);
+            }
+
+            $errorMessage = data_get($json, 'ErrorMessage');
+            $errorDetails = data_get($json, 'ErrorDetails');
+
+            if (is_array($errorMessage)) {
+                $errorMessage = implode(' ', $errorMessage);
+            }
+
+            $ocrErrors[] = trim(collect([$errorMessage, $errorDetails])->filter()->implode(' | ')) ?: 'OCR text empty for language '.$language;
         }
 
-        return trim($ocrText);
+        $this->addError(
+            'sourceImage',
+            'আপলোডকৃত ইমেজ থেকে OCR টেক্সট পাওয়া যায়নি। পরিষ্কার/সোজা ছবি দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'.(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
+        );
+
+        return '';
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
