@@ -5,6 +5,7 @@ use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
 use App\Livewire\PermissionManager;
 use App\Livewire\Questions;
+use App\Livewire\Questions\BulkUpload;
 use App\Livewire\Questions\Create;
 use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
     Route::get('/questions', Questions::class)->name('questions.index');
     Route::get('/questions/create', Create::class)->name('questions.create');
+    Route::get('/questions/bulk-upload', BulkUpload::class)->name('questions.bulk-upload');
     Route::get('/questions/{question}/edit', Edit::class)->name('questions.edit');
 
     Route::middleware('permission:exam_categories.manage')->group(function (): void {
