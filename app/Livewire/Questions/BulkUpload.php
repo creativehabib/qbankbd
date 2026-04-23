@@ -74,7 +74,29 @@ class BulkUpload extends Component
             return;
         }
 
-        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। নিচে দেখে Submit করুন।');
+        $this->rawText = $this->formatProcessedQuestionsForTextarea();
+
+        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। OCR / Raw প্রশ্ন টেক্সট বক্সে দেখুন, তারপর Submit করুন।');
+    }
+
+
+    protected function formatProcessedQuestionsForTextarea(): string
+    {
+        $lines = [];
+        $labels = ['ক', 'খ', 'গ', 'ঘ'];
+
+        foreach ($this->processedQuestions as $index => $question) {
+            $lines[] = ($index + 1).'. '.$question['title'];
+
+            foreach ($question['options'] as $optionIndex => $option) {
+                $label = $labels[$optionIndex] ?? (string) ($optionIndex + 1);
+                $lines[] = '('.$label.') '.$option['option_text'];
+            }
+
+            $lines[] = '';
+        }
+
+        return trim(implode(PHP_EOL, $lines));
     }
 
     public function submitProcessedQuestions(): void

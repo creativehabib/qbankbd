@@ -89,7 +89,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">OCR / Raw প্রশ্ন টেক্সট</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">OCR / Raw প্রশ্ন টেক্সট (Process করার পর এখানেই formatted প্রশ্ন দেখাবে)</label>
                 <textarea wire:model="rawText" rows="10" class="block w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" placeholder="1. শব্দটির অর্থ কী? (ক) ... (খ) ... (গ) ... (ঘ) ..."></textarea>
                 @error('rawText') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>

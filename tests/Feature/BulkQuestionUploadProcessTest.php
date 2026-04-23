@@ -10,5 +10,8 @@ it('processes raw mcq text into preview questions before submit', function () {
         ->assertHasNoErrors()
         ->assertSet('processedQuestions.0.title', 'শব্দটির অর্থ কী?')
         ->assertSet('processedQuestions.0.options.0.option_text', 'কলসি')
-        ->assertSet('processedQuestions.0.options.3.option_text', 'বাড়ি');
+        ->assertSet('processedQuestions.0.options.3.option_text', 'বাড়ি')
+        ->assertSee('১. শব্দটির অর্থ কী?')
+        ->assertSee('(ক) কলসি')
+        ->assertSee('(ঘ) বাড়ি');
 });
