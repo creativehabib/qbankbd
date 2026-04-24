@@ -251,21 +251,29 @@ class BulkUpload extends Component
 
     protected function makeVisionClient(): ImageAnnotatorClient
     {
-        $credentialsPath = '/Users/liton/Herd/qbankbd/storage/google-credentials.json';
+        $credentialsPath = config('services.google_vision.credentials')
+            ?: config('services.google_vision.google_application_credentials');
 
-        if (! file_exists($credentialsPath)) {
-            throw new RuntimeException('Credentials file not found: '.$credentialsPath);
+        if (is_string($credentialsPath) && $credentialsPath !== '' && file_exists($credentialsPath)) {
+            return new ImageAnnotatorClient([
+                'credentials' => $credentialsPath,
+            ]);
         }
 
-        $credentialsArray = json_decode(file_get_contents($credentialsPath), true);
+        $credentialsJson = config('services.google_vision.credentials_json');
+        $credentialsArray = is_string($credentialsJson)
+            ? json_decode($credentialsJson, true)
+            : null;
 
-        if (! is_array($credentialsArray) || empty($credentialsArray['client_email'])) {
-            throw new RuntimeException('Invalid Google credentials JSON file.');
+        if (is_array($credentialsArray) && ! empty($credentialsArray['client_email'])) {
+            return new ImageAnnotatorClient([
+                'credentials' => $credentialsArray,
+            ]);
         }
 
-        return new ImageAnnotatorClient([
-            'credentials' => $credentialsArray,
-        ]);
+        throw new RuntimeException(
+            'Google Vision credentials পাওয়া যায়নি। .env এ GOOGLE_VISION_CREDENTIALS অথবা GOOGLE_VISION_CREDENTIALS_JSON সেট করুন।'
+        );
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
