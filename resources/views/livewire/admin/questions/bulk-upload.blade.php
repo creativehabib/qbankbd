@@ -20,9 +20,9 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">প্রশ্ন ছবি/টেক্সট থেকে Bulk Upload</h1>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">প্রশ্ন ছবি/PDF/টেক্সট থেকে Bulk Upload</h1>
                     <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                        <span class="font-medium text-indigo-600 dark:text-indigo-400">Step 1:</span> MCQ টেক্সট দিন অথবা পরিষ্কার ইমেজ আপলোড করুন →
+                        <span class="font-medium text-indigo-600 dark:text-indigo-400">Step 1:</span> MCQ টেক্সট দিন অথবা ইমেজ/PDF আপলোড করুন →
                         <strong>Process Questions</strong> ক্লিক করুন।
                         <span class="font-medium text-indigo-600 dark:text-indigo-400">Step 2:</span> সঠিক উত্তর চিহ্নিত করুন →
                         <strong>Submit to Database</strong> দিন।
@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-            {{-- ── Row 2: Difficulty, Marks, Source Image ── --}}
+            {{-- ── Row 2: Difficulty, Marks, Source File ── --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -118,26 +118,97 @@
                     @enderror
                 </div>
 
+                {{-- ── Source File Upload (Image + PDF) ── --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Source Image (ঐচ্ছিক)
+                        ইমেজ / PDF আপলোড
+                        <span class="ml-1 text-xs font-normal text-gray-400">(ঐচ্ছিক)</span>
                     </label>
-                    <input type="file" wire:model="sourceImage" accept="image/*"
-                           class="block w-full text-sm text-gray-600 dark:text-gray-300
-                                  file:mr-3 file:py-1.5 file:px-3
-                                  file:rounded-md file:border-0
-                                  file:text-sm file:font-medium
-                                  file:bg-indigo-50 file:text-indigo-700
-                                  dark:file:bg-indigo-900/40 dark:file:text-indigo-300
-                                  hover:file:bg-indigo-100 cursor-pointer transition">
-                    @error('sourceImage')
+
+                    {{-- Drop Zone --}}
+                    <label for="sourceFileInput"
+                           class="group relative flex flex-col items-center justify-center w-full rounded-lg border-2 border-dashed cursor-pointer transition-all
+                                  @if($sourceFile) border-indigo-400 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                                  @else border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/30 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 @endif
+                                  min-h-[90px] px-3 py-3">
+
+                        @if($sourceFile)
+                            @php
+                                $ext = strtolower($sourceFile->getClientOriginalExtension());
+                                $isPdf = $ext === 'pdf';
+                            @endphp
+
+                            @if($isPdf)
+                                {{-- PDF Preview --}}
+                                <div class="flex flex-col items-center gap-1.5 w-full">
+                                    <div class="flex items-center gap-2 w-full">
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
+                                                {{ $sourceFile->getClientOriginalName() }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                PDF • {{ number_format($sourceFile->getSize() / 1024, 1) }} KB
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-indigo-600 dark:text-indigo-400">পরিবর্তন করতে ক্লিক করুন</p>
+                                </div>
+                            @else
+                                {{-- Image Preview --}}
+                                <div class="w-full space-y-1.5">
+                                    <div class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 max-h-24">
+                                        <img src="{{ $sourceFile->temporaryUrl() }}" class="w-full h-24 object-cover" alt="Preview">
+                                    </div>
+                                    <p class="text-center text-xs text-indigo-600 dark:text-indigo-400">পরিবর্তন করতে ক্লিক করুন</p>
+                                </div>
+                            @endif
+                        @else
+                            {{-- Empty State --}}
+                            <div class="flex flex-col items-center gap-1 text-center">
+                                <svg class="w-7 h-7 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
+                                    ক্লিক করুন বা ফাইল ড্রপ করুন
+                                </p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">
+                                    JPG, PNG, WebP, PDF — সর্বোচ্চ 10MB
+                                </p>
+                            </div>
+                        @endif
+
+                        <input id="sourceFileInput"
+                               type="file"
+                               wire:model="sourceFile"
+                               accept="image/jpeg,image/png,image/webp,application/pdf,.pdf"
+                               class="sr-only">
+                    </label>
+
+                    {{-- Upload Progress --}}
+                    <div wire:loading wire:target="sourceFile" class="mt-1.5 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                        </svg>
+                        আপলোড হচ্ছে...
+                    </div>
+
+                    @error('sourceFile')
                     <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                     @enderror
-                    @if($sourceImage)
-                        <div class="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 max-h-32">
-                            <img src="{{ $sourceImage->temporaryUrl() }}" class="w-full h-32 object-cover" alt="Preview">
-                        </div>
-                    @endif
+
+                    {{-- Info badge: Google Vision --}}
+                    <div class="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        বাংলা OCR: Google Vision AI — ইমেজ ও PDF উভয়ই সাপোর্টেড
+                    </div>
                 </div>
             </div>
 
@@ -178,8 +249,10 @@
 
             {{-- ── Action Buttons ── --}}
             <div class="flex flex-wrap items-center gap-3 pt-1">
+
+                {{-- Process Button --}}
                 <button type="button" wire:click="processQuestions"
-                        wire:loading.attr="disabled" wire:target="processQuestions,sourceImage"
+                        wire:loading.attr="disabled" wire:target="processQuestions,sourceFile"
                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white text-sm font-medium shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed">
                     <span wire:loading.remove wire:target="processQuestions">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,9 +266,16 @@
                         </svg>
                     </span>
                     <span wire:loading.remove wire:target="processQuestions">Process Questions</span>
-                    <span wire:loading wire:target="processQuestions">Processing...</span>
+                    <span wire:loading wire:target="processQuestions">
+                        @if($sourceFile && trim($rawText) === '')
+                            OCR চলছে...
+                        @else
+                            Processing...
+                        @endif
+                    </span>
                 </button>
 
+                {{-- Submit Button --}}
                 <button type="button" wire:click="submitProcessedQuestions"
                         wire:loading.attr="disabled" wire:target="submitProcessedQuestions"
                     @class([
@@ -234,7 +314,7 @@
                 @endif
             </div>
 
-            {{-- Global processedQuestions error (e.g. correct answer missing) --}}
+            {{-- Global processedQuestions error --}}
             @error('processedQuestions')
             <div class="flex items-center gap-2 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 px-4 py-3">
                 <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -244,13 +324,25 @@
             </div>
             @enderror
 
-            {{-- OCR Loading Indicator --}}
-            <div wire:loading wire:target="sourceImage" class="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400">
-                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            {{-- OCR Loading Indicator (process চলার সময়) --}}
+            <div wire:loading wire:target="processQuestions"
+                 class="flex items-center gap-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 px-4 py-3">
+                <svg class="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400 flex-shrink-0" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                 </svg>
-                ইমেজ আপলোড হচ্ছে...
+                <div>
+                    <p class="text-sm font-medium text-indigo-700 dark:text-indigo-300">
+                        @if($sourceFile && trim($rawText) === '')
+                            Google Vision AI দিয়ে বাংলা OCR করা হচ্ছে...
+                        @else
+                            প্রশ্ন প্রসেস করা হচ্ছে...
+                        @endif
+                    </p>
+                    <p class="text-xs text-indigo-500 dark:text-indigo-400 mt-0.5">
+                        একটু অপেক্ষা করুন, সাধারণত ১০-৩০ সেকেন্ড লাগে।
+                    </p>
+                </div>
             </div>
 
             {{-- ── Processed Questions Review ── --}}
@@ -286,7 +378,6 @@
                                 'p-4 rounded-lg border bg-white dark:bg-gray-900/60 space-y-3 transition',
                                 'border-green-300 dark:border-green-700 ring-1 ring-green-200 dark:ring-green-800' => $hasCorrect,
                                 'border-red-200 dark:border-red-700' => ! $hasCorrect,
-                                'border-gray-200 dark:border-gray-700' => false,
                             ])>
                                 {{-- Question title row --}}
                                 <div class="flex items-start gap-3">

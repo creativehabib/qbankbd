@@ -40,4 +40,10 @@ return [
         'languages' => env('OCR_SPACE_LANGUAGES', 'ben,eng'),
     ],
 
+    'google_vision' => [
+        'credentials' => env('GOOGLE_VISION_CREDENTIALS_PATH'),
+        // অথবা JSON key directly:
+        'credentials_json' => env('GOOGLE_VISION_CREDENTIALS_JSON'),
+    ],
+
 ];
