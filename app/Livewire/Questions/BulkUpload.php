@@ -18,6 +18,7 @@ use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\InputConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -254,16 +255,28 @@ class BulkUpload extends Component
     {
         $credentialsPath = config('services.google_vision.credentials');
         $credentialsJson = config('services.google_vision.credentials_json');
+        $googleApplicationCredentials = config('services.google_vision.google_application_credentials');
 
         $options = [];
 
         if ($credentialsJson) {
             // JSON string সরাসরি (যেমন Heroku/Render-এ env var হিসেবে)
-            $options['credentials'] = json_decode($credentialsJson, true);
+            $decodedCredentials = json_decode($credentialsJson, true);
+
+            if (! is_array($decodedCredentials) || empty($decodedCredentials['client_email'])) {
+                throw new RuntimeException('GOOGLE_VISION_CREDENTIALS_JSON invalid. নিশ্চিত করুন এটি সম্পূর্ণ Service Account JSON।');
+            }
+
+            $options['credentials'] = $decodedCredentials;
         } elseif ($credentialsPath && file_exists($credentialsPath)) {
             $options['keyFilePath'] = $credentialsPath;
+        } elseif ($googleApplicationCredentials && file_exists($googleApplicationCredentials)) {
+            $options['keyFilePath'] = $googleApplicationCredentials;
+        } else {
+            throw new RuntimeException(
+                'Google Vision credentials পাওয়া যায়নি। .env-এ GOOGLE_VISION_CREDENTIALS_PATH বা GOOGLE_VISION_CREDENTIALS_JSON বা GOOGLE_APPLICATION_CREDENTIALS সেট করুন।'
+            );
         }
-        // credentials না দিলে Application Default Credentials (ADC) ব্যবহার হবে
 
         return new ImageAnnotatorClient($options);
     }

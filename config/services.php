@@ -44,6 +44,7 @@ return [
         'credentials' => env('GOOGLE_VISION_CREDENTIALS_PATH'),
         // অথবা JSON key directly:
         'credentials_json' => env('GOOGLE_VISION_CREDENTIALS_JSON'),
+        'google_application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
     ],
 
 ];
