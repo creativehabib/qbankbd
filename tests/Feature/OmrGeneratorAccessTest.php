@@ -23,3 +23,23 @@ it('forbids students from accessing omr generator', function (): void {
         ->get(route('omr.generator'))
         ->assertForbidden();
 });
+
+it('shows omr generator in sidebar for teacher', function (): void {
+    $teacher = User::factory()->teacher()->create();
+
+    $this->actingAs($teacher)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee(route('omr.generator'), false)
+        ->assertSee('OMR Generator');
+});
+
+it('does not show omr generator in sidebar for student', function (): void {
+    $student = User::factory()->create();
+
+    $this->actingAs($student)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertDontSee(route('omr.generator'), false)
+        ->assertDontSee('OMR Generator');
+});
