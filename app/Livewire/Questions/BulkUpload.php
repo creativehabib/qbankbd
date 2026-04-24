@@ -154,7 +154,7 @@ class BulkUpload extends Component
                 ->implode(PHP_EOL);
 
             if (trim($ocrText) !== '') {
-                if ($this->isLowQualityOcrText($ocrText)) {
+                if ($this->isLowQualityOcrText($ocrText, $language)) {
                     $ocrErrors[] = 'OCR text quality is too low for language '.$language;
 
                     continue;
@@ -181,12 +181,16 @@ class BulkUpload extends Component
         return '';
     }
 
-    protected function isLowQualityOcrText(string $text): bool
+    protected function isLowQualityOcrText(string $text, string $language): bool
     {
         $trimmedText = trim($text);
 
         if ($trimmedText === '') {
             return true;
+        }
+
+        if (! str_contains($language, 'ben')) {
+            return mb_strlen($trimmedText) < 20;
         }
 
         preg_match_all('/[\x{0980}-\x{09FF}]/u', $trimmedText, $banglaMatches);
