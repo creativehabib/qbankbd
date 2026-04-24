@@ -113,7 +113,7 @@ class BulkUpload extends Component
             return '';
         }
 
-        $languages = ['ben', 'ben+eng'];
+        $languages = $this->getOcrLanguages();
         $ocrErrors = [];
 
         foreach ($languages as $language) {
@@ -123,14 +123,19 @@ class BulkUpload extends Component
                 continue;
             }
 
+            $payload = [
+                'apikey' => (string) (config('services.ocr_space.api_key') ?: 'helloworld'),
+                'isOverlayRequired' => 'false',
+                'OCREngine' => '2',
+            ];
+
+            if ($language !== '') {
+                $payload['language'] = $language;
+            }
+
             $response = Http::timeout(45)
                 ->attach('file', $fileStream, $this->sourceImage->getClientOriginalName())
-                ->post('https://api.ocr.space/parse/image', [
-                    'apikey' => 'helloworld',
-                    'language' => $language,
-                    'isOverlayRequired' => 'false',
-                    'OCREngine' => '2',
-                ]);
+                ->post('https://api.ocr.space/parse/image', $payload);
 
             fclose($fileStream);
 
@@ -197,6 +202,24 @@ class BulkUpload extends Component
         $banglaRatio = $banglaCount / $letterCount;
 
         return $banglaCount < 20 || $banglaRatio < 0.25;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function getOcrLanguages(): array
+    {
+        $configuredLanguages = (string) (config('services.ocr_space.languages') ?: '');
+
+        if ($configuredLanguages !== '') {
+            return collect(explode(',', $configuredLanguages))
+                ->map(fn ($language) => trim($language))
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        return ['eng'];
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
