@@ -39,7 +39,10 @@ class BulkUpload extends Component
     public string $rawText = '';
 
     /**
-     * @var array<int, array{title: string, options: array<int, array{option_text: string, is_correct: bool}>}>
+     * @var array<int, array{
+     *     title: string,
+     *     options: array<int, array{option_text: string, is_correct: bool}>
+     * }>
      */
     public array $processedQuestions = [];
 
@@ -59,6 +62,21 @@ class BulkUpload extends Component
     public function updatedChapterId($value): void
     {
         $this->topic_id = null;
+    }
+
+    /**
+     * Blade থেকে radio button ক্লিক করলে সঠিক উত্তর সেট হবে।
+     * একটি প্রশ্নে একটিই correct option থাকবে।
+     */
+    public function setCorrectOption(int $questionIndex, int $optionIndex): void
+    {
+        if (! isset($this->processedQuestions[$questionIndex])) {
+            return;
+        }
+
+        foreach ($this->processedQuestions[$questionIndex]['options'] as $i => $option) {
+            $this->processedQuestions[$questionIndex]['options'][$i]['is_correct'] = ($i === $optionIndex);
+        }
     }
 
     public function processQuestions(): void
@@ -82,17 +100,25 @@ class BulkUpload extends Component
             'rawText.min' => 'কমপক্ষে ২০ অক্ষরের প্রশ্ন টেক্সট দিন।',
         ]);
 
-        $this->processedQuestions = QuestionTextParser::parseMcqText($validated['rawText']);
+        $parsed = QuestionTextParser::parseMcqText($validated['rawText']);
 
-        if (empty($this->processedQuestions)) {
-            $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি। নম্বর + (ক)/(খ)/(গ)/(ঘ) ফরম্যাটে দিন।');
+        if (empty($parsed)) {
+            $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি। নম্বর + (ক)/(খ)/(গ)/(ঘ) ফরম্যাটে দিন।');
 
             return;
         }
 
+        // প্রতিটি option এ is_correct: false নিশ্চিত করা (parser যদি field না দেয়)
+        foreach ($parsed as $qi => $question) {
+            foreach ($question['options'] as $oi => $option) {
+                $parsed[$qi]['options'][$oi]['is_correct'] = (bool) ($option['is_correct'] ?? false);
+            }
+        }
+
+        $this->processedQuestions = $parsed;
         $this->rawText = $this->formatProcessedQuestionsForTextarea();
 
-        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। OCR / Raw প্রশ্ন টেক্সট বক্সে দেখুন, তারপর Submit করুন।');
+        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস করা হয়েছে। নিচে সঠিক উত্তর (✓) চিহ্নিত করুন, তারপর Submit করুন।');
     }
 
     protected function extractRawTextFromImage(): string
@@ -108,12 +134,13 @@ class BulkUpload extends Component
         $imagePath = $this->sourceImage->getRealPath();
 
         if (! $imagePath || ! is_readable($imagePath)) {
-            $this->addError('sourceImage', 'ইমেজ ফাইলটি পড়া যাচ্ছে না। আবার আপলোড করুন।');
+            $this->addError('sourceImage', 'ইমেজ ফাইলটি পড়া যাচ্ছে না। আবার আপলোড করুন।');
 
             return '';
         }
 
-        $languages = ['eng'];
+        // বাংলা আগে চেষ্টা করা হবে, তারপর English fallback
+        $languages = ['ben', 'eng'];
         $ocrErrors = [];
 
         foreach ($languages as $language) {
@@ -124,13 +151,16 @@ class BulkUpload extends Component
             }
 
             $payload = [
-                'apikey' => 'helloworld',
+                'apikey' => config('services.ocr_space.key', env('OCR_SPACE_KEY', 'helloworld')),
                 'isOverlayRequired' => 'false',
-                'OCREngine' => '2',
-                'language' => 'eng',
+                'OCREngine' => $language === 'ben' ? '1' : '2',
+                'language' => $language,
+                'detectOrientation' => 'true',
+                'scale' => 'true',
+                'isTable' => 'false',
             ];
 
-            $response = Http::timeout(45)
+            $response = Http::timeout(60)
                 ->attach('file', $fileStream, $this->sourceImage->getClientOriginalName())
                 ->post('https://api.ocr.space/parse/image', $payload);
 
@@ -167,12 +197,13 @@ class BulkUpload extends Component
                 $errorMessage = implode(' ', $errorMessage);
             }
 
-            $ocrErrors[] = trim(collect([$errorMessage, $errorDetails])->filter()->implode(' | ')) ?: 'OCR text empty for language '.$language;
+            $ocrErrors[] = trim(collect([$errorMessage, $errorDetails])->filter()->implode(' | '))
+                ?: 'OCR text empty for language '.$language;
         }
 
         $this->addError(
             'sourceImage',
-            'আপলোডকৃত ইমেজ থেকে ভালো OCR টেক্সট পাওয়া যায়নি। স্ক্যান করা পরিষ্কার/সোজা ছবি (ছায়া ছাড়া) দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'
+            'আপলোডকৃত ইমেজ থেকে ভালো OCR টেক্সট পাওয়া যায়নি। স্ক্যান করা পরিষ্কার/সোজা ছবি (ছায়া ছাড়া) দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'
             .(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
         );
 
@@ -191,6 +222,7 @@ class BulkUpload extends Component
             return mb_strlen($trimmedText) < 20;
         }
 
+        // বাংলা Unicode block: U+0980–U+09FF
         preg_match_all('/[\x{0980}-\x{09FF}]/u', $trimmedText, $banglaMatches);
         preg_match_all('/[\p{L}]/u', $trimmedText, $letterMatches);
 
@@ -243,7 +275,22 @@ class BulkUpload extends Component
             'processedQuestions.*.title' => 'required|string',
             'processedQuestions.*.options' => 'required|array|min:2',
             'processedQuestions.*.options.*.option_text' => 'required|string',
+            'processedQuestions.*.options.*.is_correct' => 'required|boolean',
         ]);
+
+        // প্রতিটি প্রশ্নে কমপক্ষে একটি সঠিক উত্তর চিহ্নিত আছে কিনা চেক
+        foreach ($validated['processedQuestions'] as $qIndex => $parsedQuestion) {
+            $hasCorrect = collect($parsedQuestion['options'])->contains('is_correct', true);
+
+            if (! $hasCorrect) {
+                $this->addError(
+                    'processedQuestions',
+                    ($qIndex + 1).' নম্বর প্রশ্নের জন্য সঠিক উত্তর (✓) চিহ্নিত করুন।'
+                );
+
+                return;
+            }
+        }
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
@@ -259,23 +306,46 @@ class BulkUpload extends Component
         $currentUser = auth()->user();
         $storedImagePath = $this->sourceImage?->store('questions/bulk-source', 'public');
 
-        DB::transaction(function () use ($subject, $validated, $storedImagePath, $currentUser): void {
-            foreach ($validated['processedQuestions'] as $parsedQuestion) {
+        DB::transaction(function () use ($subject, $validated, $currentUser): void {
+            foreach ($validated['processedQuestions'] as $index => $parsedQuestion) {
+
+                // ১. স্লাগ তৈরি (টাইটেল থেকে সরাসরি, কোনো র‍্যান্ডম স্ট্রিং ছাড়া)
+                $slug = Str::slug($parsedQuestion['title']);
+
+                if (empty($slug)) {
+                    $slug = preg_replace('/\s+/u', '-', trim($parsedQuestion['title']));
+                    $slug = str_replace(['?', '!', "'", '"', ',', '.', '(', ')', '[', ']', '{', '}'], '', $slug);
+                }
+
+                // ২. ডাটাবেজে একই স্লাগ আছে কি না চেক (Error Handling)
+                $exists = Question::where('slug', $slug)->exists();
+                if ($exists) {
+                    // লুপ থামিয়ে ইরর মেসেজ থ্রো করবে।
+                    // এটি ট্রানজেকশনের ভেতরে থাকায় কোনো ডাটা সেভ হবে না।
+                    throw new \Exception('প্রশ্ন নম্বর ('.($index + 1)."): '".$parsedQuestion['title']."' এই স্লাগটি অলরেডি ডাটাবেজে আছে। দয়া করে টাইটেল পরিবর্তন করুন।");
+                }
+
+                // ৩. অপশন ফরম্যাট করা
+                $formattedOptions = collect($parsedQuestion['options'])
+                    ->map(fn ($opt) => [
+                        'option_text' => '<p>'.e(trim($opt['option_text'])).'</p>'."\n",
+                        'is_correct' => (bool) ($opt['is_correct'] ?? false),
+                    ])
+                    ->values()
+                    ->toArray();
+
+                // ৪. ডাটাবেজে প্রশ্ন তৈরি
                 $question = Question::query()->create([
                     'subject_id' => $subject->id,
                     'chapter_id' => $this->chapter_id,
                     'topic_id' => $this->topic_id,
                     'title' => $parsedQuestion['title'],
-                    'slug' => Str::slug(Str::limit($parsedQuestion['title'], 100, '')).'-'.Str::lower(Str::random(6)),
+                    'slug' => $slug, // ক্লিন স্লাগ সেভ হবে
                     'difficulty' => $this->difficulty,
                     'question_type' => 'mcq',
                     'marks' => $this->marks,
                     'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
-                    'extra_content' => [
-                        'options' => $parsedQuestion['options'],
-                        'source_image' => $storedImagePath,
-                        'uploaded_via' => 'bulk_upload',
-                    ],
+                    'extra_content' => $formattedOptions,
                     'user_id' => $currentUser?->id,
                 ]);
 
@@ -283,7 +353,7 @@ class BulkUpload extends Component
             }
         });
 
-        session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে ডাটাবেজে সাবমিট করা হয়েছে।');
+        session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে ডাটাবেজে সাবমিট করা হয়েছে।');
         $this->redirectRoute('questions.index', navigate: true);
     }
 

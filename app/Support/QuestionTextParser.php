@@ -9,25 +9,42 @@ class QuestionTextParser
      */
     public static function parseMcqText(string $text): array
     {
-        $normalized = preg_replace('/\R+/u', "\n", trim($text)) ?? '';
-
-        if ($normalized === '') {
-            return [];
-        }
-
-        $chunks = preg_split('/\n\s*(?:\d+|[০-৯]+)\s*[\).।]\s*/u', "\n".$normalized, -1, PREG_SPLIT_NO_EMPTY);
-
-        if (! is_array($chunks)) {
-            return [];
-        }
-
         $questions = [];
+        $labels    = ['ক', 'খ', 'গ', 'ঘ'];
 
-        foreach ($chunks as $chunk) {
-            $question = self::parseSingleMcqChunk(trim($chunk));
+        // বাংলা ও English উভয় নম্বর সাপোর্ট (১. বা 1.)
+        // `u` flag অবশ্যই থাকতে হবে UTF-8 এর জন্য
+        $pattern = '/(?:^|\n)\s*(?:[০-৯\d]+)[.)।]\s*(.+?)(?=\n\s*(?:[০-৯\d]+)[.)।]|\z)/su';
 
-            if ($question !== null) {
-                $questions[] = $question;
+        preg_match_all($pattern, $text, $questionBlocks);
+
+        foreach ($questionBlocks[0] as $block) {
+            $block = trim($block);
+            if ($block === '') continue;
+
+            // বাংলা অপশন: (ক) (খ) (গ) (ঘ) বা (a) (b) (c) (d)
+            $optionPattern = '/\(\s*([কখগঘa-dA-D])\s*\)\s*(.+)/u';
+            preg_match_all($optionPattern, $block, $optionMatches, PREG_SET_ORDER);
+
+            if (count($optionMatches) < 2) continue;
+
+            // প্রশ্নের title বের করা
+            $titleLine = preg_split('/\n/', $block, 2)[0];
+            $title     = trim(preg_replace('/^[০-৯\d]+[.)।]\s*/u', '', $titleLine));
+
+            $options = [];
+            foreach ($optionMatches as $match) {
+                $options[] = [
+                    'option_text' => trim($match[2]),
+                    'is_correct'  => false,
+                ];
+            }
+
+            if ($title !== '') {
+                $questions[] = [
+                    'title'   => $title,
+                    'options' => $options,
+                ];
             }
         }
 
