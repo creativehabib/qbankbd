@@ -9,12 +9,14 @@ use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Support\QuestionTextParser;
-use Google\ApiCore\ValidationException;
 use Google\Cloud\Vision\V1\AnnotateFileRequest;
+use Google\Cloud\Vision\V1\AnnotateImageRequest;
 use Google\Cloud\Vision\V1\BatchAnnotateFilesRequest;
+use Google\Cloud\Vision\V1\BatchAnnotateImagesRequest;
 use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
 use Google\Cloud\Vision\V1\Feature;
 use Google\Cloud\Vision\V1\Feature\Type;
+use Google\Cloud\Vision\V1\Image;
 use Google\Cloud\Vision\V1\InputConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,7 +43,7 @@ class BulkUpload extends Component
 
     public array $exam_category_ids = [];
 
-    public ?TemporaryUploadedFile $sourceFile = null; // ← image + PDF দুটোই
+    public ?TemporaryUploadedFile $sourceFile = null;
 
     public string $rawText = '';
 
@@ -151,14 +153,25 @@ class BulkUpload extends Component
         }
 
         try {
-            $imageAnnotator = $this->makeVisionClient();
-            $imageContent = file_get_contents($filePath);
+            $client = $this->makeVisionClient();
 
-            // document_text_detection → dense/structured text (বাংলার জন্য ভালো)
-            $response = $imageAnnotator->documentTextDetection($imageContent);
-            $imageAnnotator->close();
+            $image = new Image();
+            $image->setContent(file_get_contents($filePath));
 
-            $annotation = $response->getFullTextAnnotation();
+            $feature = new Feature();
+            $feature->setType(Type::DOCUMENT_TEXT_DETECTION);
+
+            $request = new AnnotateImageRequest();
+            $request->setImage($image);
+            $request->setFeatures([$feature]);
+
+            $batchRequest = new BatchAnnotateImagesRequest();
+            $batchRequest->setRequests([$request]);
+
+            $response = $client->batchAnnotateImages($batchRequest);
+            $client->close();
+
+            $annotation = $response->getResponses()[0]->getFullTextAnnotation();
 
             if (! $annotation) {
                 $this->addError('sourceFile', 'ইমেজ থেকে কোনো টেক্সট পাওয়া যায়নি।');
@@ -190,38 +203,26 @@ class BulkUpload extends Component
         }
 
         try {
-            // পদ্ধতি ১: PDF content সরাসরি Vision API-তে (DOCUMENT_TEXT_DETECTION)
-            // এটি PDF-এর প্রতিটি পেজ internally render করে OCR করে
-            $imageAnnotator = $this->makeVisionClient();
+            $client = $this->makeVisionClient();
 
-            $pdfContent = file_get_contents($filePath);
-            $encodedPdf = base64_encode($pdfContent);
-
-            // Vision API-র inputConfig দিয়ে PDF পাঠানো
             $inputConfig = new InputConfig([
                 'mime_type' => 'application/pdf',
-                'content' => $pdfContent,
+                'content'   => file_get_contents($filePath),
             ]);
 
-            $features = [
-                new Feature([
-                    'type' => Type::DOCUMENT_TEXT_DETECTION,
-                ]),
-            ];
+            $feature = new Feature();
+            $feature->setType(Type::DOCUMENT_TEXT_DETECTION);
 
-            $request = new AnnotateFileRequest([
-                'input_config' => $inputConfig,
-                'features' => $features,
-                // প্রথম ৫ পেজ (Vision sync limit)
-                'pages' => range(1, 5),
-            ]);
+            $request = new AnnotateFileRequest();
+            $request->setInputConfig($inputConfig);
+            $request->setFeatures([$feature]);
+            $request->setPages(range(1, 5));
 
-            $batchRequest = new BatchAnnotateFilesRequest([
-                'requests' => [$request],
-            ]);
+            $batchRequest = new BatchAnnotateFilesRequest();
+            $batchRequest->setRequests([$request]);
 
-            $batchResponse = $imageAnnotator->batchAnnotateFiles($batchRequest);
-            $imageAnnotator->close();
+            $batchResponse = $client->batchAnnotateFiles($batchRequest);
+            $client->close();
 
             $allText = [];
             foreach ($batchResponse->getResponses() as $fileResponse) {
@@ -248,37 +249,23 @@ class BulkUpload extends Component
         }
     }
 
-    /**
-     * @throws ValidationException
-     */
     protected function makeVisionClient(): ImageAnnotatorClient
     {
-        $credentialsPath = config('services.google_vision.credentials');
-        $credentialsJson = config('services.google_vision.credentials_json');
-        $googleApplicationCredentials = config('services.google_vision.google_application_credentials');
+        $credentialsPath = '/Users/liton/Herd/qbankbd/storage/google-credentials.json';
 
-        $options = [];
-
-        if ($credentialsJson) {
-            // JSON string সরাসরি (যেমন Heroku/Render-এ env var হিসেবে)
-            $decodedCredentials = json_decode($credentialsJson, true);
-
-            if (! is_array($decodedCredentials) || empty($decodedCredentials['client_email'])) {
-                throw new RuntimeException('GOOGLE_VISION_CREDENTIALS_JSON invalid. নিশ্চিত করুন এটি সম্পূর্ণ Service Account JSON।');
-            }
-
-            $options['credentials'] = $decodedCredentials;
-        } elseif ($credentialsPath && file_exists($credentialsPath)) {
-            $options['keyFilePath'] = $credentialsPath;
-        } elseif ($googleApplicationCredentials && file_exists($googleApplicationCredentials)) {
-            $options['keyFilePath'] = $googleApplicationCredentials;
-        } else {
-            throw new RuntimeException(
-                'Google Vision credentials পাওয়া যায়নি। .env-এ GOOGLE_VISION_CREDENTIALS_PATH বা GOOGLE_VISION_CREDENTIALS_JSON বা GOOGLE_APPLICATION_CREDENTIALS সেট করুন।'
-            );
+        if (! file_exists($credentialsPath)) {
+            throw new RuntimeException('Credentials file not found: '.$credentialsPath);
         }
 
-        return new ImageAnnotatorClient($options);
+        $credentialsArray = json_decode(file_get_contents($credentialsPath), true);
+
+        if (! is_array($credentialsArray) || empty($credentialsArray['client_email'])) {
+            throw new RuntimeException('Invalid Google credentials JSON file.');
+        }
+
+        return new ImageAnnotatorClient([
+            'credentials' => $credentialsArray,
+        ]);
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
@@ -303,20 +290,20 @@ class BulkUpload extends Component
         abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
 
         $validated = $this->validate([
-            'academic_class_id' => 'required|exists:academic_classes,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'chapter_id' => 'nullable|exists:chapters,id',
-            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
-            'difficulty' => 'required|in:easy,medium,hard',
-            'marks' => 'required|numeric|min:0.25',
-            'exam_category_ids' => 'required|array|min:1',
-            'exam_category_ids.*' => 'required|exists:exam_categories,id',
-            'sourceFile' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
-            'processedQuestions' => 'required|array|min:1',
-            'processedQuestions.*.title' => 'required|string',
-            'processedQuestions.*.options' => 'required|array|min:2',
+            'academic_class_id'                        => 'required|exists:academic_classes,id',
+            'subject_id'                               => 'required|exists:subjects,id',
+            'chapter_id'                               => 'nullable|exists:chapters,id',
+            'topic_id'                                 => 'required_with:chapter_id|nullable|exists:topics,id',
+            'difficulty'                               => 'required|in:easy,medium,hard',
+            'marks'                                    => 'required|numeric|min:0.25',
+            'exam_category_ids'                        => 'required|array|min:1',
+            'exam_category_ids.*'                      => 'required|exists:exam_categories,id',
+            'sourceFile'                               => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
+            'processedQuestions'                       => 'required|array|min:1',
+            'processedQuestions.*.title'               => 'required|string',
+            'processedQuestions.*.options'             => 'required|array|min:2',
             'processedQuestions.*.options.*.option_text' => 'required|string',
-            'processedQuestions.*.options.*.is_correct' => 'required|boolean',
+            'processedQuestions.*.options.*.is_correct'  => 'required|boolean',
         ]);
 
         foreach ($validated['processedQuestions'] as $qIndex => $parsedQuestion) {
@@ -357,22 +344,22 @@ class BulkUpload extends Component
                 $formattedOptions = collect($parsedQuestion['options'])
                     ->map(fn ($opt) => [
                         'option_text' => '<p>'.e(trim($opt['option_text'])).'</p>'."\n",
-                        'is_correct' => (bool) ($opt['is_correct'] ?? false),
+                        'is_correct'  => (bool) ($opt['is_correct'] ?? false),
                     ])
                     ->values()->toArray();
 
                 $question = Question::query()->create([
-                    'subject_id' => $subject->id,
-                    'chapter_id' => $this->chapter_id,
-                    'topic_id' => $this->topic_id,
-                    'title' => $parsedQuestion['title'],
-                    'slug' => $slug,
-                    'difficulty' => $this->difficulty,
+                    'subject_id'    => $subject->id,
+                    'chapter_id'    => $this->chapter_id,
+                    'topic_id'      => $this->topic_id,
+                    'title'         => $parsedQuestion['title'],
+                    'slug'          => $slug,
+                    'difficulty'    => $this->difficulty,
                     'question_type' => 'mcq',
-                    'marks' => $this->marks,
-                    'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
+                    'marks'         => $this->marks,
+                    'status'        => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
                     'extra_content' => $formattedOptions,
-                    'user_id' => $currentUser?->id,
+                    'user_id'       => $currentUser?->id,
                 ]);
 
                 $question->examCategories()->sync($this->exam_category_ids);
@@ -386,14 +373,14 @@ class BulkUpload extends Component
     public function render()
     {
         return view('livewire.admin.questions.bulk-upload', [
-            'classes' => AcademicClass::query()->orderBy('name')->get(),
-            'subjects' => $this->academic_class_id
+            'classes'           => AcademicClass::query()->orderBy('name')->get(),
+            'subjects'          => $this->academic_class_id
                 ? Subject::query()->where('academic_class_id', $this->academic_class_id)->orderBy('name')->get()
                 : collect(),
-            'chapters' => $this->subject_id
+            'chapters'          => $this->subject_id
                 ? Chapter::query()->where('subject_id', $this->subject_id)->orderBy('name')->get()
                 : collect(),
-            'topics' => $this->chapter_id
+            'topics'            => $this->chapter_id
                 ? Topic::query()->where('chapter_id', $this->chapter_id)->orderBy('name')->get()
                 : collect(),
             'allExamCategories' => ExamCategory::query()->orderBy('name')->get(),
