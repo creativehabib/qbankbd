@@ -251,21 +251,39 @@ class BulkUpload extends Component
 
     protected function makeVisionClient(): ImageAnnotatorClient
     {
-        $credentialsPath = '/Users/liton/Herd/qbankbd/storage/google-credentials.json';
+        $credentialsPaths = array_filter([
+            config('services.google_vision.credentials'),
+            config('services.google_vision.google_application_credentials'),
+        ], fn (mixed $path): bool => is_string($path) && $path !== '');
 
-        if (! file_exists($credentialsPath)) {
-            throw new RuntimeException('Credentials file not found: '.$credentialsPath);
+        foreach ($credentialsPaths as $credentialsPath) {
+            if (file_exists($credentialsPath) && is_readable($credentialsPath)) {
+                return new ImageAnnotatorClient([
+                    'credentials' => $credentialsPath,
+                ]);
+            }
         }
 
-        $credentialsArray = json_decode(file_get_contents($credentialsPath), true);
+        $credentialsJson = config('services.google_vision.credentials_json');
+        $credentialsArray = null;
 
-        if (! is_array($credentialsArray) || empty($credentialsArray['client_email'])) {
-            throw new RuntimeException('Invalid Google credentials JSON file.');
+        if (is_string($credentialsJson) && trim($credentialsJson) !== '') {
+            $credentialsArray = json_decode($credentialsJson, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('GOOGLE_VISION_CREDENTIALS_JSON valid JSON নয়।');
+            }
         }
 
-        return new ImageAnnotatorClient([
-            'credentials' => $credentialsArray,
-        ]);
+        if (is_array($credentialsArray) && ! empty($credentialsArray['client_email'])) {
+            return new ImageAnnotatorClient([
+                'credentials' => $credentialsArray,
+            ]);
+        }
+
+        throw new RuntimeException(
+            'Google Vision credentials পাওয়া যায়নি। .env এ GOOGLE_VISION_CREDENTIALS, GOOGLE_APPLICATION_CREDENTIALS, অথবা GOOGLE_VISION_CREDENTIALS_JSON সেট করুন।'
+        );
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
