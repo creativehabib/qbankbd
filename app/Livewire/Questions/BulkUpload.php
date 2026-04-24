@@ -176,7 +176,7 @@ class BulkUpload extends Component
         $this->addError(
             'sourceImage',
             'আপলোডকৃত ইমেজ থেকে ভালো OCR টেক্সট পাওয়া যায়নি। স্ক্যান করা পরিষ্কার/সোজা ছবি (ছায়া ছাড়া) দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'
-            .(str_contains(implode(' ', $ocrErrors), 'Value for parameter \'language\' is invalid')
+            .(str_contains(implode(' ', $ocrErrors), 'Value for parameter \'language\' is invalid') && ! $this->isUsingDemoOcrKey()
                 ? ' আপনার OCR API key বাংলা language সাপোর্ট করছে না। `.env` এ `OCR_SPACE_API_KEY` (valid key) দিন অথবা `OCR_SPACE_LANGUAGES=eng` করে English OCR ব্যবহার করুন।'
                 : '')
             .(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
@@ -191,6 +191,10 @@ class BulkUpload extends Component
 
         if ($trimmedText === '') {
             return true;
+        }
+
+        if ($this->isUsingDemoOcrKey()) {
+            return mb_strlen($trimmedText) < 20;
         }
 
         preg_match_all('/[\x{0980}-\x{09FF}]/u', $trimmedText, $banglaMatches);
@@ -213,6 +217,10 @@ class BulkUpload extends Component
      */
     protected function getOcrLanguages(): array
     {
+        if ($this->isUsingDemoOcrKey()) {
+            return ['eng'];
+        }
+
         $configuredLanguages = (string) (config('services.ocr_space.languages') ?: '');
 
         if ($configuredLanguages !== '') {
@@ -224,6 +232,13 @@ class BulkUpload extends Component
         }
 
         return ['ben', 'eng'];
+    }
+
+    protected function isUsingDemoOcrKey(): bool
+    {
+        $apiKey = (string) (config('services.ocr_space.api_key') ?: '');
+
+        return $apiKey === '';
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
