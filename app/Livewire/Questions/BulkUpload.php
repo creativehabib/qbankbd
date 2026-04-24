@@ -251,19 +251,29 @@ class BulkUpload extends Component
 
     protected function makeVisionClient(): ImageAnnotatorClient
     {
-        $credentialsPath = config('services.google_vision.credentials')
-            ?: config('services.google_vision.google_application_credentials');
+        $credentialsPaths = array_filter([
+            config('services.google_vision.credentials'),
+            config('services.google_vision.google_application_credentials'),
+        ], fn (mixed $path): bool => is_string($path) && $path !== '');
 
-        if (is_string($credentialsPath) && $credentialsPath !== '' && file_exists($credentialsPath)) {
-            return new ImageAnnotatorClient([
-                'credentials' => $credentialsPath,
-            ]);
+        foreach ($credentialsPaths as $credentialsPath) {
+            if (file_exists($credentialsPath) && is_readable($credentialsPath)) {
+                return new ImageAnnotatorClient([
+                    'credentials' => $credentialsPath,
+                ]);
+            }
         }
 
         $credentialsJson = config('services.google_vision.credentials_json');
-        $credentialsArray = is_string($credentialsJson)
-            ? json_decode($credentialsJson, true)
-            : null;
+        $credentialsArray = null;
+
+        if (is_string($credentialsJson) && trim($credentialsJson) !== '') {
+            $credentialsArray = json_decode($credentialsJson, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('GOOGLE_VISION_CREDENTIALS_JSON valid JSON নয়।');
+            }
+        }
 
         if (is_array($credentialsArray) && ! empty($credentialsArray['client_email'])) {
             return new ImageAnnotatorClient([
@@ -272,7 +282,7 @@ class BulkUpload extends Component
         }
 
         throw new RuntimeException(
-            'Google Vision credentials পাওয়া যায়নি। .env এ GOOGLE_VISION_CREDENTIALS অথবা GOOGLE_VISION_CREDENTIALS_JSON সেট করুন।'
+            'Google Vision credentials পাওয়া যায়নি। .env এ GOOGLE_VISION_CREDENTIALS, GOOGLE_APPLICATION_CREDENTIALS, অথবা GOOGLE_VISION_CREDENTIALS_JSON সেট করুন।'
         );
     }
 
