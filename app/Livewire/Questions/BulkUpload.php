@@ -182,7 +182,7 @@ class BulkUpload extends Component
             return trim($annotation->getText());
 
         } catch (\Exception $e) {
-            $this->addError('sourceFile', 'Google Vision Error: '.$e->getMessage());
+            $this->addError('sourceFile', $this->formatVisionExceptionMessage($e));
 
             return '';
         }
@@ -243,7 +243,7 @@ class BulkUpload extends Component
             return implode("\n\n", $allText);
 
         } catch (\Exception $e) {
-            $this->addError('sourceFile', 'PDF OCR Error: '.$e->getMessage());
+            $this->addError('sourceFile', $this->formatVisionExceptionMessage($e));
 
             return '';
         }
@@ -251,21 +251,75 @@ class BulkUpload extends Component
 
     protected function makeVisionClient(): ImageAnnotatorClient
     {
-        $credentialsPath = '/Users/liton/Herd/qbankbd/storage/google-credentials.json';
+        $credentialsPaths = array_filter([
+            config('services.google_vision.credentials'),
+            config('services.google_vision.google_application_credentials'),
+        ], fn (mixed $path): bool => is_string($path) && $path !== '');
 
-        if (! file_exists($credentialsPath)) {
-            throw new RuntimeException('Credentials file not found: '.$credentialsPath);
+        foreach ($credentialsPaths as $credentialsPath) {
+            if (file_exists($credentialsPath) && is_readable($credentialsPath)) {
+                $fileCredentials = json_decode((string) file_get_contents($credentialsPath), true);
+
+                if (! is_array($fileCredentials)) {
+                    throw new RuntimeException('Google Vision credentials file টি valid JSON নয়। Service Account JSON ব্যবহার করুন।');
+                }
+
+                $this->assertValidServiceAccountCredentials($fileCredentials);
+
+                return new ImageAnnotatorClient([
+                    'credentials' => $fileCredentials,
+                ]);
+            }
         }
 
-        $credentialsArray = json_decode(file_get_contents($credentialsPath), true);
+        $credentialsJson = config('services.google_vision.credentials_json');
+        $credentialsArray = null;
 
-        if (! is_array($credentialsArray) || empty($credentialsArray['client_email'])) {
-            throw new RuntimeException('Invalid Google credentials JSON file.');
+        if (is_string($credentialsJson) && trim($credentialsJson) !== '') {
+            $credentialsArray = json_decode($credentialsJson, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('GOOGLE_VISION_CREDENTIALS_JSON valid JSON নয়।');
+            }
         }
 
-        return new ImageAnnotatorClient([
-            'credentials' => $credentialsArray,
-        ]);
+        if (is_array($credentialsArray) && ! empty($credentialsArray['client_email'])) {
+            $this->assertValidServiceAccountCredentials($credentialsArray);
+
+            return new ImageAnnotatorClient([
+                'credentials' => $credentialsArray,
+            ]);
+        }
+
+        throw new RuntimeException(
+            'Google Vision credentials পাওয়া যায়নি। .env এ GOOGLE_VISION_CREDENTIALS, GOOGLE_APPLICATION_CREDENTIALS, অথবা GOOGLE_VISION_CREDENTIALS_JSON সেট করুন।'
+        );
+    }
+
+    protected function assertValidServiceAccountCredentials(array $credentials): void
+    {
+        $requiredKeys = ['type', 'client_email', 'private_key', 'token_uri'];
+
+        foreach ($requiredKeys as $requiredKey) {
+            if (! isset($credentials[$requiredKey]) || ! is_string($credentials[$requiredKey]) || trim($credentials[$requiredKey]) === '') {
+                throw new RuntimeException('Google Vision এর জন্য Service Account JSON credential দিন (type, client_email, private_key, token_uri বাধ্যতামূলক)।');
+            }
+        }
+
+        if ($credentials['type'] !== 'service_account') {
+            throw new RuntimeException('Google Vision এর জন্য OAuth Client ID JSON নয়, Service Account JSON ব্যবহার করুন।');
+        }
+    }
+
+    protected function formatVisionExceptionMessage(\Throwable $exception): string
+    {
+        $message = $exception->getMessage();
+
+        if (Str::contains($message, ['UNAUTHENTICATED', 'invalid authentication credentials'])) {
+            return 'Google Vision authentication failed। Service Account key/project access যাচাই করুন (Vision API enabled + active key). Original error: '.$message;
+        }
+
+        return 'Google Vision Error: '.$message;
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
