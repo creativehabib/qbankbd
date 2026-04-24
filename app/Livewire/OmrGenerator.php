@@ -27,6 +27,26 @@ class OmrGenerator extends Component
         }
     }
 
+
+    /**
+     * @return array<string, string>
+     */
+    public function themeClassSet(): array
+    {
+        return [
+            'rose' => ['border' => 'border-rose-500', 'bg' => 'bg-rose-300/70'],
+            'blue' => ['border' => 'border-blue-500', 'bg' => 'bg-blue-300/70'],
+            'green' => ['border' => 'border-green-500', 'bg' => 'bg-green-300/70'],
+        ][$this->themeColor] ?? ['border' => 'border-rose-500', 'bg' => 'bg-rose-300/70'];
+    }
+
+    public function updatedQuestionCount(int $value): void
+    {
+        if (! in_array($value, [40, 60, 80, 100], true)) {
+            $this->questionCount = 100;
+        }
+    }
+
     public function toBanglaNumber(int $value): string
     {
         return strtr((string) $value, [
