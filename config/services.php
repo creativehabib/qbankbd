@@ -37,7 +37,7 @@ return [
 
     'ocr_space' => [
         'api_key' => env('OCR_SPACE_API_KEY'),
-        'languages' => env('OCR_SPACE_LANGUAGES', 'eng'),
+        'languages' => env('OCR_SPACE_LANGUAGES', 'ben,eng'),
     ],
 
 ];
