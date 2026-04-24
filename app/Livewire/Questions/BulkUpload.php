@@ -113,7 +113,7 @@ class BulkUpload extends Component
             return '';
         }
 
-        $languages = $this->getOcrLanguages();
+        $languages = ['eng'];
         $ocrErrors = [];
 
         foreach ($languages as $language) {
@@ -124,14 +124,11 @@ class BulkUpload extends Component
             }
 
             $payload = [
-                'apikey' => (string) (config('services.ocr_space.api_key') ?: 'helloworld'),
+                'apikey' => 'helloworld',
                 'isOverlayRequired' => 'false',
                 'OCREngine' => '2',
+                'language' => 'eng',
             ];
-
-            if ($language !== '') {
-                $payload['language'] = $language;
-            }
 
             $response = Http::timeout(45)
                 ->attach('file', $fileStream, $this->sourceImage->getClientOriginalName())
@@ -176,9 +173,6 @@ class BulkUpload extends Component
         $this->addError(
             'sourceImage',
             'আপলোডকৃত ইমেজ থেকে ভালো OCR টেক্সট পাওয়া যায়নি। স্ক্যান করা পরিষ্কার/সোজা ছবি (ছায়া ছাড়া) দিন অথবা টেক্সট ম্যানুয়ালি পেস্ট করুন।'
-            .(str_contains(implode(' ', $ocrErrors), 'Value for parameter \'language\' is invalid') && ! $this->isUsingDemoOcrKey()
-                ? ' আপনার OCR API key বাংলা language সাপোর্ট করছে না। `.env` এ `OCR_SPACE_API_KEY` (valid key) দিন অথবা `OCR_SPACE_LANGUAGES=eng` করে English OCR ব্যবহার করুন।'
-                : '')
             .(! empty($ocrErrors) ? ' বিস্তারিত: '.implode(' ; ', $ocrErrors) : '')
         );
 
@@ -193,7 +187,7 @@ class BulkUpload extends Component
             return true;
         }
 
-        if ($this->isUsingDemoOcrKey()) {
+        if ($language === 'eng') {
             return mb_strlen($trimmedText) < 20;
         }
 
@@ -210,35 +204,6 @@ class BulkUpload extends Component
         $banglaRatio = $banglaCount / $letterCount;
 
         return $banglaCount < 20 || $banglaRatio < 0.25;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function getOcrLanguages(): array
-    {
-        if ($this->isUsingDemoOcrKey()) {
-            return ['eng'];
-        }
-
-        $configuredLanguages = (string) (config('services.ocr_space.languages') ?: '');
-
-        if ($configuredLanguages !== '') {
-            return collect(explode(',', $configuredLanguages))
-                ->map(fn ($language) => trim($language))
-                ->filter()
-                ->values()
-                ->all();
-        }
-
-        return ['ben', 'eng'];
-    }
-
-    protected function isUsingDemoOcrKey(): bool
-    {
-        $apiKey = (string) (config('services.ocr_space.api_key') ?: '');
-
-        return $apiKey === '';
     }
 
     protected function formatProcessedQuestionsForTextarea(): string
