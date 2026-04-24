@@ -66,6 +66,12 @@
             {{ __('Question Create') }}
         </flux:sidebar.item>
 
+        @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))
+            <flux:sidebar.item icon="document-duplicate" :href="route('omr.generator')" :current="request()->routeIs('omr.generator')" wire:navigate>
+                {{ __('OMR Generator') }}
+            </flux:sidebar.item>
+        @endif
+
         @if(auth()->user()->isStudent())
             <flux:sidebar.item icon="book-open-text" :href="route('students.practice.index')" :current="request()->routeIs('students.practice.*')" wire:navigate>
                 {{ __('Practice') }}

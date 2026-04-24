@@ -3,6 +3,7 @@
 use App\Livewire\AcademicClasses\ClassIndex;
 use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
+use App\Livewire\OmrGenerator;
 use App\Livewire\PermissionManager;
 use App\Livewire\Questions;
 use App\Livewire\Questions\BulkUpload;
@@ -88,6 +89,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
 
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
+
+    Route::middleware('role:teacher|admin|super_admin')->group(function (): void {
+        Route::get('/omr-generator', OmrGenerator::class)->name('omr.generator');
+    });
 });
 
 require __DIR__.'/settings.php';
