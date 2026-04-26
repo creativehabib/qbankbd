@@ -180,3 +180,13 @@ select:focus[data-flux-control] {
     border-bottom: 1px solid #334155 !important;
     background-color: #0f172a !important;
 }
+
+/*OMR Question Style*/
+.center { display: flex; align-items: center; justify-content: center; }
+
+@media print {
+    @page {
+        margin: 0;
+        size: A4 portrait;
+    }
+}
