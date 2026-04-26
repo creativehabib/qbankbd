@@ -1,4 +1,4 @@
-<div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
+<div class="table-bordered py-4 print:p-0 print:overflow-hidden min-h-[95vh] print:bg-white">
     <div class="bangla flex flex-col lg:flex-row lg:items-start justify-center gap-5 print:gap-0 mx-4 print:mx-0">
 
         <!-- বাম সাইড: মূল কন্টেন্ট -->

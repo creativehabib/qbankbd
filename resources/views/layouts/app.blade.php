@@ -85,7 +85,7 @@
     </div>
 
     <!-- মূল কন্টেন্ট -->
-    <flux:main class="pt-5">
+    <flux:main class="pt-5 print:p-0">
         {{ $slot }}
     </flux:main>
 </x-layouts::app.sidebar>

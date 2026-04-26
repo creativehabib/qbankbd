@@ -4,7 +4,7 @@
         @include('partials.head')
         @stack('styles')
     </head>
-    <body class="min-h-screen bg-white dark:bg-[var(--app-dark-bg)]">
+    <body class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]">
         <flux:header container class="print:hidden border-b border-zinc-200 bg-zinc-50 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]">
             <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left" />
 

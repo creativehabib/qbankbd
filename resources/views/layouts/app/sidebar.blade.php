@@ -3,7 +3,7 @@
 <head>
     @include('partials.head')
 </head>
-<body class="min-h-screen bg-white dark:bg-[var(--app-dark-bg)]">
+<body class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]">
 <flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]">
     <flux:sidebar.header>
         <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
@@ -168,5 +168,6 @@
 {{ $slot }}
 
 @fluxScripts
+@stack('scripts')
 </body>
 </html>

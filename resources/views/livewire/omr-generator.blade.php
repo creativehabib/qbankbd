@@ -1,4 +1,4 @@
-<div class="dashboard print:p-0 lg:flex lg:justify-center">
+<div class="print:p-0 lg:flex lg:justify-center">
     @php
         $theme = $this->themeClassSet();
 
@@ -32,7 +32,7 @@
         </button>
     </div>
 
-    <div class="flex gap-5 bg-gray-100 bangla print:gap-0 print:mx-0">
+    <div class="flex gap-5 bangla print:gap-0 print:mx-0">
 
         {{-- ════════════════════════════════════════════════
              OMR SHEET
@@ -430,7 +430,7 @@
              class="hidden shrink-0 fixed top-0 right-0 z-[1000] lg:z-0 bg-white lg:bg-transparent
                     lg:sticky lg:block lg:top-16 h-screen w-80 shadow-lg lg:shadow-none
                     print:hidden overflow-y-auto">
-            <div class="p-3 bg-white">
+            <div class="p-3 bg-white border">
                 <div class="bangla p-2 space-y-3">
 
                     {{-- Header --}}
