@@ -583,12 +583,12 @@
     </div>{{-- /flex --}}
 </div>{{-- /dashboard --}}
 @push('styles')
-<style>
-    @media print {
-        @page {
-            size: A4 portrait;
-            margin: 0;
+    <style>
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
         }
-    }
-</style>
+    </style>
 @endpush
