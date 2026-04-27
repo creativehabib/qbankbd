@@ -184,9 +184,4 @@ select:focus[data-flux-control] {
 /*OMR Question Style*/
 .center { display: flex; align-items: center; justify-content: center; }
 
-@media print {
-    @page {
-        margin: 0;
-        size: A4 portrait;
-    }
-}
+

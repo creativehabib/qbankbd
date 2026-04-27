@@ -1,24 +1,4 @@
-<div
-    x-data="{
-        isPrintOverlayVisible: false,
-        triggerPrint() {
-            this.isPrintOverlayVisible = true;
-
-            this.$nextTick(() => {
-                setTimeout(() => {
-                    window.print();
-                    this.isPrintOverlayVisible = false;
-                }, 100);
-            });
-        },
-    }"
-    x-on:afterprint.window="isPrintOverlayVisible = false"
-    class="print:p-0 lg:flex lg:justify-center">
-    <div
-        x-cloak
-        x-show="isPrintOverlayVisible"
-        class="fixed inset-0 z-[1200] bg-black/30 print:hidden"
-        aria-hidden="true"></div>
+<div class="print:p-0 lg:flex lg:justify-center">
     @php
         $theme = $this->themeClassSet();
 
@@ -46,7 +26,7 @@
             class="flex gap-1 items-center py-2 bg-amber-300 hover:bg-amber-200 px-3 rounded text-sm font-medium">
             কাস্টমাইজ
         </button>
-        <button x-on:click="triggerPrint()"
+        <button onclick="window.print()"
                 class="flex gap-1 items-center py-2 bg-green-500 hover:bg-green-400 px-3 rounded text-white text-sm font-medium">
             প্রিন্ট
         </button>
@@ -457,9 +437,9 @@
                     <div class="py-2 bg-gray-200 text-center rounded font-semibold tracking-wide">সেটিংস</div>
 
                     {{-- Print button --}}
-                    <button x-on:click="triggerPrint()"
+                    <button onclick="window.print()"
                             class="center w-full gap-2 py-2 bg-green-500 hover:bg-green-400 px-3 rounded text-white font-semibold">
-                        প্রিন্ / ডাউনলোড
+                        প্রিন্ট / ডাউনলোড
                     </button>
 
                     {{-- ── Branding ── --}}
@@ -602,3 +582,13 @@
 
     </div>{{-- /flex --}}
 </div>{{-- /dashboard --}}
+@push('styles')
+<style>
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+    }
+</style>
+@endpush
