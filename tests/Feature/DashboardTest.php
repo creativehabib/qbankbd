@@ -42,3 +42,19 @@ test('super admin sees super admin dashboard', function () {
         ->assertOk()
         ->assertSee('Super Admin Panel');
 });
+
+
+test('dashboard renders custom non flux sidebar shell', function () {
+    $user = User::factory()->admin()->create();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('data-test="desktop-sidebar"', false)
+        ->assertSee('data-test="sidebar-nav"', false)
+        ->assertSee('data-test="sidebar-collapse-button"', false)
+        ->assertSee('data-test="sidebar-flyout-panel"', false)
+        ->assertSee('data-test="mobile-sidebar-trigger"', false)
+        ->assertSee('প্রশ্ন ভান্ডার')
+        ->assertSee('Question Create');
+});
