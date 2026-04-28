@@ -39,6 +39,7 @@
         activeFlyout: null,
         flyoutCloseTimer: null,
         profileMenuOpen: false,
+        collapsedProfileMenuOpen: false,
         theme: localStorage.getItem('theme') ?? (document.documentElement.classList.contains('dark') ? 'dark' : 'light'),
         setTheme(mode) {
             this.theme = mode;
@@ -49,7 +50,7 @@
             this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
         }
     }"
-    x-init="$watch('sidebarCollapsed', (value) => { localStorage.setItem('sidebar-collapsed', JSON.stringify(value)); if (! value) { activeFlyout = null; } }); setTheme(theme);"
+    x-init="$watch('sidebarCollapsed', (value) => { localStorage.setItem('sidebar-collapsed', JSON.stringify(value)); if (! value) { activeFlyout = null; collapsedProfileMenuOpen = false; } }); setTheme(theme);"
     class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]"
 >
 <div class="flex min-h-screen">
@@ -135,7 +136,50 @@
 
         <div class="mt-auto border-t border-zinc-200 p-3 dark:border-[var(--app-dark-border)]">
             <div x-show="! sidebarCollapsed"><x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" /></div>
-            <div x-show="sidebarCollapsed" class="flex justify-center"><a href="{{ route('profile.edit') }}" class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100" wire:navigate title="{{ auth()->user()->name }}">{{ auth()->user()->initials() }}</a></div>
+            <div x-show="sidebarCollapsed" class="relative flex justify-center" @click.outside="collapsedProfileMenuOpen = false">
+                <button
+                    type="button"
+                    class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 transition hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+                    @click="collapsedProfileMenuOpen = ! collapsedProfileMenuOpen"
+                    data-test="collapsed-profile-menu-button"
+                    title="{{ auth()->user()->name }}"
+                >
+                    {{ auth()->user()->initials() }}
+                </button>
+
+                <div
+                    x-show="collapsedProfileMenuOpen"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-x-1 scale-95"
+                    x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 translate-x-0 scale-100"
+                    x-transition:leave-end="opacity-0 translate-x-1 scale-95"
+                    class="absolute bottom-0 left-full z-[80] ml-2 w-56 rounded-xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+                    data-test="collapsed-profile-menu-panel"
+                >
+                    <div class="mb-2 flex items-center gap-2 rounded-lg px-2 py-2">
+                        <span class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</p>
+                            <p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v3.75l2.25 2.25"/></svg>
+                        {{ __('Settings') }}
+                    </a>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3"/></svg>
+                            {{ __('Log out') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </aside>
 
