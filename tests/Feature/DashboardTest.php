@@ -52,5 +52,6 @@ test('dashboard renders custom non flux sidebar shell', function () {
         ->assertOk()
         ->assertSee('data-test="desktop-sidebar"', false)
         ->assertSee('data-test="sidebar-nav"', false)
-        ->assertSee('data-test="sidebar-collapse-button"', false);
+        ->assertSee('data-test="sidebar-collapse-button"', false)
+        ->assertSee('data-test="sidebar-flyout-panel"', false);
 });
