@@ -24,6 +24,7 @@
     ];
 
     $questionGroupExpanded = request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']);
+    $adminGroupExpanded = request()->routeIs(['users.*', 'admin.theme-options', 'permissions.*', 'roles-permissions.*']);
     $pageTitle = $title ?? $pageTitle ?? 'Dashboard';
 @endphp
 
@@ -87,13 +88,10 @@
                         @endif
                     @endforeach
 
-                    <div x-data="{ open: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg border border-zinc-200 p-1 dark:border-zinc-700">
+                    <div x-data="{ open: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
                         <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold" @click="open = ! open">
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5A2.25 2.25 0 0 1 6 5.25h3.19a2.25 2.25 0 0 1 1.59.66l.66.66a2.25 2.25 0 0 0 1.59.66H18A2.25 2.25 0 0 1 20.25 9.5v7A2.25 2.25 0 0 1 18 18.75H6A2.25 2.25 0 0 1 3.75 16.5v-9Z" /></svg>
-                                {{ __('প্রশ্ন ভান্ডার') }}
-                            </span>
-                            <span :class="open ? 'rotate-180' : ''" class="transition">⌄</span>
+                            <span>{{ __('প্রশ্ন ভান্ডার') }}</span>
+                            <svg class="h-4 w-4 transition" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
                         </button>
                         <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
                             @foreach($questionGroupItems as $item)
@@ -105,13 +103,18 @@
                     </div>
 
                     @if(auth()->user()->hasPermission('users.manage_roles'))
-                        <div class="space-y-1 rounded-lg p-1">
-                            <p class="px-2 text-xs font-semibold text-zinc-500">{{ __('Administration') }}</p>
-                            @foreach($adminItems as $item)
-                                @if($item['visible'])
-                                    <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>{{ $item['label'] }}</a>
-                                @endif
-                            @endforeach
+                        <div x-data="{ open: {{ $adminGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
+                            <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold" @click="open = ! open">
+                                <span>{{ __('Administration') }}</span>
+                                <svg class="h-4 w-4 transition" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                            </button>
+                            <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
+                                @foreach($adminItems as $item)
+                                    @if($item['visible'])
+                                        <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>{{ $item['label'] }}</a>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -202,13 +205,13 @@
     </aside>
 
     <div class="min-h-screen flex-1 transition-all duration-200" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
-        <header class="sticky top-0 z-30 flex items-center justify-between border-b print:hidden border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
+        <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
             <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">☰</button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
         </header>
 
-        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full print:hidden border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
+        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
 
         <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
 
@@ -225,10 +228,10 @@
                     @endif
                 @endforeach
 
-                <div x-data="{ mobileQuestionsOpen: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg border border-zinc-200 p-1 dark:border-zinc-700">
+                <div x-data="{ mobileQuestionsOpen: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="mobileQuestionsOpen ? 'border border-zinc-200 dark:border-zinc-700' : ''">
                     <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium" @click="mobileQuestionsOpen = ! mobileQuestionsOpen">
                         <span>{{ __('প্রশ্ন ভান্ডার') }}</span>
-                        <span :class="mobileQuestionsOpen ? 'rotate-180' : ''" class="transition">⌄</span>
+                        <svg class="h-4 w-4 transition" :class="mobileQuestionsOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
                     </button>
                     <div x-show="mobileQuestionsOpen" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
                         @foreach($questionGroupItems as $item)
@@ -240,13 +243,31 @@
                 </div>
 
                 @if(auth()->user()->hasPermission('users.manage_roles'))
-                    <div class="rounded-lg border border-zinc-200 p-1 dark:border-zinc-700">
-                        <p class="px-2 py-2 text-xs font-semibold text-zinc-500">{{ __('Administration') }}</p>
-                        @foreach($adminItems as $item)
-                            @if($item['visible'])
-                                <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
-                            @endif
-                        @endforeach
+                    <div x-data="{ mobileAdminOpen: {{ $adminGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="mobileAdminOpen ? 'border border-zinc-200 dark:border-zinc-700' : ''">
+                        <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium" @click="mobileAdminOpen = ! mobileAdminOpen">
+                            <span>{{ __('Administration') }}</span>
+                            <svg class="h-4 w-4 transition" :class="mobileAdminOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                        </button>
+                        <div x-show="mobileAdminOpen" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
+                            @foreach($adminItems as $item)
+                                @if($item['visible'])
+                                    <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.983 5.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2m10-10h-2M4 12H2m17.071-7.071l-1.414 1.414M6.343 17.657l-1.414 1.414m0-14.142l1.414 1.414m11.314 11.314l1.414 1.414"/></svg>
+                            {{ __('Settings') }}
+                        </a>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3"/></svg>
+                                {{ __('Log out') }}
+                            </button>
+                        </form>
                     </div>
                 @endif
             </nav>
