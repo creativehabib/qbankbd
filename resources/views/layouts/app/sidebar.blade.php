@@ -202,13 +202,13 @@
     </aside>
 
     <div class="min-h-screen flex-1 transition-all duration-200" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
-        <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
+        <header class="sticky top-0 z-30 flex items-center justify-between border-b print:hidden border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
             <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">☰</button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
         </header>
 
-        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
+        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full print:hidden border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
 
         <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
 
