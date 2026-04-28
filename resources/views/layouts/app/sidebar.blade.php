@@ -7,7 +7,8 @@
     x-data="{
         mobileSidebarOpen: false,
         sidebarCollapsed: JSON.parse(localStorage.getItem('sidebar-collapsed') ?? 'false'),
-        activeFlyout: null
+        activeFlyout: null,
+        flyoutCloseTimer: null
     }"
     x-init="$watch('sidebarCollapsed', (value) => { localStorage.setItem('sidebar-collapsed', JSON.stringify(value)); if (! value) { activeFlyout = null; } })"
     class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]"
@@ -75,10 +76,10 @@
                 <div class="space-y-2">
                     <a href="{{ route('dashboard') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('dashboard') ? 'bg-white ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-700' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="Dashboard" wire:navigate>🏠</a>
 
-                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="{{ __('প্রশ্ন ভান্ডার') }}" @click="activeFlyout = activeFlyout === 'question-bank' ? null : 'question-bank'">🗂</button>
+                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="{{ __('প্রশ্ন ভান্ডার') }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'question-bank'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @focus="clearTimeout(flyoutCloseTimer); activeFlyout = 'question-bank'" @click="activeFlyout = activeFlyout === 'question-bank' ? null : 'question-bank'">🗂</button>
                     <a href="{{ route('questions.set.create') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Question Create" wire:navigate>➕</a>
                     @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))<a href="{{ route('omr.generator') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="OMR Generator" wire:navigate>📄</a>@endif
-                    @if(auth()->user()->hasPermission('users.manage_roles'))<button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Administration" @click="activeFlyout = activeFlyout === 'admin' ? null : 'admin'">🛡</button>@endif
+                    @if(auth()->user()->hasPermission('users.manage_roles'))<button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Administration" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'admin'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @focus="clearTimeout(flyoutCloseTimer); activeFlyout = 'admin'" @click="activeFlyout = activeFlyout === 'admin' ? null : 'admin'">🛡</button>@endif
                     <a href="https://laravel.com/docs/starter-kits#livewire" target="_blank" class="mt-3 flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Documentation">📘</a>
                 </div>
             </template>
@@ -86,6 +87,8 @@
             <div
                 x-show="sidebarCollapsed && activeFlyout === 'question-bank'"
                 x-transition
+                @mouseenter="clearTimeout(flyoutCloseTimer)"
+                @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)"
                 @click.outside="activeFlyout = null"
                 class="absolute left-14 top-16 z-50 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
                 data-test="sidebar-flyout-panel"
@@ -103,7 +106,7 @@
             </div>
 
             @if(auth()->user()->hasPermission('users.manage_roles'))
-                <div x-show="sidebarCollapsed && activeFlyout === 'admin'" x-transition @click.outside="activeFlyout = null" class="absolute left-14 top-52 z-50 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                <div x-show="sidebarCollapsed && activeFlyout === 'admin'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-14 top-52 z-50 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
                     <p class="mb-2 text-sm font-semibold">{{ __('Administration') }}</p>
                     <div class="space-y-1 text-sm">
                         <a href="{{ route('users.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('User Management') }}</a>
