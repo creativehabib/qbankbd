@@ -24,6 +24,7 @@
     ];
 
     $questionGroupExpanded = request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']);
+    $pageTitle = $title ?? $pageTitle ?? 'Dashboard';
 @endphp
 
 <!DOCTYPE html>
@@ -173,6 +174,20 @@
                 @endif
             </nav>
         </aside>
+
+        <header class="sticky top-0 z-30 hidden items-center justify-between border-b border-zinc-200 bg-white/95 px-5 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:flex" data-test="sticky-page-header">
+            <div>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button type="button" class="rounded-lg px-2 py-1 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800">🌙 {{ __('Theme') }}</button>
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
+                    <span class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
+                    <span class="text-sm font-semibold text-zinc-700 dark:text-zinc-100">{{ auth()->user()->name }}</span>
+                </a>
+            </div>
+        </header>
 
         <main>{{ $slot }}</main>
     </div>

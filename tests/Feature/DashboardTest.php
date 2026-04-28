@@ -56,5 +56,6 @@ test('dashboard renders custom non flux sidebar shell', function () {
         ->assertSee('data-test="sidebar-flyout-panel"', false)
         ->assertSee('data-test="mobile-sidebar-trigger"', false)
         ->assertSee('প্রশ্ন ভান্ডার')
-        ->assertSee('Question Create');
+        ->assertSee('Question Create')
+        ->assertSee('data-test="sticky-page-header"', false);
 });
