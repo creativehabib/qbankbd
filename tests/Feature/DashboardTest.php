@@ -61,5 +61,6 @@ test('dashboard renders custom non flux sidebar shell', function () {
         ->assertSee('data-test="profile-dropdown-button"', false)
         ->assertSee('data-test="theme-toggle-button"', false)
         ->assertSee('data-test="collapsed-profile-menu-button"', false)
-        ->assertSee('data-test="collapsed-profile-menu-panel"', false);
+        ->assertSee('data-test="collapsed-profile-menu-panel"', false)
+        ->assertSee('data-test="page-loading-overlay"', false);
 });
