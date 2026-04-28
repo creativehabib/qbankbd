@@ -10,7 +10,7 @@ class OmrGenerator extends Component
 
     public string $address = 'গাজীপুর সদর, গাজীপুর';
 
-    public int $schoolNameSize = 14;
+    public int $schoolNameSize = 24;
 
     public int $addressSize = 14;
 
