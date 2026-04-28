@@ -132,20 +132,69 @@
 
     <div class="min-h-screen flex-1 transition-all duration-200" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
         <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
-            <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true">☰</button>
+            <button
+                type="button"
+                class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100"
+                @click="mobileSidebarOpen = true"
+                aria-label="Open mobile menu"
+            >
+                ☰
+            </button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
         </header>
 
-        <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/40 lg:hidden" @click="mobileSidebarOpen = false"></div>
+        <button
+            type="button"
+            class="fixed bottom-5 left-3 z-40 rounded-full border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden"
+            @click="mobileSidebarOpen = true"
+            x-show="! mobileSidebarOpen"
+            data-test="mobile-sidebar-trigger"
+            aria-label="Open sidebar"
+        >
+            ☰
+        </button>
 
-        <aside x-show="mobileSidebarOpen" x-transition class="fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto border-e border-zinc-200 bg-zinc-50 p-3 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:hidden">
-            <div class="mb-3 flex items-center justify-between"><x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate /><button type="button" class="rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = false">✕</button></div>
-            <div class="space-y-1">
-                <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('Dashboard') }}</a>
-                <a href="{{ route('questions.index') }}" class="block rounded-lg px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('Questions') }}</a>
-                <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('Settings') }}</a>
+        <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
+
+        <aside
+            x-show="mobileSidebarOpen"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="-translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="-translate-x-full"
+            class="fixed inset-y-0 left-0 z-50 w-[86%] max-w-80 overflow-y-auto border-e border-zinc-200 bg-zinc-50 p-3 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:hidden"
+        >
+            <div class="mb-4 flex items-center justify-between">
+                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+                <button type="button" class="rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = false" aria-label="Close sidebar">✕</button>
             </div>
+
+            <nav class="space-y-2 text-sm">
+                <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800' }}" wire:navigate>{{ __('Dashboard') }}</a>
+
+                <div x-data="{ mobileQuestionsOpen: {{ request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']) ? 'true' : 'false' }} }" class="rounded-lg border border-zinc-200 p-1 dark:border-zinc-700">
+                    <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium" @click="mobileQuestionsOpen = ! mobileQuestionsOpen">
+                        <span>{{ __('প্রশ্ন ভান্ডার') }}</span>
+                        <span :class="mobileQuestionsOpen ? 'rotate-180' : ''" class="transition">⌄</span>
+                    </button>
+                    <div x-show="mobileQuestionsOpen" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
+                        <a href="{{ route('questions.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Questions') }}</a>
+                        @if(auth()->user()->hasAnyPermission(['exam_categories.manage']))<a href="{{ route('exam-categories.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Exam Categories') }}</a>@endif
+                        @if(auth()->user()->hasAnyPermission(['academic_classes.manage']))<a href="{{ route('academic-classes.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Academic Class') }}</a>@endif
+                        @if(auth()->user()->hasAnyPermission(['subjects.manage']))<a href="{{ route('subjects.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Subjects') }}</a>@endif
+                        @if(auth()->user()->hasAnyPermission(['chapters.manage']))<a href="{{ route('chapters.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Chapter') }}</a>@endif
+                        @if(auth()->user()->hasAnyPermission(['topics.manage']))<a href="{{ route('topics.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Topics') }}</a>@endif
+                        @if(auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete']))<a href="{{ route('tags.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ __('Tags') }}</a>@endif
+                    </div>
+                </div>
+
+                <a href="{{ route('questions.set.create') }}" class="block rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('Question Create') }}</a>
+                @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))<a href="{{ route('omr.generator') }}" class="block rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('OMR Generator') }}</a>@endif
+                <a href="{{ route('profile.edit') }}" class="block rounded-lg px-3 py-2 text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('Settings') }}</a>
+            </nav>
         </aside>
 
         <main>{{ $slot }}</main>
