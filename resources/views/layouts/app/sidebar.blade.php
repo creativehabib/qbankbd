@@ -33,7 +33,7 @@
             </button>
         </div>
 
-        <nav class="relative flex-1 space-y-2 overflow-y-auto p-2" data-test="sidebar-nav">
+        <nav class="relative flex-1 space-y-2 p-2" :class="sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'" data-test="sidebar-nav">
             <template x-if="! sidebarCollapsed">
                 <div class="space-y-2">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-white ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-700' : 'text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800' }}" wire:navigate>🏠 {{ __('Dashboard') }}</a>
@@ -90,7 +90,7 @@
                 @mouseenter="clearTimeout(flyoutCloseTimer)"
                 @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)"
                 @click.outside="activeFlyout = null"
-                class="absolute left-14 top-16 z-50 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+                class="absolute left-full top-16 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
                 data-test="sidebar-flyout-panel"
             >
                 <p class="mb-2 text-sm font-semibold">{{ __('প্রশ্ন ভান্ডার') }}</p>
@@ -106,7 +106,7 @@
             </div>
 
             @if(auth()->user()->hasPermission('users.manage_roles'))
-                <div x-show="sidebarCollapsed && activeFlyout === 'admin'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-14 top-52 z-50 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                <div x-show="sidebarCollapsed && activeFlyout === 'admin'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-full top-52 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
                     <p class="mb-2 text-sm font-semibold">{{ __('Administration') }}</p>
                     <div class="space-y-1 text-sm">
                         <a href="{{ route('users.index') }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ __('User Management') }}</a>
