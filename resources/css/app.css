@@ -184,3 +184,9 @@ select:focus[data-flux-control] {
 /*OMR Question Style*/
 .center { display: flex; align-items: center; justify-content: center; }
 
+@media print {
+    ui-sidebar,
+    [data-flux-sidebar] {
+        display: block !important;
+    }
+}
