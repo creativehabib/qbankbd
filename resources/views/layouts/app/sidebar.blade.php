@@ -209,16 +209,6 @@
     </aside>
 
     <div class="relative min-h-screen flex-1" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
-        <div x-show="pageLoading" x-transition.opacity class="absolute inset-0 z-[80] flex items-center justify-center bg-white/65 backdrop-blur-sm dark:bg-zinc-900/70" data-test="page-loading-overlay">
-            <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" class="opacity-20" stroke="currentColor" stroke-width="3"></circle>
-                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-                </svg>
-                <span>{{ __('Loading...') }}</span>
-            </div>
-        </div>
-
         <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
             <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">☰</button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
@@ -269,19 +259,6 @@
                                 @endif
                             @endforeach
                         </div>
-
-                        <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.983 5.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2m10-10h-2M4 12H2m17.071-7.071l-1.414 1.414M6.343 17.657l-1.414 1.414m0-14.142l1.414 1.414m11.314 11.314l1.414 1.414"/></svg>
-                            {{ __('Settings') }}
-                        </a>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3"/></svg>
-                                {{ __('Log out') }}
-                            </button>
-                        </form>
                     </div>
                 @endif
             </nav>
@@ -351,7 +328,19 @@
             </div>
         </header>
 
-        <main>{{ $slot }}</main>
+        <main class="relative">
+            <div x-show="pageLoading" x-transition.opacity class="absolute inset-0 z-[80] flex items-center justify-center bg-white/65 backdrop-blur-sm dark:bg-zinc-900/70" data-test="page-loading-overlay">
+                <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+                    <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9" class="opacity-20" stroke="currentColor" stroke-width="3"></circle>
+                        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                    <span>{{ __('Loading...') }}</span>
+                </div>
+            </div>
+
+            {{ $slot }}
+        </main>
     </div>
 </div>
 
