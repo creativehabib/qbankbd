@@ -10,10 +10,10 @@
     ];
 
     $singleItems = [
-        ['label' => __('Dashboard'), 'route' => 'dashboard', 'match' => 'dashboard', 'icon' => '🏠', 'visible' => true],
-        ['label' => __('Question Create'), 'route' => 'questions.set.create', 'match' => 'questions.set.create.*', 'icon' => '➕', 'visible' => true],
-        ['label' => __('OMR Generator'), 'route' => 'omr.generator', 'match' => 'omr.generator', 'icon' => '📄', 'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin'])],
-        ['label' => __('Practice'), 'route' => 'students.practice.index', 'match' => 'students.practice.*', 'icon' => '📘', 'visible' => auth()->user()->isStudent()],
+        ['label' => __('Dashboard'), 'route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'home', 'visible' => true],
+        ['label' => __('Question Create'), 'route' => 'questions.set.create', 'match' => 'questions.set.create.*', 'icon' => 'plus-circle', 'visible' => true],
+        ['label' => __('OMR Generator'), 'route' => 'omr.generator', 'match' => 'omr.generator', 'icon' => 'document-duplicate', 'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin'])],
+        ['label' => __('Practice'), 'route' => 'students.practice.index', 'match' => 'students.practice.*', 'icon' => 'book-open', 'visible' => auth()->user()->isStudent()],
     ];
 
     $adminItems = [
@@ -66,7 +66,22 @@
                     @foreach($singleItems as $item)
                         @if($item['visible'])
                             <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>
-                                <span>{{ $item['icon'] }}</span>
+                                <span class="inline-flex h-4 w-4 items-center justify-center">
+                                    @switch($item['icon'])
+                                        @case('home')
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25a1.5 1.5 0 0 1 1.5-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75" /></svg>
+                                            @break
+                                        @case('plus-circle')
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" /></svg>
+                                            @break
+                                        @case('document-duplicate')
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125H5.625A1.125 1.125 0 0 1 4.5 20.625V8.625c0-.621.504-1.125 1.125-1.125H9.75" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 3.75H10.875A1.125 1.125 0 0 0 9.75 4.875v9.75c0 .621.504 1.125 1.125 1.125H18.75c.621 0 1.125-.504 1.125-1.125V8.625L15 3.75Z" /></svg>
+                                            @break
+                                        @case('book-open')
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h6.75A2.25 2.25 0 0 1 13.5 6.75v12.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25V6.75Zm19.5 0A2.25 2.25 0 0 0 19.5 4.5h-6.75A2.25 2.25 0 0 0 10.5 6.75v12.75a2.25 2.25 0 0 1 2.25-2.25h6.75a2.25 2.25 0 0 1 2.25 2.25V6.75Z" /></svg>
+                                            @break
+                                    @endswitch
+                                </span>
                                 <span>{{ $item['label'] }}</span>
                             </a>
                         @endif
@@ -74,7 +89,10 @@
 
                     <div x-data="{ open: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg border border-zinc-200 p-1 dark:border-zinc-700">
                         <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold" @click="open = ! open">
-                            <span>🗂 {{ __('প্রশ্ন ভান্ডার') }}</span>
+                            <span class="inline-flex items-center gap-2">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5A2.25 2.25 0 0 1 6 5.25h3.19a2.25 2.25 0 0 1 1.59.66l.66.66a2.25 2.25 0 0 0 1.59.66H18A2.25 2.25 0 0 1 20.25 9.5v7A2.25 2.25 0 0 1 18 18.75H6A2.25 2.25 0 0 1 3.75 16.5v-9Z" /></svg>
+                                {{ __('প্রশ্ন ভান্ডার') }}
+                            </span>
                             <span :class="open ? 'rotate-180' : ''" class="transition">⌄</span>
                         </button>
                         <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
@@ -101,11 +119,11 @@
 
             <template x-if="sidebarCollapsed">
                 <div class="space-y-2">
-                    <a href="{{ route('dashboard') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Dashboard" wire:navigate>🏠</a>
-                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="{{ __('প্রশ্ন ভান্ডার') }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'question-bank'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'question-bank' ? null : 'question-bank'">🗂</button>
-                    <a href="{{ route('questions.set.create') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Question Create" wire:navigate>➕</a>
-                    @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))<a href="{{ route('omr.generator') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="OMR Generator" wire:navigate>📄</a>@endif
-                    @if(auth()->user()->hasPermission('users.manage_roles'))<button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Administration" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'admin'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'admin' ? null : 'admin'">🛡</button>@endif
+                    <a href="{{ route('dashboard') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Dashboard" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25a1.5 1.5 0 0 1 1.5-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75" /></svg></a>
+                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="{{ __('প্রশ্ন ভান্ডার') }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'question-bank'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'question-bank' ? null : 'question-bank'"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5A2.25 2.25 0 0 1 6 5.25h3.19a2.25 2.25 0 0 1 1.59.66l.66.66a2.25 2.25 0 0 0 1.59.66H18A2.25 2.25 0 0 1 20.25 9.5v7A2.25 2.25 0 0 1 18 18.75H6A2.25 2.25 0 0 1 3.75 16.5v-9Z" /></svg></button>
+                    <a href="{{ route('questions.set.create') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Question Create" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" /></svg></a>
+                    @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))<a href="{{ route('omr.generator') }}" class="flex h-10 items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="OMR Generator" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125H5.625A1.125 1.125 0 0 1 4.5 20.625V8.625c0-.621.504-1.125 1.125-1.125H9.75" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 3.75H10.875A1.125 1.125 0 0 0 9.75 4.875v9.75c0 .621.504 1.125 1.125 1.125H18.75c.621 0 1.125-.504 1.125-1.125V8.625L15 3.75Z" /></svg></a>@endif
+                    @if(auth()->user()->hasPermission('users.manage_roles'))<button type="button" class="flex h-10 w-full items-center justify-center rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800" title="Administration" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'admin'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'admin' ? null : 'admin'"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3.171A1.5 1.5 0 0 1 10.95 2.25h2.1a1.5 1.5 0 0 1 1.382.921l.229.551a1.5 1.5 0 0 0 1.123.9l.592.1a1.5 1.5 0 0 1 1.189 1.188l.1.593a1.5 1.5 0 0 0 .9 1.122l.55.23a1.5 1.5 0 0 1 .922 1.382v2.1a1.5 1.5 0 0 1-.921 1.382l-.551.229a1.5 1.5 0 0 0-.9 1.123l-.1.592a1.5 1.5 0 0 1-1.188 1.189l-.593.1a1.5 1.5 0 0 0-1.122.9l-.23.55a1.5 1.5 0 0 1-1.382.922h-2.1a1.5 1.5 0 0 1-1.382-.921l-.229-.551a1.5 1.5 0 0 0-1.123-.9l-.592-.1a1.5 1.5 0 0 1-1.189-1.188l-.1-.593a1.5 1.5 0 0 0-.9-1.122l-.55-.23a1.5 1.5 0 0 1-.922-1.382v-2.1a1.5 1.5 0 0 1 .921-1.382l.551-.229a1.5 1.5 0 0 0 .9-1.123l.1-.592a1.5 1.5 0 0 1 1.188-1.189l.593-.1a1.5 1.5 0 0 0 1.122-.9l.23-.55Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /></svg></button>@endif
                 </div>
             </template>
 
@@ -184,13 +202,13 @@
     </aside>
 
     <div class="min-h-screen flex-1 transition-all duration-200" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
-        <header class="sticky top-0 z-30 flex items-center justify-between print:hidden border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
+        <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
             <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">☰</button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
         </header>
 
-        <button type="button" class="fixed bottom-5 print:hidden left-3 z-40 rounded-full border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
+        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
 
         <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
 
