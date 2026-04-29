@@ -31,6 +31,8 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::patch('/dashboard/question-sets/{questionSet}', [DashboardController::class, 'updateQuestionSet'])->middleware('role:super_admin')->name('dashboard.question-sets.update');
+    Route::delete('/dashboard/question-sets/{questionSet}', [DashboardController::class, 'destroyQuestionSet'])->middleware('role:super_admin')->name('dashboard.question-sets.destroy');
 
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
     Route::get('/questions', Questions::class)->name('questions.index');
