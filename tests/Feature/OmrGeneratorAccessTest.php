@@ -32,7 +32,9 @@ it('shows omr generator in sidebar for teacher', function (): void {
         ->get(route('dashboard'))
         ->assertOk()
         ->assertSee(route('omr.generator'), false)
-        ->assertSee('OMR Generator');
+        ->assertSee('OMR Generator')
+        ->assertSee('আমার তৈরি প্রশ্ন')
+        ->assertSee(route('questions.index'), false);
 });
 
 it('does not show omr generator in sidebar for student', function (): void {
@@ -42,7 +44,9 @@ it('does not show omr generator in sidebar for student', function (): void {
         ->get(route('dashboard'))
         ->assertOk()
         ->assertDontSee(route('omr.generator'), false)
-        ->assertDontSee('OMR Generator');
+        ->assertDontSee('OMR Generator')
+        ->assertDontSee('আমার তৈরি প্রশ্ন')
+        ->assertDontSee(route('questions.index'), false);
 });
 
 

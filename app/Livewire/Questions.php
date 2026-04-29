@@ -155,6 +155,6 @@ class Questions extends Component
             'mineQuestionsCount' => $mineQuestionsCount,
             'publishedQuestionsCount' => $publishedQuestionsCount,
             'pendingQuestionsCount' => $pendingQuestionsCount,
-        ])->layout('layouts.app', ['title' => 'All Questions']);
+        ])->layout('layouts.app', ['title' => $user->isTeacher() ? 'আমার তৈরি প্রশ্ন' : 'All Questions']);
     }
 }
