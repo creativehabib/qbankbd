@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/roles-permissions', RolePermissionManager::class)->name('roles-permissions.index');
     });
 
-    Route::get('/teacher/question-set-create', CreateQuestionSet::class)->name('questions.set.create');
+    Route::get('/teacher/question-set-create', CreateQuestionSet::class)->name('question.set-create');
     Route::get('/teacher/create-question/generated-qset/{qset}', GeneratedQuestionSetPage::class)->name('qset.generated');
     Route::get('/teacher/view-questions', ViewQuestions::class)->name('questions.view');
     Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
