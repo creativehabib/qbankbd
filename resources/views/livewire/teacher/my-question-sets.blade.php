@@ -17,7 +17,7 @@
                     <tr>
                         <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">SL</th>
                         <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">Paper Details</th>
-                        <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">Question Count</th>
+                        <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">Type Count</th>
                         <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">Created At</th>
                         <th class="px-4 py-3 text-left font-semibold text-zinc-600 dark:text-zinc-300">Actions</th>
                     </tr>
@@ -30,7 +30,23 @@
                                 <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $questionSet->name }}</p>
                                 <p class="text-xs text-zinc-500">ID: {{ $questionSet->id }}</p>
                             </td>
-                            <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">{{ $questionSet->questions_count }}</td>
+                            <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">
+                                @php
+                                    $typeCounts = $questionSet->questions
+                                        ->groupBy('question_type')
+                                        ->map(fn ($questionsByType) => $questionsByType->count());
+                                @endphp
+
+                                <div class="flex flex-wrap gap-1.5">
+                                    @forelse($typeCounts as $type => $count)
+                                        <span class="inline-flex items-center rounded-md bg-zinc-100 px-2 py-1 text-xs font-semibold uppercase text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                                            {{ $type }}: {{ $count }}
+                                        </span>
+                                    @empty
+                                        <span class="text-xs text-zinc-500">No questions</span>
+                                    @endforelse
+                                </div>
+                            </td>
                             <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">{{ $questionSet->created_at?->format('d M, Y') }}</td>
                             <td class="px-4 py-3">
                                 <div class="flex flex-wrap gap-2">

@@ -13,6 +13,7 @@ class MyQuestionSets extends Component
         $questionSets = QuestionSet::query()
             ->where('user_id', auth()->id())
             ->withCount('questions')
+            ->with(['questions:id,question_type'])
             ->latest()
             ->get();
 
