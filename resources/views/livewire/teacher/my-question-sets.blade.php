@@ -5,7 +5,7 @@
             <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">আপনার তৈরি করা সব Question Set এখান থেকে দেখতে পারবেন।</p>
         </div>
 
-        <a href="{{ route('questions.set.create') }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700" wire:navigate>
+        <a href="{{ route('question.set-create') }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700" wire:navigate>
             + নতুন তৈরি করুন
         </a>
     </div>
