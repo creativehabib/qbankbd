@@ -64,3 +64,53 @@ test('dashboard renders custom non flux sidebar shell', function () {
         ->assertSee('data-test="collapsed-profile-menu-panel"', false)
         ->assertSee('data-test="page-loading-overlay"', false);
 });
+
+use App\Models\QuestionSet;
+
+test('super admin dashboard shows question set creator summary', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $teacher = User::factory()->teacher()->create(['name' => 'Teacher One']);
+
+    QuestionSet::create([
+        'name' => 'Set A',
+        'user_id' => $teacher->id,
+        'generation_criteria' => ['type' => 'mcq', 'quantity' => 20],
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Teacher One')
+        ->assertSee('MCQ: 1')
+        ->assertSee('20');
+});
+
+test('super admin can update and delete question set from dashboard', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $teacher = User::factory()->teacher()->create();
+
+    $questionSet = QuestionSet::create([
+        'name' => 'Old Name',
+        'user_id' => $teacher->id,
+        'generation_criteria' => ['type' => 'mcq', 'quantity' => 10],
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->patch(route('dashboard.question-sets.update', $questionSet), [
+            'name' => 'New Name',
+            'type' => 'cq',
+            'quantity' => 15,
+        ])
+        ->assertRedirect();
+
+    $questionSet->refresh();
+    expect($questionSet->name)->toBe('New Name');
+    expect($questionSet->generation_criteria['type'])->toBe('cq');
+    expect($questionSet->generation_criteria['quantity'])->toBe(15);
+
+    $this->actingAs($superAdmin)
+        ->delete(route('dashboard.question-sets.destroy', $questionSet))
+        ->assertRedirect();
+
+    $this->assertDatabaseMissing('question_sets', ['id' => $questionSet->id]);
+});
