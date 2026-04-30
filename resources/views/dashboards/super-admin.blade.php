@@ -12,6 +12,35 @@
         @endif
 
         <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <h3 class="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">সুপার অ্যাডমিন ওভারভিউ</h3>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Questions</p>
+                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_questions'] }}</p>
+                </div>
+                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Users/Students</p>
+                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_users'] }}</p>
+                </div>
+                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Categories/Exams</p>
+                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_exam_categories'] }}</p>
+                </div>
+                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Monthly Revenue</p>
+                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">৳ {{ number_format($overviewStats['monthly_revenue']) }}</p>
+                </div>
+                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Pending Approval</p>
+                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['pending_approval'] }}</p>
+                </div>
+            </div>
+
+            <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Monthly Revenue বর্তমানে placeholder হিসাবে 0 দেখানো হচ্ছে। সাবস্ক্রিপশন/পেমেন্ট মডিউল যুক্ত হলে এটি লাইভ ডেটা দেখাবে।</p>
+        </section>
+
+        <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
             <h3 class="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">প্রস্তুতকারী ভিত্তিক সারাংশ</h3>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-700">

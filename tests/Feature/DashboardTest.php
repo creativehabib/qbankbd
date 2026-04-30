@@ -66,6 +66,10 @@ test('dashboard renders custom non flux sidebar shell', function () {
 });
 
 use App\Models\QuestionSet;
+use App\Models\Question;
+use App\Models\ExamCategory;
+use App\Models\Subject;
+use App\Models\AcademicClass;
 
 test('super admin dashboard shows question set creator summary', function () {
     $superAdmin = User::factory()->superAdmin()->create();
@@ -113,4 +117,43 @@ test('super admin can update and delete question set from dashboard', function (
         ->assertRedirect();
 
     $this->assertDatabaseMissing('question_sets', ['id' => $questionSet->id]);
+});
+
+test('super admin dashboard shows overview stat cards', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $teacher = User::factory()->teacher()->create();
+
+    ExamCategory::query()->create([
+        'name' => 'BCS',
+        'slug' => 'bcs',
+    ]);
+
+    $academicClass = AcademicClass::query()->create([
+        'name' => 'SSC',
+        'slug' => 'ssc',
+    ]);
+
+    $subject = Subject::query()->create([
+        'academic_class_id' => $academicClass->id,
+        'name' => 'Math',
+        'slug' => 'math',
+    ]);
+
+    Question::query()->create([
+        'title' => 'Sample pending question',
+        'slug' => 'sample-pending-question',
+        'subject_id' => $subject->id,
+        'user_id' => $teacher->id,
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($superAdmin)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Total Questions')
+        ->assertSee('Total Users/Students')
+        ->assertSee('Total Categories/Exams')
+        ->assertSee('Monthly Revenue')
+        ->assertSee('Pending Approval')
+        ->assertSee('৳ 0');
 });
