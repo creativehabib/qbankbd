@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuestionSet;
+use App\Models\Question;
+use App\Models\User;
+use App\Models\ExamCategory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,9 +42,18 @@ class DashboardController extends Controller
                 ->sortByDesc('question_set_count')
                 ->values();
 
+            $overviewStats = [
+                'total_questions' => Question::query()->count(),
+                'total_users' => User::query()->count(),
+                'total_exam_categories' => ExamCategory::query()->count(),
+                'monthly_revenue' => 0,
+                'pending_approval' => Question::query()->where('status', 'pending')->count(),
+            ];
+
             return view('dashboards.super-admin', [
                 'questionSets' => $questionSets,
                 'creatorSummary' => $summary,
+                'overviewStats' => $overviewStats,
             ]);
         }
 
