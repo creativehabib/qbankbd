@@ -20,10 +20,10 @@ use Google\Cloud\Vision\V1\Image;
 use Google\Cloud\Vision\V1\InputConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use RuntimeException;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use RuntimeException;
 
 class BulkUpload extends Component
 {
@@ -155,17 +155,17 @@ class BulkUpload extends Component
         try {
             $client = $this->makeVisionClient();
 
-            $image = new Image();
+            $image = new Image;
             $image->setContent(file_get_contents($filePath));
 
-            $feature = new Feature();
+            $feature = new Feature;
             $feature->setType(Type::DOCUMENT_TEXT_DETECTION);
 
-            $request = new AnnotateImageRequest();
+            $request = new AnnotateImageRequest;
             $request->setImage($image);
             $request->setFeatures([$feature]);
 
-            $batchRequest = new BatchAnnotateImagesRequest();
+            $batchRequest = new BatchAnnotateImagesRequest;
             $batchRequest->setRequests([$request]);
 
             $response = $client->batchAnnotateImages($batchRequest);
@@ -207,18 +207,18 @@ class BulkUpload extends Component
 
             $inputConfig = new InputConfig([
                 'mime_type' => 'application/pdf',
-                'content'   => file_get_contents($filePath),
+                'content' => file_get_contents($filePath),
             ]);
 
-            $feature = new Feature();
+            $feature = new Feature;
             $feature->setType(Type::DOCUMENT_TEXT_DETECTION);
 
-            $request = new AnnotateFileRequest();
+            $request = new AnnotateFileRequest;
             $request->setInputConfig($inputConfig);
             $request->setFeatures([$feature]);
             $request->setPages(range(1, 5));
 
-            $batchRequest = new BatchAnnotateFilesRequest();
+            $batchRequest = new BatchAnnotateFilesRequest;
             $batchRequest->setRequests([$request]);
 
             $batchResponse = $client->batchAnnotateFiles($batchRequest);
@@ -339,25 +339,50 @@ class BulkUpload extends Component
         return trim(implode(PHP_EOL, $lines));
     }
 
+    /**
+     * বাংলা বা যেকোনো Unicode টেক্সট থেকে unique slug তৈরি করে।
+     * - প্রথমে ASCII অংশ দিয়ে base slug বানায়
+     * - ASCII না থাকলে 'question' ব্যবহার করে
+     * - শেষে random suffix যোগ করে uniqueness নিশ্চিত করে
+     */
+    protected function generateUniqueSlug(string $title): string
+    {
+        // বাংলা বাদ দিয়ে শুধু ASCII অংশ নিন
+        $ascii = preg_replace('/[^\x20-\x7E]/u', '', $title);
+        $base = Str::slug(trim((string) $ascii));
+
+        // যদি ASCII অংশ সম্পূর্ণ খালি হয় (পুরো বাংলা টাইটেল)
+        if ($base === '') {
+            $base = 'question';
+        }
+
+        // Unique না হওয়া পর্যন্ত নতুন suffix চেষ্টা করুন
+        do {
+            $slug = $base.'-'.Str::lower(Str::random(8));
+        } while (Question::where('slug', $slug)->exists());
+
+        return $slug;
+    }
+
     public function submitProcessedQuestions(): void
     {
         abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
 
         $validated = $this->validate([
-            'academic_class_id'                        => 'required|exists:academic_classes,id',
-            'subject_id'                               => 'required|exists:subjects,id',
-            'chapter_id'                               => 'nullable|exists:chapters,id',
-            'topic_id'                                 => 'required_with:chapter_id|nullable|exists:topics,id',
-            'difficulty'                               => 'required|in:easy,medium,hard',
-            'marks'                                    => 'required|numeric|min:0.25',
-            'exam_category_ids'                        => 'required|array|min:1',
-            'exam_category_ids.*'                      => 'required|exists:exam_categories,id',
-            'sourceFile'                               => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
-            'processedQuestions'                       => 'required|array|min:1',
-            'processedQuestions.*.title'               => 'required|string',
-            'processedQuestions.*.options'             => 'required|array|min:2',
+            'academic_class_id' => 'required|exists:academic_classes,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
+            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'marks' => 'required|numeric|min:0.25',
+            'exam_category_ids' => 'required|array|min:1',
+            'exam_category_ids.*' => 'required|exists:exam_categories,id',
+            'sourceFile' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
+            'processedQuestions' => 'required|array|min:1',
+            'processedQuestions.*.title' => 'required|string',
+            'processedQuestions.*.options' => 'required|array|min:2',
             'processedQuestions.*.options.*.option_text' => 'required|string',
-            'processedQuestions.*.options.*.is_correct'  => 'required|boolean',
+            'processedQuestions.*.options.*.is_correct' => 'required|boolean',
         ]);
 
         foreach ($validated['processedQuestions'] as $qIndex => $parsedQuestion) {
@@ -384,36 +409,30 @@ class BulkUpload extends Component
         $storedFilePath = $this->sourceFile?->store('questions/bulk-source', 'public');
 
         DB::transaction(function () use ($subject, $validated, $currentUser): void {
-            foreach ($validated['processedQuestions'] as $index => $parsedQuestion) {
-                $slug = Str::slug($parsedQuestion['title']);
-                if (empty($slug)) {
-                    $slug = preg_replace('/\s+/u', '-', trim($parsedQuestion['title']));
-                    $slug = str_replace(['?', '!', "'", '"', ',', '.', '(', ')', '[', ']', '{', '}'], '', $slug);
-                }
-
-                if (Question::where('slug', $slug)->exists()) {
-                    throw new \Exception('প্রশ্ন '.($index + 1).': এই স্লাগটি ইতিমধ্যে আছে।');
-                }
+            foreach ($validated['processedQuestions'] as $parsedQuestion) {
+                // বাংলা-safe unique slug
+                $slug = $this->generateUniqueSlug($parsedQuestion['title']);
 
                 $formattedOptions = collect($parsedQuestion['options'])
                     ->map(fn ($opt) => [
                         'option_text' => '<p>'.e(trim($opt['option_text'])).'</p>'."\n",
-                        'is_correct'  => (bool) ($opt['is_correct'] ?? false),
+                        'is_correct' => (bool) ($opt['is_correct'] ?? false),
                     ])
-                    ->values()->toArray();
+                    ->values()
+                    ->toArray();
 
                 $question = Question::query()->create([
-                    'subject_id'    => $subject->id,
-                    'chapter_id'    => $this->chapter_id,
-                    'topic_id'      => $this->topic_id,
-                    'title'         => $parsedQuestion['title'],
-                    'slug'          => $slug,
-                    'difficulty'    => $this->difficulty,
+                    'subject_id' => $subject->id,
+                    'chapter_id' => $this->chapter_id,
+                    'topic_id' => $this->topic_id,
+                    'title' => $parsedQuestion['title'],
+                    'slug' => $slug,
+                    'difficulty' => $this->difficulty,
                     'question_type' => 'mcq',
-                    'marks'         => $this->marks,
-                    'status'        => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
+                    'marks' => $this->marks,
+                    'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
                     'extra_content' => $formattedOptions,
-                    'user_id'       => $currentUser?->id,
+                    'user_id' => $currentUser?->id,
                 ]);
 
                 $question->examCategories()->sync($this->exam_category_ids);
@@ -427,14 +446,14 @@ class BulkUpload extends Component
     public function render()
     {
         return view('livewire.admin.questions.bulk-upload', [
-            'classes'           => AcademicClass::query()->orderBy('name')->get(),
-            'subjects'          => $this->academic_class_id
+            'classes' => AcademicClass::query()->orderBy('name')->get(),
+            'subjects' => $this->academic_class_id
                 ? Subject::query()->where('academic_class_id', $this->academic_class_id)->orderBy('name')->get()
                 : collect(),
-            'chapters'          => $this->subject_id
+            'chapters' => $this->subject_id
                 ? Chapter::query()->where('subject_id', $this->subject_id)->orderBy('name')->get()
                 : collect(),
-            'topics'            => $this->chapter_id
+            'topics' => $this->chapter_id
                 ? Topic::query()->where('chapter_id', $this->chapter_id)->orderBy('name')->get()
                 : collect(),
             'allExamCategories' => ExamCategory::query()->orderBy('name')->get(),

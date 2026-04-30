@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Question extends Model
 {
@@ -87,5 +88,17 @@ class Question extends Model
     public function examCategories(): BelongsToMany
     {
         return $this->belongsToMany(ExamCategory::class, 'exam_category_question', 'question_id', 'exam_category_id');
+    }
+
+    public static function generateUniqueSlug(string $title): string
+    {
+        // ASCII অংশ দিয়ে base তৈরি
+        $ascii = preg_replace('/[^\x20-\x7E]/u', '', $title);
+        $base = Str::slug(trim($ascii)) ?: 'question';
+        do {
+            $slug = $base.'-'.Str::lower(Str::random(6));
+        } while (static::where('slug', $slug)->exists());
+
+        return $slug;
     }
 }
