@@ -1,3 +1,6 @@
+import $ from 'jquery';
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
 import Swal from 'sweetalert2';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
@@ -10,6 +13,28 @@ window.Swal = Swal;
 window.Choices = Choices;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
+window.$ = window.jQuery = $;
+window.toastr = toastr;
+
+// Toastr ডিফল্ট অপশন
+toastr.options = {
+    "progressBar": true,
+    "positionClass": "toast-top-right",
+    "timeOut": "3000",
+};
+
+// লাইভওয়্যার ইভেন্ট লিসেনার
+window.addEventListener('success', event => {
+    toastr.success(event.detail.message);
+});
+
+window.addEventListener('warning', event => {
+    toastr.warning(event.detail.message);
+});
+
+window.addEventListener('error', event => {
+    toastr.error(event.detail.message);
+});
 
 window.renderMathJax = function (root = document) {
     if (!window.MathJax?.typesetPromise) {

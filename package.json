@@ -14,9 +14,11 @@
         "axios": "^1.7.4",
         "choices.js": "^11.2.2",
         "concurrently": "^9.0.1",
+        "jquery": "^4.0.0",
         "laravel-vite-plugin": "^3.0.0",
         "sweetalert2": "^11.26.24",
         "tailwindcss": "^4.0.7",
+        "toastr": "^2.1.4",
         "tom-select": "^2.5.2",
         "vite": "^8.0.0"
     },
