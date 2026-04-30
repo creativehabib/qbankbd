@@ -90,15 +90,33 @@ class Question extends Model
         return $this->belongsToMany(ExamCategory::class, 'exam_category_question', 'question_id', 'exam_category_id');
     }
 
-    public static function generateUniqueSlug(string $title): string
+    protected function generateUniqueSlug(string $title): string
     {
-        // ASCII অংশ দিয়ে base তৈরি
-        $ascii = preg_replace('/[^\x20-\x7E]/u', '', $title);
-        $base = Str::slug(trim($ascii)) ?: 'question';
-        do {
-            $slug = $base.'-'.Str::lower(Str::random(6));
-        } while (static::where('slug', $slug)->exists());
+        // ছোট হাতে রূপান্তর
+        $slug = mb_strtolower(trim($title), 'UTF-8');
 
-        return $slug;
+        // শুধু বাংলা, ইংরেজি, সংখ্যা এবং স্পেস রাখুন
+        $slug = preg_replace('/[^\p{Bengali}a-z0-9\s]/u', '', $slug);
+
+        // স্পেস → হাইফেন
+        $slug = preg_replace('/\s+/u', '-', $slug);
+
+        // একাধিক হাইফেন → একটি
+        $slug = preg_replace('/-+/', '-', $slug);
+
+        $slug = trim($slug, '-');
+
+        $base = $slug ?: Str::lower(Str::random(10));
+
+        // Unique check
+        $finalSlug = $base;
+        $counter = 1;
+
+        while (Question::where('slug', $finalSlug)->exists()) {
+            $finalSlug = $base.'-'.$counter;
+            $counter++;
+        }
+
+        return $finalSlug;
     }
 }

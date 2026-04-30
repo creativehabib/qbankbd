@@ -347,21 +347,18 @@ class BulkUpload extends Component
      */
     protected function generateUniqueSlug(string $title): string
     {
-        // বাংলা বাদ দিয়ে শুধু ASCII অংশ নিন
-        $ascii = preg_replace('/[^\x20-\x7E]/u', '', $title);
-        $base = Str::slug(trim((string) $ascii));
-
-        // যদি ASCII অংশ সম্পূর্ণ খালি হয় (পুরো বাংলা টাইটেল)
-        if ($base === '') {
-            $base = 'question';
+        $slug = mb_strtolower(trim($title), 'UTF-8');
+        $slug = preg_replace('/[^\p{Bengali}a-z0-9\s]/u', '', $slug);
+        $slug = preg_replace('/\s+/u', '-', $slug);
+        // একাধিক হাইফেন → একটি
+        $slug = preg_replace('/-+/', '-', $slug);
+        $slug = trim($slug, '-');
+        $base = $slug ?: Str::lower(Str::random(10));
+        // Duplicate হলে exception throw করুন
+        if (Question::where('slug', $base)->exists()) {
+            throw new \Exception("এই প্রশ্নটি ইতোমধ্যে আছে: \"{$title}\"");
         }
-
-        // Unique না হওয়া পর্যন্ত নতুন suffix চেষ্টা করুন
-        do {
-            $slug = $base.'-'.Str::lower(Str::random(8));
-        } while (Question::where('slug', $slug)->exists());
-
-        return $slug;
+        return $base;
     }
 
     public function submitProcessedQuestions(): void
