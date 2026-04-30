@@ -435,7 +435,6 @@ class BulkUpload extends Component
                 $question->examCategories()->sync($this->exam_category_ids);
             }
         });
-
         session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে সাবমিট হয়েছে।');
         $this->redirectRoute('questions.index', navigate: true);
     }
