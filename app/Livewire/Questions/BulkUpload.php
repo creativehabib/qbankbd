@@ -7,6 +7,7 @@ use App\Models\Chapter;
 use App\Models\ExamCategory;
 use App\Models\Question;
 use App\Models\Subject;
+use App\Models\Tag;
 use App\Models\Topic;
 use App\Support\QuestionTextParser;
 use Google\Cloud\Vision\V1\AnnotateFileRequest;
@@ -42,6 +43,8 @@ class BulkUpload extends Component
     public float $marks = 1;
 
     public array $exam_category_ids = [];
+
+    public array $tagIds = [];
 
     public ?TemporaryUploadedFile $sourceFile = null;
 
@@ -374,6 +377,7 @@ class BulkUpload extends Component
             'marks' => 'required|numeric|min:0.25',
             'exam_category_ids' => 'required|array|min:1',
             'exam_category_ids.*' => 'required|exists:exam_categories,id',
+            'tagIds' => 'nullable|array',
             'sourceFile' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
             'processedQuestions' => 'required|array|min:1',
             'processedQuestions.*.title' => 'required|string',
@@ -433,6 +437,16 @@ class BulkUpload extends Component
                 ]);
 
                 $question->examCategories()->sync($this->exam_category_ids);
+
+                $tagIds = collect($validated['tagIds'] ?? [])
+                    ->map(fn (mixed $tag): int => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => trim((string) $tag)])->id)
+                    ->filter(fn (int $tagId): bool => $tagId > 0)
+                    ->values()
+                    ->toArray();
+
+                if (! empty($tagIds)) {
+                    $question->tags()->sync($tagIds);
+                }
             }
         });
         session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে সাবমিট হয়েছে।');
@@ -452,6 +466,7 @@ class BulkUpload extends Component
             'topics' => $this->chapter_id
                 ? Topic::query()->where('chapter_id', $this->chapter_id)->orderBy('name')->get()
                 : collect(),
+            'allTags' => Tag::query()->orderBy('name')->get(),
             'allExamCategories' => ExamCategory::query()->orderBy('name')->get(),
         ])->layout('layouts.app', ['title' => 'Bulk Question Upload']);
     }

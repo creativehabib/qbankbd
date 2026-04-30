@@ -213,19 +213,28 @@
             </div>
 
             {{-- ── Exam Categories ── --}}
-            <div>
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Tags <span class="text-gray-400 font-normal">(Type and press enter)</span>
+                </label>
+                <select id="bulk_tags" class="w-full" multiple>
+                    @foreach($allTags as $tag)
+                        <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div wire:ignore>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Target Audience <span class="text-red-500">*</span>
                 </label>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700">
+                <select id="bulk_exam_categories" class="w-full" multiple placeholder="সিলেক্ট করুন (Job, Admission, Class 9)...">
                     @foreach($allExamCategories as $category)
-                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
-                            <input type="checkbox" value="{{ $category->id }}" wire:model="exam_category_ids"
-                                   class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-gray-700">
-                            <span>{{ $category->name }}</span>
-                        </label>
+                        <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
                     @endforeach
-                </div>
+                </select>
                 @error('exam_category_ids')
                 <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                 @enderror
@@ -471,3 +480,41 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
 @endpush
+
+@script
+<script>
+    const initBulkUploadTomSelect = () => {
+        if (window.bulkTsTags) {
+            window.bulkTsTags.destroy();
+            window.bulkTsTags = null;
+        }
+
+        const tagsEl = document.getElementById('bulk_tags');
+        if (tagsEl) {
+            window.bulkTsTags = new TomSelect(tagsEl, {
+                plugins: ['remove_button'],
+                persist: false,
+                create: true,
+                onChange: (v) => $wire.set('tagIds', v),
+            });
+        }
+
+        if (window.bulkTsExamCategories) {
+            window.bulkTsExamCategories.destroy();
+            window.bulkTsExamCategories = null;
+        }
+
+        const examCategoriesEl = document.getElementById('bulk_exam_categories');
+        if (examCategoriesEl) {
+            window.bulkTsExamCategories = new TomSelect(examCategoriesEl, {
+                plugins: ['remove_button'],
+                persist: false,
+                create: false,
+                onChange: (v) => $wire.set('exam_category_ids', v),
+            });
+        }
+    };
+
+    initBulkUploadTomSelect();
+</script>
+@endscript
