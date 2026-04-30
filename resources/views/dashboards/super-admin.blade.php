@@ -1,9 +1,5 @@
 <x-layouts::app title="Super Admin Panel">
     <div class="space-y-6">
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">সুপার অ্যাডমিন ড্যাশবোর্ড</h2>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">কে কয়টি প্রশ্ন তৈরি করেছে এবং কী ধরনের প্রশ্ন সেট তৈরি করেছে তার সারাংশ।</p>
-        </section>
 
         @if (session('success'))
             <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200">
@@ -36,7 +32,6 @@
                     <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['pending_approval'] }}</p>
                 </div>
             </div>
-
             <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Monthly Revenue বর্তমানে placeholder হিসাবে 0 দেখানো হচ্ছে। সাবস্ক্রিপশন/পেমেন্ট মডিউল যুক্ত হলে এটি লাইভ ডেটা দেখাবে।</p>
         </section>
 
