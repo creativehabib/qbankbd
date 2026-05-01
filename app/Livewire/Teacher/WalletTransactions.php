@@ -15,9 +15,20 @@ class WalletTransactions extends Component
 
     public string $paymentMethod = 'bkash';
 
+    public string $withdrawBalanceType = 'reward';
+
+    public string $accountNumber = '';
+
+    public string $notes = '';
+
     public function setTab(string $tab): void
     {
         $this->activeTab = $tab;
+    }
+
+    public function setPaymentMethod(string $method): void
+    {
+        $this->paymentMethod = $method;
     }
 
     public function submitRecharge(): void
@@ -46,12 +57,15 @@ class WalletTransactions extends Component
         $validated = $this->validate([
             'amount' => ['required', 'numeric', 'min:20'],
             'paymentMethod' => ['required', 'in:bkash,nagad,sslcommerz'],
+            'accountNumber' => ['required', 'string', 'max:50'],
+            'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
         $wallet = Wallet::query()->firstOrCreate(['user_id' => auth()->id()], ['credit_balance' => 0, 'reward_balance' => 0]);
+        $targetBalance = $this->withdrawBalanceType === 'credit' ? (float) $wallet->credit_balance : (float) $wallet->reward_balance;
 
-        if ((float) $wallet->reward_balance < (float) $validated['amount']) {
-            $this->addError('amount', 'Reward balance পর্যাপ্ত নয়।');
+        if ($targetBalance < (float) $validated['amount']) {
+            $this->addError('amount', 'নির্বাচিত ব্যালেন্সে পর্যাপ্ত টাকা নেই।');
 
             return;
         }
@@ -62,9 +76,10 @@ class WalletTransactions extends Component
             'amount' => (float) $validated['amount'],
             'status' => 'pending',
             'payment_method' => $validated['paymentMethod'],
+            'notes' => 'Balance: '.$this->withdrawBalanceType.' | Account: '.$validated['accountNumber'].' | '.$validated['notes'],
         ]);
 
-        $this->reset('amount');
+        $this->reset(['amount', 'accountNumber', 'notes']);
         session()->flash('success', 'Withdraw request জমা হয়েছে। Admin approve করলে প্রসেস হবে।');
     }
 
@@ -74,7 +89,7 @@ class WalletTransactions extends Component
 
         return view('livewire.teacher.wallet-transactions', [
             'wallet' => $wallet,
-            'transactions' => $wallet->transactions()->latest()->limit(10)->get(),
+            'transactions' => $wallet->transactions()->latest()->limit(15)->get(),
         ]);
     }
 }
