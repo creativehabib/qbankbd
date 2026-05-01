@@ -17,12 +17,32 @@ test('student sees student dashboard', function () {
 });
 
 test('teacher sees teacher dashboard', function () {
-    $user = User::factory()->teacher()->create();
+    $user = User::factory()->teacher()->create([
+        'institution_name' => 'গাজীপুর মর্নিং সান স্কুল',
+        'institution_address' => 'স্কুল • গাজীপুর',
+    ]);
+
+    $academicClass = AcademicClass::query()->create([
+        'name' => 'SSC',
+        'slug' => 'ssc',
+    ]);
+
+    Subject::query()->create([
+        'academic_class_id' => $academicClass->id,
+        'name' => 'বাংলা',
+        'slug' => 'bangla',
+    ]);
 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Teacher Panel');
+        ->assertSee('Teacher Panel')
+        ->assertSee('গাজীপুর মর্নিং সান স্কুল')
+        ->assertSee('স্কুল • গাজীপুর')
+        ->assertSee('প্রশ্ন তৈরি করুন')
+        ->assertSee('SSC')
+        ->assertSee('বাংলা')
+        ->assertSee('Select Subject');
 });
 
 test('admin sees admin dashboard', function () {
@@ -159,15 +179,15 @@ test('super admin dashboard shows overview stat cards', function () {
 });
 
 
-test('teacher dashboard shows monetization quick options', function () {
+test('teacher dashboard does not show removed monetization quick options', function () {
     $user = User::factory()->teacher()->create();
 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('নতুন অপশনসমূহ')
-        ->assertSee('আমার সাবস্ক্রিপশন')
-        ->assertSee('প্রাইসিং')
-        ->assertSee('আমার উপার্জন')
-        ->assertSee('রিচার্জ / উইথড্র');
+        ->assertDontSee('নতুন অপশনসমূহ')
+        ->assertDontSee('আমার সাবস্ক্রিপশন')
+        ->assertDontSee('প্রাইসিং')
+        ->assertDontSee('আমার উপার্জন')
+        ->assertDontSee('রিচার্জ / উইথড্র');
 });

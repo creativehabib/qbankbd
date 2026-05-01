@@ -6,6 +6,7 @@ use App\Models\QuestionSet;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\ExamCategory;
+use App\Models\AcademicClass;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,7 +63,34 @@ class DashboardController extends Controller
         }
 
         if ($user->isTeacher()) {
-            return view('dashboards.teacher');
+            $teacherQuestionSets = QuestionSet::query()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->get();
+
+            $totalQuestionSets = $teacherQuestionSets->count();
+            $totalMcqQuestions = $teacherQuestionSets
+                ->where(fn (QuestionSet $set) => ($set->generation_criteria['type'] ?? null) === 'mcq')
+                ->sum(fn (QuestionSet $set) => (int) ($set->generation_criteria['quantity'] ?? 0));
+            $totalWrittenQuestions = $teacherQuestionSets
+                ->where(fn (QuestionSet $set) => in_array(($set->generation_criteria['type'] ?? null), ['cq', 'written'], true))
+                ->sum(fn (QuestionSet $set) => (int) ($set->generation_criteria['quantity'] ?? 0));
+
+            $academicClasses = AcademicClass::query()
+                ->with(['subjects' => fn ($query) => $query->orderBy('name')])
+                ->orderBy('name')
+                ->get(['id', 'name']);
+
+            return view('dashboards.teacher', [
+                'teacherStats' => [
+                    'total_question_sets' => $totalQuestionSets,
+                    'total_mcq_questions' => $totalMcqQuestions,
+                    'total_written_questions' => $totalWrittenQuestions,
+                    'total_cost' => 0,
+                ],
+                'recentQuestionSet' => $teacherQuestionSets->first(),
+                'academicClasses' => $academicClasses,
+            ]);
         }
 
         return view('dashboards.student');
