@@ -15,6 +15,10 @@
         ['label' => __('আমার তৈরি প্রশ্ন'), 'route' => 'teacher.questions.index', 'match' => 'teacher.questions.index', 'icon' => 'document-text', 'visible' => auth()->user()->hasRole(['teacher'])],
         ['label' => __('OMR Generator'), 'route' => 'omr.generator', 'match' => 'omr.generator', 'icon' => 'document-duplicate', 'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin'])],
         ['label' => __('প্রতিষ্ঠানের তথ্য'), 'route' => 'teacher.institution-info', 'match' => 'teacher.institution-info', 'icon' => 'building-office', 'visible' => auth()->user()->hasRole(['teacher'])],
+        ['label' => __('আমার সাবস্ক্রিপশন'), 'route' => 'teacher.subscription', 'match' => 'teacher.subscription', 'icon' => 'book-open', 'visible' => auth()->user()->hasRole(['teacher'])],
+        ['label' => __('প্রাইসিং'), 'route' => 'teacher.pricing', 'match' => 'teacher.pricing', 'icon' => 'plus-circle', 'visible' => auth()->user()->hasRole(['teacher'])],
+        ['label' => __('আমার উপার্জন'), 'route' => 'teacher.earnings', 'match' => 'teacher.earnings', 'icon' => 'document-text', 'visible' => auth()->user()->hasRole(['teacher'])],
+        ['label' => __('রিচার্জ/উইথড্র'), 'route' => 'teacher.wallet', 'match' => 'teacher.wallet', 'icon' => 'document-duplicate', 'visible' => auth()->user()->hasRole(['teacher'])],
         
         ['label' => __('Practice'), 'route' => 'students.practice.index', 'match' => 'students.practice.*', 'icon' => 'book-open', 'visible' => auth()->user()->isStudent()],
     ];
