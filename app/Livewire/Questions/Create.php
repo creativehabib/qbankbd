@@ -265,6 +265,7 @@ class Create extends Component
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
                 'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
+                'is_paid' => false,
                 'extra_content' => $extraData,
                 'user_id' => $currentUser?->id,
             ]);
@@ -279,10 +280,13 @@ class Create extends Component
             if (! empty($this->exam_category_ids)) {
                 $question->examCategories()->sync($this->exam_category_ids);
             }
+
         });
 
         return redirect()->route('questions.index')->with('success', 'Question created successfully.');
     }
+
+
 
     public function render()
     {
