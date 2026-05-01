@@ -25,6 +25,7 @@ use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
 use App\Http\Controllers\DashboardController;
+use App\Livewire\Admin\PackageManagement;
 use App\Livewire\Admin\Settings\ThemeOptions;
 use App\Livewire\Admin\WalletApprovalPanel;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
@@ -74,6 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users', UserRoleManagement::class)->name('users.index');
         Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
         Route::get('/admin/wallet-approvals', WalletApprovalPanel::class)->name('admin.wallet-approvals');
+        Route::get('/admin/packages', PackageManagement::class)->name('admin.packages');
         Route::get('/admin/theme-options/fonts', function () {
             return Cache::remember('theme-options-fonts', now()->addHours(12), function () {
                 $response = Http::timeout(20)->get('https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json');
