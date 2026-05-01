@@ -5,12 +5,16 @@ namespace App\Livewire;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Questions extends Component
 {
+    private const QUESTION_EARNING_AMOUNT = 10;
+
     use AuthorizesRequests, WithPagination;
 
     /**
@@ -106,7 +110,14 @@ class Questions extends Component
 
         $question = Question::query()->findOrFail($id);
         $nextStatus = $question->status === 'active' ? 'pending' : 'active';
-        $question->update(['status' => $nextStatus]);
+
+        DB::transaction(function () use ($question, $nextStatus): void {
+            $question->update(['status' => $nextStatus]);
+
+            if ($nextStatus === 'active') {
+                $this->payQuestionEarning($question);
+            }
+        });
 
         $message = $nextStatus === 'active'
             ? 'Question approved successfully.'
@@ -114,6 +125,22 @@ class Questions extends Component
 
         $this->dispatch('questionStatusUpdated', message: $message);
         $this->resetPage();
+    }
+
+
+    private function payQuestionEarning(Question $question): void
+    {
+        if ($question->is_paid || ! $question->user?->isTeacher()) {
+            return;
+        }
+
+        $wallet = Wallet::query()->firstOrCreate(
+            ['user_id' => $question->user_id],
+            ['credit_balance' => 0, 'reward_balance' => 0]
+        );
+
+        $wallet->increment('reward_balance', self::QUESTION_EARNING_AMOUNT);
+        $question->update(['is_paid' => true]);
     }
 
     public function render()

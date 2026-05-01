@@ -18,6 +18,7 @@ class Question extends Model
 
     protected $casts = [
         'is_premium' => 'boolean',
+        'is_paid' => 'boolean',
         'extra_content' => 'array',
     ];
 

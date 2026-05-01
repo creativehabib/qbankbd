@@ -90,6 +90,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Taxonomy</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Type</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
+                <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Paid</th>
                 <th class="px-6 py-4 text-center font-semibold uppercase tracking-wider text-xs">Marks</th>
                 <th class="px-6 py-4 text-right font-semibold uppercase tracking-wider text-xs">Actions</th>
             </tr>
@@ -152,6 +153,13 @@
                         </span>
                     </td>
 
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-xs font-bold border {{ $q->is_paid ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800' : 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800' }}">
+                            {{ $q->is_paid ? 'TRUE' : 'FALSE' }}
+                        </span>
+                    </td>
+
                     <td class="px-6 py-4 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold text-sm dark:bg-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 shadow-sm">
                                 {{ $q->marks }}
@@ -195,7 +203,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center">
+                    <td colspan="8" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="mb-3 text-gray-300 dark:text-gray-600" height="3em" width="3em" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             <p class="text-lg font-medium">No questions found</p>
