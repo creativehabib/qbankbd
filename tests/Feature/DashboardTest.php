@@ -157,3 +157,17 @@ test('super admin dashboard shows overview stat cards', function () {
         ->assertSee('Pending Approval')
         ->assertSee('৳ 0');
 });
+
+
+test('teacher dashboard shows monetization quick options', function () {
+    $user = User::factory()->teacher()->create();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('নতুন অপশনসমূহ')
+        ->assertSee('আমার সাবস্ক্রিপশন')
+        ->assertSee('প্রাইসিং')
+        ->assertSee('আমার উপার্জন')
+        ->assertSee('রিচার্জ / উইথড্র');
+});

@@ -14,13 +14,20 @@ use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Tags\Index as TagIndex;
 use App\Livewire\Teacher\CreateQuestionSet;
 use App\Livewire\Teacher\GeneratedQuestionSetPage;
+use App\Livewire\Teacher\InstitutionInfo;
+use App\Livewire\Teacher\MyEarnings;
+use App\Livewire\Teacher\PricingPlans;
+use App\Livewire\Teacher\SubscriptionOverview;
+use App\Livewire\Teacher\WalletTransactions;
 use App\Livewire\Teacher\MyQuestionSets;
 use App\Livewire\Teacher\QuestionGenerator;
 use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Livewire\Topics\TopicIndex;
 use App\Http\Controllers\DashboardController;
+use App\Livewire\Admin\PackageManagement;
 use App\Livewire\Admin\Settings\ThemeOptions;
+use App\Livewire\Admin\WalletApprovalPanel;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Cache;
@@ -67,6 +74,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/users', UserRoleManagement::class)->name('users.index');
         Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
+        Route::get('/admin/wallet-approvals', WalletApprovalPanel::class)->name('admin.wallet-approvals');
+        Route::get('/admin/packages', PackageManagement::class)->name('admin.packages');
         Route::get('/admin/theme-options/fonts', function () {
             return Cache::remember('theme-options-fonts', now()->addHours(12), function () {
                 $response = Http::timeout(20)->get('https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json');
@@ -91,6 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
     Route::get('/teacher/my-question-sets', MyQuestionSets::class)->name('teacher.questions.index');
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
+    Route::get('/teacher/institution-info', InstitutionInfo::class)->middleware('role:teacher')->name('teacher.institution-info');
+    Route::get('/teacher/subscription', SubscriptionOverview::class)->middleware('role:teacher')->name('teacher.subscription');
+    Route::get('/teacher/pricing', PricingPlans::class)->middleware('role:teacher')->name('teacher.pricing');
+    Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
+    Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
 
