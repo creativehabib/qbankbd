@@ -265,6 +265,7 @@ class Create extends Component
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
                 'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
+                'is_paid' => false,
                 'extra_content' => $extraData,
                 'user_id' => $currentUser?->id,
             ]);

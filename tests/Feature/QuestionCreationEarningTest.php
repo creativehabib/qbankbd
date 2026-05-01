@@ -105,10 +105,22 @@ it('pays teacher only when admin approves the question and marks is_paid true', 
     Livewire::actingAs($admin)
         ->test(Questions::class)
         ->call('toggleQuestionStatus', $question->id)
+        ->assertHasNoErrors();
+
+    $question->refresh();
+
+    expect($question->status)->toBe('pending')
+        ->and($question->is_paid)->toBeTrue();
+
+    Livewire::actingAs($admin)
+        ->test(Questions::class)
         ->call('toggleQuestionStatus', $question->id)
         ->assertHasNoErrors();
 
+    $question->refresh();
     $wallet->refresh();
 
-    expect((float) $wallet->reward_balance)->toBe(10.0);
+    expect($question->status)->toBe('active')
+        ->and($question->is_paid)->toBeTrue()
+        ->and((float) $wallet->reward_balance)->toBe(10.0);
 });
