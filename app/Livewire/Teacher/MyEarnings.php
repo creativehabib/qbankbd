@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Teacher;
 
+use App\Models\Question;
 use App\Models\Wallet;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -12,7 +13,7 @@ class MyEarnings extends Component
     {
         $wallet = Wallet::query()->with('transactions')->where('user_id', auth()->id())->first();
 
-        $fromQuestions = (float) optional($wallet)->transactions?->where('type', 'earn_question')->where('status', 'approved')->sum('amount');
+        $fromQuestions = (float) Question::query()->where('user_id', auth()->id())->where('is_paid', true)->count() * 10;
         $fromShares = (float) optional($wallet)->transactions?->where('type', 'earn_share')->where('status', 'approved')->sum('amount');
 
         return view('livewire.teacher.my-earnings', [
