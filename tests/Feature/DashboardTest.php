@@ -17,12 +17,17 @@ test('student sees student dashboard', function () {
 });
 
 test('teacher sees teacher dashboard', function () {
-    $user = User::factory()->teacher()->create();
+    $user = User::factory()->teacher()->create([
+        'institution_name' => 'গাজীপুর মর্নিং সান স্কুল',
+        'institution_address' => 'স্কুল • গাজীপুর',
+    ]);
 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Teacher Panel');
+        ->assertSee('Teacher Panel')
+        ->assertSee('গাজীপুর মর্নিং সান স্কুল')
+        ->assertSee('স্কুল • গাজীপুর');
 });
 
 test('admin sees admin dashboard', function () {

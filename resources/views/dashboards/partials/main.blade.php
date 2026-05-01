@@ -11,23 +11,27 @@
         'total_cost' => 0,
     ];
     $recentQuestionSet = $recentQuestionSet ?? null;
+    $teacherInstitutionName = auth()->user()?->institution_name ?: $welcomeTitle;
+    $teacherInstitutionAddress = auth()->user()?->institution_address ?: 'প্রতিষ্ঠানের ঠিকানা যোগ করুন';
 @endphp
 
 <x-layouts::app :title="$panelTitle">
     <div class="space-y-4 sm:space-y-5">
-        <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div class="space-y-1">
-                    <h2 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 sm:text-xl">{{ $welcomeTitle }}</h2>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $welcomeSubtitle }}</p>
-                </div>
+        @if($isTeacher)
+            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div class="space-y-1">
+                        <h2 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 sm:text-xl">{{ $teacherInstitutionName }}</h2>
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $teacherInstitutionAddress }}</p>
+                    </div>
 
-                <div class="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
-                    <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">তথ্য পরিবর্তন</a>
-                    <a href="{{ $isTeacher ? route('teacher.institution-info') : route('dashboard') }}" class="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700">প্রতিষ্ঠান তথ্য</a>
+                    <div class="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
+                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">তথ্য পরিবর্তন</a>
+                        <a href="{{ route('teacher.institution-info') }}" class="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700">প্রতিষ্ঠান তথ্য</a>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
 
         <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
             <div class="space-y-2 text-center">
