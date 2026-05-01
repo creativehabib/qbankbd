@@ -28,7 +28,6 @@
                             <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">{{ $loop->iteration }}</td>
                             <td class="px-4 py-3">
                                 <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $questionSet->name }}</p>
-                                <p class="text-xs text-zinc-500">ID: {{ $questionSet->id }}</p>
                             </td>
                             <td class="px-4 py-3 text-zinc-700 dark:text-zinc-300">
                                 @php
