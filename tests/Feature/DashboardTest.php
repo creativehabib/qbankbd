@@ -22,12 +22,27 @@ test('teacher sees teacher dashboard', function () {
         'institution_address' => 'স্কুল • গাজীপুর',
     ]);
 
+    $academicClass = AcademicClass::query()->create([
+        'name' => 'SSC',
+        'slug' => 'ssc',
+    ]);
+
+    Subject::query()->create([
+        'academic_class_id' => $academicClass->id,
+        'name' => 'বাংলা',
+        'slug' => 'bangla',
+    ]);
+
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
         ->assertSee('Teacher Panel')
         ->assertSee('গাজীপুর মর্নিং সান স্কুল')
-        ->assertSee('স্কুল • গাজীপুর');
+        ->assertSee('স্কুল • গাজীপুর')
+        ->assertSee('প্রশ্ন তৈরি করুন')
+        ->assertSee('SSC')
+        ->assertSee('বাংলা')
+        ->assertSee('Select Subject');
 });
 
 test('admin sees admin dashboard', function () {

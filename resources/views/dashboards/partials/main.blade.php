@@ -11,6 +11,7 @@
         'total_cost' => 0,
     ];
     $recentQuestionSet = $recentQuestionSet ?? null;
+    $academicClasses = $academicClasses ?? collect();
     $teacherInstitutionName = auth()->user()?->institution_name ?: $welcomeTitle;
     $teacherInstitutionAddress = auth()->user()?->institution_address ?: 'প্রতিষ্ঠানের ঠিকানা যোগ করুন';
 @endphp
@@ -18,6 +19,50 @@
 <x-layouts::app :title="$panelTitle">
     <div class="space-y-4 sm:space-y-5">
         @if($isTeacher)
+            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
+                <div class="space-y-2 text-center">
+                    <h3 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">প্রশ্ন তৈরি করুন</h3>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">E-Question Builder ব্যবহার করে একাডেমিক, ভর্তি ও চাকরির প্রস্তুতির জন্য নিজের প্রশ্নপত্র তৈরি করুন।</p>
+                </div>
+
+                <div
+                    x-data="{ selectedClass: '', selectedSubject: '', classes: {{ Js::from($academicClasses->map(fn ($class) => ['id' => (string) $class->id, 'name' => $class->name, 'subjects' => $class->subjects->map(fn ($subject) => ['id' => (string) $subject->id, 'name' => $subject->name])->values()])->values()) }}, get filteredSubjects() { if (!this.selectedClass) { return []; } const foundClass = this.classes.find((item) => item.id === this.selectedClass); return foundClass ? foundClass.subjects : []; } }"
+                    class="mt-4 rounded-xl border border-dashed border-zinc-300 p-3 sm:p-4"
+                >
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" class="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700">All Subject (1 - 8th)</button>
+                            <template x-for="academicClass in classes" :key="academicClass.id">
+                                <button
+                                    type="button"
+                                    @click="selectedClass = academicClass.id; selectedSubject = '';"
+                                    class="rounded-full border px-4 py-2 text-sm font-medium"
+                                    :class="selectedClass === academicClass.id ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-zinc-300 text-zinc-700'"
+                                    x-text="academicClass.name"
+                                ></button>
+                            </template>
+                        </div>
+
+                        <div class="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+                            <select x-model="selectedSubject" class="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-700 sm:min-w-72">
+                                <option value="">Select Subject</option>
+                                <template x-for="subject in filteredSubjects" :key="subject.id">
+                                    <option :value="subject.id" x-text="subject.name"></option>
+                                </template>
+                            </select>
+
+                            <a
+                                :href="selectedSubject ? `{{ route('questions.set.create') }}?subject_id=${selectedSubject}` : '#'
+                                "
+                                class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold"
+                                :class="selectedSubject ? 'bg-indigo-600 text-white' : 'cursor-not-allowed bg-indigo-200 text-white'"
+                                :aria-disabled="selectedSubject ? 'false' : 'true'"
+                            >পরবর্তী ধাপ →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div class="space-y-1">

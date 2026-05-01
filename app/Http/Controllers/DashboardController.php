@@ -6,6 +6,7 @@ use App\Models\QuestionSet;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\ExamCategory;
+use App\Models\AcademicClass;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -75,6 +76,11 @@ class DashboardController extends Controller
                 ->where(fn (QuestionSet $set) => in_array(($set->generation_criteria['type'] ?? null), ['cq', 'written'], true))
                 ->sum(fn (QuestionSet $set) => (int) ($set->generation_criteria['quantity'] ?? 0));
 
+            $academicClasses = AcademicClass::query()
+                ->with(['subjects' => fn ($query) => $query->orderBy('name')])
+                ->orderBy('name')
+                ->get(['id', 'name']);
+
             return view('dashboards.teacher', [
                 'teacherStats' => [
                     'total_question_sets' => $totalQuestionSets,
@@ -83,6 +89,7 @@ class DashboardController extends Controller
                     'total_cost' => 0,
                 ],
                 'recentQuestionSet' => $teacherQuestionSets->first(),
+                'academicClasses' => $academicClasses,
             ]);
         }
 
