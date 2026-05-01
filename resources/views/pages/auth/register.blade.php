@@ -41,6 +41,20 @@
                 viewable
             />
 
+
+            <div x-data="{ registrationRole: '{{ old('registration_role', 'student') }}' }" class="space-y-4">
+                <flux:select name="registration_role" x-model="registrationRole" :label="__('I want to register as')">
+                    <option value="student">{{ __('Student') }}</option>
+                    <option value="teacher">{{ __('Teacher') }}</option>
+                </flux:select>
+
+                <div x-show="registrationRole === 'teacher'" x-cloak class="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                    <flux:input name="institution_name" :label="__('Institution name')" :value="old('institution_name')" type="text" :placeholder="__('Institution name')" />
+                    <flux:input name="institution_type" :label="__('Institution type')" :value="old('institution_type')" type="text" :placeholder="__('School / College / Madrasa')" />
+                    <flux:textarea name="institution_address" :label="__('Institution address')">{{ old('institution_address') }}</flux:textarea>
+                </div>
+            </div>
+
             <!-- Confirm Password -->
             <flux:input
                 name="password_confirmation"
