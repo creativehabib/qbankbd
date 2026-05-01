@@ -159,15 +159,15 @@ test('super admin dashboard shows overview stat cards', function () {
 });
 
 
-test('teacher dashboard shows monetization quick options', function () {
+test('teacher dashboard does not show removed monetization quick options', function () {
     $user = User::factory()->teacher()->create();
 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('নতুন অপশনসমূহ')
-        ->assertSee('আমার সাবস্ক্রিপশন')
-        ->assertSee('প্রাইসিং')
-        ->assertSee('আমার উপার্জন')
-        ->assertSee('রিচার্জ / উইথড্র');
+        ->assertDontSee('নতুন অপশনসমূহ')
+        ->assertDontSee('আমার সাবস্ক্রিপশন')
+        ->assertDontSee('প্রাইসিং')
+        ->assertDontSee('আমার উপার্জন')
+        ->assertDontSee('রিচার্জ / উইথড্র');
 });
