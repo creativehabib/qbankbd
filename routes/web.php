@@ -14,6 +14,11 @@ use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Tags\Index as TagIndex;
 use App\Livewire\Teacher\CreateQuestionSet;
 use App\Livewire\Teacher\GeneratedQuestionSetPage;
+use App\Livewire\Teacher\InstitutionInfo;
+use App\Livewire\Teacher\MyEarnings;
+use App\Livewire\Teacher\PricingPlans;
+use App\Livewire\Teacher\SubscriptionOverview;
+use App\Livewire\Teacher\WalletTransactions;
 use App\Livewire\Teacher\MyQuestionSets;
 use App\Livewire\Teacher\QuestionGenerator;
 use App\Livewire\Teacher\QuestionPaper;
@@ -91,6 +96,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/question-create', QuestionGenerator::class)->name('teacher.questions.generate');
     Route::get('/teacher/my-question-sets', MyQuestionSets::class)->name('teacher.questions.index');
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
+    Route::get('/teacher/institution-info', InstitutionInfo::class)->middleware('role:teacher')->name('teacher.institution-info');
+    Route::get('/teacher/subscription', SubscriptionOverview::class)->middleware('role:teacher')->name('teacher.subscription');
+    Route::get('/teacher/pricing', PricingPlans::class)->middleware('role:teacher')->name('teacher.pricing');
+    Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
+    Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
 
