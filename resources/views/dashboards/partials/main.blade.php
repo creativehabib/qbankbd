@@ -52,7 +52,7 @@
                             </select>
 
                             <a
-                                :href="selectedSubject ? `{{ route('questions.set.create') }}?subject_id=${selectedSubject}` : '#'
+                                :href="selectedSubject ? `{{ route('question.set-create') }}?subject_id=${selectedSubject}` : '#'
                                 "
                                 class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold"
                                 :class="selectedSubject ? 'bg-indigo-600 text-white' : 'cursor-not-allowed bg-indigo-200 text-white'"
