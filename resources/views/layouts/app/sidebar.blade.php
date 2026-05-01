@@ -26,6 +26,7 @@
     $adminItems = [
         ['label' => __('User Management'), 'route' => 'users.index', 'match' => 'users.*', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
         ['label' => __('Theme Options'), 'route' => 'admin.theme-options', 'match' => 'admin.theme-options', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+        ['label' => __('Wallet Approvals'), 'route' => 'admin.wallet-approvals', 'match' => 'admin.wallet-approvals', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
         ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
         ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
     ];
