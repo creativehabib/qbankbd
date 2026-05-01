@@ -29,34 +29,6 @@
             </div>
         </section>
 
-        @if($isTeacher)
-            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">নতুন অপশনসমূহ</h3>
-                    <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">Teacher Tools</span>
-                </div>
-
-                <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <a href="{{ route('teacher.subscription') }}" class="rounded-xl border border-zinc-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500">আমার সাবস্ক্রিপশন</p>
-                        <p class="mt-1 text-lg font-semibold">Package & Validity</p>
-                    </a>
-                    <a href="{{ route('teacher.pricing') }}" class="rounded-xl border border-zinc-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500">প্রাইসিং</p>
-                        <p class="mt-1 text-lg font-semibold">Buy Package</p>
-                    </a>
-                    <a href="{{ route('teacher.earnings') }}" class="rounded-xl border border-zinc-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500">আমার উপার্জন</p>
-                        <p class="mt-1 text-lg font-semibold">Earnings Summary</p>
-                    </a>
-                    <a href="{{ route('teacher.wallet') }}" class="rounded-xl border border-zinc-200 p-4 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500">রিচার্জ / উইথড্র</p>
-                        <p class="mt-1 text-lg font-semibold">Wallet & Report</p>
-                    </a>
-                </div>
-            </section>
-        @endif
-
         <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
             <div class="space-y-2 text-center">
                 <h3 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">{{ __('ড্যাশবোর্ড ওভারভিউ') }}</h3>
