@@ -40,7 +40,7 @@ class BulkUpload extends Component
 
     public string $difficulty = 'easy';
 
-    public float $marks = 1;
+    public int $marks = 1;
 
     public array $exam_category_ids = [];
 
@@ -374,7 +374,7 @@ class BulkUpload extends Component
             'chapter_id' => 'nullable|exists:chapters,id',
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
             'difficulty' => 'required|in:easy,medium,hard',
-            'marks' => 'required|numeric|min:0.25',
+            'marks' => 'required|integer|min:1',
             'exam_category_ids' => 'required|array|min:1',
             'exam_category_ids.*' => 'required|exists:exam_categories,id',
             'tagIds' => 'nullable|array',

@@ -102,7 +102,7 @@ class QuestionForm extends Component
             'title' => 'required|string',
             'difficulty' => 'required|in:easy,medium,hard',
             'question_type' => 'required|in:mcq,cq,short',
-            'marks' => 'required|numeric|min:0',
+            'marks' => 'required|integer|min:0',
             'tagIds' => 'nullable|array',
         ];
 

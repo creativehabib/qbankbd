@@ -96,7 +96,7 @@ it('creates updates and deletes a question from the livewire crud screen', funct
     $question->refresh();
 
     expect($question->title)->toBe('Updated algebra question');
-    expect((float) $question->marks)->toBe(2.0);
+    expect($question->marks)->toBe(2);
     expect($question->status)->toBe('active');
 
     Livewire::actingAs($admin)
