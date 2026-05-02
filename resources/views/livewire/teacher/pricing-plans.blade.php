@@ -16,7 +16,7 @@
                     <li>Page View - {{ $plan->page_view_limit ?: 'Unlimited' }}</li>
                     <li>Ad Free Content - {{ $plan->is_ad_free ? 'Unlimited' : 'No' }}</li>
                 </ul>
-                <button wire:click="purchase({{ $plan->id }})" class="mt-4 w-full rounded-lg bg-indigo-600 py-2 font-semibold text-white">Buy Package</button>
+                <a wire:navigate href="{{ route('teacher.pricing.checkout', $plan) }}" class="mt-4 w-full rounded-lg bg-indigo-600 py-2 font-semibold text-white">Buy Package</a>
             </div>
         @empty
             <div class="col-span-full rounded-xl border border-dashed border-zinc-300 p-8 text-center text-zinc-500 dark:border-zinc-700">কোনো package পাওয়া যায়নি।</div>
