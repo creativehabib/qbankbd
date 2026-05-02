@@ -267,7 +267,7 @@ class Edit extends Component
             'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
             'question_type' => 'required|in:mcq,cq,short,written', // written যুক্ত করা হয়েছে
-            'marks' => 'required|numeric|min:0',
+            'marks' => 'required|integer|min:0',
             'tagIds' => 'nullable|array',
             'exam_category_ids' => 'required|array|min:1', // Target Audience Required
             'exam_category_ids.*' => 'exists:exam_categories,id',
