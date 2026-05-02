@@ -321,7 +321,7 @@ class Edit extends Component
                 'description' => $this->description,
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
-                'marks' => $this->marks,
+                'marks' => (float) $this->marks == floor((float) $this->marks) ? (int) $this->marks : (float) $this->marks,
                 'extra_content' => $extraData,
             ]);
 

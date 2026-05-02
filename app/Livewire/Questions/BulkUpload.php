@@ -430,7 +430,7 @@ class BulkUpload extends Component
                     'slug' => $slug,
                     'difficulty' => $this->difficulty,
                     'question_type' => 'mcq',
-                    'marks' => $this->marks,
+                    'marks' => (float) $this->marks == floor((float) $this->marks) ? (int) $this->marks : (float) $this->marks,
                     'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
                     'extra_content' => $formattedOptions,
                     'user_id' => $currentUser?->id,

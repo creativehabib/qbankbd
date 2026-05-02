@@ -130,7 +130,7 @@ class QuestionForm extends Component
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
-                'marks' => $this->marks,
+                'marks' => (float) $this->marks == floor((float) $this->marks) ? (int) $this->marks : (float) $this->marks,
             ]);
             $q->tags()->sync($tagIds);
             $q->options()->delete();
