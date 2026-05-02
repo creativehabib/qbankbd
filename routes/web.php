@@ -17,6 +17,7 @@ use App\Livewire\Teacher\GeneratedQuestionSetPage;
 use App\Livewire\Teacher\InstitutionInfo;
 use App\Livewire\Teacher\MyEarnings;
 use App\Livewire\Teacher\PricingPlans;
+use App\Livewire\Teacher\PackageCheckout;
 use App\Livewire\Teacher\SubscriptionOverview;
 use App\Livewire\Teacher\WalletTransactions;
 use App\Livewire\Teacher\MyQuestionSets;
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/institution-info', InstitutionInfo::class)->middleware('role:teacher')->name('teacher.institution-info');
     Route::get('/teacher/subscription', SubscriptionOverview::class)->middleware('role:teacher')->name('teacher.subscription');
     Route::get('/teacher/pricing', PricingPlans::class)->middleware('role:teacher')->name('teacher.pricing');
+    Route::get('/teacher/pricing/checkout/{package}', PackageCheckout::class)->middleware('role:teacher')->name('teacher.pricing.checkout');
     Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
     Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
