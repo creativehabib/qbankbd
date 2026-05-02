@@ -189,6 +189,7 @@ class ViewQuestions extends Component
 
         $query = Question::query()
             ->with(['tags', 'examCategories'])
+            ->where('status', 'active')   // ← শুধু active প্রশ্ন দেখাবে
             ->when($this->baseType, function ($q) {
                 if (in_array($this->baseType, ['composite', 'combine'])) {
                     $q->whereIn('question_type', ['mcq', 'cq', 'short']);
@@ -197,15 +198,15 @@ class ViewQuestions extends Component
                 }
             })
 
-            // ক্লাস ফিল্টার (সবসময় থাকবে)
+            // ক্লাস ফিল্টার (সবসময় থাকবে)
             ->when($activeClassId, fn ($q) => $q->where('academic_class_id', $activeClassId))
 
-            // বিষয় এবং অধ্যায় ফিল্টার (ট্যাগ বা এক্সাম ক্যাটাগরি সিলেক্ট করা থাকলে এগুলো কাজ করবে না)
-            ->when(!$isGlobalFilterActive && $activeSubjectId, fn ($q) => $q->where('subject_id', $activeSubjectId))
-            ->when(!$isGlobalFilterActive && $activeChapterId, fn ($q) => $q->where('chapter_id', $activeChapterId))
+            // বিষয় এবং অধ্যায় ফিল্টার (ট্যাগ বা এক্সাম ক্যাটাগরি সিলেক্ট করা থাকলে এগুলো কাজ করবে না)
+            ->when(! $isGlobalFilterActive && $activeSubjectId, fn ($q) => $q->where('subject_id', $activeSubjectId))
+            ->when(! $isGlobalFilterActive && $activeChapterId, fn ($q) => $q->where('chapter_id', $activeChapterId))
 
             // অন্যান্য ফিল্টার
-            ->when($this->searchKeyword, fn ($q) => $q->where('title', 'LIKE', '%' . $this->searchKeyword . '%'))
+            ->when($this->searchKeyword, fn ($q) => $q->where('title', 'LIKE', '%'.$this->searchKeyword.'%'))
             ->when(count($this->selectedTypes) > 0, fn ($q) => $q->whereIn('question_type', $this->selectedTypes))
             ->when(count($this->selectedDifficulties) > 0, fn ($q) => $q->whereIn('difficulty', $this->selectedDifficulties))
             ->when(count($this->selectedTopics) > 0, fn ($q) => $q->whereIn('topic_id', $this->selectedTopics))
@@ -235,6 +236,6 @@ class ViewQuestions extends Component
         }
 
         return view('livewire.teacher.view-questions')
-            ->layout('layouts.app');
+            ->layout('layouts.app', ['title' => 'View Questions']);
     }
 }
