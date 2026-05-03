@@ -255,6 +255,67 @@ test('latest mcq questions are shown after opening a chapter folder', function (
         ->assertSee('এটি একটি ব্যাখ্যা।');
 });
 
+test('subject start action opens first active chapter questions directly', function () {
+    $student = User::factory()->create();
+
+    $classTen = AcademicClass::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'Class 10',
+        'slug' => 'class-10-subject-start',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $subject = Subject::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'academic_class_id' => $classTen->id,
+        'name' => 'পদার্থবিজ্ঞান',
+        'slug' => 'physics-subject-start',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    $chapter = Chapter::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'subject_id' => $subject->id,
+        'name' => 'ভৌত রাশি',
+        'slug' => 'physical-quantities',
+        'order_sequence' => 1,
+        'is_active' => true,
+        'is_premium' => false,
+    ]);
+
+    Question::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'title' => 'Subject start question',
+        'slug' => 'subject-start-question',
+        'difficulty' => 'easy',
+        'question_type' => 'mcq',
+        'marks' => 1,
+        'status' => 'active',
+        'is_premium' => false,
+        'user_id' => $student->id,
+        'academic_class_id' => $classTen->id,
+        'subject_id' => $subject->id,
+        'chapter_id' => $chapter->id,
+        'extra_content' => [
+            ['option_text' => 'Option A', 'is_correct' => true],
+            ['option_text' => 'Option B', 'is_correct' => false],
+        ],
+    ]);
+
+    Livewire::actingAs($student)
+        ->test(PracticeIndex::class)
+        ->call('openClass', $classTen->id)
+        ->call('startSubjectPractice', $subject->id)
+        ->assertSet('level', 'questions')
+        ->assertSet('selectedSubjectId', $subject->id)
+        ->assertSet('selectedChapterId', $chapter->id)
+        ->assertSee('Subject start question');
+});
+
 test('teacher cannot access student practice page', function () {
     $teacher = User::factory()->teacher()->create();
 

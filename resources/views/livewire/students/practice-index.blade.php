@@ -155,7 +155,7 @@
                             @if($level === 'subjects')
                                 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                     @foreach($subjects as $subject)
-                                        <button type="button" wire:click="openSubject({{ $subject->id }})" class="flex items-center justify-between gap-3 rounded-xl border cursor-pointer border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
+                                        <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
                                             <div class="flex items-center gap-3">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
                                                 <div>
@@ -163,8 +163,11 @@
                                                     <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $subject->mcq_questions_count }} MCQ</p>
                                                 </div>
                                             </div>
-                                            <flux:icon.chevron-right class="size-5 shrink-0 text-zinc-400" />
-                                        </button>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:bg-emerald-500"><flux:icon.play class="size-3.5" /> Start</button>
+                                                <button type="button" wire:click="openSubject({{ $subject->id }})" class="rounded-md p-1 text-zinc-400 transition hover:text-emerald-600 dark:hover:text-emerald-400"><flux:icon.chevron-right class="size-5 shrink-0" /></button>
+                                            </div>
+                                        </div>
                                     @endforeach
                                 </div>
                             @endif
