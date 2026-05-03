@@ -85,7 +85,10 @@
                                         @php($options = collect($question->extra_content ?? [])->take(4))
                                         @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                         <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
-                                            <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h5>
+
+                                            <!-- Pagination Serial Fix -->
+                                            <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($filteredQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
+
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
                                                 <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
@@ -99,6 +102,57 @@
                                                         <span class="text-sm text-zinc-800 dark:text-zinc-100" data-math-content>{!! $optionText !!}</span>
                                                     </div>
                                                 @endforeach
+                                            </div>
+
+                                            <!-- Dynamic Action Icons & Explanation -->
+                                            <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
+                                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                                                    <!-- Explanation Button: Click + Record View -->
+                                                    <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
+                                                        <span>Explanation</span>
+                                                        <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
+                                                    </button>
+
+                                                    <!-- Action Icons -->
+                                                    <div class="flex items-center gap-4 text-zinc-400 dark:text-zinc-500">
+                                                        <div class="flex items-center gap-1.5" title="Views">
+                                                            <flux:icon.eye class="size-[18px]" />
+                                                            <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
+                                                        </div>
+                                                        <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition" title="Statistics">
+                                                            <flux:icon.chart-pie class="size-[18px]" />
+                                                        </button>
+                                                        <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer transition {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                            <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
+                                                        </button>
+                                                        <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer transition {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                            <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
+                                                            @if($question->likes_count > 0)
+                                                                <span class="text-xs font-medium">{{ $question->likes_count }}</span>
+                                                            @endif
+                                                        </button>
+                                                        <button type="button" wire:click="$dispatch('openModal', { component: 'report-modal', arguments: { questionId: {{ $question->id }} } })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                            <flux:icon.flag class="size-[18px]" />
+                                                        </button>
+                                                        <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
+                                                            <flux:icon.share class="size-[18px]" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Explanation Content -->
+                                                <div x-show="openDescription" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
+                                                    @if(filled($question->description))
+                                                        <div class="prose prose-sm max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
+                                                    @else
+                                                        <div class="space-y-3 text-center">
+                                                            <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
+                                                            <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
+                                                            <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm">✨ AI Generate</button>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </article>
                                     @endforeach
@@ -159,10 +213,9 @@
                             @if($level === 'subjects')
                                 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                     @foreach($subjects as $subject)
-                                        <!-- Subject Card Update: Div used instead of button to prevent nested action issues -->
                                         <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
 
-                                            <!-- ক্লিক করলে চ্যাপ্টার লিস্টে যাবে -->
+                                            <!-- Subject Click -> Chapters -->
                                             <div wire:click="openSubject({{ $subject->id }})" class="flex flex-1 items-center gap-3 cursor-pointer">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
                                                 <div>
@@ -172,12 +225,10 @@
                                             </div>
 
                                             <div class="flex shrink-0 items-center">
-                                                <!-- হোভার করলে Start বাটন দেখাবে এবং ক্লিক করলে সাবজেক্টের প্রশ্ন আসবে -->
+                                                <!-- Hover Start Button -> Questions -->
                                                 <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="hidden items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700 group-hover:flex dark:bg-emerald-500 dark:hover:bg-emerald-600">
                                                     <flux:icon.play class="size-3.5" /> Start
                                                 </button>
-
-                                                <!-- ডিফল্ট আইকন (Start বাটন দেখালে এটি হাইড হয়ে যাবে) -->
                                                 <flux:icon.chevron-right class="size-5 text-zinc-400 transition group-hover:hidden" />
                                             </div>
                                         </div>
@@ -215,12 +266,16 @@
                                             @php($options = collect($question->extra_content ?? [])->take(4))
                                             @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                             <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
-                                                <h5 class="text-lg text-zinc-900 dark:text-zinc-100" data-math-content>{!! $loop->iteration . '. ' . $questionTitle !!}</h5>
+
+                                                <!-- Pagination Serial Fix -->
+                                                <h5 class="text-lg text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($latestQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
+
                                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                                     <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
                                                     <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
-                                                    <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->difficulty) }}</span>
+                                                    <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->difficulty ?? 'MCQ') }}</span>
                                                 </div>
+
                                                 <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
                                                     @foreach($options as $option)
                                                         <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ !empty($option['is_correct']) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
@@ -229,25 +284,50 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                                <div x-data="{ openDescription: false }" class="mt-3 space-y-3">
-                                                    <div class="flex items-center justify-between">
-                                                        <button type="button" @click="openDescription = !openDescription" class="inline-flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+
+                                                <!-- Dynamic Action Icons & Explanation -->
+                                                <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
+                                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                                                        <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
                                                             <span>Explanation</span>
-                                                            <flux:icon.chevron-down class="size-4 transition" x-bind:class="openDescription ? 'rotate-180' : ''" />
+                                                            <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
                                                         </button>
-                                                        <div class="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
-                                                            <span class="inline-flex items-center gap-1"><flux:icon.eye class="size-4" />{{ $question->views }}</span>
-                                                            <span class="inline-flex items-center gap-1"><flux:icon.calendar-days class="size-4" />{{ $question->created_at?->format('d M Y') }}</span>
+
+                                                        <div class="flex items-center gap-4 text-zinc-400 dark:text-zinc-500">
+                                                            <div class="flex items-center gap-1.5" title="Views">
+                                                                <flux:icon.eye class="size-[18px]" />
+                                                                <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
+                                                            </div>
+                                                            <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition" title="Statistics">
+                                                                <flux:icon.chart-pie class="size-[18px]" />
+                                                            </button>
+                                                            <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer transition {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                                <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
+                                                            </button>
+                                                            <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer transition {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                                <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
+                                                                @if($question->likes_count > 0)
+                                                                    <span class="text-xs font-medium">{{ $question->likes_count }}</span>
+                                                                @endif
+                                                            </button>
+                                                            <button type="button" wire:click="$dispatch('openModal', { component: 'report-modal', arguments: { questionId: {{ $question->id }} } })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                                <flux:icon.flag class="size-[18px]" />
+                                                            </button>
+                                                            <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
+                                                                <flux:icon.share class="size-[18px]" />
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <div x-show="openDescription" x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600">
+
+                                                    <div x-show="openDescription" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                                         @if(filled($question->description))
                                                             <div class="prose prose-sm max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
                                                         @else
                                                             <div class="space-y-3 text-center">
                                                                 <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
                                                                 <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
-                                                                <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700">✨ AI Generate</button>
+                                                                <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm">✨ AI Generate</button>
                                                             </div>
                                                         @endif
                                                     </div>

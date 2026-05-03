@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,25 +20,16 @@ class PracticeIndex extends Component
     use WithPagination;
 
     public string $level = 'classes';
-
     public string $activeTab = 'fast';
-
     public string $search = '';
-
     public ?int $selectedClassId = null;
-
     public ?int $selectedSubjectId = null;
-
     public ?int $selectedChapterId = null;
 
     public array $filterQuestionTypes = [];
-
     public array $filterClasses = [];
-
     public array $filterSubjects = [];
-
     public array $filterTeachers = [];
-
     public string $filterSearch = '';
 
     public function mount(): void
@@ -45,7 +37,6 @@ class PracticeIndex extends Component
         abort_unless(auth()->user()?->isStudent(), 403);
     }
 
-    // লাইভ ফিল্টার হুক
     public function updated($property): void
     {
         if (str_starts_with($property, 'filter')) {
@@ -61,13 +52,11 @@ class PracticeIndex extends Component
             || ! empty($this->filterTeachers)
             || filled($this->filterSearch);
 
-        // ফিল্টার থাকলে filtered-questions এ নিয়ে যাবে
         if ($hasFilters) {
             if ($this->level !== 'filtered-questions') {
                 $this->level = 'filtered-questions';
             }
         } else {
-            // সব ফিল্টার খালি হয়ে গেলে আগের অবস্থায় (চ্যাপ্টারের প্রশ্নে) ফিরিয়ে আনবে
             if ($this->level === 'filtered-questions') {
                 $this->level = 'questions';
             }
@@ -85,7 +74,6 @@ class PracticeIndex extends Component
         $this->filterTeachers = [];
         $this->filterSearch = '';
 
-        // যদি ফিল্টার ভিউতে থাকে, তাহলে মূল চ্যাপ্টারের প্রশ্নে ফিরিয়ে আনবে (ক্লাসে নয়)
         if ($this->level === 'filtered-questions') {
             $this->level = 'questions';
         }
@@ -93,6 +81,8 @@ class PracticeIndex extends Component
         $this->resetPage();
         $this->dispatch('practice-content-updated');
     }
+
+    // --- Navigation Methods ---
 
     public function openClass(int $classId): void
     {
@@ -121,13 +111,12 @@ class PracticeIndex extends Component
         }
     }
 
-    // নতুন মেথড: সরাসরি সাবজেক্টের প্রশ্ন লোড করার জন্য
     public function startSubjectPractice(int $subjectId): void
     {
         $isValidSubject = Subject::query()->whereKey($subjectId)->where('academic_class_id', $this->selectedClassId)->where('is_active', true)->exists();
         if ($isValidSubject) {
             $this->selectedSubjectId = $subjectId;
-            $this->selectedChapterId = null; // চ্যাপ্টার সিলেক্ট না করেই প্রশ্নে যাবে
+            $this->selectedChapterId = null;
             $this->level = 'questions';
             $this->search = '';
             $this->resetPage();
@@ -174,6 +163,45 @@ class PracticeIndex extends Component
         $this->resetPage();
         $this->dispatch('practice-content-updated');
     }
+
+    // --- Dynamic Actions (Scalable Approach) ---
+
+    public function toggleLike(int $questionId): void
+    {
+        $question = Question::findOrFail($questionId);
+        $toggled = $question->likes()->toggle(auth()->id());
+
+        if (count($toggled['attached']) > 0) {
+            $question->increment('likes_count');
+        } elseif (count($toggled['detached']) > 0) {
+            $question->decrement('likes_count');
+        }
+    }
+
+    public function toggleBookmark(int $questionId): void
+    {
+        $question = Question::findOrFail($questionId);
+        $toggled = $question->bookmarks()->toggle(auth()->id());
+
+        if (count($toggled['attached']) > 0) {
+            $question->increment('bookmarks_count');
+        } elseif (count($toggled['detached']) > 0) {
+            $question->decrement('bookmarks_count');
+        }
+    }
+
+    public function recordView(int $questionId): void
+    {
+        $viewerId = auth()->check() ? 'user_' . auth()->id() : 'ip_' . request()->ip();
+        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
+
+        if (!Cache::has($cacheKey)) {
+            Question::where('id', $questionId)->increment('views_count');
+            Cache::put($cacheKey, true, now()->addHours(24));
+        }
+    }
+
+    // --- Data Fetching ---
 
     protected function getFilterOptions(): array
     {
@@ -226,32 +254,27 @@ class PracticeIndex extends Component
             ->when($this->selectedChapterId !== null, fn (Builder $q) => $q->where('chapter_id', $this->selectedChapterId))
             ->when($this->selectedChapterId === null && $this->selectedSubjectId !== null, fn (Builder $q) => $q->where('subject_id', $this->selectedSubjectId))
             ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
+            ->withExists([
+                'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
+                'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
+            ])
             ->latest('id')->paginate(20);
     }
 
-    /**
-     * @return LengthAwarePaginator<int, Question>
-     */
     protected function filteredQuestions(): LengthAwarePaginator
     {
         return Question::query()
-            ->when(! empty($this->filterQuestionTypes), function (Builder $query): void {
-                $query->whereIn('question_type', $this->filterQuestionTypes);
-            })
+            ->when(! empty($this->filterQuestionTypes), fn (Builder $query) => $query->whereIn('question_type', $this->filterQuestionTypes))
             ->where('status', 'active')
-            ->when(! empty($this->filterClasses), function (Builder $query): void {
-                $query->whereIn('academic_class_id', $this->filterClasses);
-            })
-            ->when(! empty($this->filterSubjects), function (Builder $query): void {
-                $query->whereIn('subject_id', $this->filterSubjects);
-            })
-            ->when(! empty($this->filterTeachers), function (Builder $query): void {
-                $query->whereIn('user_id', $this->filterTeachers);
-            })
-            ->when(filled($this->filterSearch), function (Builder $query): void {
-                $query->where('title', 'like', '%'.$this->filterSearch.'%');
-            })
+            ->when(! empty($this->filterClasses), fn (Builder $query) => $query->whereIn('academic_class_id', $this->filterClasses))
+            ->when(! empty($this->filterSubjects), fn (Builder $query) => $query->whereIn('subject_id', $this->filterSubjects))
+            ->when(! empty($this->filterTeachers), fn (Builder $query) => $query->whereIn('user_id', $this->filterTeachers))
+            ->when(filled($this->filterSearch), fn (Builder $query) => $query->where('title', 'like', '%'.$this->filterSearch.'%'))
             ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name'])
+            ->withExists([
+                'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
+                'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
+            ])
             ->latest('id')
             ->paginate(20);
     }

@@ -90,6 +90,15 @@ class Question extends Model
     {
         return $this->belongsToMany(ExamCategory::class, 'exam_category_question', 'question_id', 'exam_category_id');
     }
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'question_user_likes')->withTimestamps();
+    }
+
+    public function bookmarks()
+    {
+        return $this->belongsToMany(User::class, 'question_user_bookmarks')->withTimestamps();
+    }
 
     protected function generateUniqueSlug(string $title): string
     {
