@@ -121,6 +121,27 @@ class PracticeIndex extends Component
         }
     }
 
+    public function startSubjectPractice(int $subjectId): void
+    {
+        $isValidSubject = Subject::query()->whereKey($subjectId)->where('academic_class_id', $this->selectedClassId)->where('is_active', true)->exists();
+        if (! $isValidSubject) {
+            return;
+        }
+
+        $chapterId = Chapter::query()
+            ->where('subject_id', $subjectId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->value('id');
+
+        $this->selectedSubjectId = $subjectId;
+        $this->selectedChapterId = $chapterId;
+        $this->level = $chapterId ? 'questions' : 'chapters';
+        $this->search = '';
+        $this->resetPage();
+        $this->dispatch('practice-content-updated');
+    }
+
     public function openChapter(int $chapterId): void
     {
         $isValidChapter = Chapter::query()->whereKey($chapterId)->where('subject_id', $this->selectedSubjectId)->where('is_active', true)->exists();
