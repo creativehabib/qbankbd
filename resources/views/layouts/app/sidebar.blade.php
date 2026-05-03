@@ -1,45 +1,132 @@
 @php
-    $questionGroupItems = [
-        ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'visible' => true],
-        ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
-        ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
-        ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
-        ['label' => __('Chapter'), 'route' => 'chapters.index', 'match' => 'chapters.*', 'visible' => auth()->user()->hasAnyPermission(['chapters.manage'])],
-        ['label' => __('Topics'), 'route' => 'topics.index', 'match' => 'topics.*', 'visible' => auth()->user()->hasAnyPermission(['topics.manage'])],
-        ['label' => __('Tags'), 'route' => 'tags.index', 'match' => 'tags.*', 'visible' => auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete'])],
+    $menuItems = [
+        [
+            'type' => 'link',
+            'label' => __('Dashboard'),
+            'route' => 'dashboard',
+            'match' => 'dashboard',
+            'icon' => 'home',
+            'visible' => true,
+        ],
+        [
+            'type' => 'group',
+            'label' => __('প্রশ্ন ভান্ডার'),
+            'icon' => 'circle-stack',
+            'flyout' => 'question-bank',
+            'active' => request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
+            'visible' => true,
+            'items' => [
+                ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'visible' => true],
+                ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
+                ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
+                ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
+                ['label' => __('Chapter'), 'route' => 'chapters.index', 'match' => 'chapters.*', 'visible' => auth()->user()->hasAnyPermission(['chapters.manage'])],
+                ['label' => __('Topics'), 'route' => 'topics.index', 'match' => 'topics.*', 'visible' => auth()->user()->hasAnyPermission(['topics.manage'])],
+                ['label' => __('Tags'), 'route' => 'tags.index', 'match' => 'tags.*', 'visible' => auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete'])],
+            ]
+        ],
+        [
+            'type' => 'link',
+            'label' => __('Question Create'),
+            'route' => 'question.set-create',
+            'match' => 'question.set-create',
+            'icon' => 'plus-circle',
+            'visible' => true,
+        ],
+        [
+            'type' => 'link',
+            'label' => __('আমার তৈরি প্রশ্ন'),
+            'route' => 'teacher.questions.index',
+            'match' => 'teacher.questions.index',
+            'icon' => 'document-text',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('OMR Generator'),
+            'route' => 'omr.generator',
+            'match' => 'omr.generator',
+            'icon' => 'document-duplicate',
+            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('প্রতিষ্ঠানের তথ্য'),
+            'route' => 'teacher.institution-info',
+            'match' => 'teacher.institution-info',
+            'icon' => 'building-office',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('আমার সাবস্ক্রিপশন'),
+            'route' => 'teacher.subscription',
+            'match' => 'teacher.subscription',
+            'icon' => 'book-open',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('প্রাইসিং'),
+            'route' => 'teacher.pricing',
+            'match' => 'teacher.pricing',
+            'icon' => 'currency-dollar',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('আমার উপার্জন'),
+            'route' => 'teacher.earnings',
+            'match' => 'teacher.earnings',
+            'icon' => 'banknotes',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('রিচার্জ/উইথড্র'),
+            'route' => 'teacher.wallet',
+            'match' => 'teacher.wallet',
+            'icon' => 'wallet',
+            'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('Practice'),
+            'route' => 'students.practice.index',
+            'match' => 'students.practice.*',
+            'icon' => 'academic-cap',
+            'visible' => auth()->user()->isStudent(),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('Bookmarks'),
+            'route' => 'student.bookmarks',
+            'match' => 'student.bookmarks',
+            'icon' => 'bookmark',
+            'visible' => auth()->user()->isStudent(),
+        ],
+        [
+            'type' => 'group',
+            'label' => __('Administration'),
+            'icon' => 'cog-8-tooth',
+            'flyout' => 'admin',
+            'active' => request()->routeIs(['users.*', 'admin.theme-options', 'admin.wallet-approvals', 'admin.packages', 'permissions.*', 'roles-permissions.*']),
+            'visible' => auth()->user()->hasPermission('users.manage_roles') || auth()->user()->hasPermission('users.manage_permissions'),
+            'items' => [
+                ['label' => __('User Management'), 'route' => 'users.index', 'match' => 'users.*', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Theme Options'), 'route' => 'admin.theme-options', 'match' => 'admin.theme-options', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Wallet Approvals'), 'route' => 'admin.wallet-approvals', 'match' => 'admin.wallet-approvals', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Package Management'), 'route' => 'admin.packages', 'match' => 'admin.packages', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
+                ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
+            ]
+        ]
     ];
 
-    $singleItems = [
-        ['label' => __('Dashboard'), 'route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'home', 'visible' => true],
-        ['label' => __('Question Create'), 'route' => 'question.set-create', 'match' => 'question.set-create', 'icon' => 'plus-circle', 'visible' => true],
-        ['label' => __('আমার তৈরি প্রশ্ন'), 'route' => 'teacher.questions.index', 'match' => 'teacher.questions.index', 'icon' => 'document-text', 'visible' => auth()->user()->hasRole(['teacher'])],
-        ['label' => __('OMR Generator'), 'route' => 'omr.generator', 'match' => 'omr.generator', 'icon' => 'document-duplicate', 'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin'])],
-        ['label' => __('প্রতিষ্ঠানের তথ্য'), 'route' => 'teacher.institution-info', 'match' => 'teacher.institution-info', 'icon' => 'building-office', 'visible' => auth()->user()->hasRole(['teacher'])],
-        ['label' => __('আমার সাবস্ক্রিপশন'), 'route' => 'teacher.subscription', 'match' => 'teacher.subscription', 'icon' => 'book-open', 'visible' => auth()->user()->hasRole(['teacher'])],
-        ['label' => __('প্রাইসিং'), 'route' => 'teacher.pricing', 'match' => 'teacher.pricing', 'icon' => 'plus-circle', 'visible' => auth()->user()->hasRole(['teacher'])],
-        ['label' => __('আমার উপার্জন'), 'route' => 'teacher.earnings', 'match' => 'teacher.earnings', 'icon' => 'document-text', 'visible' => auth()->user()->hasRole(['teacher'])],
-        ['label' => __('রিচার্জ/উইথড্র'), 'route' => 'teacher.wallet', 'match' => 'teacher.wallet', 'icon' => 'document-duplicate', 'visible' => auth()->user()->hasRole(['teacher'])],
-        
-        ['label' => __('Practice'), 'route' => 'students.practice.index', 'match' => 'students.practice.*', 'icon' => 'book-open', 'visible' => auth()->user()->isStudent()],
-    ];
-
-    $adminItems = [
-        ['label' => __('User Management'), 'route' => 'users.index', 'match' => 'users.*', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-        ['label' => __('Theme Options'), 'route' => 'admin.theme-options', 'match' => 'admin.theme-options', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-        ['label' => __('Wallet Approvals'), 'route' => 'admin.wallet-approvals', 'match' => 'admin.wallet-approvals', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-        ['label' => __('Package Management'), 'route' => 'admin.packages', 'match' => 'admin.packages', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-        ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
-        ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
-    ];
-
-    $questionGroupExpanded = request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']);
-    $questionGroupActive = $questionGroupExpanded;
-    $adminGroupExpanded = request()->routeIs(['users.*', 'admin.theme-options', 'permissions.*', 'roles-permissions.*']);
-    $adminGroupActive = $adminGroupExpanded;
     $pageTitle = $title ?? $pageTitle ?? 'Dashboard';
 @endphp
 
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
     @include('partials.head')
@@ -68,113 +155,85 @@
     class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]"
 >
 <div class="flex min-h-screen">
+    <!-- Desktop Sidebar -->
     <aside class="fixed inset-y-0 left-0 z-40 hidden flex-col border-e border-zinc-200 bg-zinc-50 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:flex" :class="sidebarCollapsed ? 'w-16' : 'w-72'" data-test="desktop-sidebar">
         <div class="flex items-center justify-between border-b border-zinc-200 px-3 py-3 dark:border-[var(--app-dark-border)]">
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate x-show="! sidebarCollapsed" />
-            <button type="button" class="rounded-md border border-zinc-300 p-2 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800" @click="sidebarCollapsed = ! sidebarCollapsed" data-test="sidebar-collapse-button" title="Toggle sidebar">◨</button>
+            <button type="button" class="rounded-md border border-zinc-300 p-2 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800" @click="sidebarCollapsed = ! sidebarCollapsed" data-test="sidebar-collapse-button" title="Toggle sidebar">
+                <x-heroicon-o-bars-3-bottom-left class="size-5" />
+            </button>
         </div>
 
         <nav class="relative flex-1 space-y-2 p-2" :class="sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'" data-test="sidebar-nav">
+
+            <!-- Full Sidebar Menu -->
             <template x-if="! sidebarCollapsed">
                 <div class="space-y-2">
-                    @foreach($singleItems as $item)
+                    @foreach($menuItems as $item)
                         @if($item['visible'])
-                            <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>
-                                <span class="inline-flex h-4 w-4 items-center justify-center">
-                                    @switch($item['icon'])
-                                        @case('home')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25a1.5 1.5 0 0 1 1.5-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75" /></svg>
-                                            @break
-                                        @case('plus-circle')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" /></svg>
-                                            @break
-                                        @case('document-duplicate')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125H5.625A1.125 1.125 0 0 1 4.5 20.625V8.625c0-.621.504-1.125 1.125-1.125H9.75" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 3.75H10.875A1.125 1.125 0 0 0 9.75 4.875v9.75c0 .621.504 1.125 1.125 1.125H18.75c.621 0 1.125-.504 1.125-1.125V8.625L15 3.75Z" /></svg>
-                                            @break
-                                        @case('document-text')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-8.25a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6v12a2.25 2.25 0 0 0 2.25 2.25h5.25" /><path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6m-6 3h6m-6 3h3m7.5 2.25L18 15m0 0-1.5 1.5M18 15h-4.5" /></svg>
-                                            @break
-                                        @case('book-open')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h6.75A2.25 2.25 0 0 1 13.5 6.75v12.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25V6.75Zm19.5 0A2.25 2.25 0 0 0 19.5 4.5h-6.75A2.25 2.25 0 0 0 10.5 6.75v12.75a2.25 2.25 0 0 1 2.25-2.25h6.75a2.25 2.25 0 0 1 2.25 2.25V6.75Z" /></svg>
-                                            @break
-                                        @case('building-office')
-                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M5.25 21V7.5A2.25 2.25 0 0 1 7.5 5.25h9A2.25 2.25 0 0 1 18.75 7.5V21M9 9.75h.008v.008H9V9.75Zm0 3h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm3-6h.008v.008H12V9.75Zm0 3h.008v.008H12v-.008Zm0 3h.008v.008H12v-.008Zm3-6h.008v.008H15V9.75Zm0 3h.008v.008H15v-.008Zm0 3h.008v.008H15v-.008" /></svg>
-                                            @break
-
-                                    @endswitch
-                                </span>
-                                <span>{{ $item['label'] }}</span>
-                            </a>
+                            @if($item['type'] === 'link')
+                                <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
+                                    <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
+                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    </span>
+                                    <span>{{ $item['label'] }}</span>
+                                </a>
+                            @elseif($item['type'] === 'group')
+                                <div x-data="{ open: {{ $item['active'] ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
+                                    <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-800" @click="open = ! open">
+                                        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                                            <span class="inline-flex h-5 w-5 items-center justify-center opacity-90">
+                                                <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                            </span>
+                                            <span class="text-zinc-800 dark:text-zinc-100">{{ $item['label'] }}</span>
+                                        </div>
+                                        <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                                    </button>
+                                    <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 mt-1 dark:border-zinc-700">
+                                        @foreach($item['items'] as $subItem)
+                                            @if($subItem['visible'])
+                                                <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 text-sm {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                     @endforeach
-
-                    <div x-data="{ open: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                        <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold" @click="open = ! open">
-                            <span>{{ __('প্রশ্ন ভান্ডার') }}</span>
-                            <svg class="h-4 w-4 transition" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-                        </button>
-                        <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
-                            @foreach($questionGroupItems as $item)
-                                @if($item['visible'])
-                                    <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>{{ $item['label'] }}</a>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-
-                    @if(auth()->user()->hasPermission('users.manage_roles'))
-                        <div x-data="{ open: {{ $adminGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                            <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold" @click="open = ! open">
-                                <span>{{ __('Administration') }}</span>
-                                <svg class="h-4 w-4 transition" :class="open ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-                            </button>
-                            <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
-                                @foreach($adminItems as $item)
-                                    @if($item['visible'])
-                                        <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" wire:navigate>{{ $item['label'] }}</a>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </template>
 
+            <!-- Collapsed Sidebar Menu -->
             <template x-if="sidebarCollapsed">
                 <div class="space-y-2">
-                    <a href="{{ route('dashboard') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('dashboard') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="Dashboard" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25a1.5 1.5 0 0 1 1.5-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75" /></svg></a>
-                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg {{ $questionGroupActive ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="{{ __('প্রশ্ন ভান্ডার') }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'question-bank'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'question-bank' ? null : 'question-bank'"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5A2.25 2.25 0 0 1 6 5.25h3.19a2.25 2.25 0 0 1 1.59.66l.66.66a2.25 2.25 0 0 0 1.59.66H18A2.25 2.25 0 0 1 20.25 9.5v7A2.25 2.25 0 0 1 18 18.75H6A2.25 2.25 0 0 1 3.75 16.5v-9Z" /></svg></button>
-                    <a href="{{ route('question.set-create') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('question.set-create') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="Question Create" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" /></svg></a>
-                    @if(auth()->user()->hasRole(['teacher']))<a href="{{ route('teacher.questions.index') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('teacher.questions.index') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="আমার তৈরি প্রশ্ন" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-8.25a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6v12a2.25 2.25 0 0 0 2.25 2.25h5.25" /><path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6m-6 3h6m-6 3h3m7.5 2.25L18 15m0 0-1.5 1.5M18 15h-4.5" /></svg></a>@endif
-                    @if(auth()->user()->hasRole(['teacher']))<a href="{{ route('teacher.institution-info') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('teacher.institution-info') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="প্রতিষ্ঠানের তথ্য" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M5.25 21V7.5A2.25 2.25 0 0 1 7.5 5.25h9A2.25 2.25 0 0 1 18.75 7.5V21M9 9.75h.008v.008H9V9.75Zm0 3h.008v.008H9v-.008Zm0 3h.008v.008H9v-.008Zm3-6h.008v.008H12V9.75Zm0 3h.008v.008H12v-.008Zm0 3h.008v.008H12v-.008Zm3-6h.008v.008H15V9.75Zm0 3h.008v.008H15v-.008Zm0 3h.008v.008H15v-.008" /></svg></a>@endif
-                    @if(auth()->user()->hasRole(['teacher', 'admin', 'super_admin']))<a href="{{ route('omr.generator') }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs('omr.generator') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="OMR Generator" wire:navigate><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125H5.625A1.125 1.125 0 0 1 4.5 20.625V8.625c0-.621.504-1.125 1.125-1.125H9.75" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 3.75H10.875A1.125 1.125 0 0 0 9.75 4.875v9.75c0 .621.504 1.125 1.125 1.125H18.75c.621 0 1.125-.504 1.125-1.125V8.625L15 3.75Z" /></svg></a>@endif
-                    @if(auth()->user()->hasPermission('users.manage_roles'))<button type="button" class="flex h-10 w-full items-center justify-center rounded-lg {{ $adminGroupActive ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800' }}" title="Administration" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = 'admin'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === 'admin' ? null : 'admin'"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3.171A1.5 1.5 0 0 1 10.95 2.25h2.1a1.5 1.5 0 0 1 1.382.921l.229.551a1.5 1.5 0 0 0 1.123.9l.592.1a1.5 1.5 0 0 1 1.189 1.188l.1.593a1.5 1.5 0 0 0 .9 1.122l.55.23a1.5 1.5 0 0 1 .922 1.382v2.1a1.5 1.5 0 0 1-.921 1.382l-.551.229a1.5 1.5 0 0 0-.9 1.123l-.1.592a1.5 1.5 0 0 1-1.188 1.189l-.593.1a1.5 1.5 0 0 0-1.122.9l-.23.55a1.5 1.5 0 0 1-1.382.922h-2.1a1.5 1.5 0 0 1-1.382-.921l-.229-.551a1.5 1.5 0 0 0-1.123-.9l-.592-.1a1.5 1.5 0 0 1-1.189-1.188l-.1-.593a1.5 1.5 0 0 0-.9-1.122l-.55-.23a1.5 1.5 0 0 1-.922-1.382v-2.1a1.5 1.5 0 0 1 .921-1.382l.551-.229a1.5 1.5 0 0 0 .9-1.123l.1-.592a1.5 1.5 0 0 1 1.188-1.189l.593-.1a1.5 1.5 0 0 0 1.122-.9l.23-.55Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /></svg></button>@endif
-                </div>
-            </template>
-
-            <div x-show="sidebarCollapsed && activeFlyout === 'question-bank'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-full top-16 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900" data-test="sidebar-flyout-panel">
-                <p class="mb-2 text-sm font-semibold">{{ __('প্রশ্ন ভান্ডার') }}</p>
-                <div class="space-y-1 text-sm">
-                    @foreach($questionGroupItems as $item)
+                    @foreach($menuItems as $item)
                         @if($item['visible'])
-                            <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
+                            @if($item['type'] === 'link')
+                                <a href="{{ route($item['route']) }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" title="{{ $item['label'] }}" wire:navigate>
+                                    <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                </a>
+                            @elseif($item['type'] === 'group')
+                                <div class="relative">
+                                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg {{ $item['active'] ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-emerald-600 dark:text-emerald-400' }}" title="{{ $item['label'] }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = '{{ $item['flyout'] }}'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === '{{ $item['flyout'] }}' ? null : '{{ $item['flyout'] }}'">
+                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    </button>
+
+                                    <div x-show="activeFlyout === '{{ $item['flyout'] }}'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-full top-0 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900" style="display:none;">
+                                        <p class="mb-2 text-sm font-semibold">{{ $item['label'] }}</p>
+                                        <div class="space-y-1 text-sm">
+                                            @foreach($item['items'] as $subItem)
+                                                @if($subItem['visible'])
+                                                    <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                     @endforeach
                 </div>
-            </div>
-
-            @if(auth()->user()->hasPermission('users.manage_roles'))
-                <div x-show="sidebarCollapsed && activeFlyout === 'admin'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-full top-52 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
-                    <p class="mb-2 text-sm font-semibold">{{ __('Administration') }}</p>
-                    <div class="space-y-1 text-sm">
-                        @foreach($adminItems as $item)
-                            @if($item['visible'])
-                                <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+            </template>
         </nav>
 
         <div class="mt-auto border-t border-zinc-200 p-3 dark:border-[var(--app-dark-border)]">
@@ -210,14 +269,14 @@
                     </div>
 
                     <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v3.75l2.25 2.25"/></svg>
+                        <x-heroicon-o-cog-8-tooth class="size-4" />
                         {{ __('Settings') }}
                     </a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3"/></svg>
+                            <x-heroicon-o-arrow-right-on-rectangle class="size-4" />
                             {{ __('Log out') }}
                         </button>
                     </form>
@@ -226,14 +285,19 @@
         </div>
     </aside>
 
+    <!-- Mobile Header & Main Content Area -->
     <div class="relative min-h-screen flex-1" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
         <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 print:hidden backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
-            <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">☰</button>
+            <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">
+                <x-heroicon-o-bars-3 class="size-5" />
+            </button>
             <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
         </header>
 
-        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border print:hidden border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">☰</button>
+        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border print:hidden border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">
+            <x-heroicon-o-bars-3 class="size-6" />
+        </button>
 
         <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
 
@@ -244,44 +308,41 @@
             </div>
 
             <nav class="space-y-2 text-sm">
-                @foreach($singleItems as $item)
+                @foreach($menuItems as $item)
                     @if($item['visible'])
-                        <a href="{{ route($item['route']) }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-700 hover:bg-zinc-200 dark:text-zinc-100 dark:hover:bg-zinc-800' }}" wire:navigate>{{ $item['label'] }}</a>
+                        @if($item['type'] === 'link')
+                            <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
+                                <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
+                                    <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                </span>
+                                <span>{{ $item['label'] }}</span>
+                            </a>
+                        @elseif($item['type'] === 'group')
+                            <div x-data="{ open: {{ $item['active'] ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
+                                <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-800" @click="open = ! open">
+                                    <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                                        <span class="inline-flex h-5 w-5 items-center justify-center opacity-90">
+                                            <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                        </span>
+                                        <span class="text-zinc-800 dark:text-zinc-100">{{ $item['label'] }}</span>
+                                    </div>
+                                    <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
+                                </button>
+                                <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 mt-1 dark:border-zinc-700">
+                                    @foreach($item['items'] as $subItem)
+                                        @if($subItem['visible'])
+                                            <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 text-sm {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     @endif
                 @endforeach
-
-                <div x-data="{ mobileQuestionsOpen: {{ $questionGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="mobileQuestionsOpen ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                    <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium" @click="mobileQuestionsOpen = ! mobileQuestionsOpen">
-                        <span>{{ __('প্রশ্ন ভান্ডার') }}</span>
-                        <svg class="h-4 w-4 transition" :class="mobileQuestionsOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-                    </button>
-                    <div x-show="mobileQuestionsOpen" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
-                        @foreach($questionGroupItems as $item)
-                            @if($item['visible'])
-                                <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-
-                @if(auth()->user()->hasPermission('users.manage_roles'))
-                    <div x-data="{ mobileAdminOpen: {{ $adminGroupExpanded ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="mobileAdminOpen ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                        <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 font-medium" @click="mobileAdminOpen = ! mobileAdminOpen">
-                            <span>{{ __('Administration') }}</span>
-                            <svg class="h-4 w-4 transition" :class="mobileAdminOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-                        </button>
-                        <div x-show="mobileAdminOpen" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 dark:border-zinc-700">
-                            @foreach($adminItems as $item)
-                                @if($item['visible'])
-                                    <a href="{{ route($item['route']) }}" class="block rounded-md px-2 py-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800" wire:navigate>{{ $item['label'] }}</a>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
             </nav>
         </aside>
 
+        <!-- Top Header Navigation -->
         <header class="sticky top-0 z-30 hidden items-center justify-between border-b border-zinc-200 bg-white/95 px-5 py-2 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:flex" data-test="sticky-page-header">
             <div>
                 <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
@@ -295,8 +356,8 @@
                     :title="theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'"
                     data-test="theme-toggle-button"
                 >
-                    <svg x-show="theme === 'dark'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" /></svg>
-                    <svg x-show="theme === 'light'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+                    <x-heroicon-o-sun x-show="theme === 'dark'" class="size-5" />
+                    <x-heroicon-o-moon x-show="theme === 'light'" class="size-5" />
                 </button>
 
                 <div class="relative" @click.outside="profileMenuOpen = false">
@@ -308,7 +369,7 @@
                     >
                         <span class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
                         <span class="text-sm font-semibold text-zinc-700 dark:text-zinc-100">{{ auth()->user()->name }}</span>
-                        <svg class="h-4 w-4 text-zinc-500 transition" :class="profileMenuOpen ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                        <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="profileMenuOpen ? 'rotate-180' : ''" />
                     </button>
 
                     <div
@@ -330,14 +391,14 @@
                         </div>
 
                         <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.983 5.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2m10-10h-2M4 12H2m17.071-7.071l-1.414 1.414M6.343 17.657l-1.414 1.414m0-14.142l1.414 1.414m11.314 11.314l1.414 1.414"/></svg>
+                            <x-heroicon-o-cog-8-tooth class="size-4" />
                             {{ __('Settings') }}
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 12h9m0 0l-3-3m3 3l-3 3"/></svg>
+                                <x-heroicon-o-arrow-right-on-rectangle class="size-4" />
                                 {{ __('Log out') }}
                             </button>
                         </form>

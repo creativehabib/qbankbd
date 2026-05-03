@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Livewire\AcademicClasses\ClassIndex;
+use App\Livewire\Admin\PackageManagement;
+use App\Livewire\Admin\Settings\ThemeOptions;
+use App\Livewire\Admin\WalletApprovalPanel;
 use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
 use App\Livewire\OmrGenerator;
@@ -10,26 +14,23 @@ use App\Livewire\Questions\BulkUpload;
 use App\Livewire\Questions\Create;
 use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
+use App\Livewire\Students\BookmarkedQuestions;
+use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\Tags\Index as TagIndex;
 use App\Livewire\Teacher\CreateQuestionSet;
 use App\Livewire\Teacher\GeneratedQuestionSetPage;
 use App\Livewire\Teacher\InstitutionInfo;
 use App\Livewire\Teacher\MyEarnings;
-use App\Livewire\Teacher\PricingPlans;
-use App\Livewire\Teacher\PackageCheckout;
-use App\Livewire\Teacher\SubscriptionOverview;
-use App\Livewire\Teacher\WalletTransactions;
 use App\Livewire\Teacher\MyQuestionSets;
+use App\Livewire\Teacher\PackageCheckout;
+use App\Livewire\Teacher\PricingPlans;
 use App\Livewire\Teacher\QuestionGenerator;
 use App\Livewire\Teacher\QuestionPaper;
+use App\Livewire\Teacher\SubscriptionOverview;
 use App\Livewire\Teacher\ViewQuestions;
+use App\Livewire\Teacher\WalletTransactions;
 use App\Livewire\Topics\TopicIndex;
-use App\Http\Controllers\DashboardController;
-use App\Livewire\Admin\PackageManagement;
-use App\Livewire\Admin\Settings\ThemeOptions;
-use App\Livewire\Admin\WalletApprovalPanel;
-use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\UserRoleManagement;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -109,6 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
+    Route::get('/student/bookmarks', BookmarkedQuestions::class)->name('student.bookmarks');
 
     Route::middleware('role:teacher|admin|super_admin')->group(function (): void {
         Route::get('/omr-generator', OmrGenerator::class)->name('omr.generator');
