@@ -136,7 +136,11 @@
                                     @endif
                                     @if($selectedSubjectName)
                                         <flux:icon.chevron-right class="size-3.5 text-zinc-400" />
-                                        <span class="cursor-pointer font-medium text-zinc-700 hover:text-emerald-600 dark:text-zinc-200 dark:hover:text-emerald-400" @if($level === 'chapters' || $level === 'questions') wire:click="$set('level', 'subjects'); $set('selectedSubjectId', null); $set('selectedChapterId', null);" @endif>{{ $selectedSubjectName }}</span>
+                                        @if($level === 'chapters' || ($level === 'questions' && $selectedChapterId))
+                                            <span class="cursor-pointer font-medium text-zinc-700 hover:text-emerald-600 dark:text-zinc-200 dark:hover:text-emerald-400" wire:click="$set('level', 'subjects'); $set('selectedSubjectId', null); $set('selectedChapterId', null);">{{ $selectedSubjectName }}</span>
+                                        @else
+                                            <span class="font-semibold text-zinc-900 dark:text-zinc-100">{{ $selectedSubjectName }}</span>
+                                        @endif
                                     @endif
                                     @if($selectedChapterName)
                                         <flux:icon.chevron-right class="size-3.5 text-zinc-400" />
@@ -155,18 +159,27 @@
                             @if($level === 'subjects')
                                 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                     @foreach($subjects as $subject)
+                                        <!-- Subject Card Update: Div used instead of button to prevent nested action issues -->
                                         <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
-                                            <button type="button" wire:click="openSubject({{ $subject->id }})" class="flex flex-1 items-center justify-between gap-3 text-left">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
-                                                    <div>
-                                                        <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $subject->name }}</p>
-                                                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $subject->mcq_questions_count }} MCQ</p>
-                                                    </div>
+
+                                            <!-- ক্লিক করলে চ্যাপ্টার লিস্টে যাবে -->
+                                            <div wire:click="openSubject({{ $subject->id }})" class="flex flex-1 items-center gap-3 cursor-pointer">
+                                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
+                                                <div>
+                                                    <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $subject->name }}</p>
+                                                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $subject->mcq_questions_count }} MCQ</p>
                                                 </div>
-                                                <flux:icon.chevron-right class="size-5 shrink-0 text-zinc-400" />
-                                            </button>
-                                            <button type="button" wire:click.stop="startSubjectPractice({{ $subject->id }})" class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:bg-emerald-500"><flux:icon.play class="size-3.5" /> Start</button>
+                                            </div>
+
+                                            <div class="flex shrink-0 items-center">
+                                                <!-- হোভার করলে Start বাটন দেখাবে এবং ক্লিক করলে সাবজেক্টের প্রশ্ন আসবে -->
+                                                <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="hidden items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700 group-hover:flex dark:bg-emerald-500 dark:hover:bg-emerald-600">
+                                                    <flux:icon.play class="size-3.5" /> Start
+                                                </button>
+
+                                                <!-- ডিফল্ট আইকন (Start বাটন দেখালে এটি হাইড হয়ে যাবে) -->
+                                                <flux:icon.chevron-right class="size-5 text-zinc-400 transition group-hover:hidden" />
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -193,7 +206,7 @@
                                 @if($latestQuestions->isEmpty())
                                     <div class="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                                         <flux:icon.folder-open class="mx-auto mb-2 size-8 text-zinc-300 dark:text-zinc-600" />
-                                        {{ __('এই চ্যাপ্টারে এখনো কোনো MCQ পাওয়া যায়নি।') }}
+                                        {{ __('এই অংশে এখনো কোনো MCQ পাওয়া যায়নি।') }}
                                     </div>
                                 @else
                                     @php($labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'])

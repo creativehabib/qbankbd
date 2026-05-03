@@ -61,13 +61,13 @@ class PracticeIndex extends Component
             || ! empty($this->filterTeachers)
             || filled($this->filterSearch);
 
-        // ফিল্টার থাকলে filtered-questions এ নিয়ে যাবে
+        // ফিল্টার থাকলে filtered-questions এ নিয়ে যাবে
         if ($hasFilters) {
             if ($this->level !== 'filtered-questions') {
                 $this->level = 'filtered-questions';
             }
         } else {
-            // সব ফিল্টার খালি হয়ে গেলে আগের অবস্থায় (চ্যাপ্টারের প্রশ্নে) ফিরিয়ে আনবে
+            // সব ফিল্টার খালি হয়ে গেলে আগের অবস্থায় (চ্যাপ্টারের প্রশ্নে) ফিরিয়ে আনবে
             if ($this->level === 'filtered-questions') {
                 $this->level = 'questions';
             }
@@ -85,7 +85,7 @@ class PracticeIndex extends Component
         $this->filterTeachers = [];
         $this->filterSearch = '';
 
-        // যদি ফিল্টার ভিউতে থাকে, তাহলে মূল চ্যাপ্টারের প্রশ্নে ফিরিয়ে আনবে (ক্লাসে নয়)
+        // যদি ফিল্টার ভিউতে থাকে, তাহলে মূল চ্যাপ্টারের প্রশ্নে ফিরিয়ে আনবে (ক্লাসে নয়)
         if ($this->level === 'filtered-questions') {
             $this->level = 'questions';
         }
@@ -121,25 +121,18 @@ class PracticeIndex extends Component
         }
     }
 
+    // নতুন মেথড: সরাসরি সাবজেক্টের প্রশ্ন লোড করার জন্য
     public function startSubjectPractice(int $subjectId): void
     {
         $isValidSubject = Subject::query()->whereKey($subjectId)->where('academic_class_id', $this->selectedClassId)->where('is_active', true)->exists();
-        if (! $isValidSubject) {
-            return;
+        if ($isValidSubject) {
+            $this->selectedSubjectId = $subjectId;
+            $this->selectedChapterId = null; // চ্যাপ্টার সিলেক্ট না করেই প্রশ্নে যাবে
+            $this->level = 'questions';
+            $this->search = '';
+            $this->resetPage();
+            $this->dispatch('practice-content-updated');
         }
-
-        $chapterId = Chapter::query()
-            ->where('subject_id', $subjectId)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->value('id');
-
-        $this->selectedSubjectId = $subjectId;
-        $this->selectedChapterId = $chapterId;
-        $this->level = $chapterId ? 'questions' : 'chapters';
-        $this->search = '';
-        $this->resetPage();
-        $this->dispatch('practice-content-updated');
     }
 
     public function openChapter(int $chapterId): void
@@ -156,13 +149,27 @@ class PracticeIndex extends Component
 
     public function back(): void
     {
-        match ($this->level) {
-            'filtered-questions' => [$this->level] = ['questions'], // ফিল্টার থেকে ব্যাক ক্লিক করলে চ্যাপ্টারে যাবে
-            'questions' => [$this->selectedChapterId, $this->level] = [null, 'chapters'],
-            'chapters' => [$this->selectedSubjectId, $this->selectedChapterId, $this->level] = [null, null, 'subjects'],
-            'subjects' => [$this->selectedClassId, $this->selectedSubjectId, $this->selectedChapterId, $this->level] = [null, null, null, 'classes'],
-            default => null,
-        };
+        if ($this->level === 'filtered-questions') {
+            $this->level = 'questions';
+        } elseif ($this->level === 'questions') {
+            if ($this->selectedChapterId !== null) {
+                $this->selectedChapterId = null;
+                $this->level = 'chapters';
+            } else {
+                $this->selectedSubjectId = null;
+                $this->level = 'subjects';
+            }
+        } elseif ($this->level === 'chapters') {
+            $this->selectedSubjectId = null;
+            $this->selectedChapterId = null;
+            $this->level = 'subjects';
+        } elseif ($this->level === 'subjects') {
+            $this->selectedClassId = null;
+            $this->selectedSubjectId = null;
+            $this->selectedChapterId = null;
+            $this->level = 'classes';
+        }
+
         $this->search = '';
         $this->resetPage();
         $this->dispatch('practice-content-updated');
@@ -210,12 +217,14 @@ class PracticeIndex extends Component
 
     protected function latestQuestions(): LengthAwarePaginator
     {
-        if ($this->selectedChapterId === null) {
+        if ($this->selectedSubjectId === null && $this->selectedChapterId === null) {
             return new LengthAwarePaginator([], 0, 20, 1);
         }
 
         return Question::query()
-            ->where('question_type', 'mcq')->where('status', 'active')->where('chapter_id', $this->selectedChapterId)
+            ->where('question_type', 'mcq')->where('status', 'active')
+            ->when($this->selectedChapterId !== null, fn (Builder $q) => $q->where('chapter_id', $this->selectedChapterId))
+            ->when($this->selectedChapterId === null && $this->selectedSubjectId !== null, fn (Builder $q) => $q->where('subject_id', $this->selectedSubjectId))
             ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
             ->latest('id')->paginate(20);
     }
