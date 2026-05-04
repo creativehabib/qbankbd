@@ -12,6 +12,7 @@ class MockTest extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'duration_minutes' => 'integer',
     ];
 
     public function user()

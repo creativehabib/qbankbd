@@ -4,11 +4,11 @@ namespace App\Livewire\Students;
 
 use App\Models\MockTest;
 use Livewire\Component;
-use Livewire\Attributes\Layout;
 
 class TakeMockTest extends Component
 {
     public MockTest $mockTest;
+
     public $testQuestions;
 
     // ইউজারের সিলেক্ট করা উত্তরগুলো এখানে জমা হবে (Key হবে question_id, Value হবে অপশনের ইনডেক্স)
@@ -19,7 +19,7 @@ class TakeMockTest extends Component
 
     public function mount($testId)
     {
-        // মক টেস্টটি খুঁজে বের করা এবং ভেরিফাই করা যে এটি এই স্টুডেন্টেরই কিনা
+        // মক টেস্টটি খুঁজে বের করা এবং ভেরিফাই করা যে এটি এই স্টুডেন্টেরই কিনাা
         $this->mockTest = MockTest::where('id', $testId)
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -30,12 +30,14 @@ class TakeMockTest extends Component
         }
 
         // সময় ক্যালকুলেশন (পেজ রিলোড দিলেও যেন সময় ঠিক থাকে)
-        $endTime = $this->mockTest->started_at->copy()->addMinutes($this->mockTest->duration_minutes);
+        // (int) ব্যবহার করে মানটিকে সংখ্যায় রূপান্তর করা হয়েছে
+        $endTime = $this->mockTest->started_at->copy()->addMinutes((int) $this->mockTest->duration_minutes);
         $this->remainingSeconds = now()->diffInSeconds($endTime, false);
 
         // যদি সময় আগেই শেষ হয়ে গিয়ে থাকে, তবে সাথে সাথে সাবমিট করে দেওয়া
         if ($this->remainingSeconds <= 0) {
             $this->submitExam();
+
             return;
         }
 
@@ -65,7 +67,7 @@ class TakeMockTest extends Component
                 $options = collect($testQuestion->question->extra_content ?? [])->take(4);
                 $selectedOption = $options[$userAnsIndex] ?? null;
 
-                if ($selectedOption && !empty($selectedOption['is_correct'])) {
+                if ($selectedOption && ! empty($selectedOption['is_correct'])) {
                     $isCorrect = true;
                     $correctCount++;
                 } else {
