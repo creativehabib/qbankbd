@@ -26,9 +26,59 @@
 
             <div class="space-y-4">
                 @if($activeTab === 'mock')
-                    <div class="flex flex-col items-center justify-center py-10 text-center">
-                        <flux:icon.clock class="mb-3 size-12 text-zinc-300 dark:text-zinc-600" />
-                        <p class="text-lg font-semibold text-zinc-500 dark:text-zinc-400">{{ __('Coming Soon') }}</p>
+                    <div class="space-y-6 py-4">
+                        <div class="text-center">
+                            <flux:icon.academic-cap class="mx-auto mb-3 size-12 text-emerald-500" />
+                            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ __('মক টেস্ট শুরু করুন') }}</h2>
+                            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ __('নিচের অপশনগুলো থেকে আপনার পছন্দমতো বিষয় নির্বাচন করে নিজেকে যাচাই করুন।') }}</p>
+                        </div>
+
+                        <div class="mx-auto max-w-lg space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
+
+                            <!-- Class Selection -->
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('শ্রেণি নির্বাচন করুন') }} <span class="text-red-500">*</span></label>
+                                <select wire:model.live="selectedClassId" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100">
+                                    <option value="">{{ __('নির্বাচন করুন') }}</option>
+                                    @foreach($filterOptions['classes'] as $id => $name)
+                                        <option value="{{ $id }}">{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Subject Selection (Shows only if Class is selected) -->
+                            @if($selectedClassId)
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('বিষয় নির্বাচন করুন') }} <span class="text-red-500">*</span></label>
+                                    <select wire:model.live="selectedSubjectId" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100">
+                                        <option value="">{{ __('নির্বাচন করুন') }}</option>
+                                        <!-- Since subjects depend on class, we use the subjects() method from the component -->
+                                        @foreach($this->subjects() as $subject)
+                                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <div class="pt-4">
+                                <button
+                                    type="button"
+                                    wire:click="startMockTest"
+                                    @if(!$selectedClassId || !$selectedSubjectId) disabled @endif
+                                    class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700"
+                                >
+                                    <x-heroicon-s-play class="size-5" />
+                                    {{ __('মক টেস্ট শুরু করুন (২০ মিনিট)') }}
+                                </button>
+
+                                <!-- এরর মেসেজ -->
+                                @if($mockTestError)
+                                    <p class="mt-3 text-center text-sm font-medium text-red-500 dark:text-red-400">
+                                        {{ $mockTestError }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 @else
 
@@ -237,20 +287,31 @@
                             @endif
 
                             @if($level === 'chapters')
-                                <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-                                    @foreach($chapters as $chapter)
-                                        <button type="button" wire:click="openChapter({{ $chapter->id }})" class="group flex items-center justify-between gap-3 rounded-xl cursor-pointer border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
-                                            <div class="flex items-center gap-3">
-                                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.document-text class="size-5" /></div>
-                                                <div>
-                                                    <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $chapter->name }}</p>
-                                                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $chapter->mcq_questions_count }} MCQ</p>
+                                @if($chapters->isEmpty())
+                                    <div class="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                                        <x-heroicon-o-folder-open class="mx-auto mb-2 size-8 text-zinc-300 dark:text-zinc-600" />
+                                        {{ __('এই বিষয়ে এখনো কোনো চ্যাপ্টার যোগ করা হয়নি। সরাসরি প্রশ্ন দেখতে ব্যাক করে "Start" বাটনে ক্লিক করুন।') }}
+                                    </div>
+                                @else
+                                    <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                        @foreach($chapters as $chapter)
+                                            <button type="button" wire:click="openChapter({{ $chapter->id }})" class="group flex items-center justify-between gap-3 rounded-xl cursor-pointer border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                                                        <x-heroicon-o-document-text class="size-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $chapter->name }}</p>
+                                                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $chapter->mcq_questions_count }} MCQ</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:bg-emerald-500"><flux:icon.play class="size-3.5" /> Start</div>
-                                        </button>
-                                    @endforeach
-                                </div>
+                                                <div class="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:bg-emerald-500">
+                                                    <x-heroicon-s-play class="size-3.5" /> Start
+                                                </div>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
                             @endif
 
                             @if($level === 'questions')
