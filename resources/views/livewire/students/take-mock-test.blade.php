@@ -3,6 +3,7 @@
         timeRemaining: {{ $remainingSeconds }},
         timerInterval: null,
         formattedTime() {
+            if (this.timeRemaining <= 0) return '00:00'; // এই লাইনটি যোগ করুন
             let m = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
             let s = (this.timeRemaining % 60).toString().padStart(2, '0');
             return m + ':' + s;
@@ -28,7 +29,7 @@
                 <h1 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ $subjectName }}</h1>
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $mockTest->total_questions }} টি প্রশ্ন</p>
             </div>
-
+া
             <!-- টাইমার ডিসপ্লে -->
             <div class="flex items-center gap-3 rounded-full bg-red-50 px-4 py-2 text-red-600 dark:bg-red-500/10 dark:text-red-400">
                 <x-heroicon-o-clock class="size-6 animate-pulse" />

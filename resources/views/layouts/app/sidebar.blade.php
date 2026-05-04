@@ -120,7 +120,15 @@
                 ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
                 ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
             ]
-        ]
+        ],
+        [
+            'type' => 'link',
+            'label' => __('Leaderboard'),
+            'route' => 'student.leaderboard',
+            'match' => 'student.leaderboard',
+            'icon' => 'trophy', // Heroicon name
+            'visible' => auth()->user()->isStudent(),
+        ],
     ];
 
     $pageTitle = $title ?? $pageTitle ?? 'Dashboard';

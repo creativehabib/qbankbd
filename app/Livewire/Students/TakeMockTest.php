@@ -90,14 +90,15 @@ class TakeMockTest extends Component
         ]);
 
         // পরীক্ষা শেষে রেজাল্ট পেজে রিডাইরেক্ট (আপাতত প্র্যাকটিস পেজে পাঠানো হচ্ছে, রেজাল্ট পেজ পরে বানাবো)
-        return redirect()->route('students.practice.index');
+        return redirect()->route('student.mock-test.result', ['testId' => $this->mockTest->id]);
     }
 
-    #[Layout('layouts.guest')] // ডিস্ট্রাকশন-ফ্রি রাখার জন্য guest লেআউট ব্যবহার করা হলো (সাইডবার থাকবে না)
     public function render()
     {
         return view('livewire.students.take-mock-test', [
             'subjectName' => $this->mockTest->subject?->name ?? 'Mixed Subjects',
-        ])->title('Mock Test Running');
+        ])
+            ->layout('layouts.app') // লেআউট ফিক্স
+            ->title('Mock Test Running');
     }
 }
