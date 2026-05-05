@@ -4,7 +4,6 @@ namespace App\Livewire\Students;
 
 use App\Models\MockTestQuestion;
 use App\Models\Question;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -120,37 +119,31 @@ class MistakeReview extends Component
             ->latest('id')
             ->paginate(15);
 
-        // ৩. ডানদিকের Subjects Report সম্পূর্ণ ডাইনামিক ডাটা থেকে তৈরি
-        $subjectReports = MockTestQuestion::query()
-            ->select([
-                'subjects.id',
-                'subjects.name',
-                DB::raw('count(mock_test_questions.id) as attempted_questions'),
-                DB::raw('sum(case when mock_test_questions.is_correct = 1 then 1 else 0 end) as right_answers'),
-                DB::raw('sum(case when mock_test_questions.is_correct = 0 and mock_test_questions.user_answer is not null then 1 else 0 end) as wrong_answers'),
-                DB::raw('sum(case when mock_test_questions.user_answer is null then 1 else 0 end) as skipped_answers'),
-            ])
-            ->join('mock_tests', 'mock_tests.id', '=', 'mock_test_questions.mock_test_id')
-            ->join('questions', 'questions.id', '=', 'mock_test_questions.question_id')
-            ->join('subjects', 'subjects.id', '=', 'questions.subject_id')
-            ->where('mock_tests.user_id', auth()->id())
-            ->groupBy('subjects.id', 'subjects.name')
-            ->orderByDesc('attempted_questions')
-            ->get()
-            ->map(function ($subjectReport) {
-                $attemptedQuestions = (int) $subjectReport->attempted_questions;
-                $rightAnswers = (int) $subjectReport->right_answers;
+        // ৩. ডানদিকের Subjects Report এর জন্য ডাইনামিক ডাটা তৈরি
+        // শুধুমাত্র সেই সাবজেক্টগুলো আনবে যেগুলোতে প্রশ্ন আছে
+        $subjectReports = \App\Models\Subject::withCount('questions as total_mcq')->having('total_mcq', '>', 0)->get()->map(function($subject) {
 
-                return [
-                    'id' => $subjectReport->id,
-                    'name' => $subjectReport->name,
-                    'attempted_questions' => $attemptedQuestions,
-                    'right_answers' => $rightAnswers,
-                    'wrong_answers' => (int) $subjectReport->wrong_answers,
-                    'skipped_answers' => (int) $subjectReport->skipped_answers,
-                    'accuracy' => $attemptedQuestions > 0 ? round(($rightAnswers / $attemptedQuestions) * 100, 2) : 0,
-                ];
-            });
+            // এই নির্দিষ্ট সাবজেক্টে ইউজারের পারফরম্যান্স
+            $userAttempts = MockTestQuestion::whereHas('mockTest', fn($q) => $q->where('user_id', auth()->id()))
+                ->whereHas('question', fn($q) => $q->where('subject_id', $subject->id))
+                ->get();
+
+            $subRight = $userAttempts->where('is_correct', true)->count();
+            $subTotalAttended = $userAttempts->count();
+
+            $subAccuracy = $subTotalAttended > 0 ? round(($subRight / $subTotalAttended) * 100, 2) : 0;
+
+            return [
+                'id' => $subject->id,
+                'name' => $subject->name,
+                'accuracy' => $subAccuracy,
+                'total_mcq' => $subject->total_mcq,
+                'right_mcq' => $subRight, // ছাত্র কয়টি সঠিক করেছে
+                // যদি আপনার CQ বা Content টেবিল থাকে, তবে সেগুলোর কাউন্ট এখানে বসাতে পারেন। আপাতত ডামি হিসেবে 0 রাখা হলো।
+                'total_cq' => 0,
+                'total_content' => 0,
+            ];
+        });
 
         return view('livewire.students.mistake-review', [
             'questions' => $questions,

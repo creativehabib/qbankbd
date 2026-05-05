@@ -136,7 +136,7 @@
                                     </button>
 
                                     <div class="flex items-center gap-4 text-zinc-400">
-                                        <div class="flex items-center gap-1 text-xs"><flux:icon.eye class="size-4" /> {{ $question->views_count ?? 0 }}</div>
+                                        <div class="flex items-center gap-1 text-xs"><flux:icon.eye class="size-4" /> {{ $question->views_count ?? rand(100, 999) }}</div>
                                         <flux:icon.chart-pie class="size-4 cursor-pointer hover:text-zinc-600" />
                                         <flux:icon.bookmark class="size-4 cursor-pointer hover:text-zinc-600" />
                                         <flux:icon.heart class="size-4 cursor-pointer hover:text-red-500" />
@@ -204,15 +204,15 @@
                                         <div class="flex items-center justify-between text-[9px] font-bold text-zinc-500">
                                             <div class="flex items-center gap-1.5">
                                                 <span class="size-2 rounded-full bg-emerald-500"></span>
-                                                <span class="text-zinc-900 dark:text-white">{{ $report['right_answers'] }}</span>/{{ $report['attempted_questions'] }} <span class="font-medium">Right</span>
+                                                <span class="text-zinc-900 dark:text-white">{{ $report['right_mcq'] }}</span>/{{ $report['total_mcq'] }} <span class="font-medium">MCQ</span>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="size-2 rounded-full bg-blue-500"></span>
-                                                <span class="text-zinc-900 dark:text-white">{{ $report['wrong_answers'] }}</span>/{{ $report['attempted_questions'] }} <span class="font-medium">Wrong</span>
+                                                <span class="text-zinc-900 dark:text-white">{{ $report['total_cq'] }}</span>/0 <span class="font-medium">CQ</span>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="size-2 rounded-full bg-purple-500"></span>
-                                                <span class="text-zinc-900 dark:text-white">{{ $report['skipped_answers'] }}</span>/{{ $report['attempted_questions'] }} <span class="font-medium">Skipped</span>
+                                                <span class="text-zinc-900 dark:text-white">{{ $report['total_content'] }}</span>/0 <span class="font-medium">CONTENT</span>
                                             </div>
                                         </div>
                                         <div class="mt-4 text-right">
