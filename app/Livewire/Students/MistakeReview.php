@@ -14,9 +14,19 @@ class MistakeReview extends Component
 
     public ?string $aiError = null;
 
+    // ফিল্টার ট্র্যাক করার জন্য (wrong, right, skipped)
+    public string $filter = 'wrong';
+
     public function mount()
     {
         abort_unless(auth()->user()?->isStudent(), 403);
+    }
+
+    // ফিল্টার পরিবর্তন করার মেথড
+    public function setFilter($type)
+    {
+        $this->filter = $type;
+        $this->resetPage(); // পেজিনেশন রিসেট হবে
     }
 
     public function generateAiExplanation($questionId): void
@@ -50,10 +60,10 @@ class MistakeReview extends Component
         }
 
         $cleanTitle = strip_tags(html_entity_decode($question->title ?? ''));
-        $prompt = 'তুমি একজন বিশেষজ্ঞ শিক্ষক। প্রশ্ন: ' . $cleanTitle . '. সঠিক উত্তর: ' . $correctAnswerText . '. ';
-        $prompt .= 'কেন সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো। ';
+        $prompt = 'তুমি একজন বিশেষজ্ঞ শিক্ষক। প্রশ্ন: '.$cleanTitle.'. সঠিক উত্তর: '.$correctAnswerText.'. ';
+        $prompt .= 'কেন সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো। ';
         $prompt .= 'গুরুত্বপূর্ণ: কোনো গাণিতিক সমীকরণ বা সংকেত থাকলে তা অবশ্যই LaTeX ফরম্যাটে লিখবে। ';
-        $prompt .= 'ইনলাইন সমীকরণের জন্য একটি ডলার সাইন (যেমন: $x^2$) এবং আলাদা লাইনের বড় সমীকরণের জন্য ডাবল ডলার ব্যবহার করো।';
+        $prompt .= 'ইনলাইন সমীকরণের জন্য একটি ডলার সাইন (যেমন: $x^2$) এবং আলাদা লাইনের বড় সমীকরণের জন্য ডাবল ডলার ব্যবহার করো।';
 
         try {
             $response = Http::withoutVerifying()->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
@@ -66,12 +76,11 @@ class MistakeReview extends Component
                     $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
                     $question->update(['description' => nl2br(trim($explanation))]);
 
-                    // MathJax রেন্ডার করার জন্য ইভেন্ট ডিসপ্যাচ
                     $this->dispatch('practice-content-updated');
                 }
             } else {
                 $errorBody = $response->json();
-                $this->aiError = 'API Error: '.($errorBody['error']['message'] ?? 'ব্যাখ্যা তৈরি করা সম্ভব হয়নি।');
+                $this->aiError = 'API Error: '.($errorBody['error']['message'] ?? 'ব্যাখ্যা তৈরি করা সম্ভব হয়নি।');
             }
         } catch (\Exception $e) {
             $this->aiError = 'Error: '.$e->getMessage();
@@ -80,23 +89,72 @@ class MistakeReview extends Component
 
     public function render()
     {
-        // ইউজারের ভুল করা ইউনিক প্রশ্নগুলোর আইডি বের করা
-        $mistakenQuestionIds = MockTestQuestion::query()
-            ->whereHas('mockTest', fn($q) => $q->where('user_id', auth()->id()))
-            ->where('is_correct', false) // উত্তর সঠিক হয়নি
-            ->whereNotNull('user_answer') // স্কিপ করা প্রশ্ন বাদ দেওয়া হলো
-            ->distinct()
-            ->pluck('question_id');
+        // ইউজারের সকল মক টেস্টের প্রশ্নগুলোর বেস কুয়েরি
+        $baseQuery = MockTestQuestion::whereHas('mockTest', fn ($q) => $q->where('user_id', auth()->id()));
 
-        // আইডি দিয়ে মূল প্রশ্নগুলো আনা
+        // ১. উপরের ব্যানারের পরিসংখ্যান (Stats) হিসাব করা
+        $rightCount = (clone $baseQuery)->where('is_correct', true)->count();
+        $wrongCount = (clone $baseQuery)->where('is_correct', false)->whereNotNull('user_answer')->count();
+        $skippedCount = (clone $baseQuery)->whereNull('user_answer')->count();
+        $totalCount = $rightCount + $wrongCount + $skippedCount;
+
+        $accuracy = $totalCount > 0 ? round(($rightCount / $totalCount) * 100, 1) : 0;
+
+        // ২. ফিল্টার অনুযায়ী প্রশ্ন আলাদা করা
+        $filteredQuery = clone $baseQuery;
+        if ($this->filter === 'right') {
+            $filteredQuery->where('is_correct', true);
+        } elseif ($this->filter === 'skipped') {
+            $filteredQuery->whereNull('user_answer');
+        } else {
+            $filteredQuery->where('is_correct', false)->whereNotNull('user_answer');
+        }
+
+        $filteredQuestionIds = $filteredQuery->distinct()->pluck('question_id');
+
+        // মূল প্রশ্নগুলো আনা (চ্যাপ্টার বা টপিক রিলেশন থাকলে সেটাও এড করে নিন)
         $questions = Question::query()
-            ->whereIn('id', $mistakenQuestionIds)
+            ->whereIn('id', $filteredQuestionIds)
             ->with(['academicClass:id,name', 'subject:id,name'])
             ->latest('id')
             ->paginate(15);
 
+        // ৩. ডানদিকের Subjects Report এর জন্য ডাইনামিক ডাটা তৈরি
+        // শুধুমাত্র সেই সাবজেক্টগুলো আনবে যেগুলোতে প্রশ্ন আছে
+        $subjectReports = \App\Models\Subject::withCount('questions as total_mcq')->having('total_mcq', '>', 0)->get()->map(function($subject) {
+
+            // এই নির্দিষ্ট সাবজেক্টে ইউজারের পারফরম্যান্স
+            $userAttempts = MockTestQuestion::whereHas('mockTest', fn($q) => $q->where('user_id', auth()->id()))
+                ->whereHas('question', fn($q) => $q->where('subject_id', $subject->id))
+                ->get();
+
+            $subRight = $userAttempts->where('is_correct', true)->count();
+            $subTotalAttended = $userAttempts->count();
+
+            $subAccuracy = $subTotalAttended > 0 ? round(($subRight / $subTotalAttended) * 100, 2) : 0;
+
+            return [
+                'id' => $subject->id,
+                'name' => $subject->name,
+                'accuracy' => $subAccuracy,
+                'total_mcq' => $subject->total_mcq,
+                'right_mcq' => $subRight, // ছাত্র কয়টি সঠিক করেছে
+                // যদি আপনার CQ বা Content টেবিল থাকে, তবে সেগুলোর কাউন্ট এখানে বসাতে পারেন। আপাতত ডামি হিসেবে 0 রাখা হলো।
+                'total_cq' => 0,
+                'total_content' => 0,
+            ];
+        });
+
         return view('livewire.students.mistake-review', [
-            'questions' => $questions
-        ])->layout('layouts.app', ['title' => 'আমার ভুলসমূহ']);
+            'questions' => $questions,
+            'subjectReports' => $subjectReports, // নতুন ভেরিয়েবল পাঠানো হলো
+            'stats' => [
+                'right' => $rightCount,
+                'wrong' => $wrongCount,
+                'skipped' => $skippedCount,
+                'total' => $totalCount,
+                'accuracy' => $accuracy
+            ]
+        ])->layout('layouts.app', ['title' => 'Mistake Vault']);
     }
 }
