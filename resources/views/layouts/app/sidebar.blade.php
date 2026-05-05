@@ -129,6 +129,22 @@
             'icon' => 'trophy', // Heroicon name
             'visible' => auth()->user()->isStudent(),
         ],
+        [
+            'type' => 'link',
+            'label' => __('Mistake Review'),
+            'route' => 'student.mistakes',
+            'match' => 'student.mistakes',
+            'icon' => 'exclamation-circle', // 'pencil-square' অথবা 'document-magnifying-glass' ও দিতে পারেন
+            'visible' => auth()->user()->isStudent()
+        ],
+        [
+            'type' => 'link',
+            'label' => __("Test History"),
+            'route' => 'student.test-history',
+            'match' => 'student.test-history',
+            'icon' => 'clock', // 'calendar-days' অথবা 'clipboard-document-list' ও দিতে পারেন
+            'visible' => auth()->user()->isStudent()
+        ]
     ];
 
     $pageTitle = $title ?? $pageTitle ?? 'Dashboard';

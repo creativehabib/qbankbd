@@ -16,6 +16,8 @@ use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
 use App\Livewire\Students\BookmarkedQuestions;
 use App\Livewire\Students\Leaderboard;
+use App\Livewire\Students\MistakeReview;
+use App\Livewire\Students\MockTestHistory;
 use App\Livewire\Students\MockTestResult;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Students\TakeMockTest;
@@ -117,6 +119,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/mock-test/{testId}', TakeMockTest::class)->name('student.mock-test.take');
     Route::get('/student/mock-test/{testId}/result', MockTestResult::class)->name('student.mock-test.result');
     Route::get('/student/leaderboard', Leaderboard::class)->name('student.leaderboard');
+    Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
+    Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');
 
     Route::middleware('role:teacher|admin|super_admin')->group(function (): void {
         Route::get('/omr-generator', OmrGenerator::class)->name('omr.generator');

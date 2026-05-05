@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MockTest extends Model
@@ -18,6 +19,11 @@ class MockTest extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function academicClass(): BelongsTo
+    {
+        return $this->belongsTo(AcademicClass::class, 'academic_class_id');
     }
 
     public function subject()

@@ -76,6 +76,7 @@ class MockTestResult extends Component
                     $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
                     $question->update(['description' => nl2br(trim($explanation))]);
                     $this->mockTest->load('testQuestions.question');
+                    $this->dispatch('practice-content-updated');
                 }
             } else {
                 $errorBody = $response->json();
