@@ -46,4 +46,8 @@ return [
         'google_application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];

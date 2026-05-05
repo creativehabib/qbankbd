@@ -4,11 +4,14 @@ import 'toastr/build/toastr.min.css';
 import Swal from 'sweetalert2';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
-import {collapse} from "@alpinejs/collapse";
+import { collapse } from "@alpinejs/collapse";
 import Choices from 'choices.js';
 import 'choices.js/public/assets/styles/choices.min.css';
 
-Alpine.plugin(collapse)
+// Alpine & Plugins
+Alpine.plugin(collapse);
+
+// Global Window Objects
 window.Swal = Swal;
 window.Choices = Choices;
 window.TomSelect = TomSelect;
@@ -23,58 +26,40 @@ toastr.options = {
     "timeOut": "3000",
 };
 
-// লাইভওয়্যার ইভেন্ট লিসেনার
-window.addEventListener('success', event => {
-    toastr.success(event.detail.message);
-});
+// --- লাইভওয়্যার টোস্ট ইভেন্টস ---
+window.addEventListener('success', event => toastr.success(event.detail.message));
+window.addEventListener('warning', event => toastr.warning(event.detail.message));
+window.addEventListener('error', event => toastr.error(event.detail.message));
 
-window.addEventListener('warning', event => {
-    toastr.warning(event.detail.message);
-});
-
-window.addEventListener('error', event => {
-    toastr.error(event.detail.message);
-});
-
-window.renderMathJax = function (root = document) {
-    if (!window.MathJax?.typesetPromise) {
-        return;
+// --- MathJax রেন্ডারিং লজিক (একীভূত করা হয়েছে) ---
+window.renderMathJax = function () {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        // ছোট ডিলে দেওয়া হয়েছে যাতে ডোম (DOM) আপডেট হওয়ার পর্যাপ্ত সময় পায়
+        setTimeout(() => {
+            window.MathJax.typesetPromise()
+                .catch((err) => console.warn('MathJax error:', err));
+        }, 100);
     }
-
-    const scope = root instanceof Element || root instanceof Document ? root : document;
-    const mathElements = scope.querySelectorAll('[data-math-content]');
-
-    if (mathElements.length > 0) {
-        window.MathJax.typesetPromise(Array.from(mathElements));
-
-        return;
-    }
-
-    window.MathJax.typesetPromise();
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    window.renderMathJax();
+// MathJax এর জন্য ইভেন্ট লিসেনারসমূহ
+document.addEventListener('livewire:navigated', window.renderMathJax);
+window.addEventListener('practice-content-updated', window.renderMathJax);
+
+// সরাসরি বাটন (যেমন: Explanation) ক্লিক করলে রেন্ডার করার জন্য
+document.addEventListener('click', (e) => {
+    if (e.target.closest('button')) {
+        setTimeout(window.renderMathJax, 400);
+    }
 });
 
-document.addEventListener('livewire:navigated', () => {
-    window.renderMathJax();
-});
-
-window.addEventListener('practice-content-updated', () => {
-    window.renderMathJax();
-});
-
-
+// --- সুইট অ্যালার্ট (SweetAlert2) কনফার্মেশন ---
 window.confirmDeleteAction = async function (callback, options = {}) {
     const isDarkMode = document.documentElement.classList.contains('dark')
         || window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     if (!window.Swal) {
-        if (typeof callback === 'function') {
-            callback();
-        }
-
+        if (typeof callback === 'function') callback();
         return;
     }
 
@@ -90,7 +75,6 @@ window.confirmDeleteAction = async function (callback, options = {}) {
         reverseButtons: options.reverseButtons ?? true,
         background: options.background ?? (isDarkMode ? '#1f2937' : '#ffffff'),
         color: options.color ?? (isDarkMode ? '#f3f4f6' : '#111827'),
-        customClass: options.customClass,
     });
 
     if (result.isConfirmed && typeof callback === 'function') {

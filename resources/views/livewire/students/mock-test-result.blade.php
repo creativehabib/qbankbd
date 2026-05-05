@@ -121,7 +121,7 @@
                             <p class="mb-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1">
                                 <x-heroicon-o-light-bulb class="size-4" /> ব্যাখ্যা
                             </p>
-                            <div class="prose prose-sm max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-300" data-math-content>
+                            <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-300" data-math-content>
                                 {!! $tq->question->description !!}
                             </div>
                         </div>

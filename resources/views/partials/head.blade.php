@@ -50,7 +50,11 @@
             processEscapes: true,
         },
         options: {
+            // এটি দিলে নির্দিষ্ট ক্লাসের প্রয়োজন হবে না, সব জায়গাই স্ক্যান করবে
             skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            // তবে আপনি যদি নির্দিষ্ট ক্লাস ব্যবহার করতে চান, তবে নিচের ২টি লাইন রাখতে পারেন
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
         },
     };
 </script>

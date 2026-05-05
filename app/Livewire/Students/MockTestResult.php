@@ -11,7 +11,7 @@ class MockTestResult extends Component
 {
     public MockTest $mockTest;
 
-    public $aiError = null; // এরর দেখানোর জন্য নতুন ভেরিয়েবল
+    public $aiError = null;
 
     public function mount($testId)
     {
@@ -25,29 +25,30 @@ class MockTestResult extends Component
         }
     }
 
-    // AI Explanation Generate Method
-    public function generateAiExplanation($questionId)
+    public function generateAiExplanation($questionId): void
     {
-        $this->aiError = null; // আগের কোনো এরর থাকলে মুছে ফেলা
+        $this->aiError = null;
         $question = Question::findOrFail($questionId);
 
         if (filled($question->description)) {
             return;
         }
 
-        $apiKey = env('GEMINI_API_KEY');
+        // নতুন ফ্রি এপিআই কী-টি এখানে দিন (অথবা .env থেকে নিন)
+        $apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
 
         if (! $apiKey) {
-            $this->aiError = 'Gemini API Key পাওয়া যায়নি! আপনার .env ফাইল চেক করুন।';
+            $this->aiError = 'ফ্রি এপিআই কী পাওয়া যায়নি।';
 
             return;
         }
 
+        // ডাটা প্রসেসিং
         $optionsText = '';
         $correctAnswerText = '';
         $options = collect($question->extra_content ?? [])->take(4);
+        $labels = ['ক', 'খ', 'গ', 'ঘ'];
 
-        $labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ'];
         foreach ($options as $index => $opt) {
             $cleanText = strip_tags(html_entity_decode($opt['option_text'] ?? ''));
             $optionsText .= $labels[$index].') '.$cleanText."\n";
@@ -57,37 +58,31 @@ class MockTestResult extends Component
         }
 
         $cleanTitle = strip_tags(html_entity_decode($question->title ?? ''));
-
-        $prompt = "তুমি একজন অভিজ্ঞ এবং বন্ধুসুলভ শিক্ষক। নিচের বহুনির্বাচনী প্রশ্নটি দেখো:\n\n";
-        $prompt .= "প্রশ্ন: {$cleanTitle}\n";
-        $prompt .= "অপশনসমূহ:\n{$optionsText}\n";
-        $prompt .= "সঠিক উত্তর: {$correctAnswerText}\n\n";
-        $prompt .= 'শিক্ষার্থীর জন্য বাংলায় খুব সহজ ও সুন্দর করে ৩-৪ লাইনের মধ্যে বুঝিয়ে দাও যে কেন এই উত্তরটি সঠিক এবং অন্যগুলো কেন ভুল বা প্রাসঙ্গিক নয়। উত্তরে কোনো HTML ট্যাগ ব্যবহার করবে না, শুধু সাধারণ প্যারাগ্রাফ আকারে লিখবে।';
+        $prompt = "প্রশ্ন: {$cleanTitle}. সঠিক উত্তর: {$correctAnswerText}. কেন এটি সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো।";
 
         try {
-            // সবচেয়ে স্টেবল মডেল 'gemini-pro' ব্যবহার করা হলো
-            $response = Http::withoutVerifying()->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$apiKey}", [
+            // gemini-2.5-flash-lite মডেলটি ফ্রি ইউজারদের জন্য বেস্ট
+            $response = Http::withoutVerifying()->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
                 'contents' => [
-                    ['parts' => [['text' => $prompt]]],
+                    [
+                        'parts' => [['text' => $prompt]],
+                    ],
                 ],
             ]);
 
             if ($response->successful()) {
-                $explanation = $response->json('candidates.0.content.parts.0.text');
-
-                if ($explanation) {
-                    $question->update(['description' => nl2br($explanation)]);
+                $result = $response->json();
+                if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+                    $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
+                    $question->update(['description' => nl2br(trim($explanation))]);
                     $this->mockTest->load('testQuestions.question');
-                } else {
-                    $this->aiError = 'AI কোনো উত্তর দিতে পারেনি।';
                 }
             } else {
-                $this->aiError = 'API Error: '.$response->body();
+                $errorBody = $response->json();
+                $this->aiError = 'API Error: '.($errorBody['error']['message'] ?? 'ক্রেডিট শেষ বা কি সমস্যা।');
             }
         } catch (\Exception $e) {
-            $this->aiError = 'Connection Error: '.$e->getMessage();
+            $this->aiError = 'Error: '.$e->getMessage();
         }
     }
 
@@ -96,8 +91,7 @@ class MockTestResult extends Component
         $total = $this->mockTest->total_questions;
         $correct = $this->mockTest->correct_answers;
         $wrong = $this->mockTest->wrong_answers;
-        $skipped = $total - ($correct + $wrong);
-
+        $skipped = max(0, $total - ($correct + $wrong));
         $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
 
         return view('livewire.students.mock-test-result', [

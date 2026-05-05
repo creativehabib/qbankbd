@@ -194,7 +194,7 @@
                                                 <!-- Explanation Content -->
                                                 <div x-show="openDescription" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                                     @if(filled($question->description))
-                                                        <div class="prose prose-sm max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
+                                                        <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
                                                     @else
                                                         <div class="space-y-3 text-center">
                                                             <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
@@ -383,12 +383,36 @@
 
                                                     <div x-show="openDescription" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                                         @if(filled($question->description))
-                                                            <div class="prose prose-sm max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
+                                                            <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
+                                                                {!! $question->description !!}
+                                                            </div>
                                                         @else
                                                             <div class="space-y-3 text-center">
-                                                                <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
-                                                                <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
-                                                                <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm">✨ AI Generate</button>
+                                                                <div wire:loading.remove wire:target="generateAiExplanation({{ $question->id }})">
+                                                                    <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
+                                                                    <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        wire:click.prevent="generateAiExplanation({{ $question->id }})"
+                                                                        class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm"
+                                                                    >
+                                                                        <span>✨ AI Generate</span>
+                                                                    </button>
+                                                                </div>
+
+                                                                <div wire:loading wire:target="generateAiExplanation({{ $question->id }})">
+                                                                    <div class="flex flex-col items-center gap-2">
+                                                                        <flux:icon.arrow-path class="size-6 animate-spin text-violet-600" />
+                                                                        <p class="text-xs font-medium text-violet-600 animate-pulse">AI ব্যাখ্যা তৈরি করছে...</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+
+                                                        @if($aiError)
+                                                            <div class="mt-2 text-center text-[10px] text-red-500 bg-red-50 dark:bg-red-900/20 p-1 rounded">
+                                                                {{ $aiError }}
                                                             </div>
                                                         @endif
                                                     </div>
