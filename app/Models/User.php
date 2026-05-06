@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'registration_role', 'institution_name', 'institution_type', 'institution_address'])]
+#[Fillable(['name', 'email', 'xp', 'password', 'registration_role', 'institution_name', 'institution_type', 'institution_address'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -62,7 +62,6 @@ class User extends Authenticatable
         return $this->can($permissionSlug);
     }
 
-
     public function subscriptions(): HasMany
     {
         return $this->hasMany(UserSubscription::class);
@@ -89,8 +88,33 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
     public function mockTests()
     {
         return $this->hasMany(MockTest::class);
+    }
+
+    public function getLeagueNameAttribute(): string
+    {
+        if ($this->xp >= 5000) {
+            return 'Gold League';
+        }
+        if ($this->xp >= 2000) {
+            return 'Silver League';
+        }
+
+        return 'Bronze League';
+    }
+
+    public function getLeagueIconAttribute(): string
+    {
+        if ($this->xp >= 5000) {
+            return 'text-yellow-500';
+        } // Gold color
+        if ($this->xp >= 2000) {
+            return 'text-gray-400';
+        } // Silver color
+
+        return 'text-amber-600';
     }
 }

@@ -199,26 +199,31 @@
 
                 <div class="col-span-1 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                     <div class="flex justify-between items-center border-b border-zinc-100 pb-3 dark:border-zinc-800">
-                        <h3 class="flex items-center gap-2 text-base font-bold text-amber-600">
-                            <flux:icon.trophy class="size-5" /> Bronze League
+                        <h3 class="flex items-center gap-2 text-base font-bold {{ auth()->user()->league_icon }}">
+                            <flux:icon.trophy class="size-5" /> {{ auth()->user()->league_name }}
                         </h3>
-                        <a href="#" class="text-xs text-zinc-500 hover:underline">Leaderboard →</a>
+                        <a href="{{ route('student.leaderboard') ?? '#' }}" class="text-xs text-zinc-500 hover:underline">Leaderboard →</a>
                     </div>
+
                     <div class="mt-4 space-y-3">
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-3">
-                                <span class="flex size-6 items-center justify-center rounded bg-amber-100 text-[10px] font-bold text-amber-700">#1</span>
-                                <span class="font-medium text-zinc-700 dark:text-zinc-300">Emperor Gaming</span>
+                        @forelse($leaderboard as $index => $player)
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-3">
+                                    @php
+                                        $bgClass = $index === 0 ? 'bg-amber-100 text-amber-700' : ($index === 1 ? 'bg-zinc-200 text-zinc-700' : 'bg-orange-50 text-orange-700');
+                                    @endphp
+                                    <span class="flex size-6 items-center justify-center rounded {{ $bgClass }} text-[10px] font-bold dark:bg-zinc-800 dark:text-zinc-400">
+                                        #{{ $index + 1 }}
+                                    </span>
+                                                    <span class="font-medium text-zinc-700 dark:text-zinc-300">
+                                        {{ $player->id === auth()->id() ? 'You' : $player->name }}
+                                    </span>
+                                </div>
+                                <span class="font-bold text-zinc-500">{{ $player->xp }} XP</span>
                             </div>
-                            <span class="font-bold text-zinc-500">568 XP</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-3">
-                                <span class="flex size-6 items-center justify-center rounded bg-zinc-100 text-[10px] font-bold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">#2</span>
-                                <span class="font-medium text-zinc-700 dark:text-zinc-300">Muhammad Noor</span>
-                            </div>
-                            <span class="font-bold text-zinc-500">386 XP</span>
-                        </div>
+                        @empty
+                            <div class="text-center text-xs text-zinc-500 py-4">এখনো কেউ পয়েন্ট পায়নি।</div>
+                        @endforelse
                     </div>
                 </div>
             </div>

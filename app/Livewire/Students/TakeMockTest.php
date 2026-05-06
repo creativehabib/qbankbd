@@ -64,7 +64,6 @@ class TakeMockTest extends Component
             $userAnsIndex = $this->answers[$testQuestion->id] ?? null;
             $isCorrect = false;
 
-            // যদি স্টুডেন্ট উত্তর দিয়ে থাকে (স্কিপ না করে)
             if ($userAnsIndex !== null && $userAnsIndex !== '') {
                 $options = collect($testQuestion->question->extra_content ?? [])->take(4);
                 $selectedOption = $options[$userAnsIndex] ?? null;
@@ -77,23 +76,33 @@ class TakeMockTest extends Component
                 }
             }
 
-            // ইউজারের উত্তর ডাটাবেসে সেভ করা
             $testQuestion->update([
                 'user_answer' => $userAnsIndex,
                 'is_correct' => $isCorrect,
             ]);
         }
 
-        // মূল মক টেস্ট আপডেট করা
+        // ১. মূল মক টেস্ট আপডেট করা
         $this->mockTest->update([
             'correct_answers' => $correctCount,
             'wrong_answers' => $wrongCount,
-            'total_score' => $correctCount, // ১টি সঠিক উত্তরে ১ মার্ক ধরা হলো
+            'total_score' => $correctCount,
             'status' => 'completed',
             'completed_at' => now(),
         ]);
 
-        // পরীক্ষা শেষে রেজাল্ট পেজে রিডাইরেক্ট
+        // ==================================================
+        // ২. এখানে XP যোগ করার লজিক (নতুন যুক্ত করা হয়েছে)
+        // ==================================================
+        $earnedXp = ($correctCount * 10); // প্রতিটি সঠিক উত্তরের জন্য ১০ XP
+
+        if ($earnedXp > 0) {
+            $user = auth()->user();
+            $user->increment('xp', $earnedXp);
+        }
+        // ==================================================
+
+        // ৩. পরীক্ষা শেষে রেজাল্ট পেজে রিডাইরেক্ট
         return redirect()->route('student.mock-test.result', ['testId' => $this->mockTest->id]);
     }
 

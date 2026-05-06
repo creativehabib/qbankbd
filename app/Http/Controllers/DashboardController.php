@@ -188,6 +188,15 @@ class DashboardController extends Controller
             ]
         ];
 
+        $leaderboard = User::query()
+            ->whereHas('roles', function($q) {
+                $q->where('name', 'student'); // শুধুমাত্র স্টুডেন্টদের আনবে
+            })
+            ->where('xp', '>', 0)
+            ->orderByDesc('xp')
+            ->take(5)
+            ->get(['id', 'name', 'xp']);
+
         $attendedExams = MockTest::with('subject:id,name')
             ->where('user_id', $userId)
             ->where('status', 'completed')
@@ -213,6 +222,7 @@ class DashboardController extends Controller
 
         return view('dashboards.student', [
             'studentStats' => $studentStats,
+            'leaderboard' => $leaderboard,
             'attendedExams' => $attendedExams,
             'range' => $range
         ]);
