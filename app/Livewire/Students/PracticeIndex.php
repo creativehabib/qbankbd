@@ -47,6 +47,9 @@ class PracticeIndex extends Component
     public ?string $mockTestError = null;
 
     public ?string $aiError = null;
+    // মক টেস্টের সেটিং কন্ট্রোল করার জন্য
+    public int $questionCount = 20; // ডিফল্ট ২০টি প্রশ্ন
+    public bool $hasNegativeMark = false; // ডিফল্ট নেগেটিভ মার্ক বন্ধ
 
     public function mount(): void
     {

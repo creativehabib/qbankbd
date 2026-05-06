@@ -30,12 +30,11 @@
                         <div class="text-center">
                             <flux:icon.academic-cap class="mx-auto mb-3 size-12 text-emerald-500" />
                             <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ __('মক টেস্ট শুরু করুন') }}</h2>
-                            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ __('নিচের অপশনগুলো থেকে আপনার পছন্দমতো বিষয় নির্বাচন করে নিজেকে যাচাই করুন।') }}</p>
+                            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ __('নিচের অপশনগুলো থেকে আপনার পছন্দমতো বিষয় নির্বাচন করে নিজেকে যাচাই করুন।') }}</p>
                         </div>
 
-                        <div class="mx-auto max-w-lg space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
+                        <div class="mx-auto max-w-lg space-y-5 rounded-xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
 
-                            <!-- Class Selection -->
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('শ্রেণি নির্বাচন করুন') }} <span class="text-red-500">*</span></label>
                                 <select wire:model.live="selectedClassId" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100">
@@ -46,17 +45,44 @@
                                 </select>
                             </div>
 
-                            <!-- Subject Selection (Shows only if Class is selected) -->
                             @if($selectedClassId)
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('বিষয় নির্বাচন করুন') }} <span class="text-red-500">*</span></label>
                                     <select wire:model.live="selectedSubjectId" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100">
                                         <option value="">{{ __('নির্বাচন করুন') }}</option>
-                                        <!-- Since subjects depend on class, we use the subjects() method from the component -->
                                         @foreach($this->subjects() as $subject)
                                             <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                            @endif
+
+                            @if($selectedSubjectId)
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-zinc-200 pt-5 dark:border-zinc-700">
+
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('মোট প্রশ্ন') }}</label>
+                                        <select wire:model.live="questionCount" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100">
+                                            <option value="10">১০ টি</option>
+                                            <option value="20">২০ টি</option>
+                                            <option value="30">৩০ টি</option>
+                                            <option value="50">৫০ টি</option>
+                                            <option value="100">১০০ টি</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="space-y-2 flex flex-col justify-center">
+                                        <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('নেগেটিভ মার্কিং') }}</label>
+                                        <label class="relative inline-flex cursor-pointer items-center mt-1">
+                                            <input type="checkbox" wire:model.live="hasNegativeMark" class="peer sr-only">
+
+                                            <div class="peer h-6 w-11 rounded-full bg-zinc-300 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-zinc-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500/30 dark:bg-zinc-700 dark:border-zinc-600"></div>
+
+                                            <span class="ml-3 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                                                {{ $hasNegativeMark ? 'চালু (০.২৫)' : 'বন্ধ' }}
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
                             @endif
 
@@ -65,14 +91,13 @@
                                     type="button"
                                     wire:click="startMockTest"
                                     @if(!$selectedClassId || !$selectedSubjectId) disabled @endif
-                                    class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700"
+                                    class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700 shadow-sm"
                                 >
-                                    <x-heroicon-s-play class="size-5" />
-                                    {{ __('মক টেস্ট শুরু করুন (২০ মিনিট)') }}
+                                    <flux:icon.play class="size-5" />
+                                    {{ __('মক টেস্ট শুরু করুন') }} {{ $selectedSubjectId ? "($questionCount মিনিট)" : '' }}
                                 </button>
 
-                                <!-- এরর মেসেজ -->
-                                @if($mockTestError)
+                                @if($mockTestError ?? false)
                                     <p class="mt-3 text-center text-sm font-medium text-red-500 dark:text-red-400">
                                         {{ $mockTestError }}
                                     </p>

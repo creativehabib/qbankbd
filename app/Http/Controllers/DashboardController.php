@@ -7,13 +7,15 @@ use App\Models\Question;
 use App\Models\User;
 use App\Models\ExamCategory;
 use App\Models\AcademicClass;
+use App\Models\MockTest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View|RedirectResponse
+    public function __invoke(Request $request): View|RedirectResponse
     {
         $user = auth()->user();
 
@@ -93,7 +95,127 @@ class DashboardController extends Controller
             ]);
         }
 
-        return view('dashboards.student');
+        // ==========================================
+        // Student Dashboard Logic (Updated)
+        // ==========================================
+        $userId = $user->id;
+
+        // URL থেকে রেঞ্জ নেওয়া, না থাকলে ডিফল্ট ৭ দিন
+        $range = (int) $request->get('range', 7);
+        if (!in_array($range, [7, 15, 30])) {
+            $range = 7;
+        }
+
+        $startDate = now()->subDays($range - 1)->startOfDay();
+
+        $lastDaysTests = MockTest::where('user_id', $userId)
+            ->where('status', 'completed')
+            ->where('created_at', '>=', $startDate)
+            ->get();
+
+        $examTakenCount = $lastDaysTests->count();
+        $totalStudyMinutes = 0;
+        $totalRight = 0;
+        $totalWrong = 0;
+        $totalSkipped = 0;
+
+        $engagementCategories = [];
+        $engagementMap = [];
+
+        for ($i = $range - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $dateKey = $date->format('Y-m-d');
+            $engagementCategories[] = $date->format('d M');
+            $engagementMap[$dateKey] = 0;
+        }
+
+        foreach ($lastDaysTests as $test) {
+            $start = Carbon::parse($test->started_at);
+            $end = $test->completed_at ? Carbon::parse($test->completed_at) : $start->copy()->addMinutes($test->duration_minutes ?? 20);
+
+            $actualMinutesTaken = $start->diffInMinutes($end);
+            $allocatedMinutes = $test->duration_minutes ?? 20;
+
+            // স্মার্ট স্টাডি টাইম ক্যালকুলেশন
+            $totalStudyMinutes += ($actualMinutesTaken > $allocatedMinutes) ? $allocatedMinutes : $actualMinutesTaken;
+
+            $totalRight += (int) $test->correct_answers;
+            $totalWrong += (int) $test->wrong_answers;
+            $skipped = (int) $test->total_questions - ((int) $test->correct_answers + (int) $test->wrong_answers);
+            $totalSkipped += ($skipped > 0 ? $skipped : 0);
+
+            $dateKey = $start->format('Y-m-d');
+            if (isset($engagementMap[$dateKey])) {
+                $engagementMap[$dateKey] += 1;
+            }
+        }
+
+        $engagementValues = array_values($engagementMap);
+
+        $hours = floor($totalStudyMinutes / 60);
+        $minutes = $totalStudyMinutes % 60;
+        $studyTimeFormatted = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
+
+        // নতুন একিউরেসি সূত্র (Skipped সহ হিসাব)
+        $totalQuestionsCount = $totalRight + $totalWrong + $totalSkipped;
+        $accuracyPercentage = $totalQuestionsCount > 0 ? round(($totalRight / $totalQuestionsCount) * 100, 1) : 0;
+
+        // Rank & Streak
+        $myTotalScore = MockTest::where('user_id', $userId)->sum('correct_answers');
+        $betterUsersCount = User::whereHas('mockTests')
+            ->withSum('mockTests as total_score', 'correct_answers')
+            ->having('total_score', '>', $myTotalScore)
+            ->count();
+
+        $myDynamicRank = $betterUsersCount + 1;
+        $lastTest = MockTest::where('user_id', $userId)->latest('created_at')->first();
+        $streakDays = ($lastTest && $lastTest->created_at->isToday()) ? 1 : 0;
+
+        $studentStats = [
+            'streak_days' => $streakDays,
+            'rank' => $myDynamicRank,
+            'study_time' => $studyTimeFormatted,
+            'exam_taken' => $examTakenCount,
+            'accuracy' => [
+                'percentage' => $accuracyPercentage,
+                'right' => $totalRight,
+                'wrong' => $totalWrong,
+                'skipped' => $totalSkipped,
+            ],
+            'engagement' => [
+                'categories' => $engagementCategories,
+                'data' => $engagementValues
+            ]
+        ];
+
+        $attendedExams = MockTest::with('subject:id,name')
+            ->where('user_id', $userId)
+            ->where('status', 'completed')
+            ->latest('completed_at')
+            ->take(5)
+            ->get()
+            ->map(function($test) {
+                $start = Carbon::parse($test->started_at);
+                $end = $test->completed_at ? Carbon::parse($test->completed_at) : now();
+                $skipped = $test->total_questions - ($test->correct_answers + $test->wrong_answers);
+                return [
+                    'id' => $test->id,
+                    'name' => $test->subject ? $test->subject->name . ' এর মক টেস্ট' : 'সাধারণ মক টেস্ট',
+                    'score' => $test->total_score,
+                    'total' => $test->total_questions,
+                    'time' => $start->diffInMinutes($end) . ' Mins',
+                    'right' => $test->correct_answers,
+                    'wrong' => $test->wrong_answers,
+                    'skipped' => $skipped > 0 ? $skipped : 0,
+                    'date' => $test->created_at->diffForHumans()
+                ];
+            });
+
+        return view('dashboards.student', [
+            'studentStats' => $studentStats,
+            'attendedExams' => $attendedExams,
+            'range' => $range
+        ]);
     }
 
     public function updateQuestionSet(Request $request, QuestionSet $questionSet): RedirectResponse
@@ -121,9 +243,7 @@ class DashboardController extends Controller
     public function destroyQuestionSet(Request $request, QuestionSet $questionSet): RedirectResponse
     {
         abort_unless((bool) $request->user()?->isSuperAdmin(), 403);
-
         $questionSet->delete();
-
         return back()->with('success', 'প্রশ্ন সেট ডিলিট করা হয়েছে।');
     }
 }
