@@ -4,6 +4,7 @@ namespace App\Livewire\Students;
 
 use App\Models\MockTest;
 use App\Models\Question;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
@@ -87,6 +88,42 @@ class MockTestResult extends Component
         }
     }
 
+    // --- Dynamic Actions (Scalable Approach) ---
+
+    public function toggleLike(int $questionId): void
+    {
+        $question = Question::findOrFail($questionId);
+        $toggled = $question->likes()->toggle(auth()->id());
+
+        if (count($toggled['attached']) > 0) {
+            $question->increment('likes_count');
+        } elseif (count($toggled['detached']) > 0) {
+            $question->decrement('likes_count');
+        }
+    }
+
+    public function toggleBookmark(int $questionId): void
+    {
+        $question = Question::findOrFail($questionId);
+        $toggled = $question->bookmarks()->toggle(auth()->id());
+
+        if (count($toggled['attached']) > 0) {
+            $question->increment('bookmarks_count');
+        } elseif (count($toggled['detached']) > 0) {
+            $question->decrement('bookmarks_count');
+        }
+    }
+
+    public function recordView(int $questionId): void
+    {
+        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
+        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
+
+        if (! Cache::has($cacheKey)) {
+            Question::where('id', $questionId)->increment('views_count');
+            Cache::put($cacheKey, true, now()->addHours(24));
+        }
+    }
     public function render()
     {
         $total = $this->mockTest->total_questions;

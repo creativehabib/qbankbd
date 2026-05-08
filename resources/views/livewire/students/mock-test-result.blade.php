@@ -1,47 +1,90 @@
-<div class="mx-auto max-w-4xl px-4 py-8">
+<div class="w-full max-w-5xl mx-auto relative pb-10" x-data="{ filter: 'all' }">
 
-    <!-- হেডার এবং স্কোরকার্ড -->
-    <div class="mb-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">মক টেস্ট রেজাল্ট</h1>
-                <p class="text-zinc-500 dark:text-zinc-400 mt-1">
-                    বিষয়: <span class="font-semibold text-zinc-700 dark:text-zinc-300">{{ $mockTest->subject?->name ?? 'Mixed' }}</span>
-                </p>
-                <p class="text-xs text-zinc-400 mt-1">জমা দেওয়ার সময়: {{ $mockTest->completed_at->format('d M, Y h:i A') }}</p>
-            </div>
+    <div class="bg-white dark:bg-slate-800 rounded-t-xl shadow-xs border border-zinc-200 border-b-0 dark:border-slate-700 overflow-hidden">
 
-            <!-- স্কোর সার্কেল -->
-            <div class="flex flex-col items-center justify-center shrink-0 h-28 w-28 rounded-full border-4 {{ $percentage >= 40 ? 'border-emerald-500' : 'border-red-500' }} bg-zinc-50 dark:bg-zinc-800">
-                <span class="text-2xl font-bold {{ $percentage >= 40 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">{{ $mockTest->total_score }}</span>
-                <span class="text-xs text-zinc-500">আউট অফ {{ $mockTest->total_questions }}</span>
-            </div>
+        <div class="p-2 md:p-3 text-center border-b border-zinc-100 dark:border-zinc-700/50">
+            <h1 class="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-100 tracking-tight">
+                {{ $mockTest->subject?->name ?? 'Mixed Practice' }} - এ সমস্যার সমাধান
+            </h1>
+            <p class="text-zinc-500 dark:text-slate-400 text-sm">
+                Exam Date: <span class="font-medium">{{ $mockTest->completed_at->format('d M Y, H:i') }}</span>
+            </p>
         </div>
 
-        <!-- স্ট্যাটিস্টিক্স -->
-        <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="rounded-xl bg-blue-50 p-4 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
-                <p class="text-sm font-medium text-blue-600 dark:text-blue-400">মোট প্রশ্ন</p>
-                <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ $mockTest->total_questions }}</p>
+        <div class="flex flex-wrap md:flex-nowrap gap-2 px-4 py-4">
+
+            <div class="flex-grow flex-shrink-0 basis-[calc(50%-0.5rem)] md:basis-0 rounded-lg border border-emerald-500 overflow-hidden bg-white dark:bg-slate-800 flex flex-col items-center">
+                <div class="w-full bg-emerald-500 text-white text-center py-1 font-semibold text-[10px] uppercase tracking-wider">Marks</div>
+                <div class="py-2.5 flex items-center space-x-1.5">
+                    <span class="text-emerald-500">
+                        <flux:icon.check-circle class="size-4" variant="solid" />
+                    </span>
+                    <span class="text-sm font-bold text-zinc-700 dark:text-zinc-200">{{ $mockTest->total_score + 0 }}/{{ $mockTest->total_questions }}</span>
+                </div>
             </div>
-            <div class="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30">
-                <p class="text-sm font-medium text-emerald-600 dark:text-emerald-400">সঠিক উত্তর</p>
-                <p class="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{{ $mockTest->correct_answers }}</p>
+
+            <div class="flex-grow flex-shrink-0 basis-[calc(50%-0.5rem)] md:basis-0 rounded-lg border border-sky-500 overflow-hidden bg-white dark:bg-slate-800 flex flex-col items-center">
+                <div class="w-full bg-sky-500 text-white text-center py-1 font-semibold text-[10px] uppercase tracking-wider">Accuracy</div>
+                <div class="py-2.5 flex items-center space-x-1.5">
+                    <span class="text-sky-500">
+                        <flux:icon.check-badge class="size-4" />
+                    </span>
+                    <span class="text-sm font-bold text-zinc-700 dark:text-zinc-200">{{ round($percentage ?? 0) }}%</span>
+                </div>
             </div>
-            <div class="rounded-xl bg-red-50 p-4 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30">
-                <p class="text-sm font-medium text-red-600 dark:text-red-400">ভুল উত্তর</p>
-                <p class="text-2xl font-bold text-red-700 dark:text-red-300">{{ $mockTest->wrong_answers }}</p>
+
+            <div class="flex-grow flex-shrink-0 basis-[calc(50%-0.5rem)] md:basis-0 rounded-lg border border-sky-500 overflow-hidden bg-white dark:bg-slate-800 max-sm:dark:border-zinc-700 flex flex-col items-center">
+                <div class="w-full bg-sky-500 max-sm:dark:bg-zinc-600 text-white text-center py-1 font-semibold text-[10px] uppercase tracking-wider">Time</div>
+                <div class="py-2.5 flex items-center space-x-1.5">
+                    <span class="text-sky-500">
+                        <flux:icon.clock class="size-4" />
+                    </span>
+                    <span class="text-sm font-bold text-zinc-700 dark:text-zinc-200">{{ $mockTest->duration_minutes ?? '0' }}m</span>
+                </div>
             </div>
-            <div class="rounded-xl bg-zinc-100 p-4 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700">
-                <p class="text-sm font-medium text-zinc-600 dark:text-zinc-400">উত্তর দেয়নি</p>
-                <p class="text-2xl font-bold text-zinc-700 dark:text-zinc-300">{{ $skipped }}</p>
+
+            <div class="flex-grow flex-shrink-0 basis-[calc(50%-0.5rem)] md:basis-0 rounded-lg border border-red-500 overflow-hidden bg-white dark:bg-slate-800 max-sm:dark:border-zinc-700 flex flex-col items-center">
+                <div class="w-full bg-red-500 max-sm:dark:bg-zinc-600 text-white text-center py-1 font-semibold text-[10px] uppercase tracking-wider">Negative</div>
+                <div class="py-2.5 flex items-center space-x-1.5">
+                    <span class="text-red-500">
+                        <flux:icon.minus-circle class="size-4" />
+                    </span>
+                    <span class="text-sm font-bold text-zinc-700 dark:text-zinc-200">{{ $mockTest->negative_score + 0 }}</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- প্রশ্নের সমাধান -->
-    <div class="space-y-6">
-        <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-700 pb-2">প্রশ্নের সমাধান</h2>
+    <div class="bg-white dark:bg-slate-800 rounded-b-xl flex items-center md:justify-center border border-zinc-200 dark:border-zinc-700 border-t-0 gap-3 py-3 px-4 pb-4 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide sticky z-20 top-16 shadow-sm">
+
+        <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-zinc-100 dark:bg-slate-800 border-zinc-200 dark:border-slate-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'" class="flex items-center space-x-2 px-5 py-2.5 rounded-full border transition-all duration-200">
+            <span class="w-3 h-3 rounded-full" :class="filter === 'all' ? 'bg-white' : 'bg-blue-500'"></span>
+            <span class="text-sm font-bold leading-none">All {{ $mockTest->total_questions }}</span>
+        </button>
+
+        <button @click="filter = 'right'" :class="filter === 'right' ? 'bg-emerald-500 border-emerald-500 text-white shadow-md' : 'bg-zinc-100 dark:bg-slate-800 border-zinc-200 dark:border-slate-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'" class="flex items-center space-x-2 px-5 py-2.5 rounded-full border transition-all duration-200">
+            <span class="w-3 h-3 rounded-full" :class="filter === 'right' ? 'bg-white' : 'bg-emerald-500'"></span>
+            <span class="text-sm font-bold leading-none">Right {{ $mockTest->correct_answers }}</span>
+        </button>
+
+        <button @click="filter = 'skipped'" :class="filter === 'skipped' ? 'bg-amber-500 border-amber-500 text-white shadow-md' : 'bg-zinc-100 dark:bg-slate-800 border-zinc-200 dark:border-slate-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'" class="flex items-center space-x-2 px-5 py-2.5 rounded-full border transition-all duration-200">
+            <span class="w-3 h-3 rounded-full" :class="filter === 'skipped' ? 'bg-white' : 'bg-amber-400'"></span>
+            <span class="text-sm font-bold leading-none">Skipped {{ $skipped }}</span>
+        </button>
+
+        <button @click="filter = 'wrong'" :class="filter === 'wrong' ? 'bg-rose-500 border-rose-500 text-white shadow-md' : 'bg-zinc-100 dark:bg-slate-800 border-zinc-200 dark:border-slate-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'" class="flex items-center space-x-2 px-5 py-2.5 rounded-full border transition-all duration-200">
+            <span class="w-3 h-3 rounded-full" :class="filter === 'wrong' ? 'bg-white' : 'bg-rose-500'"></span>
+            <span class="text-sm font-bold leading-none">Wrong {{ $mockTest->wrong_answers }}</span>
+        </button>
+    </div>
+
+    <div class="flex justify-center mb-6 mt-8">
+        <h2 class="text-lg md:text-xl font-bold px-6 py-1 border-l-[3px] border-r-[3px] transition-colors duration-200 border-blue-600 text-zinc-800 dark:text-zinc-100 dark:border-blue-500">
+            {{ $mockTest->subject?->name ?? 'তথ্য ও যোগাযোগ প্রযুক্তি' }} ({{ $mockTest->total_questions }})
+        </h2>
+    </div>
+
+    <div class="space-y-4 px-2 md:px-4">
 
         @php
             $labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'];
@@ -51,124 +94,150 @@
             @php
                 $options = collect($tq->question->extra_content ?? [])->take(4);
 
-                // টাইটেল থেকে p ট্যাগ রিমুভ করা
                 $rawTitle = html_entity_decode($tq->question->title ?? '');
                 $questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', $rawTitle) ?? $rawTitle;
+
+                // Alpine.js ফিল্টারিং এর জন্য স্ট্যাটাস
+                $questionStatus = 'skipped';
+                if ($tq->user_answer !== null) {
+                    $questionStatus = $tq->is_correct ? 'right' : 'wrong';
+                }
             @endphp
 
-            <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/50">
-                <div class="flex items-start justify-between gap-4">
-                    <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100" data-math-content>
-                        <span class="mr-2 text-zinc-500">{{ $index + 1 }}.</span>{!! $questionTitle !!}
-                    </h3>
+            <div x-show="filter === 'all' || filter === '{{ $questionStatus }}'"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform scale-95"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 x-data="{ openDesc: false }"
+                 class="bg-white dark:bg-zinc-800 rounded-xl p-4 md:p-5 transition-all duration-200 shadow-sm hover:shadow-md border border-zinc-200 dark:border-zinc-700">
 
-                    <!-- স্ট্যাটাস ব্যাজ -->
-                    @if($tq->user_answer === null)
-                        <span class="shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">Skipped</span>
-                    @elseif($tq->is_correct)
-                        <span class="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Correct</span>
-                    @else
-                        <span class="shrink-0 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">Wrong</span>
-                    @endif
+                <div class="mb-3">
+                    <div class="flex flex-wrap items-start justify-between gap-y-2 gap-x-4 mb-1">
+                        <p class="text-zinc-800 dark:text-zinc-100 font-medium leading-relaxed flex items-start gap-2 flex-1 text-base md:text-lg">
+                            <span class="font-bold text-zinc-500">{{ $index + 1 }}.</span>
+                            <span data-math-content>{!! $questionTitle !!}</span>
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide w-full">
+                        <span class="px-2 py-0.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 text-[10px] font-medium tracking-tight border border-zinc-200 dark:border-zinc-700 max-w-[140px] overflow-x-auto scrollbar-hide whitespace-nowrap">{{ $mockTest->subject?->name ?? 'Subject' }}</span>
+                    </div>
                 </div>
 
-                <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div class="grid md:grid-cols-2 gap-1">
                     @foreach($options as $optIndex => $option)
                         @php
-                            // অপশন থেকে p ট্যাগ রিমুভ করা
                             $rawOption = html_entity_decode($option['option_text'] ?? '');
                             $optionText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', $rawOption) ?? $rawOption;
 
                             $isUserAnswer = ($tq->user_answer !== null && $tq->user_answer == $optIndex);
                             $isCorrectOption = !empty($option['is_correct']);
 
-                            // ডিফল্ট স্টাইল
-                            $bgClass = 'border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200';
-                            $icon = null;
+                            $circleClass = 'border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300';
 
-                            // যদি এই অপশনটি সঠিক হয় (সবসময় সবুজ দেখাবে)
                             if ($isCorrectOption) {
-                                $bgClass = 'border-emerald-500 bg-emerald-50 dark:border-emerald-500/50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200 ring-1 ring-emerald-500';
-                                $icon = '<x-heroicon-s-check-circle class="size-5 text-emerald-500" />';
-                            }
-                            // যদি ইউজার ভুল অপশন সিলেক্ট করে থাকে (লাল দেখাবে)
-                            elseif ($isUserAnswer && !$isCorrectOption) {
-                                $bgClass = 'border-red-500 bg-red-50 dark:border-red-500/50 dark:bg-red-900/20 text-red-800 dark:text-red-200 ring-1 ring-red-500';
-                                $icon = '<x-heroicon-s-x-circle class="size-5 text-red-500" />';
+                                $circleClass = 'bg-green-600 text-white border-green-700 shadow-sm';
+                            } elseif ($isUserAnswer && !$isCorrectOption) {
+                                $circleClass = 'bg-red-500 text-white border-red-600 shadow-sm';
                             }
                         @endphp
 
-                        <div class="relative flex items-start gap-3 rounded-xl border p-4 transition-all {{ $bgClass }}">
-                            <div class="flex-1 text-sm leading-6">
-                                <span class="mr-2 font-bold opacity-70">{{ $labels[$optIndex] ?? $optIndex + 1 }}.</span>
-                                <span data-math-content>{!! $optionText !!}</span>
-                            </div>
-                            @if($icon)
-                                <div class="shrink-0">
-                                    {!! $icon !!}
+                        <button disabled class="p-1.5 pl-3 rounded-xl border transition-all relative bg-zinc-50 dark:bg-zinc-700/50 border-zinc-100 dark:border-zinc-700 cursor-default text-left">
+                            <div class="flex items-center gap-3 w-full">
+                                <span class="flex shrink-0 items-center justify-center w-6 h-6 rounded-full border text-sm font-bold pt-0.5 {{ $circleClass }}">
+                                    {{ $labels[$optIndex] ?? $optIndex + 1 }}
+                                </span>
+                                <div class="flex items-center gap-2 w-full relative">
+                                    <span class="text-zinc-800 dark:text-zinc-200 text-sm flex-1 font-medium" data-math-content>{!! $optionText !!}</span>
                                 </div>
-                            @endif
-                        </div>
+                            </div>
+                        </button>
                     @endforeach
                 </div>
 
-                <!-- Explanation (যদি থাকে) -->
-                <!-- Explanation Area -->
-                <div class="mt-5">
+                <div class="flex items-center justify-between mt-3 gap-4 overflow-x-auto scrollbar-hide">
+
+                    <button @click="openDesc = !openDesc" class="flex items-center gap-1.5 group px-2 py-1 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 rounded-lg transition">
+                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 group-hover:text-blue-600">Des</span>
+                        <flux:icon.chevron-down class="size-4 text-zinc-400 transition-transform duration-200 group-hover:text-blue-500" x-bind:class="openDesc ? 'rotate-180 text-blue-500' : ''" />
+                    </button>
+
+                    <div class="flex items-center gap-1 md:gap-2 shrink-0 cursor-default">
+
+                        <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500" title="Views">
+                            <flux:icon.eye class="size-[18px]" />
+                            <span class="text-sm font-semibold pt-0.5">{{ $tq->question->views_count ?? 0 }}</span>
+                        </div>
+
+                        <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition text-zinc-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20" title="Statistics">
+                            <flux:icon.chart-pie class="size-[18px]" />
+                        </button>
+
+                        <button type="button" wire:click="toggleBookmark({{ $tq->question_id }})" class="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition {{ $tq->question->is_bookmarked ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20' }}" title="{{ $tq->question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                            <flux:icon.bookmark class="size-[18px]" variant="{{ $tq->question->is_bookmarked ? 'solid' : 'outline' }}" />
+                        </button>
+
+                        <button type="button" wire:click="toggleLike({{ $tq->question_id }})" class="px-2 w-auto h-8 flex items-center justify-center gap-1.5 rounded-full cursor-pointer transition {{ $tq->question->is_liked ? 'text-pink-500 bg-pink-50 dark:bg-pink-900/20' : 'text-zinc-400 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20' }}" title="{{ $tq->question->is_liked ? 'Unlike' : 'Like' }}">
+                            <flux:icon.heart class="size-[18px]" variant="{{ $tq->question->is_liked ? 'solid' : 'outline' }}" />
+                            @if($tq->question->likes_count > 0)
+                                <span class="text-xs font-bold pt-0.5">{{ $tq->question->likes_count }}</span>
+                            @endif
+                        </button>
+                        <button type="button" wire:click="$dispatch('openModal', { component: 'report-modal', arguments: { questionId: {{ $tq->question_id }} } })" class="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="Report Error">
+                            <flux:icon.flag class="size-[18px]" />
+                        </button>
+                        <button type="button" class="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer transition text-zinc-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Share">
+                            <flux:icon.share class="size-[18px]" />
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="openDesc" x-collapse>
                     @if(filled($tq->question->description))
-                        <!-- যদি ব্যাখ্যা থাকে -->
-                        <div class="rounded-xl border border-dashed border-blue-200 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
+                        <div class="mt-4 rounded-xl border border-dashed border-blue-200 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
                             <p class="mb-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                                <x-heroicon-o-light-bulb class="size-4" /> ব্যাখ্যা
+                                <flux:icon.light-bulb class="size-4" /> ব্যাখ্যা
                             </p>
                             <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-300" data-math-content>
                                 {!! $tq->question->description !!}
                             </div>
                         </div>
                     @else
-                        <!-- যদি ব্যাখ্যা না থাকে, তাহলে AI বাটন দেখাবে -->
-                        <div class="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-                            <div class="flex items-center gap-3">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400">
-                                    <x-heroicon-o-sparkles class="size-5" />
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">এই প্রশ্নের কোনো ব্যাখ্যা নেই</p>
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">AI ব্যবহার করে এই প্রশ্নের একটি সহজ সমাধান তৈরি করুন।</p>
-                                </div>
-                            </div>
+                        <div class="mt-4 space-y-3">
+                            <div class="text-center border-2 border-dashed rounded-xl p-6 border-zinc-200 dark:border-zinc-700">
+                                <div class="space-y-3 text-center">
+                                    <div wire:loading.remove wire:target="generateAiExplanation({{ $tq->question_id }})">
+                                        <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
+                                        <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
 
-                            <!-- AI Generate Button -->
-                            <button
-                                type="button"
-                                wire:click="generateAiExplanation({{ $tq->question_id }})"
-                                wire:loading.attr="disabled"
-                                class="shrink-0 rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-wait disabled:opacity-70 dark:bg-violet-500 dark:hover:bg-violet-600"
-                            >
-                                <span wire:loading.remove wire:target="generateAiExplanation({{ $tq->question_id }})">
-                                    ✨ AI Generate
-                                </span>
-                                <span wire:loading wire:target="generateAiExplanation({{ $tq->question_id }})" class="flex items-center gap-2">
-                                    <x-heroicon-o-arrow-path class="size-3.5 animate-spin" /> জেনারেট হচ্ছে...
-                                </span>
-                            </button>
-                        </div>
-                        <!-- এরর দেখানোর জায়গা -->
-                        @if($aiError)
-                            <div class="mt-2 text-sm text-red-500 font-semibold px-2">
-                                {{ $aiError }}
+                                        <button
+                                            type="button"
+                                            wire:click.prevent="generateAiExplanation({{ $tq->question_id }})"
+                                            class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm"
+                                        >
+                                            <span>✨ AI Generate</span>
+                                        </button>
+                                    </div>
+
+                                    <div wire:loading wire:target="generateAiExplanation({{ $tq->question_id }})">
+                                        <div class="flex flex-col items-center gap-2">
+                                            <flux:icon.arrow-path class="size-6 animate-spin text-violet-600" />
+                                            <p class="text-xs font-medium text-violet-600 animate-pulse">AI ব্যাখ্যা তৈরি করছে...</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+
+
+
+                        @if($aiError)
+                            <div class="mt-2 text-sm font-semibold text-red-500 px-2 text-center">{{ $aiError }}</div>
                         @endif
                     @endif
                 </div>
+
             </div>
         @endforeach
-    </div>
-
-    <!-- ব্যাক বাটন -->
-    <div class="mt-8 text-center">
-        <a href="{{ route('students.practice.index') }}" wire:navigate class="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white">
-            <x-heroicon-o-arrow-left class="size-4" /> আরও অনুশীলন করুন
-        </a>
     </div>
 </div>

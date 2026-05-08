@@ -179,7 +179,7 @@
                                         <p class="text-[10px] text-zinc-500">{{ $exam['date'] }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-black text-emerald-600">{{ number_format($exam['score'], 2) }}/{{ $exam['total'] }}</p>
+                                        <p class="text-sm font-black text-emerald-600">{{ $exam['score'] + 0 }}/{{ $exam['total'] }}</p>
                                         <p class="text-[10px] text-zinc-500">{{ $exam['time'] }}</p>
                                     </div>
                                 </div>
