@@ -29,7 +29,9 @@ class BookmarkedQuestions extends Component
         if (count($toggled['attached']) > 0) {
             $question->increment('likes_count');
         } elseif (count($toggled['detached']) > 0) {
-            $question->decrement('likes_count');
+            if ($question->likes_count > 0) {
+                $question->decrement('likes_count');
+            }
         }
     }
 
@@ -37,11 +39,10 @@ class BookmarkedQuestions extends Component
     {
         $question = Question::findOrFail($questionId);
         $toggled = $question->bookmarks()->toggle(auth()->id());
-
         if (count($toggled['attached']) > 0) {
             $question->increment('bookmarks_count');
         } elseif (count($toggled['detached']) > 0) {
-            $question->decrement('bookmarks_count');
+            $question->bookmarks_count > 0 ? $question->decrement('bookmarks_count') : $question->bookmarks_count = 0;
         }
     }
 

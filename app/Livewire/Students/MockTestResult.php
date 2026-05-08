@@ -18,7 +18,15 @@ class MockTestResult extends Component
     {
         $this->mockTest = MockTest::where('id', $testId)
             ->where('user_id', auth()->id())
-            ->with(['testQuestions.question', 'subject'])
+            ->with([
+                'testQuestions.question' => fn ($query) => $query
+                    ->withCount(['likes', 'bookmarks'])
+                    ->withExists([
+                        'likes as is_liked' => fn ($likeQuery) => $likeQuery->where('user_id', auth()->id()),
+                        'bookmarks as is_bookmarked' => fn ($bookmarkQuery) => $bookmarkQuery->where('user_id', auth()->id()),
+                    ]),
+                'subject',
+            ])
             ->firstOrFail();
 
         if ($this->mockTest->status !== 'completed') {
@@ -35,16 +43,13 @@ class MockTestResult extends Component
             return;
         }
 
-        // নতুন ফ্রি এপিআই কী-টি এখানে দিন (অথবা .env থেকে নিন)
         $apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
 
         if (! $apiKey) {
-            $this->aiError = 'ফ্রি এপিআই কী পাওয়া যায়নি।';
-
+            $this->aiError = 'ফ্রি এপিআই কী পাওয়া যায়নি।';
             return;
         }
 
-        // ডাটা প্রসেসিং
         $optionsText = '';
         $correctAnswerText = '';
         $options = collect($question->extra_content ?? [])->take(4);
@@ -59,10 +64,9 @@ class MockTestResult extends Component
         }
 
         $cleanTitle = strip_tags(html_entity_decode($question->title ?? ''));
-        $prompt = "প্রশ্ন: {$cleanTitle}. সঠিক উত্তর: {$correctAnswerText}. কেন এটি সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো।";
+        $prompt = "প্রশ্ন: {$cleanTitle}. সঠিক উত্তর: {$correctAnswerText}. কেন এটি সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো।";
 
         try {
-            // gemini-2.5-flash-lite মডেলটি ফ্রি ইউজারদের জন্য বেস্ট
             $response = Http::withoutVerifying()->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
                 'contents' => [
                     [
@@ -76,7 +80,9 @@ class MockTestResult extends Component
                 if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
                     $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
                     $question->update(['description' => nl2br(trim($explanation))]);
-                    $this->mockTest->load('testQuestions.question');
+
+                    // ব্যাখ্যা যুক্ত হওয়ার পর ডাটা রিফ্রেশ
+                    $this->refreshQuestionsData();
                     $this->dispatch('practice-content-updated');
                 }
             } else {
@@ -88,7 +94,7 @@ class MockTestResult extends Component
         }
     }
 
-    // --- Dynamic Actions (Scalable Approach) ---
+    // --- Dynamic Actions ---
 
     public function toggleLike(int $questionId): void
     {
@@ -98,8 +104,12 @@ class MockTestResult extends Component
         if (count($toggled['attached']) > 0) {
             $question->increment('likes_count');
         } elseif (count($toggled['detached']) > 0) {
-            $question->decrement('likes_count');
+            if ($question->likes_count > 0) {
+                $question->decrement('likes_count');
+            }
         }
+        // ডাটাবেসে আপডেট হওয়ার সাথে সাথেই সকল প্রশ্নের স্টেট রিফ্রেশ করা হলো
+        $this->refreshQuestionsData();
     }
 
     public function toggleBookmark(int $questionId): void
@@ -110,8 +120,13 @@ class MockTestResult extends Component
         if (count($toggled['attached']) > 0) {
             $question->increment('bookmarks_count');
         } elseif (count($toggled['detached']) > 0) {
-            $question->decrement('bookmarks_count');
+            if ($question->bookmarks_count > 0) {
+                $question->decrement('bookmarks_count');
+            }
         }
+
+        // ডাটাবেসে আপডেট হওয়ার সাথে সাথেই সকল প্রশ্নের স্টেট রিফ্রেশ করা হলো
+        $this->refreshQuestionsData();
     }
 
     public function recordView(int $questionId): void
@@ -124,6 +139,20 @@ class MockTestResult extends Component
             Cache::put($cacheKey, true, now()->addHours(24));
         }
     }
+
+    // Livewire এর Hydration সমস্যা সমাধানের জন্য হেল্পার ফাংশন
+    private function refreshQuestionsData(): void
+    {
+        $this->mockTest->load([
+            'testQuestions.question' => fn ($query) => $query
+                ->withCount(['likes', 'bookmarks'])
+                ->withExists([
+                    'likes as is_liked' => fn ($likeQuery) => $likeQuery->where('user_id', auth()->id()),
+                    'bookmarks as is_bookmarked' => fn ($bookmarkQuery) => $bookmarkQuery->where('user_id', auth()->id()),
+                ]),
+        ]);
+    }
+
     public function render()
     {
         $total = $this->mockTest->total_questions;

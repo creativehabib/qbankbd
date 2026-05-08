@@ -1,6 +1,5 @@
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="max-w-5xl mx-auto space-y-6" x-data="{ showBookmarkModal: false, selectedQuestionId: null }">
 
-    <!-- Header Section -->
     <div class="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
         <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
             <flux:icon.bookmark class="size-6" variant="solid" />
@@ -11,7 +10,6 @@
         </div>
     </div>
 
-    <!-- Questions List -->
     <div>
         @if($questions->isEmpty())
             <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center text-sm text-zinc-500 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
@@ -44,7 +42,6 @@
                             @endforeach
                         </div>
 
-                        <!-- Dynamic Action Icons & Explanation -->
                         <div x-data="{ openDescription: false }" class="mt-5 border-t border-zinc-200 pt-4 dark:border-zinc-700 space-y-3">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -58,11 +55,28 @@
                                         <flux:icon.eye class="size-[18px]" />
                                         <span class="text-sm font-semibold">{{ $question->views_count ?? 0 }}</span>
                                     </div>
-                                    <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer transition {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
-                                        <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
+
+                                    <button
+                                        type="button"
+                                        onclick="confirmDeleteAction(() => @this.toggleBookmark({{ $question->id }}), {
+                                            title: 'আপনি কি নিশ্চিত?',
+                                            text: 'এই প্রশ্নটি আপনার বুকমার্ক লিস্ট থেকে রিমুভ হয়ে যাবে।',
+                                            confirmButtonText: 'হ্যাঁ, রিমুভ করুন',
+                                            confirmButtonColor: '#b03a3e'
+                                        })"
+                                        class="cursor-pointer transition text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
+                                        title="Remove Bookmark"
+                                    >
+                                        <flux:icon.bookmark class="size-[18px]" variant="solid" />
                                     </button>
+
                                     <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer transition {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
-                                        <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
+                                        @if($question->is_liked)
+                                            <flux:icon.heart class="size-[18px]" variant="solid" />
+                                        @else
+                                            <flux:icon.heart class="size-[18px]" variant="outline" />
+                                        @endif
+
                                         @if($question->likes_count > 0)
                                             <span class="text-xs font-medium">{{ $question->likes_count }}</span>
                                         @endif
@@ -85,7 +99,6 @@
                 @endforeach
             </div>
 
-            <!-- Pagination -->
             <div class="pt-4">
                 {{ $questions->links() }}
             </div>
