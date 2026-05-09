@@ -7,6 +7,9 @@ use App\Livewire\Admin\Settings\ThemeOptions;
 use App\Livewire\Admin\WalletApprovalPanel;
 use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
+use App\Livewire\OMR\EvaluateOmr;
+use App\Livewire\OMR\ManageTokens;
+use App\Livewire\OMR\MapAnswers;
 use App\Livewire\OmrGenerator;
 use App\Livewire\PermissionManager;
 use App\Livewire\Questions;
@@ -19,6 +22,7 @@ use App\Livewire\Students\Leaderboard;
 use App\Livewire\Students\MistakeReview;
 use App\Livewire\Students\MockTestHistory;
 use App\Livewire\Students\MockTestResult;
+use App\Livewire\Students\OmrScanner;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Students\TakeMockTest;
 use App\Livewire\Subjects\SubjectIndex;
@@ -121,6 +125,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/leaderboard', Leaderboard::class)->name('student.leaderboard');
     Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
     Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');
+    Route::get('/student/omr-scanner', OmrScanner::class)->name('student.omr-scanner');
+
+    Route::get('/tokens', ManageTokens::class)->name('tokens.list');
+    Route::get('/tokens/{token_id}/map', MapAnswers::class)->name('tokens.map-answers');
+    Route::get('/omr/evaluate', EvaluateOmr::class)->name('omr.evaluate');
 
     Route::middleware('role:teacher|admin|super_admin')->group(function (): void {
         Route::get('/omr-generator', OmrGenerator::class)->name('omr.generator');

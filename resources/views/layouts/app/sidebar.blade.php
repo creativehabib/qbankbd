@@ -51,6 +51,14 @@
         ],
         [
             'type' => 'link',
+            'label' => __('OMR স্ক্যানার'),
+            'route' => 'student.omr-scanner',
+            'match' => 'student.omr-scanner',
+            'icon' => 'document-duplicate',
+            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin', 'student']),
+        ],
+        [
+            'type' => 'link',
             'label' => __('প্রতিষ্ঠানের তথ্য'),
             'route' => 'teacher.institution-info',
             'match' => 'teacher.institution-info',
@@ -144,7 +152,20 @@
             'match' => 'student.test-history',
             'icon' => 'clock', // 'calendar-days' অথবা 'clipboard-document-list' ও দিতে পারেন
             'visible' => auth()->user()->isStudent()
-        ]
+        ],
+        [
+            'type' => 'group',
+            'label' => __('OMR'),
+            'icon' => 'circle-stack',
+            'flyout' => 'question-bank',
+            'active' => request()->routeIs(['tokens.*', 'omr.*']),
+            'visible' => true,
+            'items' => [
+                ['label' => __('Token List'), 'route' => 'tokens.list', 'match' => 'tokens.*', 'visible' => true],
+                ['label' => __('Token Map'), 'route' => 'tokens.map-answers', 'match' => 'tokens.*', 'visible' => auth()->user()->hasAnyPermission(['tokens.map-answers'])],
+                ['label' => __('OMR'), 'route' => 'omr.evaluate', 'match' => 'omr.*', 'visible' => auth()->user()->hasAnyPermission(['omr.evaluate'])],
+            ]
+        ],
     ];
 
     $pageTitle = $title ?? $pageTitle ?? 'Dashboard';
