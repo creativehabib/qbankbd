@@ -61,7 +61,7 @@ class EvaluateOmr extends Component
 
         // ৫. পাইথন প্রসেস কল করা
         $process = new Process([
-            'python3',
+            '/usr/bin/python3', // অথবা আপনার হোস্টিংয়ের পাইথন পাথ
             base_path('scripts/omr_scanner.py'),
             $realPath,
             $destinationPath, // রেজাল্ট ইমেজ সেভ করার ডিরেক্টরি
