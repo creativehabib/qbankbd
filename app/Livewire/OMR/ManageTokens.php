@@ -11,25 +11,52 @@ class ManageTokens extends Component
 {
     public bool $showModal = false;
 
-    // ফর্ম ইনপুট ভ্যারিয়েবলস
+    // ফর্ম ইনপুট ভ্যারিয়েবলস
     public $title;
-
     public $selectedTemplateId;
-
+    public $templateType = 'signature';
     public $totalQuestions;
-
+    public $unique_code;
     public string $negativeMark = '';
 
-    protected $rules = [
-        'title' => 'required|string|max:255',
-        'selectedTemplateId' => 'required|exists:omr_templates,id',
-        'totalQuestions' => 'required|integer|min:10|max:100',
-        'negativeMark' => 'required',
-    ];
+    protected function rules()
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'selectedTemplateId' => 'required|exists:omr_templates,id',
+            'totalQuestions' => 'required|integer|min:10|max:100',
+
+            // 🌟 ডাটাবেজের সাথে ম্যাচিং ভ্যালিডেশন
+            'unique_code' => $this->templateType !== 'signature'
+                ? 'required|string|max:50|exists:omr_templates,unique_code'
+                : 'nullable',
+
+            'negativeMark' => 'required',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'unique_code.required' => 'OMR Sheet Code প্রদান করা আবশ্যক!',
+            'unique_code.exists' => 'OMR কোডটি ডাটাবেজের সাথে ম্যাচ করেনি! দয়া করে সঠিক কোড দিন।',
+            'totalQuestions.required' => 'মোট প্রশ্ন সংখ্যা দেওয়া আবশ্যক!',
+            'title.required' => 'পরীক্ষার একটি টাইটেল দিন!',
+            'negativeMark.required' => 'নেগেটিভ মার্কিং সিলেক্ট করুন!',
+        ];
+    }
 
     public function openModal()
     {
-        $this->reset(['title', 'selectedTemplateId', 'totalQuestions', 'negativeMark']);
+        $this->reset(['title', 'selectedTemplateId', 'totalQuestions', 'negativeMark', 'unique_code', 'templateType']);
+
+        $defaultTemplate = OmrTemplate::where('type', 'signature')->first();
+        if ($defaultTemplate) {
+            $this->selectedTemplateId = $defaultTemplate->id;
+            $this->templateType = 'signature';
+            $this->totalQuestions = $defaultTemplate->total_questions;
+        }
+
         $this->showModal = true;
     }
 
@@ -38,10 +65,11 @@ class ManageTokens extends Component
         $this->showModal = false;
     }
 
-    // ওএমআর টেমপ্লেট কার্ডে ক্লিক করলে ডাইনামিক সিলেকশন ও প্রশ্ন সংখ্যা সেট করা
-    public function selectTemplate($templateId)
+    public function selectTemplate($templateId, $type)
     {
         $this->selectedTemplateId = $templateId;
+        $this->templateType = $type;
+
         $template = OmrTemplate::find($templateId);
         if ($template) {
             $this->totalQuestions = $template->total_questions;
@@ -55,7 +83,7 @@ class ManageTokens extends Component
         $template = OmrTemplate::find($this->selectedTemplateId);
         $tokenId = 'TOK-'.strtoupper(Str::random(6));
 
-        // প্রাথমিক ফাঁকা উত্তরপত্রসহ টোকেন তৈরি করা
+        // 🌟 omr_tokens টেবিলে unique_code কলাম না থাকায় সেটি এখান থেকে বাদ দেওয়া হয়েছে 🌟
         OmrToken::create([
             'token_id' => $tokenId,
             'omr_template_id' => $template->id,
@@ -68,7 +96,6 @@ class ManageTokens extends Component
 
         $this->showModal = false;
 
-        // টোকেন জেনারেট শেষে সরাসরি আপনার উত্তরপত্র সাজানোর পেজে রিডাইরেক্ট করা
         return redirect()->route('tokens.map-answers', ['token_id' => $tokenId]);
     }
 
@@ -76,7 +103,7 @@ class ManageTokens extends Component
     {
         return view('livewire.omr.manage-tokens', [
             'tokens' => OmrToken::with('template')->latest()->get(),
-            'templates' => OmrTemplate::all(), // ডাটাবেস থেকে টেমপ্লেট তালিকা রিড করা
+            'templates' => OmrTemplate::all(),
         ]);
     }
 }

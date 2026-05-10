@@ -1,10 +1,11 @@
 <div class="p-6 bg-gray-100 min-h-screen">
-    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+    <div class="max-w-6xl mx-auto bg-white rounded shadow-sm border border-gray-200 p-6">
+
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                📂 আমার তৈরি OMR টোকেন
+            <h1 class="text-xl font-bold text-gray-800">
+                আমার তৈরী OMR টোকেন
             </h1>
-            <button wire:click="openModal" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition">
+            <button wire:click="openModal" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded transition">
                 + New Token
             </button>
         </div>
@@ -17,30 +18,49 @@
 
         <div class="overflow-x-auto rounded border border-gray-200 bg-white">
             <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
-                <thead class="bg-gray-50 text-gray-700 font-semibold uppercase">
+
+                <thead class="bg-gray-100 text-gray-700 font-bold">
                 <tr>
-                    <th class="px-6 py-3">টাইটেল</th>
-                    <th class="px-6 py-3">টেমপ্লেট</th>
-                    <th class="px-6 py-3">OMR কোড</th>
-                    <th class="px-6 py-3">মোট প্রশ্ন</th>
-                    <th class="px-6 py-3">নেগেティブ মার্কিং</th>
-                    <th class="px-6 py-3 text-center">পদক্ষেপ</th>
+                    <th class="px-6 py-4">টাইটেল</th>
+                    <th class="px-6 py-4">টেমপ্লেট</th>
+                    <th class="px-6 py-4">OMR কোড</th>
+                    <th class="px-6 py-4">মোট প্রশ্ন</th>
+                    <th class="px-6 py-4">নেগেটিভ মার্কিং</th>
+                    <th class="px-6 py-4 text-center">পদক্ষেপ</th>
                 </tr>
                 </thead>
+
                 <tbody class="divide-y divide-gray-200">
                 @forelse($tokens as $token)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 font-bold text-gray-800">{{ $token->title }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $token->template->name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $token->template->unique_code ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $token->total_questions }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $token->negative_mark }}</td>
-                        <td class="px-6 py-4 text-center flex justify-center gap-2">
-                            <a href="{{ route('tokens.map-answers', $token->token_id) }}" class="border border-gray-300 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-100 text-xs font-semibold">
-                                View Answers
-                            </a>
-                            <a href="{{ route('omr.evaluate', ['token' => $token->token_id]) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-semibold">
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+
+                        <td class="px-6 py-4 font-bold text-black">{{ $token->title }}</td>
+
+                        <td class="px-6 py-4 font-medium">
+                            @if(isset($token->template) && $token->template->type === 'signature')
+                                <span class="bg-green-600 text-white px-3 py-1 rounded text-xs font-semibold">সিগনেচার</span>
+                            @else
+                                <span class="text-gray-800">{{ $token->template->name ?? 'সাধারণ' }}</span>
+                            @endif
+                        </td>
+
+                        <td class="px-6 py-4 text-gray-800 font-medium">
+                            {{ $token->template->unique_code ?? '-' }}
+                        </td>
+
+                        <td class="px-6 py-4 text-gray-800 font-medium">{{ $token->total_questions }}</td>
+
+                        <td class="px-6 py-4 text-gray-800 font-medium">{{ floatval($token->negative_mark) }}</td>
+
+                        <td class="px-6 py-4 flex justify-center gap-2">
+                            <a href="{{ route('omr.evaluate', ['token' => $token->token_id]) }}"
+                               class="border border-gray-300 text-black bg-white px-4 py-1.5 rounded hover:bg-gray-100 text-xs font-semibold transition">
                                 Scan Now
+                            </a>
+
+                            <a href="{{ route('tokens.map-answers', $token->token_id) }}"
+                               class="border border-gray-300 text-green-600 bg-white px-4 py-1.5 rounded hover:bg-green-50 text-xs font-semibold transition">
+                                View
                             </a>
                         </td>
                     </tr>
@@ -50,13 +70,14 @@
                     </tr>
                 @endforelse
                 </tbody>
+
             </table>
         </div>
     </div>
 
     @if($showModal)
         <div class="w-full fixed top-0 left-0 z-[100] h-[100vh] bg-black/30 flex justify-center items-center">
-            <div class="w-full md:w-96 bg-slate-700 text-white rounded shadow-lg mx-2 overflow-auto">
+            <div class="w-full md:w-96 bg-slate-700 text-white rounded shadow-lg mx-2 overflow-auto max-h-[90vh]">
 
                 <div class="flex text-lg items-center justify-between px-3 py-2">
                     <p class="font-semibold bangla text-white">নতুন টোকেন তৈরী</p>
@@ -90,7 +111,7 @@
                                 <p class="mb-2 font-semibold text-gray-700 text-sm">OMR Template নির্বাচন করুন</p>
                                 <div class="flex gap-4">
                                     @foreach($templates as $template)
-                                        <div wire:click="selectTemplate({{ $template->id }})"
+                                        <div wire:click="selectTemplate({{ $template->id }}, '{{ $template->type }}')"
                                              class="relative border-2 rounded-lg cursor-pointer transition-all duration-200 p-1 w-36 text-center
                                              {{ $selectedTemplateId == $template->id ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-400' }}">
 
@@ -117,12 +138,18 @@
                                 @error('selectedTemplateId') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
-                            <div class="flex gap-2 my-2">
-                                <div class="w-full">
-                                    <input wire:model="totalQuestions" type="number" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="Total Question">
-                                    @error('totalQuestions') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                            @if($templateType !== 'signature')
+                                <div class="flex gap-2 my-2 transition-all duration-300">
+                                    <div class="w-full">
+                                        <input wire:model="unique_code" type="text" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="OMR Sheet Code">
+                                        @error('unique_code') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full">
+                                        <input wire:model="totalQuestions" type="number" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="Total Question">
+                                        @error('totalQuestions') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
 
                             <div class="mt-2">
                                 <select wire:model="negativeMark" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none text-gray-700">

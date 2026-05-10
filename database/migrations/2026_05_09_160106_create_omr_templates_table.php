@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('omr_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');                      // টেমপ্লেটের নাম (যেমন: সাধারণ, সিগনেচার)
-            $table->string('unique_code')->unique();     // ইউনিক ওএমআর কোড (যেমন: 13160)
+            $table->string('unique_code')->unique()->nullable();     // ইউনিক ওএমআর কোড (যেমন: 13160)
             $table->integer('total_questions');          // মোট প্রশ্ন (যেমন: ৬০ বা ১০০)
             $table->integer('columns');                  // কলাম সংখ্যা (যেমন: ৩ বা ৪)
             $table->string('type')->default('standard'); // টেমপ্লেটের টাইপ

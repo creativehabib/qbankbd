@@ -6,23 +6,44 @@ use Livewire\Component;
 
 class OmrGenerator extends Component
 {
-    public string $schoolName = 'গাজীপুর মর্নিং সান স্কুল';
+    public string $schoolName = 'অনলাইন ডিজিটাল স্কুল';
 
     public string $address = 'গাজীপুর সদর, গাজীপুর';
 
+    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট সাইজ ২৪ করা হয়েছে
     public int $schoolNameSize = 24;
 
     public int $addressSize = 14;
 
     public string $themeColor = 'rose';       // rose | gray | blue | green | purple | orange | cyan | pink | yellow | lime
 
-    public int $questionCount = 100;           // 40 | 60 | 80 | 100
+    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট প্রশ্ন সংখ্যা ১০০ করা হয়েছে
+    public int $questionCount = 100;           // 10 to 100
 
-    public string $headerSize = 'BIG';         // BIG | SMALL
+    public int $columns = 2;                  // 2 | 3 | 4
 
-    public string $infoType = 'DIGITAL';     // DIGITAL | MANUAL
+    public string $headerSize = 'BIG';        // BIG | SMALL
 
-    public string $templateType = 'iproshbang';  // iproshbang | standard
+    public string $infoType = 'DIGITAL';      // DIGITAL | MANUAL
+
+    // ডিফল্ট টেমপ্লেট 'iproshbang' সেট করা হয়েছে
+    public string $templateType = 'iproshbang'; // iproshbang | standard
+
+    /* ─── Template Switch Hook ───────────────────────────── */
+
+    public function updatedTemplateType($value): void
+    {
+        // টেমপ্লেট চেঞ্জ করলে ডিফল্ট ভ্যালুগুলো এডজাস্ট করার জন্য
+        if ($value === 'standard') {
+            $this->schoolNameSize = 14;
+            $this->addressSize = 14;
+            $this->questionCount = 20;
+        } else {
+            $this->schoolNameSize = 24;
+            $this->addressSize = 14;
+            $this->questionCount = 100;
+        }
+    }
 
     /* ─── Theme ─────────────────────────────────────────── */
 
@@ -55,10 +76,15 @@ class OmrGenerator extends Component
 
     /* ─── Validation ─────────────────────────────────────── */
 
-    public function updatedQuestionCount(int $value): void
+    public function updatedQuestionCount($value): void
     {
-        if (! in_array($value, [40, 60, 80, 100], true)) {
+        $val = (int) $value;
+        if ($val < 10) {
+            $this->questionCount = 10;
+        } elseif ($val > 100) {
             $this->questionCount = 100;
+        } else {
+            $this->questionCount = $val;
         }
     }
 
@@ -70,6 +96,14 @@ class OmrGenerator extends Component
             '0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪',
             '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯',
         ]);
+    }
+
+    // Dynamic OMR Code Generator
+    public function getOmrCodeProperty(): string
+    {
+        $tType = $this->templateType === 'standard' ? '1' : '2';
+        $qCount = str_pad($this->questionCount, 2, '0', STR_PAD_LEFT);
+        return $tType . $this->columns . '1' . $qCount;
     }
 
     /* ─── Render ─────────────────────────────────────────── */
