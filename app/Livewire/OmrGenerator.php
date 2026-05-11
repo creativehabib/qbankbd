@@ -10,15 +10,13 @@ class OmrGenerator extends Component
 
     public string $address = 'গাজীপুর সদর, গাজীপুর';
 
-    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট সাইজ ২৪ করা হয়েছে
-    public int $schoolNameSize = 24;
+    public int $schoolNameSize = 14;
 
     public int $addressSize = 14;
 
     public string $themeColor = 'rose';       // rose | gray | blue | green | purple | orange | cyan | pink | yellow | lime
 
-    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট প্রশ্ন সংখ্যা ১০০ করা হয়েছে
-    public int $questionCount = 100;           // 10 to 100
+    public int $questionCount = 20;           // 10 to 100
 
     public int $columns = 2;                  // 2 | 3 | 4
 
@@ -26,23 +24,62 @@ class OmrGenerator extends Component
 
     public string $infoType = 'DIGITAL';      // DIGITAL | MANUAL
 
-    // ডিফল্ট টেমপ্লেট 'iproshbang' সেট করা হয়েছে
-    public string $templateType = 'iproshbang'; // iproshbang | standard
+    public string $templateType = 'standard'; // iproshbang | standard
 
     /* ─── Template Switch Hook ───────────────────────────── */
 
     public function updatedTemplateType($value): void
     {
-        // টেমপ্লেট চেঞ্জ করলে ডিফল্ট ভ্যালুগুলো এডজাস্ট করার জন্য
         if ($value === 'standard') {
             $this->schoolNameSize = 14;
             $this->addressSize = 14;
             $this->questionCount = 20;
+            $this->columns = 2;
         } else {
             $this->schoolNameSize = 24;
             $this->addressSize = 14;
             $this->questionCount = 100;
         }
+    }
+
+    /* ─── Dynamic Column & Question Logic ───────────────── */
+
+    public function updatedQuestionCount($value): void
+    {
+        $val = (int) $value;
+        if ($val < 10) {
+            $this->questionCount = 10;
+        } elseif ($val > 100) {
+            $this->questionCount = 100;
+        } else {
+            $this->questionCount = $val;
+        }
+
+        // অটো কলাম সিলেকশন লজিক
+        if ($this->questionCount == 20) {
+            $this->columns = 2;
+        } elseif ($this->questionCount == 30) {
+            $this->columns = 3;
+        } elseif ($this->questionCount == 40) {
+            $this->columns = 4;
+        } elseif ($this->questionCount == 60) {
+            $this->columns = 3;
+        }
+
+        // ৫০ এর উপর প্রশ্ন হলে ২ কলাম থাকতে পারবে না
+        if ($this->questionCount > 50 && $this->columns < 3) {
+            $this->columns = 3;
+        }
+    }
+
+    // বাটন ক্লিক করার সময় কলাম সেট করার ফাংশন
+    public function setColumns(int $val): void
+    {
+        // ৫০ এর উপর প্রশ্ন হলে ২ কলাম সিলেক্ট করতে বাধা দেওয়া
+        if ($this->questionCount > 50 && $val < 3) {
+            return;
+        }
+        $this->columns = $val;
     }
 
     /* ─── Theme ─────────────────────────────────────────── */
@@ -72,20 +109,6 @@ class OmrGenerator extends Component
         ];
 
         return $themes[$this->themeColor] ?? $themes['rose'];
-    }
-
-    /* ─── Validation ─────────────────────────────────────── */
-
-    public function updatedQuestionCount($value): void
-    {
-        $val = (int) $value;
-        if ($val < 10) {
-            $this->questionCount = 10;
-        } elseif ($val > 100) {
-            $this->questionCount = 100;
-        } else {
-            $this->questionCount = $val;
-        }
     }
 
     /* ─── Helper ─────────────────────────────────────────── */

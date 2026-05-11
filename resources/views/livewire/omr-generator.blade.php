@@ -86,12 +86,31 @@
 
                                 <div class="border-gray-800 relative" style="border-width: 3px;">
 
-                                    <div class="border-b border-dashed border-gray-400 p-1 flex justify-around">
-                                        @for($c = 0; $c < $this->columns; $c++)
-                                            <div class="flex items-center justify-center flex-1">
-                                                <div class="h-4 w-3 bg-black"></div>
+                                    <div class="border-b border-dashed border-gray-400 p-1 flex justify-between items-center relative">
+
+                                        <div class="flex items-center gap-12 pl-1">
+                                            <div class="h-5 w-3 bg-black"></div>
+
+                                            <div class="flex items-center gap-1.5">
+                                                @for($c = 0; $c < $this->columns; $c++)
+                                                    <div class="h-5 w-3 bg-black"></div>
+                                                @endfor
                                             </div>
-                                        @endfor
+                                        </div>
+
+                                        <div class="absolute left-1/2 -translate-x-1/2">
+                                            <div class="h-5 w-3 bg-black"></div>
+                                        </div>
+
+                                        <div class="flex items-center justify-end gap-1.5 pr-1">
+                                            @php
+                                                $qBars = max(1, floor($this->questionCount / 10)); // Ensure at least 1 bar
+                                            @endphp
+                                            @for($q = 0; $q < $qBars; $q++)
+                                                <div class="h-5 w-3 bg-black"></div>
+                                            @endfor
+                                        </div>
+
                                     </div>
 
                                     <div class="flex justify-around gap-2 px-2 py-3">
@@ -140,7 +159,7 @@
                             {{-- ── Top barcode strip ── --}}
                             <div class="absolute flex items-center justify-center top-0 left-1/2 -translate-x-1/2">
                                 <div class="{{ $theme['bg50'] }} w-[660px] h-10">
-                                    <div class="text-center text-sm {{ $theme['text'] }} font-bold">এই বক্সে কোনো দাগ দেয়া যাবে না।</div>
+                                    <div class="text-center text-sm {{ $theme['text'] }} font-bold">এই বক্সে কোনো দাগ দেয়া যাবে্বা না।</div>
                                     <div class="center flex justify-center">
                                         <div class="flex flex-wrap gap-1">
                                             @foreach($seqIprosh as $s)
@@ -680,13 +699,17 @@
                         <div>
                             <label class="block font-bold text-gray-800 mb-1">Column</label>
                             <div class="flex gap-2">
-                                <button wire:click="$set('columns', 2)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 2 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
+                                <button wire:click="setColumns(2)"
+                                        @if($this->questionCount > 50) disabled title="৫০ এর অধিক প্রশ্নে ২ কলাম সম্ভব নয়" @endif
+                                        class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition
+                                        {{ $this->columns == 2 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}
+                                        {{ $this->questionCount > 50 ? 'opacity-40 cursor-not-allowed bg-gray-100' : '' }}">
                                     <div class="w-3.5 h-6 bg-gray-300"></div><div class="w-3.5 h-6 bg-gray-300"></div>
                                 </button>
-                                <button wire:click="$set('columns', 3)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 3 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
+                                <button wire:click="setColumns(3)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 3 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
                                     <div class="w-2.5 h-6 bg-gray-300"></div><div class="w-2.5 h-6 bg-gray-300"></div><div class="w-2.5 h-6 bg-gray-300"></div>
                                 </button>
-                                <button wire:click="$set('columns', 4)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 4 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
+                                <button wire:click="setColumns(4)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 4 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
                                     <div class="w-2 h-6 bg-gray-300"></div><div class="w-2 h-6 bg-gray-300"></div><div class="w-2 h-6 bg-gray-300"></div><div class="w-2 h-6 bg-gray-300"></div>
                                 </button>
                             </div>
