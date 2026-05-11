@@ -88,7 +88,7 @@
 
                                     <div class="border-b border-dashed border-gray-400 p-1 flex justify-between items-center relative">
 
-                                        <div class="flex items-center gap-12 pl-1">
+                                        <div class="flex items-center gap-24 pl-1">
                                             <div class="h-5 w-3 bg-black"></div>
 
                                             <div class="flex items-center gap-1.5">
@@ -706,7 +706,11 @@
                                         {{ $this->questionCount > 50 ? 'opacity-40 cursor-not-allowed bg-gray-100' : '' }}">
                                     <div class="w-3.5 h-6 bg-gray-300"></div><div class="w-3.5 h-6 bg-gray-300"></div>
                                 </button>
-                                <button wire:click="setColumns(3)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 3 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">
+                                <button wire:click="setColumns(3)"
+                                        @if($this->questionCount > 70) disabled title="৭০ এর অধিক প্রশ্নে ৪ কলামের নিচে সম্ভব নয়" @endif
+                                        class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition
+                                        {{ $this->columns == 3 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}
+                                        {{ $this->questionCount > 70 ? 'opacity-40 cursor-not-allowed bg-gray-100' : '' }}">
                                     <div class="w-2.5 h-6 bg-gray-300"></div><div class="w-2.5 h-6 bg-gray-300"></div><div class="w-2.5 h-6 bg-gray-300"></div>
                                 </button>
                                 <button wire:click="setColumns(4)" class="flex-1 h-10 border rounded flex gap-1 items-center justify-center transition {{ $this->columns == 4 ? 'border-gray-800 border-2 shadow-sm' : 'border-gray-300 hover:border-gray-400' }}">

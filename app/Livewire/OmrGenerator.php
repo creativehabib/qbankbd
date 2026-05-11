@@ -10,14 +10,12 @@ class OmrGenerator extends Component
 
     public string $address = 'গাজীপুর সদর, গাজীপুর';
 
-    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট সাইজ ২৪
     public int $schoolNameSize = 24;
 
     public int $addressSize = 14;
 
     public string $themeColor = 'rose';       // rose | gray | blue | green | purple | orange | cyan | pink | yellow | lime
 
-    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট প্রশ্ন সংখ্যা ১০০
     public int $questionCount = 100;           // 10 to 100
 
     public int $columns = 4;                  // 2 | 3 | 4
@@ -26,14 +24,12 @@ class OmrGenerator extends Component
 
     public string $infoType = 'DIGITAL';      // DIGITAL | MANUAL
 
-    // 🌟 ডিফল্ট টেমপ্লেট 'iproshbang' সেট করা হলো
     public string $templateType = 'iproshbang'; // iproshbang | standard
 
     /* ─── Template Switch Hook ───────────────────────────── */
 
     public function updatedTemplateType($value): void
     {
-        // টেমপ্লেট চেঞ্জ করলে ডিফল্ট ভ্যালুগুলো এডজাস্ট করার জন্য
         if ($value === 'standard') {
             $this->schoolNameSize = 14;
             $this->addressSize = 14;
@@ -43,6 +39,7 @@ class OmrGenerator extends Component
             $this->schoolNameSize = 24;
             $this->addressSize = 14;
             $this->questionCount = 100;
+            $this->columns = 4;
         }
     }
 
@@ -61,18 +58,22 @@ class OmrGenerator extends Component
 
         // অটো কলাম সিলেকশন লজিক (Standard টেমপ্লেটের জন্য)
         if ($this->templateType === 'standard') {
-            if ($this->questionCount == 20) {
+            if ($this->questionCount <= 20) {
                 $this->columns = 2;
-            } elseif ($this->questionCount == 30) {
+            } elseif ($this->questionCount <= 30) {
                 $this->columns = 3;
             } elseif ($this->questionCount == 40) {
                 $this->columns = 4;
-            } elseif ($this->questionCount == 60) {
+            } elseif ($this->questionCount <= 60) {
                 $this->columns = 3;
+            } else {
+                $this->columns = 4; // 60 এর উপরে অটো ৪ কলাম
             }
 
-            // ৫০ এর উপর প্রশ্ন হলে ২ কলাম থাকতে পারবে না
-            if ($this->questionCount > 50 && $this->columns < 3) {
+            // 🌟 রেস্ট্রিকশন লজিক
+            if ($this->questionCount > 70 && $this->columns < 4) {
+                $this->columns = 4;
+            } elseif ($this->questionCount > 50 && $this->columns < 3) {
                 $this->columns = 3;
             }
         }
@@ -81,7 +82,11 @@ class OmrGenerator extends Component
     // বাটন ক্লিক করার সময় কলাম সেট করার ফাংশন
     public function setColumns(int $val): void
     {
-        // ৫০ এর উপর প্রশ্ন হলে ২ কলাম সিলেক্ট করতে বাধা দেওয়া
+        // 🌟 ৭০ এর উপর প্রশ্ন হলে ৪ কলামের নিচে সিলেক্ট করতে বাধা দেওয়া
+        if ($this->questionCount > 70 && $val < 4) {
+            return;
+        }
+        // 🌟 ৫০ এর উপর প্রশ্ন হলে ২ কলাম সিলেক্ট করতে বাধা দেওয়া
         if ($this->questionCount > 50 && $val < 3) {
             return;
         }
