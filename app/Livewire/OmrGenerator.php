@@ -10,26 +10,30 @@ class OmrGenerator extends Component
 
     public string $address = 'গাজীপুর সদর, গাজীপুর';
 
-    public int $schoolNameSize = 14;
+    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট সাইজ ২৪
+    public int $schoolNameSize = 24;
 
     public int $addressSize = 14;
 
     public string $themeColor = 'rose';       // rose | gray | blue | green | purple | orange | cyan | pink | yellow | lime
 
-    public int $questionCount = 20;           // 10 to 100
+    // ইপ্রশ্নব্যাংকের জন্য ডিফল্ট প্রশ্ন সংখ্যা ১০০
+    public int $questionCount = 100;           // 10 to 100
 
-    public int $columns = 2;                  // 2 | 3 | 4
+    public int $columns = 4;                  // 2 | 3 | 4
 
     public string $headerSize = 'BIG';        // BIG | SMALL
 
     public string $infoType = 'DIGITAL';      // DIGITAL | MANUAL
 
-    public string $templateType = 'standard'; // iproshbang | standard
+    // 🌟 ডিফল্ট টেমপ্লেট 'iproshbang' সেট করা হলো
+    public string $templateType = 'iproshbang'; // iproshbang | standard
 
     /* ─── Template Switch Hook ───────────────────────────── */
 
     public function updatedTemplateType($value): void
     {
+        // টেমপ্লেট চেঞ্জ করলে ডিফল্ট ভ্যালুগুলো এডজাস্ট করার জন্য
         if ($value === 'standard') {
             $this->schoolNameSize = 14;
             $this->addressSize = 14;
@@ -55,20 +59,22 @@ class OmrGenerator extends Component
             $this->questionCount = $val;
         }
 
-        // অটো কলাম সিলেকশন লজিক
-        if ($this->questionCount == 20) {
-            $this->columns = 2;
-        } elseif ($this->questionCount == 30) {
-            $this->columns = 3;
-        } elseif ($this->questionCount == 40) {
-            $this->columns = 4;
-        } elseif ($this->questionCount == 60) {
-            $this->columns = 3;
-        }
+        // অটো কলাম সিলেকশন লজিক (Standard টেমপ্লেটের জন্য)
+        if ($this->templateType === 'standard') {
+            if ($this->questionCount == 20) {
+                $this->columns = 2;
+            } elseif ($this->questionCount == 30) {
+                $this->columns = 3;
+            } elseif ($this->questionCount == 40) {
+                $this->columns = 4;
+            } elseif ($this->questionCount == 60) {
+                $this->columns = 3;
+            }
 
-        // ৫০ এর উপর প্রশ্ন হলে ২ কলাম থাকতে পারবে না
-        if ($this->questionCount > 50 && $this->columns < 3) {
-            $this->columns = 3;
+            // ৫০ এর উপর প্রশ্ন হলে ২ কলাম থাকতে পারবে না
+            if ($this->questionCount > 50 && $this->columns < 3) {
+                $this->columns = 3;
+            }
         }
     }
 

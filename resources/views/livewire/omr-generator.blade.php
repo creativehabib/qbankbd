@@ -159,7 +159,7 @@
                             {{-- ── Top barcode strip ── --}}
                             <div class="absolute flex items-center justify-center top-0 left-1/2 -translate-x-1/2">
                                 <div class="{{ $theme['bg50'] }} w-[660px] h-10">
-                                    <div class="text-center text-sm {{ $theme['text'] }} font-bold">এই বক্সে কোনো দাগ দেয়া যাবে্বা না।</div>
+                                    <div class="text-center text-sm {{ $theme['text'] }} font-bold">এই বক্সে কোনো দাগ দেয়া যাবে না।</div>
                                     <div class="center flex justify-center">
                                         <div class="flex flex-wrap gap-1">
                                             @foreach($seqIprosh as $s)
