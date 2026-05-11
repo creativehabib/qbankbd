@@ -140,14 +140,17 @@
 
                             @if($templateType !== 'signature')
                                 <div class="flex gap-2 my-2 transition-all duration-300">
+
                                     <div class="w-full">
-                                        <input wire:model="unique_code" type="text" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="OMR Sheet Code">
+                                        <input wire:model.live="unique_code" type="text" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="যেমন: 13130">
                                         @error('unique_code') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                     </div>
+
                                     <div class="w-full">
-                                        <input wire:model="totalQuestions" type="number" class="border rounded p-2 w-full focus:ring-2 focus:ring-green-400 focus:outline-none" placeholder="Total Question">
+                                        <input wire:model="totalQuestions" type="number" readonly class="border rounded p-2 w-full bg-gray-100 text-gray-500 font-bold cursor-not-allowed focus:outline-none" placeholder="Total Question">
                                         @error('totalQuestions') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                                     </div>
+
                                 </div>
                             @endif
 

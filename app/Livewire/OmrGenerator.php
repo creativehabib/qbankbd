@@ -31,7 +31,7 @@ class OmrGenerator extends Component
     public function updatedTemplateType($value): void
     {
         if ($value === 'standard') {
-            $this->schoolNameSize = 14;
+            $this->schoolNameSize = 24;
             $this->addressSize = 14;
             $this->questionCount = 20;
             $this->columns = 2;

@@ -88,7 +88,7 @@
 
                                     <div class="border-b border-dashed border-gray-400 p-1 flex justify-between items-center relative">
 
-                                        <div class="flex items-center gap-24 pl-1">
+                                        <div class="flex items-center gap-12 pl-1">
                                             <div class="h-5 w-3 bg-black"></div>
 
                                             <div class="flex items-center gap-1.5">
