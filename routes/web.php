@@ -22,7 +22,7 @@ use App\Livewire\Students\Leaderboard;
 use App\Livewire\Students\MistakeReview;
 use App\Livewire\Students\MockTestHistory;
 use App\Livewire\Students\MockTestResult;
-use App\Livewire\Students\OmrScanner;
+use App\Livewire\OmrScanner;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Students\TakeMockTest;
 use App\Livewire\Subjects\SubjectIndex;
