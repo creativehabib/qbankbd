@@ -104,6 +104,10 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
         left_anchor = bubbles[0]['cx']
         right_anchor = bubbles[-1]['cx']
         span = right_anchor - left_anchor
+
+        if detected_cols <= 0:
+            detected_cols = fallback_cols if fallback_cols > 0 else 3
+
         col_width = span / detected_cols
 
         col_groups = [[] for _ in range(detected_cols)]
@@ -115,7 +119,10 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
             col_groups[col_idx].append(b)
 
         results = {}
-        questions_per_col = detected_questions // detected_cols
+
+        # 🌟 ম্যাজিক ফিক্স: ৫০/৩ = ১৬.৬৬ কে ১৭ বানানোর জন্য np.ceil ব্যবহার করা হলো 🌟
+        questions_per_col = int(np.ceil(detected_questions / detected_cols))
+
         char_map = {0: 'A', 1: 'B', 2: 'C', 3: 'D'}
 
         for col_idx, col_bubbles in enumerate(col_groups):
@@ -170,7 +177,6 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
                         fill_percentages.append(0)
                         continue
 
-                    # 🌟 ম্যাজিক: প্যাডিং কমানো হলো যাতে পুরো বৃত্ত স্ক্যান হয় (0.25 থেকে 0.15 করা হলো) 🌟
                     pad_w = int(b['w'] * 0.15)
                     pad_h = int(b['h'] * 0.15)
 
@@ -193,7 +199,6 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
                 bubbled = np.argmin([-val for val in fill_percentages])
                 max_fill = fill_percentages[bubbled]
 
-                # 🌟 ম্যাজিক: কালির লিমিট ৪০% থেকে ৫৫% করা হলো (টিক/ক্রস বাতিল করার জন্য) 🌟
                 if max_fill > 55:
                     other_fills = [fill_percentages[idx] for idx in valid_bubble_indices if idx != bubbled]
                     second_max = max(other_fills) if len(other_fills) > 0 else 0

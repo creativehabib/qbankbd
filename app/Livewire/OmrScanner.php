@@ -51,6 +51,18 @@ class OmrScanner extends Component
 
     public function saveAnswers()
     {
+        // 🌟 ম্যাজিক লজিক: ইউজার যেই কয়টি প্রশ্ন সিলেক্ট করবে, শুধু সেই কয়টির উত্তরই রাখা হবে।
+        // যদি আগে ৬০টি প্রশ্নের উত্তর সেভ করা থাকে, আর এখন ২০ সিলেক্ট করে সেভ দেওয়া হয়,
+        // তবে ২১ থেকে ৬০ পর্যন্ত সব উত্তর ডাটাবেজ থেকে চিরতরে মুছে যাবে।
+        $cleanedAnswers = [];
+        for ($i = 1; $i <= $this->totalQuestions; $i++) {
+            if (isset($this->correctAnswers[$i])) {
+                $cleanedAnswers[$i] = $this->correctAnswers[$i];
+            }
+        }
+
+        $this->correctAnswers = $cleanedAnswers; // লাইভওয়্যার অ্যারেটি আপডেট করা হলো
+
         AnswerKey::updateOrCreate(
             ['id' => 1],
             [
@@ -92,15 +104,15 @@ class OmrScanner extends Component
                 }
             }
 
-            $cols = $this->totalQuestions <= 30 ? 2 : ($this->totalQuestions <= 60 ? 3 : 4);
+            $cols = 0;
 
             $process = new Process([
-                '/usr/bin/python3', // Windows এ 'python' ব্যবহার করতে পারেন
+                '/usr/bin/python3', // আপনার লাইভ সার্ভারের পাথ
                 base_path('scripts/omr_scanner.py'),
                 $absolutePath,
                 $outputDir,
                 $this->totalQuestions,
-                $cols,
+                $cols, // 0 পাঠানো হচ্ছে, যাতে পাইথন নিজের অটো-ডিটেকশন ব্যবহার করে
                 json_encode($this->correctAnswers),
             ]);
 
@@ -117,7 +129,6 @@ class OmrScanner extends Component
             if (isset($result['error'])) {
                 $this->addError('scan', $result['error']);
                 $this->isScanning = false;
-
                 return;
             }
 
