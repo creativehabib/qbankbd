@@ -95,7 +95,7 @@ class OmrScanner extends Component
             $cols = $this->totalQuestions <= 30 ? 2 : ($this->totalQuestions <= 60 ? 3 : 4);
 
             $process = new Process([
-                'python3', // Windows এ 'python' ব্যবহার করতে পারেন
+                '/usr/bin/python3', // Windows এ 'python' ব্যবহার করতে পারেন
                 base_path('scripts/omr_scanner.py'),
                 $absolutePath,
                 $outputDir,
