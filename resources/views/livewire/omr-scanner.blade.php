@@ -49,7 +49,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="size-16 text-zinc-400 mb-2" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
                                     <span class="font-bold text-zinc-600">PDF File Selected</span>
                                     <span class="text-sm text-zinc-500 mt-1">{{ $photo->getClientOriginalName() }}</span>
-                                    <span class="text-sm text-green-600 font-bold mt-2">Ready to scan!</span>
+                                    <span class="text-xs text-rose-500 mt-3 font-bold">(Python script currently requires JPG/PNG directly)</span>
                                 </div>
                             @endif
                         @endif
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <div class="p-4 md:p-6" style="column-count: {{ $totalQuestions <= 30 ? 2 : ($totalQuestions <= 60 ? 3 : 4) }}; column-gap: 2rem;">
+            <div class="p-4 md:p-6 columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-6">
                 @for($i = 1; $i <= $totalQuestions; $i++)
                     <div class="flex items-center justify-end break-inside-avoid mb-3">
                         <div class="w-8 font-bold text-right mr-3 text-zinc-500">{{ $i }}</div>

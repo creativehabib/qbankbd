@@ -2,24 +2,28 @@
 
 namespace App\Livewire;
 
+use App\Models\AnswerKey;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use App\Models\AnswerKey;
+use Symfony\Component\Process\Process;
 
 class OmrScanner extends Component
 {
     use WithFileUploads;
 
     public $photo;
+
     public $scannedImageUrl;
 
     public int $totalQuestions = 20;
+
     public float $negativeMark = 0;
 
     public array $correctAnswers = [];
+
     public array $scannedAnswers = [];
+
     public array $stats = [];
 
     public bool $isScanning = false;
@@ -30,7 +34,7 @@ class OmrScanner extends Component
         if ($savedKey) {
             $this->totalQuestions = $savedKey->total_questions;
             $dbAnswers = json_decode($savedKey->answers, true);
-            if(is_array($dbAnswers)) {
+            if (is_array($dbAnswers)) {
                 $this->correctAnswers = $dbAnswers;
             }
         }
@@ -51,7 +55,7 @@ class OmrScanner extends Component
             ['id' => 1],
             [
                 'total_questions' => $this->totalQuestions,
-                'answers' => json_encode($this->correctAnswers)
+                'answers' => json_encode($this->correctAnswers),
             ]
         );
         session()->flash('message', 'সঠিক উত্তরপত্র সফলভাবে ডাটাবেজে সেভ হয়েছে!');
@@ -67,24 +71,24 @@ class OmrScanner extends Component
 
         try {
             $imagePath = $this->photo->store('omr_uploads', 'public');
-            $absolutePath = storage_path('app/public/' . $imagePath);
+            $absolutePath = storage_path('app/public/'.$imagePath);
             $outputDir = storage_path('app/public/omr_scans');
 
-            if (!file_exists($outputDir)) {
+            if (! file_exists($outputDir)) {
                 mkdir($outputDir, 0777, true);
             }
 
             // 🌟 PDF to JPG Conversion (ImageMagick) 🌟
             $extension = strtolower($this->photo->getClientOriginalExtension());
             if ($extension === 'pdf') {
-                $jpgPath = storage_path('app/public/omr_uploads/' . uniqid('pdf_') . '.jpg');
-                $command = "convert -density 300 " . escapeshellarg($absolutePath) . "[0] -quality 90 " . escapeshellarg($jpgPath);
+                $jpgPath = storage_path('app/public/omr_uploads/'.uniqid('pdf_').'.jpg');
+                $command = 'convert -density 300 '.escapeshellarg($absolutePath).'[0] -quality 90 '.escapeshellarg($jpgPath);
                 exec($command);
 
                 if (file_exists($jpgPath)) {
                     $absolutePath = $jpgPath;
                 } else {
-                    throw new \Exception("PDF কে Image এ কনভার্ট করা যায়নি। সার্ভারে ImageMagick ইন্সটল করা আছে কি না চেক করুন।");
+                    throw new \Exception('PDF কে Image এ কনভার্ট করা যায়নি। সার্ভারে ImageMagick ইন্সটল করা আছে কি না চেক করুন।');
                 }
             }
 
@@ -97,13 +101,13 @@ class OmrScanner extends Component
                 $outputDir,
                 $this->totalQuestions,
                 $cols,
-                json_encode($this->correctAnswers)
+                json_encode($this->correctAnswers),
             ]);
 
             $process->setTimeout(60);
             $process->run();
 
-            if (!$process->isSuccessful()) {
+            if (! $process->isSuccessful()) {
                 throw new ProcessFailedException($process);
             }
 
@@ -113,11 +117,12 @@ class OmrScanner extends Component
             if (isset($result['error'])) {
                 $this->addError('scan', $result['error']);
                 $this->isScanning = false;
+
                 return;
             }
 
             $this->scannedAnswers = $result['answers'] ?? [];
-            if(isset($result['result_image'])) {
+            if (isset($result['result_image'])) {
                 $this->scannedImageUrl = asset($result['result_image']);
             }
 
@@ -126,7 +131,7 @@ class OmrScanner extends Component
             $unanswered = 0;
 
             for ($i = 1; $i <= $this->totalQuestions; $i++) {
-                $studentAns = $this->scannedAnswers[(string)$i] ?? 'N/A';
+                $studentAns = $this->scannedAnswers[(string) $i] ?? 'N/A';
                 $correctAns = $this->correctAnswers[$i] ?? null;
 
                 if ($studentAns === 'N/A' || $studentAns === null) {
@@ -145,11 +150,11 @@ class OmrScanner extends Component
                 'correct' => $correct,
                 'wrong' => $wrong,
                 'unanswered' => $unanswered,
-                'score' => max(0, $score)
+                'score' => max(0, $score),
             ];
 
         } catch (\Exception $e) {
-            $this->addError('scan', 'স্ক্যানিং ব্যর্থ হয়েছে: ' . $e->getMessage());
+            $this->addError('scan', 'স্ক্যানিং ব্যর্থ হয়েছে: '.$e->getMessage());
         }
 
         $this->isScanning = false;
@@ -162,6 +167,6 @@ class OmrScanner extends Component
 
     public function render()
     {
-        return view('livewire.omr-scanner')->layout('layouts.app');
+        return view('livewire.omr-scanner')->layout('layouts.app', ['title' => 'OMR Scanner']);
     }
 }
