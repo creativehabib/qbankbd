@@ -14,21 +14,17 @@ class OmrScanner extends Component
 
     public $photo;
 
+    // 🌟 এখন আর কোনো Path সেভ রাখার দরকার নেই, শুধু Base64 কোড থাকবে
     public $scannedImageUrl;
 
     public int $totalQuestions = 20;
-
     public float $negativeMark = 0;
-
     public array $correctAnswers = [];
-
     public array $scannedAnswers = [];
-
     public array $stats = [];
-
     public bool $isScanning = false;
 
-    public function mount()
+    public function mount(): void
     {
         $savedKey = AnswerKey::first();
         if ($savedKey) {
@@ -40,7 +36,7 @@ class OmrScanner extends Component
         }
     }
 
-    public function toggleAnswer($questionNumber, $option)
+    public function toggleAnswer($questionNumber, $option): void
     {
         if (isset($this->correctAnswers[$questionNumber]) && $this->correctAnswers[$questionNumber] === $option) {
             unset($this->correctAnswers[$questionNumber]);
@@ -49,11 +45,8 @@ class OmrScanner extends Component
         }
     }
 
-    public function saveAnswers()
+    public function saveAnswers(): void
     {
-        // 🌟 ম্যাজিক লজিক: ইউজার যেই কয়টি প্রশ্ন সিলেক্ট করবে, শুধু সেই কয়টির উত্তরই রাখা হবে।
-        // যদি আগে ৬০টি প্রশ্নের উত্তর সেভ করা থাকে, আর এখন ২০ সিলেক্ট করে সেভ দেওয়া হয়,
-        // তবে ২১ থেকে ৬০ পর্যন্ত সব উত্তর ডাটাবেজ থেকে চিরতরে মুছে যাবে।
         $cleanedAnswers = [];
         for ($i = 1; $i <= $this->totalQuestions; $i++) {
             if (isset($this->correctAnswers[$i])) {
@@ -61,7 +54,7 @@ class OmrScanner extends Component
             }
         }
 
-        $this->correctAnswers = $cleanedAnswers; // লাইভওয়্যার অ্যারেটি আপডেট করা হলো
+        $this->correctAnswers = $cleanedAnswers;
 
         AnswerKey::updateOrCreate(
             ['id' => 1],
@@ -73,7 +66,7 @@ class OmrScanner extends Component
         session()->flash('message', 'সঠিক উত্তরপত্র সফলভাবে ডাটাবেজে সেভ হয়েছে!');
     }
 
-    public function scanOmr()
+    public function scanOmr(): void
     {
         $this->validate([
             'photo' => 'required|file|max:10240|mimes:jpg,jpeg,png,pdf',
@@ -82,42 +75,40 @@ class OmrScanner extends Component
         $this->isScanning = true;
 
         try {
-            $imagePath = $this->photo->store('omr_uploads', 'public');
-            $absolutePath = storage_path('app/public/'.$imagePath);
-            $outputDir = storage_path('app/public/omr_scans');
+            // 🌟 ম্যাজিক: File কোথাও সেভ না করে লাইভওয়্যারের Temporary Path ব্যবহার করা হচ্ছে 🌟
+            $absolutePath = $this->photo->getRealPath();
+            $tempPdfConvertedPath = null;
 
-            if (! file_exists($outputDir)) {
-                mkdir($outputDir, 0777, true);
-            }
-
-            // 🌟 PDF to JPG Conversion (ImageMagick) 🌟
             $extension = strtolower($this->photo->getClientOriginalExtension());
             if ($extension === 'pdf') {
-                $jpgPath = storage_path('app/public/omr_uploads/'.uniqid('pdf_').'.jpg');
-                $command = 'convert -density 300 '.escapeshellarg($absolutePath).'[0] -quality 90 '.escapeshellarg($jpgPath);
+                // PDF হলে সাময়িক ফোল্ডারে (tmp) একটি ছবি বানাবে
+                $tempPdfConvertedPath = sys_get_temp_dir() . '/' . uniqid('pdf_') . '.jpg';
+                $command = 'convert -density 300 '.escapeshellarg($absolutePath).'[0] -quality 90 '.escapeshellarg($tempPdfConvertedPath);
                 exec($command);
 
-                if (file_exists($jpgPath)) {
-                    $absolutePath = $jpgPath;
+                if (file_exists($tempPdfConvertedPath)) {
+                    $absolutePath = $tempPdfConvertedPath;
                 } else {
-                    throw new \Exception('PDF কে Image এ কনভার্ট করা যায়নি। সার্ভারে ImageMagick ইন্সটল করা আছে কি না চেক করুন।');
+                    throw new \Exception('PDF কে Image এ কনভার্ট করা যায়নি।');
                 }
             }
 
-            $cols = 0;
-
             $process = new Process([
-                '/usr/bin/python3', // আপনার লাইভ সার্ভারের পাথ
+                '/usr/bin/python3',
                 base_path('scripts/omr_scanner.py'),
                 $absolutePath,
-                $outputDir,
                 $this->totalQuestions,
-                $cols, // 0 পাঠানো হচ্ছে, যাতে পাইথন নিজের অটো-ডিটেকশন ব্যবহার করে
+                0,
                 json_encode($this->correctAnswers),
             ]);
 
             $process->setTimeout(60);
             $process->run();
+
+            // 🌟 কাজ শেষে PDF এর সাময়িক ছবিটাও সাথে সাথে ডিলিট 🌟
+            if ($tempPdfConvertedPath && file_exists($tempPdfConvertedPath)) {
+                unlink($tempPdfConvertedPath);
+            }
 
             if (! $process->isSuccessful()) {
                 throw new ProcessFailedException($process);
@@ -133,8 +124,10 @@ class OmrScanner extends Component
             }
 
             $this->scannedAnswers = $result['answers'] ?? [];
-            if (isset($result['result_image'])) {
-                $this->scannedImageUrl = asset($result['result_image']);
+
+            // 🌟 পাইথনের পাঠানো Base64 কোড সরাসরি ভেরিয়েবলে সেট করা হলো 🌟
+            if (isset($result['result_image_base64'])) {
+                $this->scannedImageUrl = $result['result_image_base64'];
             }
 
             $correct = 0;
@@ -173,6 +166,7 @@ class OmrScanner extends Component
 
     public function removePhoto()
     {
+        // 🌟 সার্ভারে কোনো ফাইলই নেই, তাই শুধু ভেরিয়েবল রিসেট করলেই হবে 🌟
         $this->reset(['photo', 'scannedImageUrl', 'scannedAnswers', 'stats']);
     }
 

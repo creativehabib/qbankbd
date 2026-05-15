@@ -4,8 +4,10 @@ import sys
 import json
 import os
 import time
+import base64 # 🌟 Base64 ইম্পোর্ট করা হলো
 
-def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, expected_options=4):
+# 🌟 output_dir বাদ দিয়ে answer_key_json রিসিভ করার ব্যবস্থা করা হলো
+def process_omr(image_path, fallback_total_q=60, fallback_cols=3, expected_options=4, answer_key_json="{}"):
     try:
         if not os.path.exists(image_path):
             return json.dumps({"error": "ফাইলটি পাওয়া যায়নি!"})
@@ -120,7 +122,6 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
 
         results = {}
 
-        # 🌟 ম্যাজিক ফিক্স: ৫০/৩ = ১৬.৬৬ কে ১৭ বানানোর জন্য np.ceil ব্যবহার করা হলো 🌟
         questions_per_col = int(np.ceil(detected_questions / detected_cols))
 
         char_map = {0: 'A', 1: 'B', 2: 'C', 3: 'D'}
@@ -210,12 +211,12 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
                 else:
                     results[str(actual_q_num)] = {"option_idx": -1, "all_options": options}
 
+        # 🌟 sys.argv[5] এর বদলে প্যারামিটার থেকে JSON পড়া হচ্ছে
         correct_answers_dict = {}
-        if len(sys.argv) > 5:
-            try:
-                correct_answers_dict = json.loads(sys.argv[5])
-            except:
-                pass
+        try:
+            correct_answers_dict = json.loads(answer_key_json)
+        except:
+            pass
 
         logical_limit = detected_questions
         if correct_answers_dict and len(correct_answers_dict) > 0:
@@ -251,38 +252,44 @@ def process_omr(image_path, output_dir, fallback_total_q=60, fallback_cols=3, ex
             else:
                 formatted_answers[q_str] = 'N/A'
 
-        result_filename = "evaluated_" + str(int(time.time())) + ".png"
-        result_path = os.path.join(output_dir, result_filename)
-        cv2.imwrite(result_path, display_image)
+        # 🌟 ম্যাজিক: File সেভ না করে Image কে সরাসরি Base64 স্ট্রিংয়ে কনভার্ট করা হচ্ছে 🌟
+        _, buffer = cv2.imencode('.jpg', display_image, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
+        base64_image = base64.b64encode(buffer).decode('utf-8')
+        image_data_uri = f"data:image/jpeg;base64,{base64_image}"
 
         return json.dumps({
             "status": "success",
             "answers": formatted_answers,
             "detected_columns": detected_cols,
             "detected_questions": detected_questions,
-            "result_image": "/storage/omr_scans/" + result_filename
+            "result_image_base64": image_data_uri
         })
 
     except Exception as e:
         return json.dumps({"error": str(e)})
 
+# 🌟 লারাভেল থেকে আসা ৪টি ডাটা সঠিকভাবে রিসিভ করার কোড 🌟
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 1:
         img_path = sys.argv[1]
-        out_dir = sys.argv[2]
-
         total_q = 60
         cols = 3
-        if len(sys.argv) > 3:
-            arg3 = sys.argv[3]
-            if arg3.isdigit() and len(arg3) >= 4 and arg3[0] == '1' and arg3[1] in ['2', '3', '4'] and arg3[2] == '1':
-                cols = int(arg3[1])
-                total_q = int(arg3[3:])
-            else:
-                try: total_q = int(arg3)
-                except: total_q = 60
-                cols = int(sys.argv[4]) if len(sys.argv) > 4 else 3
+        answer_key = "{}"
 
-        print(process_omr(img_path, out_dir, total_q, cols))
+        # sys.argv[2] হলো মোট প্রশ্ন ($this->totalQuestions)
+        if len(sys.argv) > 2:
+            try: total_q = int(sys.argv[2])
+            except: pass
+
+        # sys.argv[3] হলো কলাম সংখ্যা (লারাভেল থেকে 0 বা 3 পাঠানো হচ্ছে)
+        if len(sys.argv) > 3:
+            try: cols = int(sys.argv[3])
+            except: pass
+
+        # sys.argv[4] হলো JSON Answer Key
+        if len(sys.argv) > 4:
+            answer_key = sys.argv[4]
+
+        print(process_omr(img_path, total_q, cols, 4, answer_key))
     else:
         print(json.dumps({"error": "No image path provided!"}))

@@ -1,4 +1,17 @@
 <main class="flex flex-col xl:flex-row gap-6 my-6 max-w-7xl mx-auto px-4">
+
+    <style>
+        @keyframes scanner {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .animate-scanner {
+            animation: scanner 2s linear infinite;
+        }
+    </style>
+
     <div class="flex-[3] space-y-6">
 
         <div class="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-sm">
@@ -34,10 +47,22 @@
                         <p class="text-xs font-semibold px-3 py-1 bg-zinc-100 text-zinc-600 rounded-md">Supported formats: JPG, PNG, PDF (Max 10MB)</p>
                     </div>
                 @else
-                    <div class="relative bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex justify-center min-h-[300px]">
-                        <button wire:click="removePhoto" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 z-10">
+                    <div class="relative bg-zinc-50 rounded-xl p-4 border border-zinc-200 flex justify-center min-h-[300px] overflow-hidden">
+                        <button wire:click="removePhoto" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 z-30">
                             <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg>
                         </button>
+
+                        <div wire:loading wire:target="scanOmr" class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+                            <div class="absolute w-full h-[3px] bg-green-500 shadow-[0_0_15px_4px_rgba(34,197,94,0.7)] animate-scanner left-0"></div>
+
+                            <div class="bg-white px-6 py-3 rounded-full shadow-2xl font-bold text-green-600 flex items-center gap-3 animate-pulse border border-green-200">
+                                <svg class="size-6 animate-spin text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                স্ক্যান করা হচ্ছে...
+                            </div>
+                        </div>
 
                         @if($scannedImageUrl)
                             <img src="{{ $scannedImageUrl }}" class="max-h-[500px] object-contain shadow-md border" alt="Scanned OMR">
@@ -49,7 +74,6 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="size-16 text-zinc-400 mb-2" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
                                     <span class="font-bold text-zinc-600">PDF File Selected</span>
                                     <span class="text-sm text-zinc-500 mt-1">{{ $photo->getClientOriginalName() }}</span>
-                                    <span class="text-xs text-rose-500 mt-3 font-bold">(Python script currently requires JPG/PNG directly)</span>
                                 </div>
                             @endif
                         @endif
