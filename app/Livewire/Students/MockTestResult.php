@@ -4,8 +4,8 @@ namespace App\Livewire\Students;
 
 use App\Models\MockTest;
 use App\Models\Question;
+use App\Services\GeminiService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
 class MockTestResult extends Component
@@ -37,59 +37,23 @@ class MockTestResult extends Component
     public function generateAiExplanation($questionId): void
     {
         $this->aiError = null;
-        $question = Question::findOrFail($questionId);
 
-        if (filled($question->description)) {
-            return;
-        }
-
-        $apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
-
-        if (! $apiKey) {
-            $this->aiError = 'ফ্রি এপিআই কী পাওয়া যায়নি।';
-            return;
-        }
-
-        $optionsText = '';
-        $correctAnswerText = '';
-        $options = collect($question->extra_content ?? [])->take(4);
-        $labels = ['ক', 'খ', 'গ', 'ঘ'];
-
-        foreach ($options as $index => $opt) {
-            $cleanText = strip_tags(html_entity_decode($opt['option_text'] ?? ''));
-            $optionsText .= $labels[$index].') '.$cleanText."\n";
-            if (! empty($opt['is_correct'])) {
-                $correctAnswerText = $cleanText;
-            }
-        }
-
-        $cleanTitle = strip_tags(html_entity_decode($question->title ?? ''));
-        $prompt = "প্রশ্ন: {$cleanTitle}. সঠিক উত্তর: {$correctAnswerText}. কেন এটি সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো।";
+        // UI তে কোন প্রশ্নে এরর দেখাবে তা ট্র্যাক করার জন্য
+        session()->flash('last_question_id', $questionId);
 
         try {
-            $response = Http::withoutVerifying()->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [['text' => $prompt]],
-                    ],
-                ],
-            ]);
+            $question = Question::findOrFail($questionId);
 
-            if ($response->successful()) {
-                $result = $response->json();
-                if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-                    $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
-                    $question->update(['description' => nl2br(trim($explanation))]);
+            // 🌟 আমাদের তৈরি করা মাস্টার সার্ভিস ক্লাস ব্যবহার করা হচ্ছে 🌟
+            $geminiService = new GeminiService;
+            $geminiService->generateAndSaveExplanation($question);
 
-                    // ব্যাখ্যা যুক্ত হওয়ার পর ডাটা রিফ্রেশ
-                    $this->refreshQuestionsData();
-                    $this->dispatch('practice-content-updated');
-                }
-            } else {
-                $errorBody = $response->json();
-                $this->aiError = 'API Error: '.($errorBody['error']['message'] ?? 'ক্রেডিট শেষ বা কি সমস্যা।');
-            }
+            // সফল হলে ডাটা রিফ্রেশ এবং ইভেন্ট ডিসপ্যাচ
+            $this->refreshQuestionsData();
+            $this->dispatch('practice-content-updated');
+
         } catch (\Exception $e) {
+            // সার্ভিস ক্লাস থেকে পাঠানো এরর সরাসরি এখানে সেট হয়ে যাবে
             $this->aiError = 'Error: '.$e->getMessage();
         }
     }

@@ -240,6 +240,43 @@
                 @enderror
             </div>
 
+            {{-- ── 🤖 AI Bulk Question Generator ── --}}
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800 p-5 shadow-sm">
+                <h3 class="text-sm font-bold text-indigo-800 dark:text-indigo-300 flex items-center gap-2 mb-4 uppercase tracking-wider">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    AI Bulk Question Generator
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div class="md:col-span-7">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">টপিক (কী নিয়ে প্রশ্ন বানাতে চান?)</label>
+                        <input type="text" wire:model="aiPrompt" placeholder="যেমন: বাংলাদেশের মুক্তিযুদ্ধ, আইসিটি ১ম অধ্যায়..." class="block w-full rounded-lg border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">প্রশ্নের সংখ্যা</label>
+                        <input type="number" wire:model="aiQuestionCount" min="1" max="50" class="block w-full rounded-lg border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+
+                    <div class="md:col-span-3">
+                        <button type="button" wire:click="generateBulkAiQuestions" wire:loading.attr="disabled" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-md transition-all h-[38px]">
+                            <span wire:loading.remove wire:target="generateBulkAiQuestions">Generate AI Questions</span>
+                            <span wire:loading.flex wire:target="generateBulkAiQuestions" class="items-center justify-center gap-2">
+                                <svg class="animate-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                                <span>Thinking...</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col mt-2">
+                    @error('aiPrompt') <p class="text-xs text-red-500 font-bold">{{ $message }}</p> @enderror
+                    @error('aiQuestionCount') <p class="text-xs text-red-500 font-bold">{{ $message }}</p> @enderror
+                </div>
+
+                <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-3 font-medium">✨ AI একসাথে একাধিক প্রশ্ন তৈরি করে সরাসরি নিচের "Processed Questions" লিস্টে যোগ করে দেবে। (সঠিক উত্তরগুলোও AI অটোমেটিক মার্ক করে দেবে!)</p>
+            </div>
+
             {{-- ── Raw Text Textarea ── --}}
             <div>
                 <div class="flex items-center justify-between mb-1">

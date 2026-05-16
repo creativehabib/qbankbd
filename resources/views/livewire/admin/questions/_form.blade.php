@@ -119,7 +119,35 @@
         </div>
 
         <x-slug-input table="questions" :ignore-id="$question->id ?? null" />
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 p-5 rounded-xl border border-indigo-100 dark:border-indigo-800 shadow-sm mt-4">
+            <h3 class="text-sm font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>
+                AI Auto-Fill Assistant
+            </h3>
 
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1 w-full relative">
+                    <input type="text" wire:model="aiPrompt" placeholder="কী নিয়ে প্রশ্ন বানাতে চান? (যেমন: বাংলাদেশের স্বাধীনতা যুদ্ধ)" class="w-full px-4 py-2.5 rounded-lg border border-indigo-200 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white h-[44px]">
+                </div>
+
+                <button type="button" wire:click="generateAiQuestion" wire:loading.attr="disabled" class="w-full md:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 h-[44px]">
+                    <span wire:loading.remove wire:target="generateAiQuestion">Generate MCQ</span>
+                    <span wire:loading.flex wire:target="generateAiQuestion" class="items-center justify-center gap-2">
+                        <svg class="animate-spin size-4 text-white shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                        <span>Thinking...</span>
+                    </span>
+                </button>
+            </div>
+
+            <div class="flex flex-col mt-2">
+                @error('aiPrompt')<span class="text-xs text-red-500 font-bold">{{ $message }}</span>@enderror
+                @if(session()->has('ai_success'))
+                    <span class="text-xs text-green-600 font-bold">{{ session('ai_success') }}</span>
+                @endif
+            </div>
+
+            <p class="text-xs text-indigo-500 dark:text-indigo-400 mt-2 font-medium">AI আপনার দেওয়া টপিক অনুযায়ী একটি প্রশ্ন ও ৪টি অপশন তৈরি করে নিচের ফর্মগুলো স্বয়ংক্রিয়ভাবে পূরণ করে দেবে।</p>
+        </div>
         <div>
             <label class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 border-b pb-1">Main Question / Stimulus (উদ্দীপক) <span class="text-red-500">*</span></label>
             <div wire:ignore class="rounded-md focus-within:ring-1 focus-within:ring-indigo-500">
@@ -500,5 +528,24 @@
 
             window.hasRegisteredQuestionEvents = true;
         }
+
+        window.addEventListener('ai-data-filled', e => {
+            let data = e.detail;
+
+            // মেইন প্রশ্ন (Title) বক্সে ডাটা বসানো
+            if (CKEDITOR.instances['editor']) {
+                CKEDITOR.instances['editor'].setData(data.title);
+            }
+
+            // ৪টি অপশনের বক্সে ডাটা বসানো
+            if (data.options && data.options.length > 0) {
+                data.options.forEach((opt, index) => {
+                    let optEditorId = 'opt_editor_' + index;
+                    if (CKEDITOR.instances[optEditorId]) {
+                        CKEDITOR.instances[optEditorId].setData(opt.option_text);
+                    }
+                });
+            }
+        });
     </script>
 @endpush

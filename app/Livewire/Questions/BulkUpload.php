@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
+use App\Services\GeminiService;
 use App\Support\QuestionTextParser;
 use Google\Cloud\Vision\V1\AnnotateFileRequest;
 use Google\Cloud\Vision\V1\AnnotateImageRequest;
@@ -19,7 +20,8 @@ use Google\Cloud\Vision\V1\Feature;
 use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\Image;
 use Google\Cloud\Vision\V1\InputConfig;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; // 🌟 AI এর জন্য Http ইমপোর্ট করা হলো
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -52,6 +54,14 @@ class BulkUpload extends Component
 
     public array $processedQuestions = [];
 
+    // 🌟 AI এর জন্য নতুন ৩টি ভেরিয়েবল
+    public string $aiPrompt = '';
+
+    public int $aiQuestionCount = 10;
+
+    public bool $isGeneratingAi = false;
+
+    // ... (আপনার আগের updatedAcademicClassId, updatedSubjectId ইত্যাদি সব ফাংশন আগের মতোই থাকবে) ...
     public function updatedAcademicClassId(): void
     {
         $this->subject_id = null;
@@ -79,6 +89,53 @@ class BulkUpload extends Component
         foreach ($this->processedQuestions[$questionIndex]['options'] as $i => $option) {
             $this->processedQuestions[$questionIndex]['options'][$i]['is_correct'] = ($i === $optionIndex);
         }
+    }
+
+    // 🌟 ম্যাজিক: Bulk AI Question Generator 🌟
+    public function generateBulkAiQuestions(): void
+    {
+        $this->validate([
+            'aiPrompt' => 'required|string|max:255',
+            'aiQuestionCount' => 'required|integer|min:1|max:50',
+        ]);
+
+        $this->isGeneratingAi = true;
+
+        // AI কে কড়া নির্দেশ দেওয়া হচ্ছে যেন সে আপনার Processed Questions এর ফরমেটেই ডাটা দেয়
+        $prompt = "Create {$this->aiQuestionCount} multiple-choice questions in Bengali language about '{$this->aiPrompt}'.
+        IMPORTANT RULE: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
+        You MUST return the response STRICTLY as a JSON array in the exact format below, and nothing else (no markdown, no extra text):
+        [
+            {
+                \"title\": \"এখানে প্রশ্ন থাকবে?\",
+                \"options\": [
+                    {\"option_text\": \"প্রথম অপশন\", \"is_correct\": false},
+                    {\"option_text\": \"দ্বিতীয় অপশন\", \"is_correct\": true},
+                    {\"option_text\": \"তৃতীয় অপশন\", \"is_correct\": false},
+                    {\"option_text\": \"চতুর্থ অপশন\", \"is_correct\": false}
+                ]
+            }
+        ]";
+
+        try {
+            // 🌟 আমাদের তৈরি করা সার্ভিস ক্লাস ব্যবহার করা হচ্ছে 🌟
+            $geminiService = new GeminiService;
+
+            // ৩০০ সেকেন্ড টাইমআউট দিয়ে কল
+            $aiData = $geminiService->generateJson($prompt);
+
+            if (is_array($aiData) && count($aiData) > 0) {
+                // 🌟 AI এর ডাটা সরাসরি Processed লিস্টে বসিয়ে দেওয়া হলো! 🌟
+                $this->processedQuestions = $aiData;
+                session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন AI দ্বারা তৈরি হয়েছে। দয়া করে রিভিউ করে সাবমিট করুন।');
+            } else {
+                $this->addError('aiPrompt', 'AI সঠিক ফরম্যাটে উত্তর দিতে পারেনি।');
+            }
+        } catch (\Exception $e) {
+            $this->addError('aiPrompt', 'Error: '.$e->getMessage());
+        }
+
+        $this->isGeneratingAi = false;
     }
 
     public function processQuestions(): void
@@ -142,9 +199,6 @@ class BulkUpload extends Component
         return $this->extractTextFromImageViaVision();
     }
 
-    /**
-     * Image → Google Vision OCR (বাংলা সহ সব ভাষা)
-     */
     protected function extractTextFromImageViaVision(): string
     {
         $filePath = $this->sourceFile->getRealPath();
@@ -191,10 +245,6 @@ class BulkUpload extends Component
         }
     }
 
-    /**
-     * PDF → Google Vision (প্রতিটি পেজ image হিসেবে OCR)
-     * ছোট PDF (≤5 পেজ) এর জন্য synchronous approach
-     */
     protected function extractTextFromPdfViaVision(): string
     {
         $filePath = $this->sourceFile->getRealPath();
@@ -342,25 +392,19 @@ class BulkUpload extends Component
         return trim(implode(PHP_EOL, $lines));
     }
 
-    /**
-     * বাংলা বা যেকোনো Unicode টেক্সট থেকে unique slug তৈরি করে।
-     * - প্রথমে ASCII অংশ দিয়ে base slug বানায়
-     * - ASCII না থাকলে 'question' ব্যবহার করে
-     * - শেষে random suffix যোগ করে uniqueness নিশ্চিত করে
-     */
     protected function generateUniqueSlug(string $title): string
     {
         $slug = mb_strtolower(trim($title), 'UTF-8');
         $slug = preg_replace('/[^\p{Bengali}a-z0-9\s]/u', '', $slug);
         $slug = preg_replace('/\s+/u', '-', $slug);
-        // একাধিক হাইফেন → একটি
         $slug = preg_replace('/-+/', '-', $slug);
         $slug = trim($slug, '-');
         $base = $slug ?: Str::lower(Str::random(10));
-        // Duplicate হলে exception throw করুন
+
         if (Question::where('slug', $base)->exists()) {
             throw new \Exception("এই প্রশ্নটি ইতোমধ্যে আছে: \"{$title}\"");
         }
+
         return $base;
     }
 
@@ -411,7 +455,6 @@ class BulkUpload extends Component
 
         DB::transaction(function () use ($subject, $validated, $currentUser): void {
             foreach ($validated['processedQuestions'] as $parsedQuestion) {
-                // বাংলা-safe unique slug
                 $slug = $this->generateUniqueSlug($parsedQuestion['title']);
 
                 $formattedOptions = collect($parsedQuestion['options'])

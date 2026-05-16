@@ -9,12 +9,12 @@ use App\Models\MockTestQuestion;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\User;
+use App\Services\GeminiService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -47,8 +47,10 @@ class PracticeIndex extends Component
     public ?string $mockTestError = null;
 
     public ?string $aiError = null;
+
     // মক টেস্টের সেটিং কন্ট্রোল করার জন্য
     public int $questionCount = 20; // ডিফল্ট ২০টি প্রশ্ন
+
     public bool $hasNegativeMark = false; // ডিফল্ট নেগেটিভ মার্ক বন্ধ
 
     public function mount(): void
@@ -155,71 +157,24 @@ class PracticeIndex extends Component
         }
     }
 
-    public function generateAiExplanation(int $questionId): void
+    public function generateAiExplanation($questionId): void
     {
         $this->aiError = null;
-        $question = Question::findOrFail($questionId);
+        session()->flash('last_question_id', $questionId); // UI এরর দেখানোর জন্য
 
-        if (filled($question->description)) {
-            return;
-        }
-
-        // সেশন এ বর্তমান কোয়েশ্চন আইডি রাখা (যাতে সঠিক জায়গায় এরর দেখায়)
-        session()->flash('last_question_id', $questionId);
-
-        $apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
-
-        if (! $apiKey) {
-            $this->aiError = 'API Key পাওয়া যায়নি।';
-
-            return;
-        }
-
-        // প্রশ্ন ও উত্তর প্রসেসিং
-        $optionsText = '';
-        $correctAnswerText = '';
-        $options = collect($question->extra_content ?? [])->take(4);
-        $labels = ['ক', 'খ', 'গ', 'ঘ'];
-
-        foreach ($options as $index => $opt) {
-            $cleanText = strip_tags(html_entity_decode($opt['option_text'] ?? ''));
-            $optionsText .= $labels[$index].') '.$cleanText."\n";
-            if (! empty($opt['is_correct'])) {
-                $correctAnswerText = $cleanText;
-            }
-        }
-
-        $cleanTitle = strip_tags(html_entity_decode($question->title ?? ''));
-
-        // নতুন প্রম্পটটি এখানে বসানো হলো
-        $prompt = 'তুমি একজন বিশেষজ্ঞ শিক্ষক। প্রশ্ন: '.$cleanTitle.'. সঠিক উত্তর: '.$correctAnswerText.'. ';
-        $prompt .= 'কেন সঠিক তা বাংলায় ৩ লাইনে ব্যাখ্যা করো। ';
-        $prompt .= 'গুরুত্বপূর্ণ: কোনো গাণিতিক সমীকরণ বা সংকেত থাকলে তা অবশ্যই LaTeX ফরম্যাটে লিখবে। ';
-        $prompt .= 'ইনলাইন সমীকরণের জন্য একটি ডলার সাইন (যেমন: $x^2$) এবং আলাদা লাইনের বড় সমীকরণের জন্য ডাবল ডলার ($$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$) ব্যবহার করো।';
         try {
-            // আমরা এখন gemini-2.5-flash-lite ব্যবহার করছি যা ফ্রি টিয়ারে ভালো কাজ করে
-            $response = Http::withoutVerifying()
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}", [
-                    'contents' => [
-                        ['parts' => [['text' => $prompt]]],
-                    ],
-                ]);
+            $question = Question::findOrFail($questionId);
 
-            if ($response->successful()) {
-                $result = $response->json();
-                if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-                    $explanation = $result['candidates'][0]['content']['parts'][0]['text'];
-                    $question->update(['description' => nl2br(trim($explanation))]);
+            // 🌟 সার্ভিস ক্লাস কল করে ম্যাজিক! 🌟
+            $geminiService = new GeminiService;
+            $geminiService->generateAndSaveExplanation($question);
 
-                    // কন্টেন্ট রিফ্রেশ করার জন্য
-                    $this->dispatch('practice-content-updated');
-                }
-            } else {
-                $errorBody = $response->json();
-                $this->aiError = 'AI Error: '.($errorBody['error']['message'] ?? 'ব্যাখ্যা তৈরি করা সম্ভব হয়নি।');
-            }
+            // সফল হলে UI রিফ্রেশ
+            $this->dispatch('practice-content-updated');
+
         } catch (\Exception $e) {
-            $this->aiError = 'কানেকশন সমস্যা: '.$e->getMessage();
+            // সার্ভিস ক্লাস থেকে পাঠানো এরর এখানে সেট হয়ে যাবে
+            $this->aiError = $e->getMessage();
         }
     }
 

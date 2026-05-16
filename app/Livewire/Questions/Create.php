@@ -10,6 +10,7 @@ use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
+use App\Services\GeminiService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -49,6 +50,8 @@ class Create extends Component
     public $exam_category_ids = []; // Target Audience
 
     public $image; // Written প্রশ্নের ছবির জন্য
+
+    public $aiPrompt = '';
 
     public function mount(): void
     {
@@ -160,6 +163,69 @@ class Create extends Component
             $this->options = [];
         }
         $this->dispatch('refresh-editors');
+    }
+
+    // 🌟 AI জেনারেটর ফাংশন
+    public function generateAiQuestion(): void
+    {
+        $this->validate([
+            'aiPrompt' => 'required|string|max:255',
+        ]);
+
+        // প্রশ্ন টাইপ অটোমেটিক MCQ করে দেওয়া হচ্ছে
+        $this->question_type = 'mcq';
+        if (empty($this->options)) {
+            $this->resetToMcq();
+        }
+
+        // 🌟 AI এর জন্য কড়া প্রম্পট (Random Answer) 🌟
+        $prompt = "Create 1 multiple-choice question in Bengali language about '{$this->aiPrompt}'.
+        IMPORTANT RULE: RANDOMLY place the correct answer in A, B, C, or D. Do NOT always make 'A' the correct answer.
+        You MUST return the response strictly in the following JSON format, and nothing else (no markdown, no extra text):
+        {
+            \"question\": \"এখানে প্রশ্ন থাকবে?\",
+            \"options\": {
+                \"A\": \"প্রথম অপশন\",
+                \"B\": \"দ্বিতীয় অপশন\",
+                \"C\": \"তৃতীয় অপশন\",
+                \"D\": \"চতুর্থ অপশন\"
+            },
+            \"answer\": \"সঠিক অপশনের Letter (যেমন: B বা C বা D)\"
+        }";
+
+        try {
+            // 🌟 আমাদের তৈরি করা সার্ভিস ক্লাস ব্যবহার করা হচ্ছে (৬০ সেকেন্ড টাইমআউট) 🌟
+            $geminiService = new GeminiService;
+            $aiData = $geminiService->generateJson($prompt, 60);
+
+            if (is_array($aiData) && isset($aiData['question'], $aiData['options'])) {
+                // 🌟 ফর্মের ফিল্ডগুলো অটোমেটিক পূরণ করা হচ্ছে 🌟
+                $this->title = $aiData['question'];
+
+                $this->options = [
+                    ['option_text' => $aiData['options']['A'], 'is_correct' => $aiData['answer'] === 'A'],
+                    ['option_text' => $aiData['options']['B'], 'is_correct' => $aiData['answer'] === 'B'],
+                    ['option_text' => $aiData['options']['C'], 'is_correct' => $aiData['answer'] === 'C'],
+                    ['option_text' => $aiData['options']['D'], 'is_correct' => $aiData['answer'] === 'D'],
+                ];
+
+                // 🌟 CKEditor রিলোড করার সিগন্যাল 🌟
+                $this->dispatch('refresh-editors');
+                $this->dispatch('ai-data-filled', title: $this->title, options: $this->options);
+                session()->flash('ai_success', 'AI দিয়ে সফলভাবে প্রশ্ন অটো-ফিল করা হয়েছে!');
+            } else {
+                $this->addError('aiPrompt', 'AI সঠিক ফরম্যাটে উত্তর দিতে পারেনি।');
+            }
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            // 🌟 কোটা লিমিট শেষ হলে সুন্দর বাংলা মেসেজ 🌟
+            if (str_contains($errorMessage, 'Quota exceeded') || str_contains($errorMessage, '429')) {
+                $this->addError('aiPrompt', 'AI সার্ভারে এখন অনেক চাপ। অনুগ্রহ করে ১ মিনিট অপেক্ষা করে আবার চেষ্টা করুন।');
+            } else {
+                $this->addError('aiPrompt', 'Error: '.$errorMessage);
+            }
+        }
     }
 
     public function updatedSubjectId($value)
@@ -285,8 +351,6 @@ class Create extends Component
 
         return redirect()->route('questions.index')->with('success', 'Question created successfully.');
     }
-
-
 
     public function render()
     {
