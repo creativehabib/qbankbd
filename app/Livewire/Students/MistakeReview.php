@@ -24,7 +24,7 @@ class MistakeReview extends Component
     }
 
     // ফিল্টার পরিবর্তন করার মেথড
-    public function setFilter($type)
+    public function setFilter($type): void
     {
         $this->filter = $type;
         $this->resetPage(); // পেজিনেশন রিসেট হবে

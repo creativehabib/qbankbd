@@ -148,8 +148,7 @@ class BulkUpload extends Component
         }
 
         if ($rawText === '') {
-            $this->addError('rawText', 'অনুগ্রহ করে প্রশ্নের টেক্সট দিন অথবা একটি ইমেজ/PDF আপলোড করুন।');
-
+            $this->dispatch('error', 'অনুগ্রহ করে প্রশ্নের টেক্সট দিন অথবা একটি ইমেজ/PDF আপলোড করুন।');
             return;
         }
 
