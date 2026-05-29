@@ -241,7 +241,7 @@ class Edit extends Component
         $this->dispatch('topicsUpdated', topics: $topics);
     }
 
-    // নতুন মেথড: ইউজার যদি এডিট পেজ থেকে বর্তমান ছবি ডিলিট করতে চায়
+    // নতুন মেথড: ইউজার যদি এডিট পেজ থেকে বর্তমান ছবি ডিলিট করতে চায়
     public function removeExistingImage()
     {
         if ($this->existingImage) {
@@ -323,6 +323,7 @@ class Edit extends Component
                 'question_type' => $this->question_type,
                 'marks' => (float) $this->marks == floor((float) $this->marks) ? (int) $this->marks : (float) $this->marks,
                 'extra_content' => $extraData,
+                'has_error' => false, // 🌟 প্রশ্ন সফলভাবে সংশোধন হওয়ায় এরর ফ্ল্যাগ রিলিজ করা হলো
             ]);
 
             // Tags আপডেট
@@ -332,6 +333,18 @@ class Edit extends Component
             // Exam Categories আপডেট
             if (! empty($this->exam_category_ids)) {
                 $this->question->examCategories()->sync($this->exam_category_ids);
+            }
+
+            // 🚀 ─── অটো-রিমুভাল লজিক ───
+            // এই প্রশ্ন সংক্রান্ত স্টুডেন্টদের করা সব ওপেন রিপোর্ট এক ক্লিকে সমাধান (Resolved) করে দেওয়া হলো
+            if (\Schema::hasTable('question_reports')) {
+                DB::table('question_reports')
+                    ->where('question_id', $this->question->id)
+                    ->where('is_resolved', false)
+                    ->update([
+                        'is_resolved' => true,
+                        'updated_at' => now()
+                    ]);
             }
         });
 

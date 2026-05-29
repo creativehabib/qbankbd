@@ -1,10 +1,8 @@
 <div x-data="{ filterOpen: false }" @keydown.escape.window="if(filterOpen) { filterOpen = false; } else if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')" class="relative flex flex-col lg:flex-row gap-5 lg:gap-6">
 
-    <!-- বাম সাইড: মূল কন্টেন্ট -->
     <div class="w-full min-w-0 lg:flex-1">
         <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative">
 
-            <!-- লোডিং ওভারলে -->
             <div wire:loading.remove="hidden" class="hidden absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm dark:bg-zinc-900/60">
                 <div class="flex flex-col items-center gap-2">
                     <flux:icon.arrow-path class="size-8 animate-spin text-emerald-600" />
@@ -12,7 +10,6 @@
                 </div>
             </div>
 
-            <!-- Tabs -->
             <div class="border-b border-zinc-200 dark:border-zinc-700">
                 <div class="grid grid-cols-2">
                     <button type="button" wire:click="$set('activeTab', 'fast')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer transition {{ $activeTab === 'fast' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
@@ -107,7 +104,6 @@
                     </div>
                 @else
 
-                    <!-- লাইভ ফিল্টার ভিউ -->
                     @if($level === 'filtered-questions')
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
@@ -129,7 +125,6 @@
                                 </button>
                             </div>
 
-                            <!-- অ্যাক্টিভ ফিল্টার পিলস -->
                             <div class="flex flex-wrap gap-2">
                                 @foreach($filterQuestionTypes as $type)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">{{ strtoupper($type) }}</span>
@@ -161,7 +156,6 @@
                                         @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                         <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
 
-                                            <!-- Pagination Serial Fix -->
                                             <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($filteredQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
 
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
@@ -179,17 +173,14 @@
                                                 @endforeach
                                             </div>
 
-                                            <!-- Dynamic Action Icons & Explanation -->
                                             <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                                                    <!-- Explanation Button: Click + Record View -->
                                                     <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
                                                         <span>Explanation</span>
                                                         <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
                                                     </button>
 
-                                                    <!-- Action Icons -->
                                                     <div class="flex items-center gap-4 text-zinc-400 dark:text-zinc-500">
                                                         <div class="flex items-center gap-1.5" title="Views">
                                                             <flux:icon.eye class="size-[18px]" />
@@ -207,7 +198,7 @@
                                                                 <span class="text-xs font-medium">{{ $question->likes_count }}</span>
                                                             @endif
                                                         </button>
-                                                        <button type="button" wire:click="$dispatch('openModal', { component: 'report-modal', arguments: { questionId: {{ $question->id }} } })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                        <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
                                                             <flux:icon.flag class="size-[18px]" />
                                                         </button>
                                                         <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
@@ -216,7 +207,6 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- Explanation Content -->
                                                 <div x-show="openDescription" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                                     @if(filled($question->description))
                                                         <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>{!! $question->description !!}</div>
@@ -237,7 +227,6 @@
                         </div>
 
                     @else
-                        <!-- ড্রিল-ডাউন কন্টেন্ট -->
                         @if($level === 'classes')
                             <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Select Topics for Practice') }}</h2>
                             <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -290,7 +279,6 @@
                                     @foreach($subjects as $subject)
                                         <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
 
-                                            <!-- Subject Click -> Chapters -->
                                             <div wire:click="openSubject({{ $subject->id }})" class="flex flex-1 items-center gap-3 cursor-pointer">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
                                                 <div>
@@ -300,7 +288,6 @@
                                             </div>
 
                                             <div class="flex shrink-0 items-center">
-                                                <!-- Hover Start Button -> Questions -->
                                                 <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="hidden items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700 group-hover:flex dark:bg-emerald-500 dark:hover:bg-emerald-600">
                                                     <flux:icon.play class="size-3.5" /> Start
                                                 </button>
@@ -353,7 +340,6 @@
                                             @php($questionTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? ''))
                                             <article class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
 
-                                                <!-- Pagination Serial Fix -->
                                                 <h5 class="text-lg text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($latestQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
 
                                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
@@ -371,7 +357,6 @@
                                                     @endforeach
                                                 </div>
 
-                                                <!-- Dynamic Action Icons & Explanation -->
                                                 <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -397,7 +382,7 @@
                                                                     <span class="text-xs font-medium">{{ $question->likes_count }}</span>
                                                                 @endif
                                                             </button>
-                                                            <button type="button" wire:click="$dispatch('openModal', { component: 'report-modal', arguments: { questionId: {{ $question->id }} } })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                            <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
                                                                 <flux:icon.flag class="size-[18px]" />
                                                             </button>
                                                             <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
@@ -455,10 +440,8 @@
         </div>
     </div>
 
-    <!-- ডান সাইড: ফিল্টার সেকশন (সব স্ক্রিনে ড্রয়ার হিসেবে কাজ করবে) -->
     @if($level === 'questions' || $level === 'filtered-questions')
 
-        <!-- ফ্লোটিং বাটন (মোবাইল/ট্যাবলেটে দেখাবে) -->
         <button
             @click="filterOpen = !filterOpen"
             class="fixed bottom-6 right-6 z-40 flex lg:hidden h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl transition hover:bg-emerald-700"
@@ -472,7 +455,6 @@
             @endif
         </button>
 
-        <!-- ব্যাকড্রপ (মোবাইল/ট্যাবলেটে কাজ করবে) -->
         <div
             x-show="filterOpen"
             x-transition:enter="transition-opacity ease-out duration-300"
@@ -486,7 +468,6 @@
             style="display:none;"
         ></div>
 
-        <!-- মোবাইল ড্রয়ার (ছোট স্ক্রিনে স্লাইড ইন হবে) -->
         <div
             x-show="filterOpen"
             x-transition:enter="transform transition ease-in-out duration-300"
@@ -499,7 +480,6 @@
             style="display:none;"
         >
 
-            <!-- মোবাইল হেডার -->
             <div class="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white/80 backdrop-blur-md p-4 dark:border-zinc-700 dark:bg-zinc-900/80">
                 <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                     <flux:icon.adjustments-horizontal class="size-5 text-emerald-600" />
@@ -521,7 +501,6 @@
                 </div>
 
                 <div class="max-h-[calc(100vh-320px)] space-y-5 overflow-y-auto pr-1">
-                    <!-- প্রশ্নের ধরন -->
                     <div x-data="{ open: true }">
                         <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                             প্রশ্নের ধরন
@@ -545,7 +524,6 @@
 
                     <hr class="border-zinc-200 dark:border-zinc-700">
 
-                    <!-- শ্রেণি -->
                     <div x-data="{ open: true }">
                         <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                             শ্রেণি নির্বাচন
@@ -563,7 +541,6 @@
 
                     <hr class="border-zinc-200 dark:border-zinc-700">
 
-                    <!-- বিষয় -->
                     <div x-data="{ open: true }">
                         <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                             বিষয় নির্বাচন
@@ -581,7 +558,6 @@
 
                     <hr class="border-zinc-200 dark:border-zinc-700">
 
-                    <!-- শিক্ষক -->
                     <div x-data="{ open: true }">
                         <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                             শিক্ষক নির্বাচন
@@ -598,7 +574,6 @@
                     </div>
                 </div>
 
-                <!-- রিসেট বাটন -->
                 <div class="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-700">
                     <button
                         type="button"
@@ -617,11 +592,9 @@
             </div>
         </div>
 
-        <!-- ডেস্কটপ সাইডবার (lg স্ক্রিনে দেখাবে) -->
         <div class="hidden lg:block w-80 shrink-0 h-fit sticky top-5">
             <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
 
-                <!-- ডেস্কটপ হেডার -->
                 <div class="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-700">
                     <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                         <flux:icon.adjustments-horizontal class="size-5 text-emerald-600" />
@@ -640,7 +613,6 @@
                     </div>
 
                     <div class="max-h-[calc(100vh-400px)] space-y-5 overflow-y-auto pr-1">
-                        <!-- প্রশ্নের ধরন -->
                         <div x-data="{ open: true }">
                             <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                                 প্রশ্নের ধরন
@@ -664,7 +636,6 @@
 
                         <hr class="border-zinc-200 dark:border-zinc-700">
 
-                        <!-- শ্রেণি -->
                         <div x-data="{ open: true }">
                             <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                                 শ্রেণি নির্বাচন
@@ -682,7 +653,6 @@
 
                         <hr class="border-zinc-200 dark:border-zinc-700">
 
-                        <!-- বিষয় -->
                         <div x-data="{ open: true }">
                             <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                                 বিষয় নির্বাচন
@@ -700,7 +670,6 @@
 
                         <hr class="border-zinc-200 dark:border-zinc-700">
 
-                        <!-- শিক্ষক -->
                         <div x-data="{ open: true }">
                             <button @click="open = !open" class="flex w-full items-center justify-between text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                                 শিক্ষক নির্বাচন
@@ -717,7 +686,6 @@
                         </div>
                     </div>
 
-                    <!-- রিসেট বাটন -->
                     <div class="mt-6 border-t border-zinc-200 pt-4 dark:border-zinc-700">
                         <button
                             type="button"
@@ -725,7 +693,7 @@
                                 title: 'ফিল্টার মুছুন?',
                                 text: 'ফিল্টার মুছে মূল চ্যাপ্টারে ফিরে যাবেন।',
                                 confirmButtonText: 'হ্যাঁ, মুছুন',
-                                confirmButtonColor: '#10b981'
+                                transition: 'bg-emerald-600'
                             })"
                             class="w-full flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                         >
@@ -737,4 +705,61 @@
             </div>
         </div>
     @endif
+
+    {{-- ─── 🚀 ALPINE + FLUX CUSTOM REPORT ERROR MODAL ─── --}}
+    <div
+        x-data="{
+            showModal: false,
+            questionId: null,
+            reportReason: 'wrong_answer',
+            note: ''
+        }"
+        @open-report-modal.window="showModal = true; questionId = $event.detail.id; reportReason = 'wrong_answer'; note = '';"
+        x-show="showModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto"
+        style="display: none;"
+    >
+        <div class="fixed inset-0 bg-zinc-950/40 backdrop-blur-sm transition-opacity" @click="showModal = false"></div>
+
+        <div class="relative w-full max-w-md transform rounded-xl border border-zinc-200 bg-white p-6 shadow-xl transition-all dark:border-zinc-700 dark:bg-zinc-900">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-3 dark:border-zinc-800">
+                <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <flux:icon.flag class="size-5 text-red-500" />
+                    {{ __('প্রশ্নে ভুল রিপোর্ট করুন') }}
+                </h3>
+                <button @click="showModal = false" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
+            </div>
+
+            <div class="mt-4 space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">{{ __('ভুলের ধরণ নির্বাচন করুন') }}</label>
+                    <select x-model="reportReason" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none focus:border-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                        <option value="wrong_answer">সঠিক উত্তর অপশনে নেই / উত্তর ভুল</option>
+                        <option value="typing_mistake">প্রশ্ন বা অপশনে বানান ভুল আছে</option>
+                        <option value="wrong_explanation">প্রশ্নের ব্যাখ্যাটি সঠিক নয়</option>
+                        <option value="blurry_image">সংযুক্ত ছবি বা সমীকরণ অস্পষ্ট</option>
+                        <option value="other">অন্যান্য সমস্যা</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">{{ __('বিস্তারিত লিখুন (ঐচ্ছিক)') }}</label>
+                    <textarea x-model="note" rows="3" placeholder="ভুলটি সনাক্ত করতে আমাদের সাহায্য করুন..." class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 outline-none focus:border-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+                <button type="button" @click="showModal = false" class="rounded-lg border border-zinc-300 px-4 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-700">
+                    {{ __('বাতিল') }}
+                </button>
+                <button
+                    type="button"
+                    @click="@this.reportQuestionError(questionId, reportReason, note); showModal = false;"
+                    class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 shadow-sm transition"
+                >
+                    {{ __('রিপোর্ট সাবমিট করুন') }}
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

@@ -7,11 +7,13 @@ use App\Models\Question;
 use App\Models\User;
 use App\Models\ExamCategory;
 use App\Models\AcademicClass;
+use App\Models\Chapter;
 use App\Models\MockTest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -23,6 +25,9 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
+        // ==========================================
+        // ১. Super Admin Dashboard Logic
+        // ==========================================
         if ($user->isSuperAdmin()) {
             $questionSets = QuestionSet::query()
                 ->with('user:id,name')
@@ -60,10 +65,109 @@ class DashboardController extends Controller
             ]);
         }
 
+        // ==========================================
+        // ২. Admin Dashboard Logic (Advanced & Student Reports Integrated)
+        // ==========================================
         if ($user->isAdmin()) {
-            return view('dashboards.admin');
+            // কুইক স্ট্যাটস কাউন্টার (Overview Counters)
+            $totalQuestions = Question::query()->count();
+            $todayQuestionsCount = Question::query()->whereDate('created_at', Carbon::today())->count();
+            $totalTeachers = User::role('teacher')->count();
+            $totalStudents = User::role('student')->count();
+            $totalUsers = User::query()->count();
+
+            // নতুন 'exam_type' কলাম অনুযায়ী ওএমআর পরীক্ষার মোট সংখ্যা
+            $totalOmrEvaluations = MockTest::query()->where('exam_type', 'omr')->count();
+
+            // শ্রেণিভিত্তিক প্রশ্ন বন্টন (Category/Subject Distribution)
+            $classWiseDistribution = AcademicClass::query()
+                ->withCount('questions')
+                ->get(['id', 'name'])
+                ->filter(fn($class) => $class->questions_count > 0)
+                ->values();
+
+            // পেন্ডিং রিভিউ কাউন্ট
+            $pendingReviewCount = Question::query()->where('status', 'pending')->count();
+
+            // 🚀 [ADVANCED ১] নতুন question_reports টেবিল থেকে লাইভ ডাটা লোড (শিক্ষক ও স্টুডেন্ট রিলেশন সহ)
+            $criticalAlerts = collect();
+            if (\Schema::hasTable('question_reports')) {
+                $criticalAlerts = \App\Models\QuestionReport::query()
+                    ->where('is_resolved', false)
+                    ->with([
+                        'question:id,title,user_id',
+                        'question.user:id,name', // প্রশ্নটির লেখক/শিক্ষক
+                        'user:id,name'           // রিপোর্টকারী স্টুডেন্ট
+                    ])
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            }
+            $reportedErrorsCount = $criticalAlerts->count();
+
+            // 🚀 [ADVANCED ২] ওএমআর স্ক্যান স্ট্যাটস অ্যানালিটিক্স
+            $omrStats = MockTest::query()
+                ->select('status', DB::raw('count(*) as count'))
+                ->where('exam_type', 'omr')
+                ->groupBy('status')
+                ->get()
+                ->pluck('count', 'status')
+                ->toArray();
+
+            // 🚀 [ADVANCED ৩] প্রশ্ন ব্যাংকের স্বাস্থ্য পরীক্ষা (যে চ্যাপ্টারে প্রশ্ন সংখ্যা ১০ এর কম)
+            $weakChapters = Chapter::query()
+                ->withCount('questions')
+                ->having('questions_count', '<', 10)
+                ->orderBy('questions_count', 'asc')
+                ->take(5)
+                ->get(['id', 'name']);
+
+            // 🚀 [ADVANCED ৪] শিক্ষক কন্ট্রিবিউশন ও পে-আউট সামারি (Financial)
+            $pendingWithdrawSum = 0;
+            if (\Schema::hasTable('wallet_transactions')) {
+                $pendingWithdrawSum = DB::table('wallet_transactions')
+                    ->where('status', 'pending')
+                    ->where('type', 'withdraw')
+                    ->sum('amount');
+            } elseif (\Schema::hasTable('wallets')) {
+                $pendingWithdrawSum = DB::table('wallets')->sum('pending_withdraw');
+            }
+
+            // কন্ট্রিবিউশন লিডারবোর্ড (টপ শিক্ষকরা)
+            $topContributingTeachers = Question::query()
+                ->select('user_id', DB::raw('count(*) as total_added'))
+                ->whereNotNull('user_id')
+                ->groupBy('user_id')
+                ->with('user:id,name,email')
+                ->orderByDesc('total_added')
+                ->take(5)
+                ->get();
+
+            return view('dashboards.admin', [
+                'adminStats' => [
+                    'total_questions' => $totalQuestions,
+                    'today_questions' => $todayQuestionsCount,
+                    'total_teachers' => $totalTeachers,
+                    'total_students' => $totalStudents,
+                    'total_users' => $totalUsers,
+                    'total_omr_evaluations' => $totalOmrEvaluations,
+                    'pending_reviews' => $pendingReviewCount,
+                    'reported_errors' => $reportedErrorsCount,
+                ],
+                'classWiseDistribution' => $classWiseDistribution,
+                'topTeachers' => $topContributingTeachers,
+
+                // এডভান্সড ডেটা পাসিং
+                'criticalAlerts' => $criticalAlerts,
+                'omrStats' => $omrStats,
+                'weakChapters' => $weakChapters,
+                'pendingWithdrawSum' => $pendingWithdrawSum,
+            ]);
         }
 
+        // ==========================================
+        // ৩. Teacher Dashboard Logic
+        // ==========================================
         if ($user->isTeacher()) {
             $teacherQuestionSets = QuestionSet::query()
                 ->where('user_id', $user->id)
@@ -96,11 +200,9 @@ class DashboardController extends Controller
         }
 
         // ==========================================
-        // Student Dashboard Logic (Updated)
+        // ৪. Student Dashboard Logic
         // ==========================================
         $userId = $user->id;
-
-        // URL থেকে রেঞ্জ নেওয়া, না থাকলে ডিফল্ট ৭ দিন
         $range = (int) $request->get('range', 7);
         if (!in_array($range, [7, 15, 30])) {
             $range = 7;
@@ -136,12 +238,11 @@ class DashboardController extends Controller
             $actualMinutesTaken = $start->diffInMinutes($end);
             $allocatedMinutes = $test->duration_minutes ?? 20;
 
-            // স্মার্ট স্টাডি টাইম ক্যালকুলেশন
             $totalStudyMinutes += ($actualMinutesTaken > $allocatedMinutes) ? $allocatedMinutes : $actualMinutesTaken;
 
             $totalRight += (int) $test->correct_answers;
             $totalWrong += (int) $test->wrong_answers;
-            $skipped = (int) $test->total_questions - ((int) $test->correct_answers + (int) $test->wrong_answers);
+            $skipped = $test->total_questions - ($test->correct_answers + $test->wrong_answers);
             $totalSkipped += ($skipped > 0 ? $skipped : 0);
 
             $dateKey = $start->format('Y-m-d');
@@ -156,11 +257,9 @@ class DashboardController extends Controller
         $minutes = $totalStudyMinutes % 60;
         $studyTimeFormatted = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 
-        // নতুন একিউরেসি সূত্র (Skipped সহ হিসাব)
         $totalQuestionsCount = $totalRight + $totalWrong + $totalSkipped;
         $accuracyPercentage = $totalQuestionsCount > 0 ? round(($totalRight / $totalQuestionsCount) * 100, 1) : 0;
 
-        // Rank & Streak
         $myTotalScore = MockTest::where('user_id', $userId)->sum('correct_answers');
         $betterUsersCount = User::whereHas('mockTests')
             ->withSum('mockTests as total_score', 'correct_answers')
@@ -190,7 +289,7 @@ class DashboardController extends Controller
 
         $leaderboard = User::query()
             ->whereHas('roles', function($q) {
-                $q->where('name', 'student'); // শুধুমাত্র স্টুডেন্টদের আনবে
+                $q->where('name', 'student');
             })
             ->where('xp', '>', 0)
             ->orderByDesc('xp')

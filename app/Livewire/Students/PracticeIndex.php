@@ -280,6 +280,29 @@ class PracticeIndex extends Component
         }
     }
 
+    // 🚀 স্টুডেন্ট প্যানেল থেকে প্রশ্নের ভুল রিপোর্ট সাবমিট করার চূড়ান্ত মেথড
+    public function reportQuestionError(int $questionId, string $reason, string $description = ''): void
+    {
+        $question = Question::findOrFail($questionId);
+
+        // ১. মূল প্রশ্ন টেবিলে এরর ফ্ল্যাগ ট্র্রিগার করা (এডমিন অ্যালার্টের জন্য)
+        if (\Schema::hasColumn('questions', 'has_error')) {
+            $question->update([
+                'has_error' => true
+            ]);
+        }
+
+        // ২. ডেডিকেটেড রিপোর্টে সমস্ত তথ্য ডাটাবেজে সংরক্ষণ করা
+        \App\Models\QuestionReport::create([
+            'user_id' => auth()->id(),
+            'question_id' => $questionId,
+            'reason' => $reason,
+            'description' => $description ?: null,
+        ]);
+
+        // টোস্ট বা নোটিফিকেশন ডিসপ্যাচ
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'রিপোর্ট সফলভাবে জমা হয়েছে! এডমিন দ্রুত এটি যাচাই করবেন।']);
+    }
     public function recordView(int $questionId): void
     {
         $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();

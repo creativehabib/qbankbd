@@ -306,10 +306,209 @@
                     </script>
                 @endpush
             @else
-                {{-- ─── ADMIN DASHBOARD VIEW (OR OTHER ROLES) ────────────────────── --}}
-                <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 text-center">
-                    <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">স্বাগতম, অ্যাডমিন প্যানেল</h3>
-                    <p class="text-sm text-zinc-500 mt-1">সিস্টেম এবং ডেটাবেজ ম্যানেজ করার জন্য বাম পাশের অ্যাডমিনিস্ট্রেশন মেনুবার ব্যবহার করুন।</p>
+                {{-- ─── ADMIN DASHBOARD VIEW (ADVANCED CONTEXT) ────────────────── --}}
+                <div class="space-y-6">
+
+                    {{-- ১. কুইক স্ট্যাটস কাউন্টার (Overview Counters) --}}
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                            <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
+                                <flux:icon.document-text class="size-12" />
+                            </div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('মোট প্রশ্ন সংখ্যা') }}</p>
+                            <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">
+                                {{ number_format($adminStats['total_questions'] ?? 0) }}
+                                @if(($adminStats['today_questions'] ?? 0) > 0)
+                                    <span class="text-xs font-bold text-emerald-500 ml-1 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">+{{ $adminStats['today_questions'] }} আজ</span>
+                                @endif
+                            </p>
+                        </div>
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                            <div class="absolute -right-2 -top-2 size-12 text-amber-100 dark:text-amber-900 opacity-20 transition-transform group-hover:scale-110">
+                                <flux:icon.clock class="size-12" />
+                            </div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('পেন্ডিং রিভিউ') }}</p>
+                            <p class="mt-2 text-3xl font-black {{ ($adminStats['pending_reviews'] ?? 0) > 0 ? 'text-amber-500' : 'text-zinc-400' }}">
+                                {{ $adminStats['pending_reviews'] ?? 0 }} <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">টি</span>
+                            </p>
+                        </div>
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                            <div class="absolute -right-2 -top-2 size-12 text-rose-100 dark:text-rose-900 opacity-20 transition-transform group-hover:scale-110">
+                                <flux:icon.banknotes class="size-12" />
+                            </div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('পেন্ডিং উইথড্রাল') }}</p>
+                            <p class="mt-2 text-3xl font-black {{ ($pendingWithdrawSum ?? 0) > 0 ? 'text-rose-500' : 'text-zinc-400' }}">
+                                ৳{{ number_format($pendingWithdrawSum ?? 0, 2) }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                            <div class="absolute -right-2 -top-2 size-12 text-emerald-100 dark:text-emerald-900 opacity-20 transition-transform group-hover:scale-110">
+                                <flux:icon.adjustments-horizontal class="size-12" />
+                            </div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('OMR এভালুয়েশন') }}</p>
+                            <p class="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                                {{ number_format($adminStats['total_omr_evaluations'] ?? 0) }}
+                                @if(isset($omrStats['started']) && $omrStats['started'] > 0)
+                                    <span class="text-[10px] font-medium text-zinc-400 block mt-0.5">রানিং/চলতি ওএমআর পরীক্ষা: {{ $omrStats['started'] }} টি</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- ২. শ্রেণিভিত্তিক প্রশ্ন বন্টন এবং টপ কন্ট্রিবিউটর শিক্ষক --}}
+                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+                        <div class="lg:col-span-2 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
+                                    <flux:icon.chart-pie class="size-5 text-indigo-500" />
+                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">{{ __('শ্রেণিভিত্তিক প্রশ্ন বন্টন') }}</h3>
+                                </div>
+                                <div class="mt-4 space-y-4 max-h-60 overflow-y-auto pr-1">
+                                    @forelse($classWiseDistribution ?? [] as $class)
+                                        <div class="space-y-1">
+                                            <div class="flex justify-between text-xs font-medium">
+                                                <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ $class->name }}</span>
+                                                <span class="text-zinc-500">{{ $class->questions_count }} টি প্রশ্ন</span>
+                                            </div>
+                                            <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
+                                                @php
+                                                    $percentage = $adminStats['total_questions'] > 0 ? ($class->questions_count / $adminStats['total_questions']) * 100 : 0;
+                                                @endphp
+                                                <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: {{ $percentage }}%"></div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center text-xs text-zinc-500 py-8">{{ __('কোনো ডেটা পাওয়া যায়নি।') }}</div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between text-[11px] font-semibold text-zinc-400 uppercase">
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-blue-500"></span> {{ $adminStats['total_teachers'] ?? 0 }} জন শিক্ষক</span>
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-emerald-500"></span> {{ $adminStats['total_students'] ?? 0 }} জন শিক্ষার্থী</span>
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-zinc-400"></span> {{ $adminStats['total_users'] ?? 0 }} মোট অ্যাকাউন্ট</span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
+                                    <flux:icon.trophy class="size-5 text-amber-500" />
+                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">{{ __('সেরা কন্ট্রিবিউটর (শিক্ষক)') }}</h3>
+                                </div>
+                                <div class="mt-4 space-y-3">
+                                    @forelse($topTeachers ?? [] as $index => $teacher)
+                                        <div class="flex items-center justify-between text-xs">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <span class="flex size-5 shrink-0 items-center justify-center rounded-md bg-amber-50 dark:bg-amber-950/30 text-amber-700 text-[10px] font-bold">
+                                                    #{{ $index + 1 }}
+                                                </span>
+                                                <span class="font-medium text-zinc-700 dark:text-zinc-300 truncate" title="{{ $teacher->user?->name }}">
+                                                    {{ $teacher->user?->name ?? 'Unknown Teacher' }}
+                                                </span>
+                                            </div>
+                                            <span class="font-bold text-zinc-500 shrink-0 ml-2">{{ $teacher->total_added }} টি প্রশ্ন</span>
+                                        </div>
+                                    @empty
+                                        <div class="text-center text-xs text-zinc-500 py-4">{{ __('এখনো কেউ প্রশ্ন যুক্ত করেনি।') }}</div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div class="mt-6 space-y-2">
+                                <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">{{ __('দ্রুত অ্যাকশন লিংক') }}</h4>
+                                <a href="{{ route('questions.index') }}" class="flex w-full items-center justify-center gap-1.5 rounded-lg bg-zinc-900 py-2 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition shadow-sm">
+                                    <flux:icon.check-circle class="size-4" /> {{ __('নতুন প্রশ্ন মডারেট করুন') }}
+                                </a>
+                                <a href="{{ route('admin.wallet-approvals') }}" class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-300 py-2 text-xs font-semibold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
+                                    <flux:icon.wallet class="size-4" /> {{ __('ওয়ালেট ও টোকেন রিকোয়েস্ট') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ৩. অ্যাডভান্সড কন্টেন্ট হেলথ এবং ভুল রিপোর্টেড প্রশ্ন অ্যালার্ট গ্রিড (স্টুডেন্ট ফিডব্যাক সহ) --}}
+                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                            <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800 mb-3">
+                                <flux:icon.exclamation-circle class="size-5 text-amber-500" />
+                                <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
+                                    {{ __('প্রশ্ন বাড়াতে হবে (Low Content Chapters)') }}
+                                </h3>
+                            </div>
+                            <ul class="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs">
+                                @forelse($weakChapters ?? [] as $chapter)
+                                    <li class="py-2.5 flex justify-between items-center">
+                                        <span class="text-zinc-700 dark:text-zinc-300 font-medium">{{ $chapter->name }}</span>
+                                        <span class="rounded-full bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 font-bold text-amber-600 dark:text-amber-400">
+                                            {{ $chapter->questions_count }} টি প্রশ্ন
+                                        </span>
+                                    </li>
+                                @empty
+                                    <div class="text-center text-xs text-zinc-400 py-6">সব চ্যাপ্টারে পর্যাপ্ত প্রশ্ন আছে! 👍</div>
+                                @endforelse
+                            </ul>
+                        </div>
+
+                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                            <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800 mb-3">
+                                <flux:icon.flag class="size-5 text-red-500" />
+                                <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
+                                    {{ __('জরুরি সংশোধন প্রয়োজন (Critical Question Errors)') }}
+                                </h3>
+                            </div>
+                            <div class="mt-4 space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                                @forelse($criticalAlerts ?? [] as $alert)
+                                    <div class="p-3 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20 space-y-2">
+                                        <div class="flex justify-between items-start gap-2">
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-zinc-800 dark:text-zinc-200 font-bold text-xs truncate">
+                                                    {{ Str::limit(strip_tags($alert->question->title ?? 'প্রশ্ন পাওয়া যায়নি'), 55) }}
+                                                </p>
+                                                <span class="text-[10px] text-zinc-400 block mt-0.5">
+                                                    👨‍🏫 শিক্ষক: <span class="font-semibold text-zinc-500 dark:text-zinc-400">{{ $alert->question->user->name ?? 'Unknown' }}</span>
+                                                </span>
+                                            </div>
+                                            <a href="{{ route('questions.edit', $alert->question_id) }}" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline shrink-0 text-[10px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded shadow-sm">
+                                                {{ __('ঠিক করুন') }} →
+                                            </a>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-1.5 pt-1 text-[10px] font-medium">
+                                            @php
+                                                $reasonLabels = [
+                                                    'wrong_answer' => 'ভুল উত্তর',
+                                                    'typing_mistake' => 'বানান ভুল',
+                                                    'wrong_explanation' => 'ভুল ব্যাখ্যা',
+                                                    'blurry_image' => 'অস্পষ্ট ছবি',
+                                                    'other' => 'অন্যান্য'
+                                                ];
+                                                $reasonClass = $alert->reason === 'wrong_answer' ? 'bg-red-50 text-red-600 dark:bg-red-950/30' : 'bg-amber-50 text-amber-600 dark:bg-amber-950/30';
+                                            @endphp
+                                            <span class="px-2 py-0.5 rounded font-bold uppercase tracking-wide {{ $reasonClass }}">
+                                                ⚠️ {{ $reasonLabels[$alert->reason] ?? 'অন্যান্য' }}
+                                            </span>
+                                            <span class="text-zinc-400">by {{ $alert->user->name ?? 'Student' }}</span>
+                                        </div>
+
+                                        @if(filled($alert->description))
+                                            <div class="bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 p-2 rounded text-[11px] text-zinc-600 dark:text-zinc-400 italic">
+                                                "{{ $alert->description }}"
+                                            </div>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="text-center text-xs text-zinc-400 py-8">কোনো ভুল রিপোর্টেড প্রশ্ন নেই, ডাটাবেজ কন্টেন্ট হেলদি আছে! ✨</div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             @endif
         @endif
