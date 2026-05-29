@@ -43,10 +43,10 @@
         ],
         [
             'type' => 'link',
-            'label' => __('OMR Generator'),
+            'label' => __('OMR শীট তৈরি'),
             'route' => 'omr.generator',
             'match' => 'omr.generator',
-            'icon' => 'document-duplicate',
+            'icon' => 'custom-omr-frame',
             'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
         ],
         [
@@ -54,7 +54,7 @@
             'label' => __('OMR স্ক্যানার'),
             'route' => 'student.omr-scanner',
             'match' => 'student.omr-scanner',
-            'icon' => 'document-duplicate',
+            'icon' => 'viewfinder-circle',
             'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin', 'student']),
         ],
         [
@@ -134,7 +134,7 @@
             'label' => __('Leaderboard'),
             'route' => 'student.leaderboard',
             'match' => 'student.leaderboard',
-            'icon' => 'trophy', // Heroicon name
+            'icon' => 'trophy',
             'visible' => auth()->user()->isStudent(),
         ],
         [
@@ -142,7 +142,7 @@
             'label' => __('Mistake Review'),
             'route' => 'student.mistakes',
             'match' => 'student.mistakes',
-            'icon' => 'exclamation-circle', // 'pencil-square' অথবা 'document-magnifying-glass' ও দিতে পারেন
+            'icon' => 'exclamation-circle',
             'visible' => auth()->user()->isStudent()
         ],
         [
@@ -150,7 +150,7 @@
             'label' => __("Test History"),
             'route' => 'student.test-history',
             'match' => 'student.test-history',
-            'icon' => 'clock', // 'calendar-days' অথবা 'clipboard-document-list' ও দিতে পারেন
+            'icon' => 'clock',
             'visible' => auth()->user()->isStudent()
         ],
         [
@@ -200,7 +200,6 @@
     class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]"
 >
 <div class="flex min-h-screen">
-    <!-- Desktop Sidebar -->
     <aside class="fixed inset-y-0 left-0 z-40 hidden flex-col border-e border-zinc-200 bg-zinc-50 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:flex" :class="sidebarCollapsed ? 'w-16' : 'w-72'" data-test="desktop-sidebar">
         <div class="flex items-center justify-between border-b border-zinc-200 px-3 py-3 dark:border-[var(--app-dark-border)]">
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate x-show="! sidebarCollapsed" />
@@ -211,7 +210,6 @@
 
         <nav class="relative flex-1 space-y-2 p-2" :class="sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'" data-test="sidebar-nav">
 
-            <!-- Full Sidebar Menu -->
             <template x-if="! sidebarCollapsed">
                 <div class="space-y-2">
                     @foreach($menuItems as $item)
@@ -219,7 +217,12 @@
                             @if($item['type'] === 'link')
                                 <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
                                     <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
-                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                        {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Full Sidebar) 🌟 --}}
+                                        @if($item['icon'] === 'custom-omr-frame')
+                                            <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
+                                        @else
+                                            <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                        @endif
                                     </span>
                                     <span>{{ $item['label'] }}</span>
                                 </a>
@@ -248,14 +251,18 @@
                 </div>
             </template>
 
-            <!-- Collapsed Sidebar Menu -->
             <template x-if="sidebarCollapsed">
                 <div class="space-y-2">
                     @foreach($menuItems as $item)
                         @if($item['visible'])
                             @if($item['type'] === 'link')
                                 <a href="{{ route($item['route']) }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" title="{{ $item['label'] }}" wire:navigate>
-                                    <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Collapsed Sidebar) 🌟 --}}
+                                    @if($item['icon'] === 'custom-omr-frame')
+                                        <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
+                                    @else
+                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    @endif
                                 </a>
                             @elseif($item['type'] === 'group')
                                 <div class="relative">
@@ -330,7 +337,6 @@
         </div>
     </aside>
 
-    <!-- Mobile Header & Main Content Area -->
     <div class="relative min-h-screen flex-1" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
         <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 print:hidden backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
             <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">
@@ -358,7 +364,12 @@
                         @if($item['type'] === 'link')
                             <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
                                 <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
-                                    <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Mobile Sidebar) 🌟 --}}
+                                    @if($item['icon'] === 'custom-omr-frame')
+                                        <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
+                                    @else
+                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
+                                    @endif
                                 </span>
                                 <span>{{ $item['label'] }}</span>
                             </a>
@@ -387,7 +398,6 @@
             </nav>
         </aside>
 
-        <!-- Top Header Navigation -->
         <header class="sticky top-0 z-30 hidden items-center justify-between border-b border-zinc-200 bg-white/95 px-5 py-2 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:flex" data-test="sticky-page-header">
             <div>
                 <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
