@@ -26,6 +26,28 @@ class OmrGenerator extends Component
 
     public string $templateType = 'iproshbang'; // iproshbang | standard
 
+    /* ─── Mount Hook: শিক্ষক লগইন থাকলে প্রতিষ্ঠানের তথ্য লোড করা ──────────────── */
+
+    public function mount(): void
+    {
+        $user = auth()->user();
+
+        // 🌟 শিক্ষক যদি লগইন অবস্থায় থাকেন
+        if ($user && $user->hasRole('teacher')) {
+
+            // অপশন ১: আপনার সিস্টেমে যদি User মডেলের সাথে Institution রিলেশন থাকে (যেমন: $user->institution)
+            if (isset($user->institution)) {
+                $this->schoolName = $user->institution->name ?? $this->schoolName;
+                $this->address = $user->institution->address ?? $this->address;
+            }
+            // অপশন ২: যদি সরাসরি ইউজার টেবিলেই স্কুল/ইনস্টিটিউটের কলাম থাকে
+            else {
+                $this->schoolName = $user->institution_name ?? $user->school_name ?? $this->schoolName;
+                $this->address = $user->institution_address ?? $user->address ?? $this->address;
+            }
+        }
+    }
+
     /* ─── Template Switch Hook ───────────────────────────── */
 
     public function updatedTemplateType($value): void
@@ -82,11 +104,11 @@ class OmrGenerator extends Component
     // বাটন ক্লিক করার সময় কলাম সেট করার ফাংশন
     public function setColumns(int $val): void
     {
-        // 🌟 ৭০ এর উপর প্রশ্ন হলে ৪ কলামের নিচে সিলেক্ট করতে বাধা দেওয়া
+        // 🌟 ৭০ এর উপর প্রশ্ন হলে ৪ কলামের নিচে সিলেক্ট করতে বাধা দেওয়া
         if ($this->questionCount > 70 && $val < 4) {
             return;
         }
-        // 🌟 ৫০ এর উপর প্রশ্ন হলে ২ কলাম সিলেক্ট করতে বাধা দেওয়া
+        // 🌟 ৫০ এর উপর প্রশ্ন হলে ২ কলাম সিলেক্ট করতে বাধা দেওয়া
         if ($this->questionCount > 50 && $val < 3) {
             return;
         }
