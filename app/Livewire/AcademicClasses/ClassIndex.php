@@ -2,6 +2,7 @@
 
 namespace App\Livewire\AcademicClasses;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\Subject;
@@ -12,6 +13,7 @@ use Livewire\Component;
 
 class ClassIndex extends Component
 {
+    use InteractsWithFluxToasts;
     public string $classSearch = '';
 
     public string $subjectSearch = '';
@@ -133,6 +135,7 @@ class ClassIndex extends Component
 
         $this->showClassModal = false;
         $this->dispatch('entity-saved', message: $message);
+        $this->toastSuccess($message);
         $this->resetClassForm();
     }
 
@@ -140,6 +143,7 @@ class ClassIndex extends Component
     {
         AcademicClass::query()->findOrFail($id)->delete();
         $this->dispatch('entity-deleted', message: 'Academic class deleted successfully.');
+        $this->toastSuccess('Academic class deleted successfully.');
     }
 
     public function openSubjectModal(): void
@@ -203,6 +207,7 @@ class ClassIndex extends Component
 
         $this->showSubjectModal = false;
         $this->dispatch('entity-saved', message: $message);
+        $this->toastSuccess($message);
         $this->resetSubjectForm();
     }
 
@@ -210,6 +215,7 @@ class ClassIndex extends Component
     {
         Subject::query()->findOrFail($id)->delete();
         $this->dispatch('entity-deleted', message: 'Subject deleted successfully.');
+        $this->toastSuccess('Subject deleted successfully.');
     }
 
     public function openChapterModal(): void
@@ -273,6 +279,7 @@ class ClassIndex extends Component
 
         $this->showChapterModal = false;
         $this->dispatch('entity-saved', message: $message);
+        $this->toastSuccess($message);
         $this->resetChapterForm();
     }
 
@@ -280,6 +287,7 @@ class ClassIndex extends Component
     {
         Chapter::query()->findOrFail($id)->delete();
         $this->dispatch('entity-deleted', message: 'Chapter deleted successfully.');
+        $this->toastSuccess('Chapter deleted successfully.');
     }
 
     public function openTopicModal(): void
@@ -340,6 +348,7 @@ class ClassIndex extends Component
 
         $this->showTopicModal = false;
         $this->dispatch('entity-saved', message: $message);
+        $this->toastSuccess($message);
         $this->resetTopicForm();
     }
 
@@ -347,6 +356,7 @@ class ClassIndex extends Component
     {
         Topic::query()->findOrFail($id)->delete();
         $this->dispatch('entity-deleted', message: 'Topic deleted successfully.');
+        $this->toastSuccess('Topic deleted successfully.');
     }
 
     public function render(): View

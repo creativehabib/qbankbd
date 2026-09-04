@@ -2,6 +2,7 @@
 
 namespace App\Livewire\ExamCategories;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\ExamCategory;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -10,6 +11,7 @@ use Livewire\WithPagination;
 
 class ExamCategoriesIndex extends Component
 {
+    use InteractsWithFluxToasts;
     use WithPagination;
 
     public $search = '';
@@ -81,6 +83,7 @@ class ExamCategoriesIndex extends Component
         $this->showModal = false; // <-- সেভ হওয়ার পর মডাল ক্লোজ করার জন্য false করা হলো
 
         $this->dispatch('examCategorySaved', message: $message);
+        $this->toastSuccess($message);
     }
 
     // ডিলিট করার মেথড
@@ -91,6 +94,7 @@ class ExamCategoriesIndex extends Component
             $examCategory->delete();
             $this->resetPage();
             $this->dispatch('examCategoryDeleted', message: 'Exam category deleted successfully.');
+        $this->toastSuccess('Exam category deleted successfully.');
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -11,6 +12,7 @@ use Livewire\WithPagination;
 
 class UserRoleManagement extends Component
 {
+    use InteractsWithFluxToasts;
     use WithPagination;
 
     public string $search = '';
@@ -91,6 +93,7 @@ class UserRoleManagement extends Component
 
             $this->showEditModal = false;
             $this->dispatch('entity-saved', message: 'User created successfully.');
+        $this->toastSuccess('User created successfully.');
             $this->reset(['name', 'email', 'selectedRole', 'password', 'password_confirmation']);
 
             return;
@@ -112,6 +115,7 @@ class UserRoleManagement extends Component
 
         $this->showEditModal = false;
         $this->dispatch('entity-saved', message: 'User updated successfully.');
+        $this->toastSuccess('User updated successfully.');
         $this->reset(['password', 'password_confirmation']);
     }
 
@@ -132,6 +136,7 @@ class UserRoleManagement extends Component
         $targetUser->delete();
 
         $this->dispatch('entity-deleted', message: 'User deleted successfully.');
+        $this->toastSuccess('User deleted successfully.');
     }
 
     public function render(): View

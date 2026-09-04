@@ -106,3 +106,14 @@ test('academic structure records can be deleted from the page', function () {
     expect(Subject::withTrashed()->find($subject->id)?->deleted_at)->not->toBeNull();
     expect(AcademicClass::withTrashed()->find($academicClass->id)?->deleted_at)->not->toBeNull();
 });
+
+test('academic class management uses Flux UI controls', function () {
+    $view = file_get_contents(base_path('resources/views/livewire/academic-classes/class-index.blade.php'));
+
+    expect($view)
+        ->toContain('<flux:modal')
+        ->toContain('<flux:input')
+        ->toContain('<flux:textarea')
+        ->toContain('<flux:checkbox')
+        ->toContain('<flux:button');
+});

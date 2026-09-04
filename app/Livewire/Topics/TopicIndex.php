@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Topics;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Chapter;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -12,6 +13,7 @@ use Livewire\WithPagination;
 
 class TopicIndex extends Component
 {
+    use InteractsWithFluxToasts;
     use WithPagination;
 
     public $search = '';
@@ -103,6 +105,7 @@ class TopicIndex extends Component
         $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->showModal = false;
         $this->dispatch('topicSaved', message: $message);
+        $this->toastSuccess($message);
     }
 
     public function delete($id)
@@ -112,6 +115,7 @@ class TopicIndex extends Component
             $topic->delete();
             $this->resetPage();
             $this->dispatch('topicDeleted', message: 'Topic deleted successfully.');
+        $this->toastSuccess('Topic deleted successfully.');
         }
     }
 

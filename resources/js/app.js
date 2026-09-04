@@ -53,31 +53,19 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// --- সুইট অ্যালার্ট (SweetAlert2) কনফার্মেশন ---
-window.confirmDeleteAction = async function (callback, options = {}) {
-    const isDarkMode = document.documentElement.classList.contains('dark')
-        || window.matchMedia('(prefers-color-scheme: dark)').matches;
+// --- Flux UI delete confirmation ---
+window.confirmDeleteAction = function (callback) {
+    window.pendingDeleteAction = callback;
+    window.Flux?.modal('delete-confirmation').show();
+};
 
-    if (!window.Swal) {
-        if (typeof callback === 'function') callback();
-        return;
-    }
+window.confirmPendingDeletion = function () {
+    const callback = window.pendingDeleteAction;
 
-    const result = await Swal.fire({
-        title: options.title ?? 'Are you sure?',
-        text: options.text ?? 'You will not be able to recover this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: options.confirmButtonColor ?? '#ef4444',
-        cancelButtonColor: options.cancelButtonColor ?? '#6b7280',
-        confirmButtonText: options.confirmButtonText ?? 'Yes, delete it!',
-        cancelButtonText: options.cancelButtonText ?? 'Cancel',
-        reverseButtons: options.reverseButtons ?? true,
-        background: options.background ?? (isDarkMode ? '#1f2937' : '#ffffff'),
-        color: options.color ?? (isDarkMode ? '#f3f4f6' : '#111827'),
-    });
+    window.pendingDeleteAction = null;
+    window.Flux?.modal('delete-confirmation').close();
 
-    if (result.isConfirmed && typeof callback === 'function') {
+    if (typeof callback === 'function') {
         callback();
     }
 };

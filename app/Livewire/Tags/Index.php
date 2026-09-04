@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Tags;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Tag;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use InteractsWithFluxToasts;
     use WithPagination;
 
     public string $name = '';
@@ -43,6 +45,7 @@ class Index extends Component
         $this->name = '';
         $this->resetPage();
         $this->dispatch('tagSaved', message: 'Tag added successfully.');
+        $this->toastSuccess('Tag added successfully.');
     }
 
     public function delete(int $id): void
@@ -53,6 +56,7 @@ class Index extends Component
 
         $this->resetPage();
         $this->dispatch('tagDeleted', message: 'Tag deleted successfully.');
+        $this->toastSuccess('Tag deleted successfully.');
     }
 
     public function edit(int $id): void
@@ -77,6 +81,7 @@ class Index extends Component
         $this->editingId = null;
         $this->editingName = '';
         $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
+        $this->toastSuccess('Tag updated successfully.');
     }
 
     public function cancelEdit(): void

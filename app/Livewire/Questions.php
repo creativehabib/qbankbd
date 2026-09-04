@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -13,6 +14,7 @@ use Livewire\WithPagination;
 
 class Questions extends Component
 {
+    use InteractsWithFluxToasts;
     private const QUESTION_EARNING_AMOUNT = 10;
 
     use AuthorizesRequests, WithPagination;
@@ -101,6 +103,7 @@ class Questions extends Component
         $question->forceDelete();
 
         $this->dispatch('questionDeleted', message: 'Question deleted successfully.');
+        $this->toastSuccess('Question deleted successfully.');
         $this->resetPage();
     }
 

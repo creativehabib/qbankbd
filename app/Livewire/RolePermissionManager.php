@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
@@ -10,6 +11,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionManager extends Component
 {
+    use InteractsWithFluxToasts;
     public bool $showModal = false;
 
     public ?int $editingRoleId = null;
@@ -69,6 +71,7 @@ class RolePermissionManager extends Component
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-saved', message: 'Role saved successfully.');
+        $this->toastSuccess('Role saved successfully.');
         $this->showModal = false;
     }
 
@@ -88,6 +91,7 @@ class RolePermissionManager extends Component
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-deleted', message: 'Role deleted successfully.');
+        $this->toastSuccess('Role deleted successfully.');
     }
 
     public function render(): View
