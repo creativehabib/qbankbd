@@ -44,8 +44,7 @@
 <header class="fixed inset-x-0 top-0 z-50 border-b border-sky-200/50 bg-[#f5f3ee]/90 backdrop-blur-lg dark:border-sky-700/30 dark:bg-[#0d0f1a]/90">
     <nav class="mx-auto flex h-17 w-full max-w-7xl items-center justify-between px-4 lg:px-8">
         <a href="{{ route('home') }}" class="flex items-center gap-3 text-sky-600 dark:text-sky-400">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600 text-sm font-bold text-white">প্র</span>
-            <span class="font-tiro text-xl font-bold">প্রশ্নব্যাংক</span>
+            <x-app-logo-icon />
         </a>
 
         <ul class="hidden items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300 md:flex">
@@ -381,8 +380,7 @@
         <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12">
             <div class="lg:col-span-1">
                 <a href="{{ route('home') }}" class="flex items-center gap-3 text-sky-600 dark:text-sky-400 mb-4">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 text-xs font-bold text-white">প্র</span>
-                    <span class="font-tiro text-xl font-bold">প্রশ্নব্যাংক</span>
+                   <x-app-logo-ai />
                 </a>
                 <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs">বাংলাদেশের শিক্ষার্থী ও শিক্ষকদের জন্য সেরা ডিজিটাল প্রশ্নভান্ডার ও পরীক্ষা ব্যবস্থাপনা প্ল্যাটফর্ম।</p>
             </div>

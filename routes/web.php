@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PdfGeneratorController;
 use App\Livewire\AcademicClasses\ClassIndex;
 use App\Livewire\Admin\PackageManagement;
 use App\Livewire\Admin\Settings\ThemeOptions;
@@ -104,6 +105,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/permissions', PermissionManager::class)->name('permissions.index');
         Route::get('/roles-permissions', RolePermissionManager::class)->name('roles-permissions.index');
     });
+
+    Route::get('/question-set/{id}/download-pdf', [PdfGeneratorController::class, 'downloadQuestionPaper'])
+        ->name('pdf.download')
+        ->middleware('auth');
 
     Route::get('/teacher/question-set-create', CreateQuestionSet::class)->name('question.set-create');
     Route::get('/teacher/create-question/generated-qset/{qset}', GeneratedQuestionSetPage::class)->name('qset.generated');

@@ -55,6 +55,10 @@
                                     <a href="{{ route('questions.paper', ['qset' => $questionSet->id]) }}" class="inline-flex items-center rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300" wire:navigate>
                                         Paper
                                     </a>
+                                    <a href="{{ route('pdf.download', $questionSet->id) }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                        <flux:icon.document-arrow-down class="size-4" />
+                                        {{ __('PDF ডাউনলোড করুন') }}
+                                    </a>
                                 </div>
                             </td>
                         </tr>
