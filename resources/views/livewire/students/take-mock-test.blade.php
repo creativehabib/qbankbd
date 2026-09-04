@@ -2,38 +2,35 @@
     x-data="{
         endTime: Date.now() + ({{ $remainingSeconds }} * 1000),
         timeRemaining: {{ $remainingSeconds }},
+        answers: @js($answers),
+        isSubmitting: false,
         timerInterval: null,
         isSubmitting: false,
         selectedAnswers: {{ Js::from($answers) }},
         formattedTime() {
             if (this.timeRemaining <= 0) return '00:00';
-
-            const minutes = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
-            const seconds = (this.timeRemaining % 60).toString().padStart(2, '0');
-
-            return minutes + ':' + seconds;
-        },
-        updateTimer() {
-            this.timeRemaining = Math.max(0, Math.ceil((this.endTime - Date.now()) / 1000));
-
-            if (this.timeRemaining === 0) {
-                clearInterval(this.timerInterval);
-                this.submitExam();
-            }
+            let m = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
+            let s = (this.timeRemaining % 60).toString().padStart(2, '0');
+            return m + ':' + s;
         },
         startTimer() {
-            this.updateTimer();
-            this.timerInterval = setInterval(() => this.updateTimer(), 1000);
+            this.timerInterval = setInterval(() => {
+                if (this.timeRemaining > 0) {
+                    this.timeRemaining--;
+                } else {
+                    clearInterval(this.timerInterval);
+                    this.submit();
+                }
+            }, 1000);
         },
-        submitExam() {
+        submit() {
             if (this.isSubmitting) return;
 
             this.isSubmitting = true;
-            $wire.submitExam();
-        }
+            $wire.submitExam(this.answers);
+        },
     }"
-    x-init="startTimer()"
-    x-on:beforeunload.window="clearInterval(timerInterval)"
+    x-init="startTimer()" x-on:beforeunload.window="clearInterval(timerInterval)"
     class="min-h-screen bg-gray-50 pb-20 dark:bg-[var(--app-dark-bg)]"
 >
     <!-- স্টিকি হেডার (টাইমার সহ) -->
@@ -70,16 +67,14 @@
                             @php($optionText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? ''))
 
                             <!-- রেডিও বাটন এবং অপশন কার্ড -->
-                            <label
-                                class="group relative flex cursor-pointer items-start gap-4 rounded-xl border border-zinc-200 p-4 transition-all hover:border-emerald-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-emerald-600 dark:hover:bg-zinc-800"
-                                :class="selectedAnswers[{{ $tq->id }}] == {{ $optIndex }} && 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500 dark:border-emerald-500 dark:bg-emerald-900/20'"
-                            >
+                            <label class="group relative flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition-all
+                                border-zinc-200 hover:border-emerald-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-emerald-600 dark:hover:bg-zinc-800"
+                                :class="String(answers[{{ $tq->id }}]) === '{{ $optIndex }}' ? 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500 dark:border-emerald-500 dark:bg-emerald-900/20' : ''">
 
                                 <div class="flex h-6 items-center">
                                     <input
                                         type="radio"
-                                        wire:model="answers.{{ $tq->id }}"
-                                        x-model="selectedAnswers[{{ $tq->id }}]"
+                                        x-model="answers[{{ $tq->id }}]"
                                         value="{{ $optIndex }}"
                                         name="question_{{ $tq->id }}"
                                         class="h-4 w-4 border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-700"
@@ -100,12 +95,11 @@
         <div class="mt-10 mb-20 flex justify-center">
             <flux:button
                 type="button"
-                x-on:click="if (confirm('আপনি কি নিশ্চিত যে আপনি পরীক্ষাটি সাবমিট করতে চান?')) submitExam()"
-                x-bind:disabled="isSubmitting"
+                x-on:click="if (confirm('আপনি কি নিশ্চিত যে আপনি পরীক্ষাটি সাবমিট করতে চান?')) submit()"
                 variant="primary"
                 class="w-full max-w-sm py-4 text-lg shadow-lg"
             >
-                <x-heroicon-s-check-circle class="size-6" />
+                <flux:icon.check-circle class="size-6" />
                 {{ __('পরীক্ষা জমা দিন') }}
             </flux:button>
         </div>
