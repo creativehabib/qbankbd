@@ -12,6 +12,7 @@ use App\Models\Tag;
 use App\Models\Topic;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -337,18 +338,18 @@ class Edit extends Component
 
             // 🚀 ─── অটো-রিমুভাল লজিক ───
             // এই প্রশ্ন সংক্রান্ত স্টুডেন্টদের করা সব ওপেন রিপোর্ট এক ক্লিকে সমাধান (Resolved) করে দেওয়া হলো
-            if (\Schema::hasTable('question_reports')) {
+            if (Schema::hasTable('question_reports')) {
                 DB::table('question_reports')
                     ->where('question_id', $this->question->id)
                     ->where('is_resolved', false)
                     ->update([
                         'is_resolved' => true,
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
             }
         });
 
-        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'questions.index';
+        $route = auth()->user()->isTeacher() ? 'questions.index' : 'questions.index';
 
         return redirect()->route($route)->with('success', 'Question updated successfully.');
     }
