@@ -3,6 +3,9 @@
 namespace App\Livewire\Students;
 
 use App\Models\MockTest;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class TakeMockTest extends Component
@@ -17,7 +20,7 @@ class TakeMockTest extends Component
     // আর কত সেকেন্ড বাকি আছে
     public int $remainingSeconds = 0;
 
-    public function mount($testId)
+    public function mount(int $testId): ?RedirectResponse
     {
         // মক টেস্টটি খুঁজে বের করা এবং ভেরিফাই করা যে এটি এই স্টুডেন্টেরই কিনা
         $this->mockTest = MockTest::where('id', $testId)
@@ -35,8 +38,7 @@ class TakeMockTest extends Component
 
         // যদি সময় আগেই শেষ হয়ে গিয়ে থাকে, তবে সাথে সাথে সাবমিট করে দেওয়া
         if ($this->remainingSeconds <= 0) {
-            $this->submitExam();
-            return;
+            return $this->submitExam();
         }
 
         // প্রশ্নগুলো লোড করা
@@ -49,64 +51,73 @@ class TakeMockTest extends Component
                 $this->answers[$tq->id] = $tq->user_answer;
             }
         }
+
+        return null;
     }
 
-    public function submitExam()
+    /**
+     * Persist the answers only once, when the student submits the test.
+     *
+     * @param  array<int|string, int|string>  $answers
+     */
+    public function submitExam(array $answers = []): RedirectResponse
     {
-        // পরীক্ষা শেষ হওয়ার লজিক
-        $correctCount = 0;
-        $wrongCount = 0;
+        $submittedAnswers = $answers === [] ? $this->answers : $answers;
 
-        // লাইভওয়্যার যেন null না দেয়, তাই সাবমিটের সময় প্রশ্নগুলো আবার লোড করে নেওয়া হলো
-        $questions = $this->mockTest->testQuestions()->with('question')->get();
+        DB::transaction(function () use ($submittedAnswers): void {
+            $mockTest = MockTest::query()
+                ->whereKey($this->mockTest->id)
+                ->where('user_id', auth()->id())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        foreach ($questions as $testQuestion) {
-            $userAnsIndex = $this->answers[$testQuestion->id] ?? null;
-            $isCorrect = false;
-
-            if ($userAnsIndex !== null && $userAnsIndex !== '') {
-                $options = collect($testQuestion->question->extra_content ?? [])->take(4);
-                $selectedOption = $options[$userAnsIndex] ?? null;
-
-                if ($selectedOption && ! empty($selectedOption['is_correct'])) {
-                    $isCorrect = true;
-                    $correctCount++;
-                } else {
-                    $wrongCount++;
-                }
+            if ($mockTest->status === 'completed') {
+                return;
             }
 
-            $testQuestion->update([
-                'user_answer' => $userAnsIndex,
-                'is_correct' => $isCorrect,
+            $correctCount = 0;
+            $wrongCount = 0;
+            $testQuestions = $mockTest->testQuestions()->with('question')->get();
+
+            foreach ($testQuestions as $testQuestion) {
+                $userAnswerIndex = $submittedAnswers[$testQuestion->id] ?? null;
+                $isCorrect = false;
+
+                if ($userAnswerIndex !== null && $userAnswerIndex !== '') {
+                    $options = collect($testQuestion->question->extra_content ?? [])->take(4);
+                    $selectedOption = $options[(int) $userAnswerIndex] ?? null;
+                    $isCorrect = (bool) ($selectedOption['is_correct'] ?? false);
+
+                    if ($isCorrect) {
+                        $correctCount++;
+                    } else {
+                        $wrongCount++;
+                    }
+                }
+
+                $testQuestion->update([
+                    'user_answer' => $userAnswerIndex,
+                    'is_correct' => $isCorrect,
+                ]);
+            }
+
+            $mockTest->update([
+                'correct_answers' => $correctCount,
+                'wrong_answers' => $wrongCount,
+                'total_score' => $correctCount,
+                'status' => 'completed',
+                'completed_at' => now(),
             ]);
-        }
 
-        // ১. মূল মক টেস্ট আপডেট করা
-        $this->mockTest->update([
-            'correct_answers' => $correctCount,
-            'wrong_answers' => $wrongCount,
-            'total_score' => $correctCount,
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
+            if ($correctCount > 0) {
+                $mockTest->user()->increment('xp', $correctCount * 10);
+            }
+        });
 
-        // ==================================================
-        // ২. এখানে XP যোগ করার লজিক (নতুন যুক্ত করা হয়েছে)
-        // ==================================================
-        $earnedXp = ($correctCount * 10); // প্রতিটি সঠিক উত্তরের জন্য ১০ XP
-
-        if ($earnedXp > 0) {
-            $user = auth()->user();
-            $user->increment('xp', $earnedXp);
-        }
-        // ==================================================
-
-        // ৩. পরীক্ষা শেষে রেজাল্ট পেজে রিডাইরেক্ট
         return redirect()->route('student.mock-test.result', ['testId' => $this->mockTest->id]);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.students.take-mock-test', [
             'subjectName' => $this->mockTest->subject?->name ?? 'Mixed Subjects',

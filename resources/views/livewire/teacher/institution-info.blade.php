@@ -11,9 +11,9 @@
     @endif
 
     <form wire:submit="save" class="space-y-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-        <flux:input wire:model="institutionName" label="প্রতিষ্ঠানের নাম" placeholder="যেমন: ঢাকা কলেজ" />
-        <flux:input wire:model="institutionType" label="প্রতিষ্ঠানের ধরন" placeholder="যেমন: কলেজ / স্কুল / মাদ্রাসা" />
-        <flux:textarea wire:model="institutionAddress" label="প্রতিষ্ঠানের ঠিকানা" rows="4" />
+        <flux:input wire:model.live.blur="institutionName" label="প্রতিষ্ঠানের নাম" placeholder="যেমন: ঢাকা কলেজ" />
+        <flux:input wire:model.live.blur="institutionType" label="প্রতিষ্ঠানের ধরন" placeholder="যেমন: কলেজ / স্কুল / মাদ্রাসা" />
+        <flux:textarea wire:model.live.blur="institutionAddress" label="প্রতিষ্ঠানের ঠিকানা" rows="4" />
 
         <div class="flex justify-end">
             <flux:button type="submit" variant="primary">আপডেট করুন</flux:button>
