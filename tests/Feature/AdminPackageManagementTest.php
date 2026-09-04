@@ -37,3 +37,13 @@ it('admin can create update and delete package', function () {
 
     expect(Package::query()->whereKey($package->id)->exists())->toBeFalse();
 });
+
+it('package management uses Flux UI controls', function () {
+    $view = file_get_contents(base_path('resources/views/livewire/admin/package-management.blade.php'));
+
+    expect($view)
+        ->toContain('<flux:field')
+        ->toContain('<flux:input')
+        ->toContain('<flux:checkbox')
+        ->toContain('<flux:button');
+});
