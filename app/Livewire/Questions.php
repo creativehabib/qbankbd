@@ -165,9 +165,11 @@ class Questions extends Component
             ->when($this->quickFilter === 'pending', fn ($q) => $q->where('status', 'pending'))
             ->when($this->search, function ($q) {
                 $search = '%'.$this->search.'%';
-                $q->where('title', 'like', $search)
-                    ->orWhereRelation('subject', 'name', 'like', $search)
-                    ->orWhereRelation('topic', 'name', 'like', $search);
+                $q->where(function ($query) use ($search): void {
+                    $query->where('title', 'like', $search)
+                        ->orWhereRelation('subject', 'name', 'like', $search)
+                        ->orWhereRelation('topic', 'name', 'like', $search);
+                });
             })
             ->when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->topicId, fn ($q) => $q->where('topic_id', $this->topicId))

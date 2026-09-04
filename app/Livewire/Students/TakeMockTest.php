@@ -3,8 +3,8 @@
 namespace App\Livewire\Students;
 
 use App\Models\MockTest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -57,9 +57,16 @@ class TakeMockTest extends Component
         return null;
     }
 
-    public function submitExam(): RedirectResponse
+    /**
+     * Persist the answers only once, when the student submits the test.
+     *
+     * @param  array<int|string, int|string>  $answers
+     */
+    public function submitExam(array $answers = []): RedirectResponse
     {
-        DB::transaction(function (): void {
+        $submittedAnswers = $answers === [] ? $this->answers : $answers;
+
+        DB::transaction(function () use ($submittedAnswers): void {
             $mockTest = MockTest::query()
                 ->whereKey($this->mockTest->id)
                 ->where('user_id', auth()->id())
@@ -72,18 +79,18 @@ class TakeMockTest extends Component
 
             $correctCount = 0;
             $wrongCount = 0;
+            $testQuestions = $mockTest->testQuestions()->with('question')->get();
 
-            foreach ($mockTest->testQuestions()->with('question')->get() as $testQuestion) {
-                $userAnswerIndex = $this->answers[$testQuestion->id] ?? null;
+            foreach ($testQuestions as $testQuestion) {
+                $userAnswerIndex = $submittedAnswers[$testQuestion->id] ?? null;
                 $isCorrect = false;
 
                 if ($userAnswerIndex !== null && $userAnswerIndex !== '') {
-                    $selectedOption = collect($testQuestion->question->extra_content ?? [])
-                        ->take(4)
-                        ->get($userAnswerIndex);
+                    $options = collect($testQuestion->question->extra_content ?? [])->take(4);
+                    $selectedOption = $options[(int) $userAnswerIndex] ?? null;
+                    $isCorrect = (bool) ($selectedOption['is_correct'] ?? false);
 
-                    if ($selectedOption && ! empty($selectedOption['is_correct'])) {
-                        $isCorrect = true;
+                    if ($isCorrect) {
                         $correctCount++;
                     } else {
                         $wrongCount++;
@@ -104,21 +111,15 @@ class TakeMockTest extends Component
                 'completed_at' => now(),
             ]);
 
-            auth()->user()?->increment('xp', $correctCount * 10);
-            $this->mockTest = $mockTest;
+            if ($correctCount > 0) {
+                $mockTest->user()->increment('xp', $correctCount * 10);
+            }
         });
 
         return redirect()->route('student.mock-test.result', ['testId' => $this->mockTest->id]);
     }
 
-    private function testQuestions(): Collection
-    {
-        return $this->mockTest->testQuestions()
-            ->with('question')
-            ->get();
-    }
-
-    public function render()
+    public function render(): View
     {
         return view('livewire.students.take-mock-test', [
             'subjectName' => $this->mockTest->subject?->name ?? 'Mixed Subjects',

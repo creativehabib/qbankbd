@@ -270,7 +270,7 @@
                             @if($level === 'subjects' || $level === 'chapters')
                                 <div class="relative">
                                     <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                                    <input type="text" wire:model.live.debounce.150ms="search" placeholder="খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                                    <input type="text" wire:model.live.debounce.500ms="search" placeholder="খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                                 </div>
                             @endif
 
@@ -497,7 +497,7 @@
 
                 <div class="relative mb-5">
                     <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                    <input type="text" wire:model.live.debounce.250ms="filterSearch" placeholder="প্রশ্ন লিখে খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                    <input type="text" wire:model.live.debounce.500ms="filterSearch" placeholder="প্রশ্ন লিখে খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                 </div>
 
                 <div class="max-h-[calc(100vh-320px)] space-y-5 overflow-y-auto pr-1">
@@ -609,7 +609,7 @@
 
                     <div class="relative mb-5">
                         <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                        <input type="text" wire:model.live.debounce.250ms="filterSearch" placeholder="প্রশ্ন লিখে খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                        <input type="text" wire:model.live.debounce.500ms="filterSearch" placeholder="প্রশ্ন লিখে খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                     </div>
 
                     <div class="max-h-[calc(100vh-400px)] space-y-5 overflow-y-auto pr-1">
