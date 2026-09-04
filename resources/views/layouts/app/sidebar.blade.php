@@ -14,7 +14,7 @@
             'icon' => 'circle-stack',
             'flyout' => 'question-bank',
             'active' => request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
-            'visible' => true,
+            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
             'items' => [
                 ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'visible' => true],
                 ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
@@ -31,7 +31,7 @@
             'route' => 'question.set-create',
             'match' => 'question.set-create',
             'icon' => 'plus-circle',
-            'visible' => true,
+            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
         ],
         [
             'type' => 'link',
@@ -55,7 +55,7 @@
             'route' => 'student.omr-scanner',
             'match' => 'student.omr-scanner',
             'icon' => 'viewfinder-circle',
-            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin', 'student']),
+            'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
         ],
         [
             'type' => 'link',
@@ -167,8 +167,6 @@
             ]
         ],
     ];
-
-    $pageTitle = $title ?? $pageTitle ?? 'Dashboard';
 @endphp
 
     <!DOCTYPE html>
@@ -178,305 +176,223 @@
 </head>
 <body
     x-data="{
-        mobileSidebarOpen: false,
-        sidebarCollapsed: JSON.parse(localStorage.getItem('sidebar-collapsed') ?? 'false'),
-        activeFlyout: null,
-        flyoutCloseTimer: null,
-        profileMenuOpen: false,
-        collapsedProfileMenuOpen: false,
-        pageLoading: false,
-        theme: localStorage.getItem('theme') ?? (document.documentElement.classList.contains('dark') ? 'dark' : 'light'),
-        setTheme(mode) {
-            this.theme = mode;
-            localStorage.setItem('theme', mode);
-            document.documentElement.classList.toggle('dark', mode === 'dark');
-        },
-        toggleTheme() {
-            this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
-        }
-    }"
-    x-init="$watch('sidebarCollapsed', (value) => { localStorage.setItem('sidebar-collapsed', JSON.stringify(value)); if (! value) { activeFlyout = null; collapsedProfileMenuOpen = false; } }); setTheme(theme); window.addEventListener('beforeunload', () => pageLoading = true); document.addEventListener('livewire:navigating', () => pageLoading = true); document.addEventListener('livewire:navigated', () => pageLoading = false);"
-    @click.capture="if ($event.target.closest('a[wire\\:navigate]')) { pageLoading = true; }"
-    class="min-h-screen bg-gray-50 print:bg-white dark:bg-[var(--app-dark-bg)]"
+            settingsOpen: false,
+            helpOpen: false,
+            mode: localStorage.getItem('flux.appearance') || localStorage.getItem('theme') || 'system',
+            applyAppearance(selected) {
+                this.mode = selected;
+
+                if (this.$flux) {
+                    this.$flux.appearance = selected;
+                }
+
+                if (selected === 'dark') {
+                    localStorage.setItem('theme', 'dark');
+                    localStorage.setItem('flux.appearance', 'dark');
+                    document.documentElement.classList.add('dark');
+                } else if (selected === 'light') {
+                    localStorage.setItem('theme', 'light');
+                    localStorage.setItem('flux.appearance', 'light');
+                    document.documentElement.classList.remove('dark');
+                } else {
+                    localStorage.removeItem('theme');
+                    localStorage.setItem('flux.appearance', 'system');
+                    document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+                }
+
+                window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: selected } }));
+            }
+        }"
+    x-on:keydown.escape.window="settingsOpen = false; helpOpen = false"
+    class="min-h-screen bg-white dark:bg-zinc-800 flex"
 >
-<div class="flex min-h-screen">
-    <aside class="fixed inset-y-0 left-0 z-40 hidden flex-col border-e border-zinc-200 bg-zinc-50 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:flex" :class="sidebarCollapsed ? 'w-16' : 'w-72'" data-test="desktop-sidebar">
-        <div class="flex items-center justify-between border-b border-zinc-200 px-3 py-3 dark:border-[var(--app-dark-border)]">
-            <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate x-show="! sidebarCollapsed" />
-            <button type="button" class="rounded-md border border-zinc-300 p-2 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800" @click="sidebarCollapsed = ! sidebarCollapsed" data-test="sidebar-collapse-button" title="Toggle sidebar">
-                <x-heroicon-o-bars-3-bottom-left class="size-5" />
-            </button>
-        </div>
 
-        <nav class="relative flex-1 space-y-2 p-2" :class="sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto'" data-test="sidebar-nav">
 
-            <template x-if="! sidebarCollapsed">
-                <div class="space-y-2">
-                    @foreach($menuItems as $item)
-                        @if($item['visible'])
-                            @if($item['type'] === 'link')
-                                <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
-                                    <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
-                                        {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Full Sidebar) 🌟 --}}
-                                        @if($item['icon'] === 'custom-omr-frame')
-                                            <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
-                                        @else
-                                            <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                        @endif
-                                    </span>
-                                    <span>{{ $item['label'] }}</span>
-                                </a>
-                            @elseif($item['type'] === 'group')
-                                <div x-data="{ open: {{ $item['active'] ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                                    <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-800" @click="open = ! open">
-                                        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                                            <span class="inline-flex h-5 w-5 items-center justify-center opacity-90">
-                                                <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                            </span>
-                                            <span class="text-zinc-800 dark:text-zinc-100">{{ $item['label'] }}</span>
-                                        </div>
-                                        <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
-                                    </button>
-                                    <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 mt-1 dark:border-zinc-700">
-                                        @foreach($item['items'] as $subItem)
-                                            @if($subItem['visible'])
-                                                <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 text-sm {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        @endif
-                    @endforeach
-                </div>
-            </template>
+<flux:header sticky collapsible="mobile" class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
+    <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
-            <template x-if="sidebarCollapsed">
-                <div class="space-y-2">
-                    @foreach($menuItems as $item)
-                        @if($item['visible'])
-                            @if($item['type'] === 'link')
-                                <a href="{{ route($item['route']) }}" class="flex h-10 items-center justify-center rounded-lg {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" title="{{ $item['label'] }}" wire:navigate>
-                                    {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Collapsed Sidebar) 🌟 --}}
-                                    @if($item['icon'] === 'custom-omr-frame')
-                                        <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
-                                    @else
-                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                    @endif
-                                </a>
-                            @elseif($item['type'] === 'group')
-                                <div class="relative">
-                                    <button type="button" class="flex h-10 w-full items-center justify-center rounded-lg {{ $item['active'] ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-emerald-600 dark:text-emerald-400' }}" title="{{ $item['label'] }}" @mouseenter="clearTimeout(flyoutCloseTimer); activeFlyout = '{{ $item['flyout'] }}'" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click="activeFlyout = activeFlyout === '{{ $item['flyout'] }}' ? null : '{{ $item['flyout'] }}'">
-                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                    </button>
+    <flux:navbar class="-mb-px max-lg:hidden">
+        <flux:navbar.item icon="inbox" badge="12" href="#">{{ __('Inbox') }}</flux:navbar.item>
+        <flux:separator vertical variant="subtle" class="my-2"/>
+        <flux:dropdown class="max-lg:hidden">
+            <flux:navbar.item icon:trailing="chevron-down">{{__('Favorites')}}</flux:navbar.item>
+            <flux:navmenu>
+                <flux:navmenu.item href="#">{{__('Marketing site')}}</flux:navmenu.item>
+                <flux:navmenu.item href="#">{{__('Android app')}}</flux:navmenu.item>
+                <flux:navmenu.item href="#">{{ __('Brand guidelines') }}</flux:navmenu.item>
+            </flux:navmenu>
+        </flux:dropdown>
+    </flux:navbar>
+    <flux:spacer />
+    <flux:navbar class="me-4">
+        <flux:navbar.item icon="magnifying-glass" href="#" label="Search" />
+        {{--        <livewire:layout.notification-menu wire:key="header-notification-menu" />--}}
+        {{--        <livewire:layout.language-switcher wire:key="header-language-switcher" />--}}
+        <flux:navbar.item icon="globe-alt" :href="route('home')" target="_blank" label="{{ __('Visit Website') }}" />
+        <flux:button type="button" variant="ghost" icon="cog-6-tooth" class="max-lg:hidden" x-on:click="settingsOpen = true" aria-label="{{ __('Open settings') }}" />
+    </flux:navbar>
 
-                                    <div x-show="activeFlyout === '{{ $item['flyout'] }}'" x-transition @mouseenter="clearTimeout(flyoutCloseTimer)" @mouseleave="flyoutCloseTimer = setTimeout(() => activeFlyout = null, 140)" @click.outside="activeFlyout = null" class="absolute left-full top-0 z-[70] ml-2 w-48 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900" style="display:none;">
-                                        <p class="mb-2 text-sm font-semibold">{{ $item['label'] }}</p>
-                                        <div class="space-y-1 text-sm">
-                                            @foreach($item['items'] as $subItem)
-                                                @if($subItem['visible'])
-                                                    <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        @endif
-                    @endforeach
-                </div>
-            </template>
-        </nav>
+    <flux:dropdown align="end">
+        <flux:profile
+            :initials="auth()->user()->initials()"
+            :avatar="filled(auth()->user()->picture) ? asset('storage/' . auth()->user()->picture) : null"
+        />
 
-        <div class="mt-auto border-t border-zinc-200 p-3 dark:border-[var(--app-dark-border)]">
-            <div x-show="! sidebarCollapsed"><x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" /></div>
-            <div x-show="sidebarCollapsed" class="relative flex justify-center" @click.outside="collapsedProfileMenuOpen = false">
-                <button
-                    type="button"
-                    class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 transition hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
-                    @click="collapsedProfileMenuOpen = ! collapsedProfileMenuOpen"
-                    data-test="collapsed-profile-menu-button"
-                    title="{{ auth()->user()->name }}"
-                >
-                    {{ auth()->user()->initials() }}
-                </button>
-
-                <div
-                    x-show="collapsedProfileMenuOpen"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 translate-x-1 scale-95"
-                    x-transition:enter-end="opacity-100 translate-x-0 scale-100"
-                    x-transition:leave="transition ease-in duration-150"
-                    x-transition:leave-start="opacity-100 translate-x-0 scale-100"
-                    x-transition:leave-end="opacity-0 translate-x-1 scale-95"
-                    class="absolute bottom-0 left-full z-[80] ml-2 w-56 rounded-xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
-                    data-test="collapsed-profile-menu-panel"
-                >
-                    <div class="mb-2 flex items-center gap-2 rounded-lg px-2 py-2">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
-                        <div class="min-w-0">
-                            <p class="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</p>
-                            <p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p>
+        <flux:menu class="min-w-72">
+            <div class="px-3 py-3">
+                <div class="flex items-start gap-3">
+                    <div class="min-w-0 flex-1">
+                        <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
+                        <flux:text size="sm" class="truncate">{{ auth()->user()->email }}</flux:text>
+                        <div class="mt-2 flex flex-wrap gap-1.5">
                         </div>
                     </div>
-
-                    <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
-                        <x-heroicon-o-cog-8-tooth class="size-4" />
-                        {{ __('Settings') }}
-                    </a>
-
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-                            <x-heroicon-o-arrow-right-on-rectangle class="size-4" />
-                            {{ __('Log out') }}
-                        </button>
-                    </form>
                 </div>
             </div>
-        </div>
-    </aside>
 
-    <div class="relative min-h-screen flex-1" :class="sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'">
-        <header class="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200 bg-zinc-50/95 px-4 py-3 print:hidden backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:hidden">
-            <button type="button" class="inline-flex items-center rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = true" aria-label="Open mobile menu">
-                <x-heroicon-o-bars-3 class="size-5" />
-            </button>
-            <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</div>
-            <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" data-test="logout-button">{{ __('Log out') }}</button></form>
-        </header>
+            <flux:menu.separator />
 
-        <button type="button" class="fixed bottom-5 left-3 z-40 rounded-full border print:hidden border-zinc-300 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 lg:hidden" @click="mobileSidebarOpen = true" x-show="! mobileSidebarOpen" data-test="mobile-sidebar-trigger" aria-label="Open sidebar">
-            <x-heroicon-o-bars-3 class="size-6" />
-        </button>
+            <flux:menu.item :href="route('profile.edit')" icon="user" wire:navigate>
+                {{ __('Profile Settings') }}
+            </flux:menu.item>
+            <flux:menu.item :href="route('security.edit')" icon="shield-check" wire:navigate>
+                {{ __('Security') }}
+            </flux:menu.item>
+            <flux:menu.item :href="route('appearance.edit')" icon="paint-brush" wire:navigate>
+                {{ __('Appearance') }}
+            </flux:menu.item>
+            <flux:menu.item icon="cog-6-tooth" x-on:click="settingsOpen = true">
+                {{ __('Quick Settings') }}
+            </flux:menu.item>
 
-        <div x-show="mobileSidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1px] lg:hidden" @click="mobileSidebarOpen = false"></div>
+            <flux:menu.separator />
 
-        <aside x-show="mobileSidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 w-[86%] max-w-80 overflow-y-auto border-e border-zinc-200 bg-zinc-50 p-3 dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)] lg:hidden">
-            <div class="mb-4 flex items-center justify-between">
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-                <button type="button" class="rounded-md border border-zinc-300 px-2 py-1 text-zinc-700 dark:border-zinc-700 dark:text-zinc-100" @click="mobileSidebarOpen = false" aria-label="Close sidebar">✕</button>
-            </div>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <button
+                    type="submit"
+                    class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                    data-test="logout-button"
+                >
+                    <flux:icon.arrow-right-start-on-rectangle class="size-4" />
+                    <span>{{ __('Log out') }}</span>
+                </button>
+            </form>
+        </flux:menu>
+    </flux:dropdown>
 
-            <nav class="space-y-2 text-sm">
-                @foreach($menuItems as $item)
-                    @if($item['visible'])
-                        @if($item['type'] === 'link')
-                            <a href="{{ route($item['route']) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ request()->routeIs($item['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200' }}" wire:navigate>
-                                <span class="inline-flex h-5 w-5 items-center justify-center opacity-80">
-                                    {{-- 🌟 কাস্টম আইকন হ্যান্ডেলার (Mobile Sidebar) 🌟 --}}
-                                    @if($item['icon'] === 'custom-omr-frame')
-                                        <x-omr-icon class="text-zinc-500 group-hover:text-emerald-600" />
-                                    @else
-                                        <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                    @endif
-                                </span>
-                                <span>{{ $item['label'] }}</span>
-                            </a>
-                        @elseif($item['type'] === 'group')
-                            <div x-data="{ open: {{ $item['active'] ? 'true' : 'false' }} }" class="rounded-lg p-1" :class="open ? 'border border-zinc-200 dark:border-zinc-700' : ''">
-                                <button type="button" class="flex w-full items-center justify-between rounded-md px-2 py-2 text-sm font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-800" @click="open = ! open">
-                                    <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                                        <span class="inline-flex h-5 w-5 items-center justify-center opacity-90">
-                                            <x-dynamic-component :component="'heroicon-o-' . $item['icon']" class="size-5" />
-                                        </span>
-                                        <span class="text-zinc-800 dark:text-zinc-100">{{ $item['label'] }}</span>
-                                    </div>
-                                    <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="open ? 'rotate-180' : ''" />
-                                </button>
-                                <div x-show="open" x-collapse class="space-y-1 border-s border-zinc-200 ps-3 mt-1 dark:border-zinc-700">
-                                    @foreach($item['items'] as $subItem)
-                                        @if($subItem['visible'])
-                                            <a href="{{ route($subItem['route']) }}" class="block rounded-md px-2 py-1.5 text-sm {{ request()->routeIs($subItem['match']) ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300' }}" wire:navigate>{{ $subItem['label'] }}</a>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
+</flux:header>
+
+<flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <flux:sidebar.header>
+        <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+        <flux:sidebar.collapse class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2" />
+    </flux:sidebar.header>
+
+    <flux:sidebar.nav>
+
+        <!-- start dynamic menu -->
+        @foreach($menuItems as $item)
+            @if($item['visible'])
+
+                @if($item['type'] === 'link')
+                    @if($item['icon'] === 'custom-omr-frame')
+                        <flux:sidebar.item :href="route($item['route'])" :current="request()->routeIs($item['match'])" wire:navigate>
+                            <x-slot:icon>
+                                <x-omr-icon class="size-5 text-zinc-500 group-hover:text-emerald-600" />
+                            </x-slot:icon>
+                            {{ $item['label'] }}
+                        </flux:sidebar.item>
+                    @else
+                        <flux:sidebar.item :icon="$item['icon']" :href="route($item['route'])" :current="request()->routeIs($item['match'])" wire:navigate>
+                            {{ $item['label'] }}
+                        </flux:sidebar.item>
                     @endif
-                @endforeach
-            </nav>
-        </aside>
 
-        <header class="sticky top-0 z-30 hidden items-center justify-between border-b border-zinc-200 bg-white/95 px-5 py-2 backdrop-blur dark:border-[var(--app-dark-border)] dark:bg-[var(--app-dark-panel)]/95 lg:flex" data-test="sticky-page-header">
-            <div>
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{{ $pageTitle }}</h1>
-            </div>
+                @elseif($item['type'] === 'group')
+                    <flux:sidebar.group expandable :icon="$item['icon']" :heading="$item['label']" :expanded="$item['active']" class="grid">
+                        @foreach($item['items'] as $subItem)
+                            @if($subItem['visible'])
+                                <flux:sidebar.item :href="route($subItem['route'])" :current="request()->routeIs($subItem['match'])" wire:navigate>
+                                    {{ $subItem['label'] }}
+                                </flux:sidebar.item>
+                            @endif
+                        @endforeach
+                    </flux:sidebar.group>
+                @endif
 
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    class="rounded-lg border border-zinc-200 p-2 text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
-                    @click="toggleTheme()"
-                    :title="theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'"
-                    data-test="theme-toggle-button"
-                >
-                    <x-heroicon-o-sun x-show="theme === 'dark'" class="size-5" />
-                    <x-heroicon-o-moon x-show="theme === 'light'" class="size-5" />
-                </button>
+            @endif
+        @endforeach
+        <!-- End dynamic menu -->
 
-                <div class="relative" @click.outside="profileMenuOpen = false">
-                    <button
-                        type="button"
-                        class="flex items-center gap-2 rounded-lg border border-zinc-200 px-2 py-1.5 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                        @click="profileMenuOpen = ! profileMenuOpen"
-                        data-test="profile-dropdown-button"
-                    >
-                        <span class="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
-                        <span class="text-sm font-semibold text-zinc-700 dark:text-zinc-100">{{ auth()->user()->name }}</span>
-                        <x-heroicon-o-chevron-down class="size-4 text-zinc-500 transition-transform" x-bind:class="profileMenuOpen ? 'rotate-180' : ''" />
-                    </button>
+    </flux:sidebar.nav>
 
-                    <div
-                        x-show="profileMenuOpen"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 -translate-y-2"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 -translate-y-1"
-                        class="absolute right-0 z-50 mt-2 w-64 rounded-xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
-                    >
-                        <div class="mb-2 flex items-center gap-2 rounded-lg px-2 py-2">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-200 text-xs font-semibold text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100">{{ auth()->user()->initials() }}</span>
-                            <div class="min-w-0">
-                                <p class="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</p>
-                                <p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p>
-                            </div>
+    <flux:spacer />
+
+    <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
+</flux:sidebar>
+
+<!-- Mobile User Menu -->
+<flux:header class="hidden">
+    <flux:sidebar.toggle class="hidden" icon="bars-2" inset="left" />
+
+    <flux:spacer />
+
+    <flux:dropdown position="top" align="end">
+        <flux:profile
+            :initials="auth()->user()->initials()"
+            icon-trailing="chevron-down"
+        />
+
+        <flux:menu>
+            <flux:menu.radio.group>
+                <div class="p-0 text-sm font-normal">
+                    <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                        <flux:avatar
+                            :name="auth()->user()->name"
+                            :initials="auth()->user()->initials()"
+                        />
+
+                        <div class="grid flex-1 text-start text-sm leading-tight">
+                            <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
+                            <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
                         </div>
-
-                        <a href="{{ route('profile.edit') }}" class="mb-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" wire:navigate>
-                            <x-heroicon-o-cog-8-tooth class="size-4" />
-                            {{ __('Settings') }}
-                        </a>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
-                                <x-heroicon-o-arrow-right-on-rectangle class="size-4" />
-                                {{ __('Log out') }}
-                            </button>
-                        </form>
                     </div>
                 </div>
-            </div>
-        </header>
+            </flux:menu.radio.group>
 
-        <main class="relative">
-            <div x-show="pageLoading" x-transition.opacity class="absolute inset-0 z-[80] flex items-center justify-center bg-white/65 backdrop-blur-sm dark:bg-zinc-900/70" data-test="page-loading-overlay">
-                <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-lg dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                    <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="9" class="opacity-20" stroke="currentColor" stroke-width="3"></circle>
-                        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
-                    </svg>
-                    <span>{{ __('Loading...') }}</span>
-                </div>
-            </div>
+            <flux:menu.separator />
 
-            {{ $slot }}
-        </main>
-    </div>
-</div>
+            <flux:menu.radio.group>
+                <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
+                    {{ __('Settings') }}
+                </flux:menu.item>
+            </flux:menu.radio.group>
+
+            <flux:menu.separator />
+
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item
+                    as="button"
+                    type="submit"
+                    icon="arrow-right-start-on-rectangle"
+                    class="w-full cursor-pointer"
+                    data-test="logout-button"
+                >
+                    {{ __('Log out') }}
+                </flux:menu.item>
+            </form>
+        </flux:menu>
+    </flux:dropdown>
+</flux:header>
+
+<!-- Main slot -->
+{{ $slot }}
+
+@persist('toast')
+<flux:toast />
+@endpersist
 
 @fluxScripts
 @stack('scripts')

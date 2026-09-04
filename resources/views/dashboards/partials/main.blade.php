@@ -90,15 +90,15 @@
                 {{-- ─── STUDENT DASHBOARD VIEW ────────────────────────────────── --}}
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div class="flex flex-wrap gap-2 sm:gap-4">
-                        <a href="{{ route('students.practice.index') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
+                        <a href="{{ route('students.practice.index') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
                             <flux:icon.play-circle class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Practice</span>
                         </a>
-                        <a href="{{ route('student.mistakes') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
+                        <a href="{{ route('student.mistakes') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
                             <flux:icon.exclamation-circle class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Mistakes</span>
                         </a>
-                        <a href="{{ route('student.test-history') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
+                        <a href="{{ route('student.test-history') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
                             <flux:icon.clock class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">History</span>
                         </a>

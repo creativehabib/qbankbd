@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 80" width="100%" height="100%" class="h-12 w-auto">
     <defs>
-        <!-- 🌟 Light Mode Gradient for the Ring -->
+        <!-- Light Mode Gradient for the Ring -->
         <linearGradient id="ringLight" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#0F172A" /> <!-- Slate 900 -->
             <stop offset="100%" stop-color="#334155" /> <!-- Slate 700 -->
         </linearGradient>
 
-        <!-- 🌙 Dark Mode Gradient for the Ring (Silver/White finish) -->
+        <!-- Dark Mode Gradient for the Ring (Silver/White finish) -->
         <linearGradient id="ringDark" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#F8FAFC" /> <!-- Slate 50 -->
             <stop offset="100%" stop-color="#94A3B8" /> <!-- Slate 400 -->
@@ -31,7 +31,7 @@
     </defs>
 
     <g transform="translate(10, 5)">
-        <!-- 🌟 Light Mode Ring (Hidden in Dark Mode) -->
+        <!-- Light Mode Ring (Hidden in Dark Mode) -->
         <circle cx="35" cy="35" r="22"
                 fill="none"
                 stroke="url(#ringLight)"
@@ -39,7 +39,7 @@
                 mask="url(#perfect-cutout)"
                 class="block dark:hidden" />
 
-        <!-- 🌙 Dark Mode Ring (Hidden in Light Mode) -->
+        <!-- Dark Mode Ring (Hidden in Light Mode) -->
         <circle cx="35" cy="35" r="22"
                 fill="none"
                 stroke="url(#ringDark)"

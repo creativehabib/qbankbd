@@ -12,10 +12,10 @@
 
             <div class="border-b border-zinc-200 dark:border-zinc-700">
                 <div class="grid grid-cols-2">
-                    <button type="button" wire:click="$set('activeTab', 'fast')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer transition {{ $activeTab === 'fast' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
+                    <button type="button" wire:click="$set('activeTab', 'fast')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer {{ $activeTab === 'fast' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
                         {{ __('দ্রুত অনুশীলন') }}
                     </button>
-                    <button type="button" wire:click="$set('activeTab', 'mock')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer transition {{ $activeTab === 'mock' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
+                    <button type="button" wire:click="$set('activeTab', 'mock')" class="border-b-2 px-4 py-3 text-base font-semibold cursor-pointer {{ $activeTab === 'mock' ? 'border-emerald-600 text-zinc-900 dark:text-zinc-100' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500' }}">
                         {{ __('Mock Test') }}
                     </button>
                 </div>
@@ -88,7 +88,7 @@
                                     type="button"
                                     wire:click="startMockTest"
                                     @if(!$selectedClassId || !$selectedSubjectId) disabled @endif
-                                    class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700 shadow-sm"
+                                    class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700 shadow-sm"
                                 >
                                     <flux:icon.play class="size-5" />
                                     {{ __('মক টেস্ট শুরু করুন') }} {{ $selectedSubjectId ? "($questionCount মিনিট)" : '' }}
@@ -186,22 +186,22 @@
                                                             <flux:icon.eye class="size-[18px]" />
                                                             <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
                                                         </div>
-                                                        <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition" title="Statistics">
+                                                        <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400" title="Statistics">
                                                             <flux:icon.chart-pie class="size-[18px]" />
                                                         </button>
-                                                        <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer transition {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                        <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
                                                             <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
                                                         </button>
-                                                        <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer transition {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                        <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
                                                             <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
                                                             @if($question->likes_count > 0)
                                                                 <span class="text-xs font-medium">{{ $question->likes_count }}</span>
                                                             @endif
                                                         </button>
-                                                        <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                        <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400" title="Report Error">
                                                             <flux:icon.flag class="size-[18px]" />
                                                         </button>
-                                                        <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
+                                                        <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400" title="Share">
                                                             <flux:icon.share class="size-[18px]" />
                                                         </button>
                                                     </div>
@@ -214,7 +214,7 @@
                                                         <div class="space-y-3 text-center">
                                                             <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
                                                             <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
-                                                            <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm">✨ AI Generate</button>
+                                                            <button type="button" class="rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 shadow-sm">✨ AI Generate</button>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -231,7 +231,7 @@
                             <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Select Topics for Practice') }}</h2>
                             <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                 @foreach($classes as $class)
-                                    <button type="button" wire:click="openClass({{ $class->id }})" class="flex items-center justify-between cursor-pointer gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
+                                    <button type="button" wire:click="openClass({{ $class->id }})" class="flex items-center justify-between cursor-pointer gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-left hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
                                         <div class="flex items-center gap-3">
                                             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.folder class="size-5" /></div>
                                             <div>
@@ -270,14 +270,14 @@
                             @if($level === 'subjects' || $level === 'chapters')
                                 <div class="relative">
                                     <flux:icon.magnifying-glass class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                                    <input type="text" wire:model.live.debounce.150ms="search" placeholder="খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                                    <input type="text" wire:model.live.debounce.150ms="search" placeholder="খুঁজুন..." class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2.5 pl-10 pr-4 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                                 </div>
                             @endif
 
                             @if($level === 'subjects')
                                 <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                     @foreach($subjects as $subject)
-                                        <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
+                                        <div class="group flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
 
                                             <div wire:click="openSubject({{ $subject->id }})" class="flex flex-1 items-center gap-3 cursor-pointer">
                                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"><flux:icon.book-open class="size-5" /></div>
@@ -288,10 +288,10 @@
                                             </div>
 
                                             <div class="flex shrink-0 items-center">
-                                                <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="hidden items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700 group-hover:flex dark:bg-emerald-500 dark:hover:bg-emerald-600">
+                                                <button type="button" wire:click="startSubjectPractice({{ $subject->id }})" class="hidden items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 group-hover:flex dark:bg-emerald-500 dark:hover:bg-emerald-600">
                                                     <flux:icon.play class="size-3.5" /> Start
                                                 </button>
-                                                <flux:icon.chevron-right class="size-5 text-zinc-400 transition group-hover:hidden" />
+                                                <flux:icon.chevron-right class="size-5 text-zinc-400 group-hover:hidden" />
                                             </div>
                                         </div>
                                     @endforeach
@@ -307,7 +307,7 @@
                                 @else
                                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                         @foreach($chapters as $chapter)
-                                            <button type="button" wire:click="openChapter({{ $chapter->id }})" class="group flex items-center justify-between gap-3 rounded-xl cursor-pointer border border-zinc-200 bg-zinc-50 px-4 py-3 text-left transition hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
+                                            <button type="button" wire:click="openChapter({{ $chapter->id }})" class="group flex items-center justify-between gap-3 rounded-xl cursor-pointer border border-zinc-200 bg-zinc-50 px-4 py-3 text-left hover:border-emerald-500 hover:bg-emerald-50/40 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-emerald-500/60">
                                                 <div class="flex items-center gap-3">
                                                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
                                                         <x-heroicon-o-document-text class="size-5" />
@@ -317,7 +317,7 @@
                                                         <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $chapter->mcq_questions_count }} MCQ</p>
                                                     </div>
                                                 </div>
-                                                <div class="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:bg-emerald-500">
+                                                <div class="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 dark:bg-emerald-500">
                                                     <x-heroicon-s-play class="size-3.5" /> Start
                                                 </div>
                                             </button>
@@ -360,7 +360,7 @@
                                                 <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                                                        <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
+                                                        <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400">
                                                             <span>Explanation</span>
                                                             <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
                                                         </button>
@@ -370,22 +370,22 @@
                                                                 <flux:icon.eye class="size-[18px]" />
                                                                 <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
                                                             </div>
-                                                            <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition" title="Statistics">
+                                                            <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400" title="Statistics">
                                                                 <flux:icon.chart-pie class="size-[18px]" />
                                                             </button>
-                                                            <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer transition {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                            <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
                                                                 <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
                                                             </button>
-                                                            <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer transition {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                            <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
                                                                 <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
                                                                 @if($question->likes_count > 0)
                                                                     <span class="text-xs font-medium">{{ $question->likes_count }}</span>
                                                                 @endif
                                                             </button>
-                                                            <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400 transition" title="Report Error">
+                                                            <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400" title="Report Error">
                                                                 <flux:icon.flag class="size-[18px]" />
                                                             </button>
-                                                            <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition" title="Share">
+                                                            <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400" title="Share">
                                                                 <flux:icon.share class="size-[18px]" />
                                                             </button>
                                                         </div>
@@ -405,7 +405,7 @@
                                                                     <button
                                                                         type="button"
                                                                         wire:click.prevent="generateAiExplanation({{ $question->id }})"
-                                                                        class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 transition shadow-sm"
+                                                                        class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 shadow-sm"
                                                                     >
                                                                         <span>✨ AI Generate</span>
                                                                     </button>
@@ -444,7 +444,7 @@
 
         <button
             @click="filterOpen = !filterOpen"
-            class="fixed bottom-6 right-6 z-40 flex lg:hidden h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl transition hover:bg-emerald-700"
+            class="fixed bottom-6 right-6 z-40 flex lg:hidden h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xl hover:bg-emerald-700"
         >
             <flux:icon.adjustments-horizontal class="size-6" />
             @if($level === 'filtered-questions')
@@ -470,10 +470,10 @@
 
         <div
             x-show="filterOpen"
-            x-transition:enter="transform transition ease-in-out duration-300"
+            x-transition:enter="transform ease-in-out duration-300"
             x-transition:enter-start="translate-x-full"
             x-transition:enter-end="translate-x-0"
-            x-transition:leave="transform transition ease-in-out duration-300"
+            x-transition:leave="transform ease-in-out duration-300"
             x-transition:leave-start="translate-x-0"
             x-transition:leave-end="translate-x-full"
             class="fixed lg:hidden top-0 right-0 z-50 h-full w-[320px] shrink-0 overflow-y-auto bg-white dark:bg-zinc-900 shadow-2xl border-l border-zinc-200 dark:border-zinc-700"
@@ -488,7 +488,7 @@
                         <span class="flex h-2.5 w-2.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
                     @endif
                 </h3>
-                <button @click="filterOpen = false" class="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button @click="filterOpen = false" class="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800">
                     <flux:icon.x-mark class="size-5" />
                 </button>
             </div>
@@ -509,15 +509,15 @@
                         <div x-show="open" x-collapse x-cloak class="mt-3 space-y-3">
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" value="mcq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">বহুনির্বাচনী (MCQ)</span>
+                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">বহুনির্বাচনী (MCQ)</span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" value="cq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">রচনামূলক (CQ)</span>
+                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">রচনামূলক (CQ)</span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" value="mcq+cq" wire:model.live="filterQuestionTypes" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">MCQ + CQ</span>
+                                <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">MCQ + CQ</span>
                             </label>
                         </div>
                     </div>
@@ -533,7 +533,7 @@
                             @foreach($filterOptions['classes'] as $id => $name)
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" value="{{ $id }}" wire:model.live="filterClasses" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">{{ $name }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -550,7 +550,7 @@
                             @foreach($filterOptions['subjects'] as $id => $name)
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" value="{{ $id }}" wire:model.live="filterSubjects" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">{{ $name }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -567,7 +567,7 @@
                             @foreach($filterOptions['teachers'] as $id => $name)
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" value="{{ $id }}" wire:model.live="filterTeachers" class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600" />
-                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100 transition">{{ $name }}</span>
+                                    <span class="text-sm text-zinc-600 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-100">{{ $name }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -583,7 +583,7 @@
                             confirmButtonText: 'হ্যাঁ, মুছুন',
                             confirmButtonColor: '#10b981'
                         })"
-                        class="w-full flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        class="w-full flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                     >
                         <flux:icon.arrow-path class="size-4" />
                         সব ফিল্টার মুছুন
