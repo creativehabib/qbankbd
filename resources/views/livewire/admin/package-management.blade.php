@@ -1,47 +1,95 @@
 <div class="space-y-5">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold">Package Management</h1>
-        <button wire:click="resetForm" class="rounded-lg border border-zinc-300 px-4 py-2 text-sm">New Package</button>
+        <flux:heading size="xl">Package Management</flux:heading>
+        <flux:button wire:click="resetForm" variant="ghost" icon="plus">
+            New Package
+        </flux:button>
     </div>
 
     @if (session('success'))
-        <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700">{{ session('success') }}</div>
+        <flux:callout variant="success" icon="check-circle">
+            {{ session('success') }}
+        </flux:callout>
     @endif
 
-    <div class="rounded-xl border border-zinc-200 bg-white p-5">
-        <h2 class="mb-4 text-lg font-semibold">{{ $editingId ? 'Edit Package' : 'Create Package' }}</h2>
-        <div class="grid gap-3 md:grid-cols-2">
-            <input wire:model="name" class="rounded-lg border border-zinc-300 px-3 py-2" placeholder="Package name" />
-            <input wire:model="price" type="number" step="0.01" class="rounded-lg border border-zinc-300 px-3 py-2" placeholder="Price" />
-            <input wire:model="questionCreateLimit" type="number" class="rounded-lg border border-zinc-300 px-3 py-2" placeholder="Question create limit" />
-            <input wire:model="pageViewLimit" type="number" class="rounded-lg border border-zinc-300 px-3 py-2" placeholder="Page view limit (optional)" />
-            <input wire:model="validityDays" type="number" class="rounded-lg border border-zinc-300 px-3 py-2" placeholder="Validity days" />
-            <div class="flex items-center gap-4 text-sm">
-                <label><input type="checkbox" wire:model="isAdFree"> Ad free</label>
-                <label><input type="checkbox" wire:model="isActive"> Active</label>
+    <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+        <flux:heading size="lg">{{ $editingId ? 'Edit Package' : 'Create Package' }}</flux:heading>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+            <flux:field>
+                <flux:label>Package name</flux:label>
+                <flux:input wire:model="name" placeholder="Package name" />
+                <flux:error name="name" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Price</flux:label>
+                <flux:input wire:model="price" type="number" step="0.01" min="0" placeholder="Price" />
+                <flux:error name="price" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Question creation limit</flux:label>
+                <flux:input wire:model="questionCreateLimit" type="number" min="0" placeholder="Question creation limit" />
+                <flux:error name="questionCreateLimit" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Page-view limit</flux:label>
+                <flux:input wire:model="pageViewLimit" type="number" min="0" placeholder="Optional" />
+                <flux:error name="pageViewLimit" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Validity (days)</flux:label>
+                <flux:input wire:model="validityDays" type="number" min="1" placeholder="Validity days" />
+                <flux:error name="validityDays" />
+            </flux:field>
+
+            <div class="flex items-end gap-5 pb-2">
+                <flux:checkbox wire:model="isAdFree" label="Ad free" />
+                <flux:checkbox wire:model="isActive" label="Active" />
             </div>
         </div>
-        <button wire:click="save" class="mt-4 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white">Save Package</button>
-    </div>
 
-    <div class="rounded-xl border border-zinc-200 bg-white p-4">
+        <flux:button wire:click="save" variant="primary" class="mt-5" icon="check">
+            Save Package
+        </flux:button>
+    </section>
+
+    <section class="overflow-x-auto rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800">
         <table class="min-w-full text-sm">
-            <thead><tr class="text-left text-zinc-500"><th>Name</th><th>Price</th><th>Limit</th><th>Validity</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-            @foreach($packages as $package)
-                <tr class="border-t border-zinc-200">
-                    <td class="py-2">{{ $package->name }}</td>
-                    <td class="py-2">৳{{ $package->price }}</td>
-                    <td class="py-2">{{ $package->question_create_limit }}</td>
-                    <td class="py-2">{{ $package->validity_days }} days</td>
-                    <td class="py-2">{{ $package->is_active ? 'Active' : 'Inactive' }}</td>
-                    <td class="py-2 text-right space-x-2">
-                        <button wire:click="edit({{ $package->id }})" class="rounded bg-zinc-100 px-3 py-1">Edit</button>
-                        <button wire:click="delete({{ $package->id }})" class="rounded bg-rose-100 px-3 py-1 text-rose-700">Delete</button>
-                    </td>
+            <thead>
+                <tr class="text-left text-zinc-500 dark:text-zinc-400">
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Limit</th>
+                    <th>Validity</th>
+                    <th>Status</th>
+                    <th><span class="sr-only">Actions</span></th>
                 </tr>
-            @endforeach
+            </thead>
+            <tbody>
+                @forelse ($packages as $package)
+                    <tr wire:key="package-{{ $package->id }}" class="border-t border-zinc-200 dark:border-zinc-700">
+                        <td class="py-2">{{ $package->name }}</td>
+                        <td class="py-2">৳{{ $package->price }}</td>
+                        <td class="py-2">{{ $package->question_create_limit }}</td>
+                        <td class="py-2">{{ $package->validity_days }} days</td>
+                        <td class="py-2">
+                            <flux:badge :color="$package->is_active ? 'green' : 'zinc'">{{ $package->is_active ? 'Active' : 'Inactive' }}</flux:badge>
+                        </td>
+                        <td class="space-x-2 py-2 text-right">
+                            <flux:button wire:click="edit({{ $package->id }})" size="sm" variant="ghost">Edit</flux:button>
+                            <flux:button wire:click="delete({{ $package->id }})" wire:confirm="Delete this package?" size="sm" variant="danger">Delete</flux:button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-zinc-500 dark:text-zinc-400">No packages found.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
-    </div>
+    </section>
 </div>
