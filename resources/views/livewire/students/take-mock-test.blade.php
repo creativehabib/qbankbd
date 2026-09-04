@@ -1,25 +1,39 @@
 <div
     x-data="{
+        endTime: Date.now() + ({{ $remainingSeconds }} * 1000),
         timeRemaining: {{ $remainingSeconds }},
         timerInterval: null,
+        isSubmitting: false,
+        selectedAnswers: {{ Js::from($answers) }},
         formattedTime() {
-            if (this.timeRemaining <= 0) return '00:00'; // এই লাইনটি যোগ করুন
-            let m = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
-            let s = (this.timeRemaining % 60).toString().padStart(2, '0');
-            return m + ':' + s;
+            if (this.timeRemaining <= 0) return '00:00';
+
+            const minutes = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
+            const seconds = (this.timeRemaining % 60).toString().padStart(2, '0');
+
+            return minutes + ':' + seconds;
+        },
+        updateTimer() {
+            this.timeRemaining = Math.max(0, Math.ceil((this.endTime - Date.now()) / 1000));
+
+            if (this.timeRemaining === 0) {
+                clearInterval(this.timerInterval);
+                this.submitExam();
+            }
         },
         startTimer() {
-            this.timerInterval = setInterval(() => {
-                if (this.timeRemaining > 0) {
-                    this.timeRemaining--;
-                } else {
-                    clearInterval(this.timerInterval);
-                    $wire.submitExam(); // সময় শেষ হলে অটো সাবমিট
-                }
-            }, 1000);
+            this.updateTimer();
+            this.timerInterval = setInterval(() => this.updateTimer(), 1000);
+        },
+        submitExam() {
+            if (this.isSubmitting) return;
+
+            this.isSubmitting = true;
+            $wire.submitExam();
         }
     }"
     x-init="startTimer()"
+    x-on:beforeunload.window="clearInterval(timerInterval)"
     class="min-h-screen bg-gray-50 pb-20 dark:bg-[var(--app-dark-bg)]"
 >
     <!-- স্টিকি হেডার (টাইমার সহ) -->
@@ -29,9 +43,8 @@
                 <h1 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ $subjectName }}</h1>
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $mockTest->total_questions }} টি প্রশ্ন</p>
             </div>
-া
             <!-- টাইমার ডিসপ্লে -->
-            <div class="flex items-center gap-3 rounded-full bg-red-50 px-4 py-2 text-red-600 dark:bg-red-500/10 dark:text-red-400">
+            <div class="flex items-center gap-3 rounded-full bg-red-50 px-4 py-2 text-red-600 dark:bg-red-500/10 dark:text-red-400" :class="{ 'animate-pulse': timeRemaining <= 60 }">
                 <x-heroicon-o-clock class="size-6 animate-pulse" />
                 <span class="text-xl font-mono font-bold tracking-wider" x-text="formattedTime()"></span>
             </div>
@@ -57,13 +70,16 @@
                             @php($optionText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? ''))
 
                             <!-- রেডিও বাটন এবং অপশন কার্ড -->
-                            <label class="group relative flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition-all
-                                {{ (isset($answers[$tq->id]) && $answers[$tq->id] == $optIndex) ? 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500 dark:border-emerald-500 dark:bg-emerald-900/20' : 'border-zinc-200 hover:border-emerald-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-emerald-600 dark:hover:bg-zinc-800' }}">
+                            <label
+                                class="group relative flex cursor-pointer items-start gap-4 rounded-xl border border-zinc-200 p-4 transition-all hover:border-emerald-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-emerald-600 dark:hover:bg-zinc-800"
+                                :class="selectedAnswers[{{ $tq->id }}] == {{ $optIndex }} && 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500 dark:border-emerald-500 dark:bg-emerald-900/20'"
+                            >
 
                                 <div class="flex h-6 items-center">
                                     <input
                                         type="radio"
                                         wire:model="answers.{{ $tq->id }}"
+                                        x-model="selectedAnswers[{{ $tq->id }}]"
                                         value="{{ $optIndex }}"
                                         name="question_{{ $tq->id }}"
                                         class="h-4 w-4 border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-700"
@@ -82,15 +98,16 @@
 
         <!-- সাবমিট বাটন -->
         <div class="mt-10 mb-20 flex justify-center">
-            <button
+            <flux:button
                 type="button"
-                wire:click="submitExam"
-                wire:confirm="আপনি কি নিশ্চিত যে আপনি পরীক্ষাটি সাবমিট করতে চান?"
-                class="flex w-full max-w-sm items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-4 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                x-on:click="if (confirm('আপনি কি নিশ্চিত যে আপনি পরীক্ষাটি সাবমিট করতে চান?')) submitExam()"
+                x-bind:disabled="isSubmitting"
+                variant="primary"
+                class="w-full max-w-sm py-4 text-lg shadow-lg"
             >
                 <x-heroicon-s-check-circle class="size-6" />
                 {{ __('পরীক্ষা জমা দিন') }}
-            </button>
+            </flux:button>
         </div>
     </main>
 </div>
