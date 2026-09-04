@@ -1,9 +1,12 @@
 <div
     x-data="{
+        endTime: Date.now() + ({{ $remainingSeconds }} * 1000),
         timeRemaining: {{ $remainingSeconds }},
         answers: @js($answers),
         isSubmitting: false,
         timerInterval: null,
+        isSubmitting: false,
+        selectedAnswers: {{ Js::from($answers) }},
         formattedTime() {
             if (this.timeRemaining <= 0) return '00:00';
             let m = Math.floor(this.timeRemaining / 60).toString().padStart(2, '0');
@@ -38,7 +41,7 @@
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $mockTest->total_questions }} টি প্রশ্ন</p>
             </div>
             <!-- টাইমার ডিসপ্লে -->
-            <div class="flex items-center gap-3 rounded-full bg-red-50 px-4 py-2 text-red-600 dark:bg-red-500/10 dark:text-red-400">
+            <div class="flex items-center gap-3 rounded-full bg-red-50 px-4 py-2 text-red-600 dark:bg-red-500/10 dark:text-red-400" :class="{ 'animate-pulse': timeRemaining <= 60 }">
                 <x-heroicon-o-clock class="size-6 animate-pulse" />
                 <span class="text-xl font-mono font-bold tracking-wider" x-text="formattedTime()"></span>
             </div>

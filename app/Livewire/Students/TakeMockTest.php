@@ -23,7 +23,9 @@ class TakeMockTest extends Component
     public function mount(int $testId): ?RedirectResponse
     {
         // মক টেস্টটি খুঁজে বের করা এবং ভেরিফাই করা যে এটি এই স্টুডেন্টেরই কিনা
-        $this->mockTest = MockTest::where('id', $testId)
+        $this->mockTest = MockTest::query()
+            ->with('subject:id,name')
+            ->where('id', $testId)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
@@ -42,7 +44,7 @@ class TakeMockTest extends Component
         }
 
         // প্রশ্নগুলো লোড করা
-        $this->testQuestions = $this->mockTest->testQuestions()->with('question')->get();
+        $this->testQuestions = $this->testQuestions();
 
         // আগে থেকে কোনো উত্তর দিয়ে থাকলে তা ফর্মে সেট করা (যদি রিলোড দেয়)
         // null এরর এড়াতে এখানে ?? [] ব্যবহার করা হয়েছে
