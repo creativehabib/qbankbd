@@ -6,11 +6,6 @@
         </flux:button>
     </div>
 
-    @if (session('success'))
-        <flux:callout variant="success" icon="check-circle">
-            {{ session('success') }}
-        </flux:callout>
-    @endif
 
     <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
         <flux:heading size="lg">{{ $editingId ? 'Edit Package' : 'Create Package' }}</flux:heading>
@@ -81,7 +76,7 @@
                         </td>
                         <td class="space-x-2 py-2 text-right">
                             <flux:button wire:click="edit({{ $package->id }})" size="sm" variant="ghost">Edit</flux:button>
-                            <flux:button wire:click="delete({{ $package->id }})" wire:confirm="Delete this package?" size="sm" variant="danger">Delete</flux:button>
+                            <flux:button x-data x-on:click="window.confirmDeleteAction(() => $wire.delete({{ $package->id }}))" size="sm" variant="danger">Delete</flux:button>
                         </td>
                     </tr>
                 @empty

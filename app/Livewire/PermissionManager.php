@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Permission;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 class PermissionManager extends Component
 {
+    use InteractsWithFluxToasts;
     public bool $showModal = false;
 
     public ?int $editingPermissionId = null;
@@ -63,6 +65,7 @@ class PermissionManager extends Component
 
         $this->showModal = false;
         $this->dispatch('entity-saved', message: 'Permission saved successfully.');
+        $this->toastSuccess('Permission saved successfully.');
     }
 
     public function deletePermission(int $permissionId): void
@@ -74,6 +77,7 @@ class PermissionManager extends Component
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->dispatch('entity-deleted', message: 'Permission deleted successfully.');
+        $this->toastSuccess('Permission deleted successfully.');
     }
 
     public function render(): View

@@ -394,6 +394,8 @@
 <flux:toast />
 @endpersist
 
+<x-delete-confirmation />
+
 @fluxScripts
 @stack('scripts')
 </body>

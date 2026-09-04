@@ -47,3 +47,24 @@ it('package management uses Flux UI controls', function () {
         ->toContain('<flux:checkbox')
         ->toContain('<flux:button');
 });
+
+it('sends Flux toast notifications for package mutations', function () {
+    $source = file_get_contents(base_path('app/Livewire/Admin/PackageManagement.php'));
+
+    expect($source)
+        ->toContain('use InteractsWithFluxToasts;')
+        ->toContain("toastSuccess('Package saved successfully.')")
+        ->toContain("toastSuccess('Package deleted successfully.')");
+});
+
+test('the application uses a shared Flux delete confirmation dialog', function () {
+    $dialog = file_get_contents(base_path('resources/views/components/delete-confirmation.blade.php'));
+    $helper = file_get_contents(base_path('resources/js/app.js'));
+
+    expect($dialog)
+        ->toContain('<flux:modal name="delete-confirmation"')
+        ->toContain('<flux:button variant="danger"')
+        ->and($helper)
+        ->toContain("window.Flux?.modal('delete-confirmation').show()")
+        ->toContain('window.confirmPendingDeletion');
+});

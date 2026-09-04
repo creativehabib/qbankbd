@@ -356,8 +356,7 @@
                                                 এডিট
                                             </a>
                                             <button
-                                                wire:click="deleteQuestionSet('{{ $questionSet->id }}')"
-                                                wire:confirm="আপনি কি নিশ্চিত যে এই প্রশ্ন সেটটি মুছে ফেলতে চান?"
+                                                x-data x-on:click="window.confirmDeleteAction(() => $wire.deleteQuestionSet('{{ $questionSet->id }}'))"
                                                 class="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 dark:border-red-500/40 dark:text-red-300 dark:hover:border-red-400/60 dark:hover:bg-red-500/10"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">

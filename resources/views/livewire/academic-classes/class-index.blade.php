@@ -44,7 +44,7 @@
                                 <td class="px-5 py-3">
                                     <div class="flex items-center justify-end gap-2">
                                         <flux:button wire:click="editClass({{ $academicClass->id }})" variant="ghost" size="sm" icon="pencil-square" aria-label="Edit class" />
-                                        <flux:button wire:click="deleteClass({{ $academicClass->id }})" wire:confirm="Delete this class?" variant="danger" size="sm" icon="trash" aria-label="Delete class" />
+                                        <flux:button x-data x-on:click="window.confirmDeleteAction(() => $wire.deleteClass({{ $academicClass->id }}))" variant="danger" size="sm" icon="trash" aria-label="Delete class" />
                                     </div>
                                 </td>
                             </tr>

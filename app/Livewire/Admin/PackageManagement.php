@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Package;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class PackageManagement extends Component
 {
+    use InteractsWithFluxToasts;
     public ?int $editingId = null;
 
     public string $name = '';
@@ -69,12 +71,13 @@ class PackageManagement extends Component
         );
 
         $this->resetForm();
-        session()->flash('success', 'Package saved successfully.');
+        $this->toastSuccess('Package saved successfully.');
     }
 
     public function delete(int $packageId): void
     {
         Package::query()->findOrFail($packageId)->delete();
+        $this->toastSuccess('Package deleted successfully.');
     }
 
     public function resetForm(): void

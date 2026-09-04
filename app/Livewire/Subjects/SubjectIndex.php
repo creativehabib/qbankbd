@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Subjects;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Subject;
 use Illuminate\Support\Str;
@@ -11,6 +12,7 @@ use Livewire\WithPagination;
 
 class SubjectIndex extends Component
 {
+    use InteractsWithFluxToasts;
     use WithFileUploads, WithPagination;
 
     public $search = '';
@@ -119,6 +121,7 @@ class SubjectIndex extends Component
         // সেভ হওয়ার পর মডাল বন্ধের সিগন্যাল এবং টোস্ট মেসেজ
         $this->dispatch('close-subject-modal');
         $this->dispatch('subjectSaved', message: $message);
+        $this->toastSuccess($message);
     }
 
     public function delete($id)
@@ -128,6 +131,7 @@ class SubjectIndex extends Component
             $subject->delete();
             $this->resetPage();
             $this->dispatch('subjectDeleted', message: 'Subject deleted successfully.');
+        $this->toastSuccess('Subject deleted successfully.');
         }
     }
 

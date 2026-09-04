@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Chapters;
 
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\Subject;
@@ -12,6 +13,7 @@ use Livewire\WithPagination;
 
 class ChapterIndex extends Component
 {
+    use InteractsWithFluxToasts;
     use WithFileUploads, WithPagination;
 
     public string $search = '';
@@ -130,6 +132,7 @@ class ChapterIndex extends Component
         // সেভ হওয়ার পর মডাল বন্ধের সিগন্যাল এবং টোস্ট মেসেজ
         $this->dispatch('close-chapter-modal');
         $this->dispatch('chapterSaved', message: $message);
+        $this->toastSuccess($message);
     }
 
     public function delete($id)
@@ -139,6 +142,7 @@ class ChapterIndex extends Component
             $subject->delete();
             $this->resetPage();
             $this->dispatch('subjectDeleted', message: 'Subject deleted successfully.');
+        $this->toastSuccess('Subject deleted successfully.');
         }
     }
 
