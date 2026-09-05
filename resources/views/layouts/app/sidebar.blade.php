@@ -10,7 +10,7 @@
         ],
         [
             'type' => 'group',
-            'label' => __('প্রশ্ন ভান্ডার'),
+            'label' => __('Question Bank'),
             'icon' => 'circle-stack',
             'flyout' => 'question-bank',
             'active' => request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
