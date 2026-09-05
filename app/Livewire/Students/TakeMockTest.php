@@ -43,11 +43,10 @@ class TakeMockTest extends Component
             return $this->submitExam();
         }
 
-        // প্রশ্নগুলো লোড করা
-        $this->testQuestions = $this->testQuestions();
+        // প্রশ্নগুলো লোড করা (MockTest রিলেশনশিপ থেকে)
+        $this->testQuestions = $this->mockTest->testQuestions()->with('question')->get();
 
         // আগে থেকে কোনো উত্তর দিয়ে থাকলে তা ফর্মে সেট করা (যদি রিলোড দেয়)
-        // null এরর এড়াতে এখানে ?? [] ব্যবহার করা হয়েছে
         foreach ($this->testQuestions ?? [] as $tq) {
             if ($tq->user_answer !== null) {
                 $this->answers[$tq->id] = $tq->user_answer;

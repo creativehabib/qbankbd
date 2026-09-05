@@ -16,13 +16,13 @@
             'active' => request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
             'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
             'items' => [
-                ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'visible' => true],
-                ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
-                ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
-                ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
-                ['label' => __('Chapter'), 'route' => 'chapters.index', 'match' => 'chapters.*', 'visible' => auth()->user()->hasAnyPermission(['chapters.manage'])],
-                ['label' => __('Topics'), 'route' => 'topics.index', 'match' => 'topics.*', 'visible' => auth()->user()->hasAnyPermission(['topics.manage'])],
-                ['label' => __('Tags'), 'route' => 'tags.index', 'match' => 'tags.*', 'visible' => auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete'])],
+                ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'icon' => 'document-text', 'visible' => true],
+                ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'icon' => 'folder', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
+                ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'icon' => 'academic-cap', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
+                ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'icon' => 'book-open', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
+                ['label' => __('Chapter'), 'route' => 'chapters.index', 'match' => 'chapters.*', 'icon' => 'bookmark', 'visible' => auth()->user()->hasAnyPermission(['chapters.manage'])],
+                ['label' => __('Topics'), 'route' => 'topics.index', 'match' => 'topics.*', 'icon' => 'hashtag', 'visible' => auth()->user()->hasAnyPermission(['topics.manage'])],
+                ['label' => __('Tags'), 'route' => 'tags.index', 'match' => 'tags.*', 'icon' => 'tag', 'visible' => auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete'])],
             ]
         ],
         [
@@ -116,17 +116,17 @@
         [
             'type' => 'group',
             'label' => __('Administration'),
-            'icon' => 'cog-8-tooth',
+            'icon' => 'shield-check',
             'flyout' => 'admin',
             'active' => request()->routeIs(['users.*', 'admin.theme-options', 'admin.wallet-approvals', 'admin.packages', 'permissions.*', 'roles-permissions.*']),
             'visible' => auth()->user()->hasPermission('users.manage_roles') || auth()->user()->hasPermission('users.manage_permissions'),
             'items' => [
-                ['label' => __('User Management'), 'route' => 'users.index', 'match' => 'users.*', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-                ['label' => __('Theme Options'), 'route' => 'admin.theme-options', 'match' => 'admin.theme-options', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-                ['label' => __('Wallet Approvals'), 'route' => 'admin.wallet-approvals', 'match' => 'admin.wallet-approvals', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-                ['label' => __('Package Management'), 'route' => 'admin.packages', 'match' => 'admin.packages', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
-                ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
-                ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
+                ['label' => __('User Management'), 'route' => 'users.index', 'match' => 'users.*', 'icon' => 'users', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Theme Options'), 'route' => 'admin.theme-options', 'match' => 'admin.theme-options', 'icon' => 'paint-brush', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Wallet Approvals'), 'route' => 'admin.wallet-approvals', 'match' => 'admin.wallet-approvals', 'icon' => 'banknotes', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Package Management'), 'route' => 'admin.packages', 'match' => 'admin.packages', 'icon' => 'cube', 'visible' => auth()->user()->hasPermission('users.manage_roles')],
+                ['label' => __('Permissions'), 'route' => 'permissions.index', 'match' => 'permissions.*', 'icon' => 'key', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
+                ['label' => __('Roles & Permissions'), 'route' => 'roles-permissions.index', 'match' => 'roles-permissions.*', 'icon' => 'lock-closed', 'visible' => auth()->user()->hasPermission('users.manage_permissions')],
             ]
         ],
         [
@@ -156,16 +156,49 @@
         [
             'type' => 'group',
             'label' => __('OMR'),
-            'icon' => 'circle-stack',
-            'flyout' => 'question-bank',
+            'icon' => 'document-check',
+            'flyout' => 'omr-bank',
             'active' => request()->routeIs(['tokens.*', 'omr.*']),
             'visible' => true,
             'items' => [
-                ['label' => __('Token List'), 'route' => 'tokens.list', 'match' => 'tokens.*', 'visible' => true],
-                ['label' => __('Token Map'), 'route' => 'tokens.map-answers', 'match' => 'tokens.*', 'visible' => auth()->user()->hasAnyPermission(['tokens.map-answers'])],
-                ['label' => __('OMR'), 'route' => 'omr.evaluate', 'match' => 'omr.*', 'visible' => auth()->user()->hasAnyPermission(['omr.evaluate'])],
+                ['label' => __('Token List'), 'route' => 'tokens.list', 'match' => 'tokens.*', 'icon' => 'ticket', 'visible' => true],
+                ['label' => __('Token Map'), 'route' => 'tokens.map-answers', 'match' => 'tokens.*', 'icon' => 'map-pin', 'visible' => auth()->user()->hasAnyPermission(['tokens.map-answers'])],
+                ['label' => __('OMR'), 'route' => 'omr.evaluate', 'match' => 'omr.*', 'icon' => 'check-badge', 'visible' => auth()->user()->hasAnyPermission(['omr.evaluate'])],
             ]
         ],
+        [
+            'type'  => 'group',
+            'label' =>  __('Settings'),
+            'icon'  =>  'cog-8-tooth',
+            'flyout'   => 'settings',
+            'active'    => request()->routeIs([]),
+            'visible'   => true,
+            'items'     => [
+                ['label' => __('General Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'adjustments-horizontal', 'visible' => true],
+                ['label' => __('Brand Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'sparkles', 'visible' => true],
+                ['label' => __('Email Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'envelope', 'visible' => true],
+                ['label' => __('AI Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'cpu-chip', 'visible' => true],
+                ['label' => __('Languages'), 'route' => 'dashboard', 'match' => '', 'icon' => 'language', 'visible' => true],
+                ['label' => __('Website Tracking'), 'route' => 'dashboard', 'match' => '', 'icon' => 'chart-bar', 'visible' => true],
+                ['label' => __('User Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'user-group', 'visible' => true],
+            ]
+        ],
+        [
+            'type'  => 'group',
+            'label' =>  __('System Settings'),
+            'icon'  =>  'server-stack',
+            'flyout'   => 'system-settings',
+            'active'    => request()->routeIs([]),
+            'visible'   => true,
+            'items'     => [
+                ['label' => __('Sitemap Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'globe-alt', 'visible' => true],
+                ['label' => __('Htaccess'), 'route' => 'dashboard', 'match' => '', 'icon' => 'code-bracket', 'visible' => true],
+                ['label' => __('Backups'), 'route' => 'dashboard', 'match' => '', 'icon' => 'circle-stack', 'visible' => true],
+                ['label' => __('Cache Management'), 'route' => 'dashboard', 'match' => '', 'icon' => 'trash', 'visible' => true],
+                ['label' => __('System Information'), 'route' => 'dashboard', 'match' => '', 'icon' => 'information-circle', 'visible' => true],
+                ['label' => __('Activity Logs'), 'route' => 'dashboard', 'match' => '', 'icon' => 'clipboard-document-list', 'visible' => true],
+            ]
+        ]
     ];
 @endphp
 
@@ -176,37 +209,36 @@
 </head>
 <body
     x-data="{
-            settingsOpen: false,
-            helpOpen: false,
-            mode: localStorage.getItem('flux.appearance') || localStorage.getItem('theme') || 'system',
-            applyAppearance(selected) {
-                this.mode = selected;
+        settingsOpen: false,
+        helpOpen: false,
+        mode: localStorage.getItem('flux.appearance') || localStorage.getItem('theme') || 'system',
+        applyAppearance(selected) {
+            this.mode = selected;
 
-                if (this.$flux) {
-                    this.$flux.appearance = selected;
-                }
-
-                if (selected === 'dark') {
-                    localStorage.setItem('theme', 'dark');
-                    localStorage.setItem('flux.appearance', 'dark');
-                    document.documentElement.classList.add('dark');
-                } else if (selected === 'light') {
-                    localStorage.setItem('theme', 'light');
-                    localStorage.setItem('flux.appearance', 'light');
-                    document.documentElement.classList.remove('dark');
-                } else {
-                    localStorage.removeItem('theme');
-                    localStorage.setItem('flux.appearance', 'system');
-                    document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
-                }
-
-                window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: selected } }));
+            if (this.$flux) {
+                this.$flux.appearance = selected;
             }
-        }"
-    x-on:keydown.escape.window="settingsOpen = false; helpOpen = false"
-    class="min-h-screen bg-white dark:bg-zinc-800 flex"
->
 
+            if (selected === 'dark') {
+                localStorage.setItem('theme', 'dark');
+                localStorage.setItem('flux.appearance', 'dark');
+                document.documentElement.classList.add('dark');
+            } else if (selected === 'light') {
+                localStorage.setItem('theme', 'light');
+                localStorage.setItem('flux.appearance', 'light');
+                document.documentElement.classList.remove('dark');
+            } else {
+                localStorage.removeItem('theme');
+                localStorage.setItem('flux.appearance', 'system');
+                document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+            }
+
+            window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: selected } }));
+        }
+    }"
+    x-on:keydown.escape.window="settingsOpen = false; helpOpen = false"
+    class="min-h-screen bg-white dark:bg-zinc-800"
+>
 
 <flux:header sticky collapsible="mobile" class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
@@ -226,8 +258,6 @@
     <flux:spacer />
     <flux:navbar class="me-4">
         <flux:navbar.item icon="magnifying-glass" href="#" label="Search" />
-        {{--        <livewire:layout.notification-menu wire:key="header-notification-menu" />--}}
-        {{--        <livewire:layout.language-switcher wire:key="header-language-switcher" />--}}
         <flux:navbar.item icon="globe-alt" :href="route('home')" target="_blank" label="{{ __('Visit Website') }}" />
         <flux:button type="button" variant="ghost" icon="cog-6-tooth" class="max-lg:hidden" x-on:click="settingsOpen = true" aria-label="{{ __('Open settings') }}" />
     </flux:navbar>
@@ -244,8 +274,7 @@
                     <div class="min-w-0 flex-1">
                         <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
                         <flux:text size="sm" class="truncate">{{ auth()->user()->email }}</flux:text>
-                        <div class="mt-2 flex flex-wrap gap-1.5">
-                        </div>
+                        <div class="mt-2 flex flex-wrap gap-1.5"></div>
                     </div>
                 </div>
             </div>
@@ -280,7 +309,6 @@
             </form>
         </flux:menu>
     </flux:dropdown>
-
 </flux:header>
 
 <flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -290,8 +318,7 @@
     </flux:sidebar.header>
 
     <flux:sidebar.nav>
-
-        <!-- start dynamic menu -->
+        <!-- Dynamic Menu Loop -->
         @foreach($menuItems as $item)
             @if($item['visible'])
 
@@ -313,7 +340,12 @@
                     <flux:sidebar.group expandable :icon="$item['icon']" :heading="$item['label']" :expanded="$item['active']" class="grid">
                         @foreach($item['items'] as $subItem)
                             @if($subItem['visible'])
-                                <flux:sidebar.item :href="route($subItem['route'])" :current="request()->routeIs($subItem['match'])" wire:navigate>
+                                <flux:sidebar.item
+                                    :icon="$subItem['icon'] ?? null"
+                                    :href="route($subItem['route'])"
+                                    :current="filled($subItem['match']) ? request()->routeIs($subItem['match']) : false"
+                                    wire:navigate
+                                >
                                     {{ $subItem['label'] }}
                                 </flux:sidebar.item>
                             @endif
@@ -323,8 +355,6 @@
 
             @endif
         @endforeach
-        <!-- End dynamic menu -->
-
     </flux:sidebar.nav>
 
     <flux:spacer />
@@ -387,7 +417,7 @@
     </flux:dropdown>
 </flux:header>
 
-<!-- Main slot -->
+
 {{ $slot }}
 
 @persist('toast')

@@ -2,15 +2,18 @@
     "agents": [
         "junie"
     ],
+    "cloud": false,
     "guidelines": true,
     "mcp": true,
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
+        "infer-conventions",
+        "fortify-development",
         "laravel-best-practices",
+        "testing-best-practices",
         "fluxui-development",
         "livewire-development",
-        "pest-testing",
         "tailwindcss-development"
     ]
 }
