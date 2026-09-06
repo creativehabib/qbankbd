@@ -85,6 +85,19 @@ test('dashboard renders custom non flux sidebar shell', function () {
         ->assertSee('data-test="page-loading-overlay"', false);
 });
 
+test('dashboard sidebar renders responsive full and collapsed brand marks', function () {
+    $user = User::factory()->admin()->create();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertSee('data-test="sidebar-full-logo"', false)
+        ->assertSee('in-data-flux-sidebar-collapsed-desktop:hidden', false)
+        ->assertSee('data-test="sidebar-collapsed-logo"', false)
+        ->assertSee('title="Question Bank"', false)
+        ->assertSee('in-data-flux-sidebar-collapsed-desktop:block', false)
+        ->assertSee('in-data-flux-sidebar-collapsed-desktop:w-full', false);
+});
+
 use App\Models\QuestionSet;
 use App\Models\Question;
 use App\Models\ExamCategory;
