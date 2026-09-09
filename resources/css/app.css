@@ -3,7 +3,7 @@
 @import "tom-select/dist/css/tom-select.css";
 @import 'sweetalert2/dist/sweetalert2.min.css';
 @import '../../vendor/livewire/flux/dist/flux.css';
-@import 'sweetalert2/dist/sweetalert2.min.css';
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
@@ -46,7 +46,6 @@
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
@@ -61,7 +60,7 @@
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
@@ -74,39 +73,30 @@ select:focus[data-flux-control] {
     .app-form-input {
         @apply block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
     }
-
     .app-form-select {
         @apply block w-full rounded-lg border border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white;
     }
-
     .app-form-button {
         @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
     }
-
     .app-form-control {
         @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
     }
-
     .app-search-input {
         @apply block w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
     }
-
     .app-primary-action-btn {
         @apply inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
     }
-
     .app-primary-submit-btn {
         @apply inline-flex items-center gap-2 rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
     }
-
     .app-icon-btn-edit {
         @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-indigo-100 text-indigo-500 transition-colors hover:border-transparent hover:bg-indigo-500 hover:text-white dark:border-gray-600 dark:hover:bg-indigo-600;
     }
-
     .app-icon-btn-delete {
         @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-100 text-red-500 transition-colors hover:border-transparent hover:bg-red-500 hover:text-white dark:border-gray-600 dark:hover:bg-red-600;
     }
-
     .app-color-input {
         @apply h-10 w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700;
     }
@@ -115,139 +105,123 @@ select:focus[data-flux-control] {
         @apply text-slate-100;
         background-color: var(--app-dark-bg);
     }
-
-    .dark flux\:main,
-    .dark [data-flux-main] {
+    .dark flux\:main, .dark [data-flux-main] {
         @apply bg-transparent;
     }
-
-    .dark flux\:header,
-    .dark [data-flux-header] {
+    .dark flux\:header, .dark [data-flux-header] {
         @apply backdrop-blur;
         border-color: var(--app-dark-border);
         background-color: color-mix(in srgb, var(--app-dark-panel) 95%, transparent);
     }
-
-    .dark flux\:sidebar,
-    .dark [data-flux-sidebar] {
+    .dark flux\:sidebar, .dark [data-flux-sidebar] {
         border-color: var(--app-dark-border);
         background-color: var(--app-dark-panel);
     }
-
     .dark [data-flux-sidebar] [data-current] {
         background-color: var(--app-dark-active-bg);
         color: var(--app-dark-active-text);
     }
 }
 
-/* Choices.js theming (light/dark) */
+/* =========================================
+   Choices.js Custom Theming
+========================================= */
 .choices__inner {
     border-radius: 6px !important;
     padding: 4px !important;
     min-height: 0 !important;
 }
-
 .choices__list--dropdown,
 .choices__list[aria-expanded] {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     color: #0f172a;
 }
-
 .choices__list--dropdown .choices__item--selectable.is-highlighted,
 .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
     background-color: #e2e8f0;
 }
-
 .dark .choices__inner {
     background-color: var(--color-slate-800) !important;
     border-color: #334155 !important;
     color: #e2e8f0;
 }
-
 .dark .choices__list--dropdown,
 .dark .choices__list[aria-expanded] {
     background-color: #0f172a !important;
     border-color: #334155 !important;
     color: #e2e8f0;
 }
-
 .dark .choices__list--dropdown .choices__item--selectable.is-highlighted,
 .dark .choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
     background-color: #1e293b !important;
 }
-
 .dark .choices[data-type*=select-one] .choices__input {
     border-bottom: 1px solid #334155 !important;
     background-color: #0f172a !important;
 }
-/* ১. পুরো এডিটরের বর্ডার এবং রাউন্ডেড কর্নার */
+
+/* =========================================
+   CKEditor 4 Custom UI Fixes
+========================================= */
 .cke_chrome {
+    border: 1px solid #e5e7eb !important;
     border-radius: 0.75rem !important;
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
-
-.dark .cke_chrome{
-    border: 1px solid #3f444f !important;
+.dark .cke_chrome {
+    border-color: #374151 !important;
 }
-
-/* ২. টুলবার এরিয়া (Top Section) */
+.cke_top, .cke_bottom {
+    background: #f9fafb !important;
+    border-color: #e5e7eb !important;
+}
+.dark .cke_top, .dark .cke_bottom {
+    background: #1e293b !important;
+    border-color: #374151 !important;
+}
 .dark .cke_top {
-    background-color: #1e293b !important;
-    border-bottom: 1px solid #334155 !important;
     padding: 6px !important;
-    /* আইকন সোজা রাখার জন্য ফ্লেক্স লেআউট */
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
 }
-
-/* ডার্ক মোডে আইকন এলাইনমেন্ট ফিক্স */
 .dark .cke_toolbar {
     display: flex !important;
     align-items: center !important;
     margin-bottom: 4px !important;
 }
-
 .dark .cke_button {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     vertical-align: middle !important;
-    height: 24px !important; /* নির্দিষ্ট উচ্চতা নিশ্চিত করা */
+    height: 24px !important;
 }
-
 .dark .cke_button_icon {
     filter: invert(1) brightness(1.5);
-    float: none !important; /* ফ্লোট সরিয়ে ফেলা */
+    float: none !important;
     display: inline-block !important;
 }
-
-/* ৩. একটিভ বাটনের সাদা ভাব দূর করা */
 .dark .cke_button_on {
     background: #334155 !important;
     border: 1px solid #475569 !important;
     box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.2) !important;
 }
-
 .dark .cke_button_on .cke_button_icon {
     filter: invert(1) brightness(2) !important;
 }
-
 .dark .cke_button:hover {
     background-color: #334155 !important;
     border-radius: 4px;
 }
-
-/* ৪. ড্রপডাউন (Styles, Format, Font) এলাইনমেন্ট ফিক্স */
 .dark .cke_combo {
     display: inline-flex !important;
     align-items: center !important;
     height: 26px !important;
     margin: 2px 4px !important;
 }
-
 .dark .cke_combo_button {
     background: #0f172a !important;
     border: 1px solid #334155 !important;
@@ -256,37 +230,90 @@ select:focus[data-flux-control] {
     align-items: center !important;
     padding: 0 8px !important;
 }
-
 .dark .cke_combo_text {
     color: #cbd5e1 !important;
-    line-height: 26px !important; /* টেক্সট মাঝখানে আনা */
+    line-height: 26px !important;
 }
-
-/* ৫. এডিটরের ভেতরের অংশ */
 .dark .cke_wysiwyg_frame {
     background-color: #0f172a !important;
 }
-
-/* ৬. নিচের পাথ বার */
-.dark .cke_bottom {
-    background-color: #0f172a !important;
-    border-top: 1px solid #334155 !important;
-}
-
 .dark .cke_path_item {
     color: #94a3b8 !important;
     text-shadow: none !important;
 }
-
-a.cke_button{
+a.cke_button {
     cursor: pointer !important;
 }
-/*OMR Question Style*/
-.center { display: flex; align-items: center; justify-content: center; }
+
+/* =========================================
+   TomSelect Custom UI Fixes
+========================================= */
+.ts-wrapper .ts-control {
+    min-height: 46px !important;
+    display: flex;
+    align-items: center;
+    border-radius: 0.75rem !important;
+    border: 1px solid #d1d5db !important;
+    padding: 0.5rem 0.75rem !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+}
+.ts-wrapper.focus .ts-control {
+    border-color: #818cf8 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    outline: none;
+}
+.ts-control input {
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 0.875rem !important;
+}
+.dark .ts-wrapper .ts-control,
+.dark .ts-wrapper .ts-control input {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+.dark .ts-wrapper.focus .ts-control {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+.dark .ts-dropdown {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+    border-radius: 0.5rem !important;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+.dark .ts-dropdown .option.active,
+.dark .ts-dropdown .option:hover {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================
+   Flux UI & Misc Global Utilities
+========================================= */
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 @media print {
-    ui-sidebar,
-    [data-flux-sidebar] {
+    ui-sidebar, [data-flux-sidebar] {
         display: block !important;
     }
+}
+
+[data-flux-sidebar-group] [data-flux-sidebar-group-content],
+.flux-dropdown-content {
+    transition: all 0.3s ease-in-out !important;
+}
+
+[x-collapse] {
+    transition-duration: 300ms !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }

@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
     Route::get('/questions', Questions::class)->name('questions.index');
     Route::get('/questions/create', Create::class)->name('questions.create');
+//    Route::get('/questions/{question}/show', App\Livewire\ShowQuestion::class)->name('questions.show');
     Route::get('/questions/bulk-upload', BulkUpload::class)->name('questions.bulk-upload');
     Route::get('/questions/{question}/edit', Edit::class)->name('questions.edit');
 

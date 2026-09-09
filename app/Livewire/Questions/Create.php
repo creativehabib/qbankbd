@@ -3,6 +3,7 @@
 namespace App\Livewire\Questions;
 
 use App\Livewire\Traits\SlugValidationTrait;
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\ExamCategory; // Image Upload এর জন্য
@@ -19,7 +20,7 @@ use Livewire\WithFileUploads;
 
 class Create extends Component
 {
-    use AuthorizesRequests, SlugValidationTrait, WithFileUploads; // WithFileUploads যুক্ত করা হলো
+    use AuthorizesRequests, SlugValidationTrait, WithFileUploads, InteractsWithFluxToasts; // WithFileUploads যুক্ত করা হলো
 
     public $subject_id;
 
@@ -84,6 +85,7 @@ class Create extends Component
     {
         $this->options[] = ['option_text' => '', 'is_correct' => false];
         $this->dispatch('refresh-editors');
+        $this->toastSuccess('নতুন অপশন যুক্ত করা হয়েছে।', 'অপশন যুক্ত');
     }
 
     public function removeOption($index): void
@@ -91,6 +93,9 @@ class Create extends Component
         if (count($this->options) > 2) {
             unset($this->options[$index]);
             $this->options = array_values($this->options);
+            $this->toastWarning('একটি অপশন মুছে ফেলা হয়েছে।', 'অপশন রিমুভ');
+        } else {
+            $this->toastDanger('অন্তত ২টি অপশন থাকা বাধ্যতামূলক।', 'অপশন রিমুভ ব্যর্থ');
         }
     }
 
