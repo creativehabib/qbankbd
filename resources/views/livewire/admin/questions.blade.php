@@ -101,7 +101,7 @@
         <div class="overflow-x-auto border-t border-zinc-200 dark:border-zinc-700">
             <flux:table>
                 <flux:table.columns>
-                    @if($canDeleteQuestion)<flux:table.column class="w-12"><flux:checkbox wire:model.live="selectPage" aria-label="Select all questions" /></flux:table.column>@endif
+                    @if($canDeleteQuestion)<flux:table.column class="w-16 pl-4"><flux:checkbox wire:model.live="selectPage" aria-label="Select all questions" /></flux:table.column>@endif
                     <flux:table.column>QUESTION</flux:table.column>
                     <flux:table.column>TAXONOMY</flux:table.column>
                     <flux:table.column>TYPE</flux:table.column>
@@ -115,7 +115,7 @@
                     @forelse($questions as $question)
                         <flux:table.row wire:key="question-{{ $quickFilter }}-{{ $question->id }}">
                             @if($canDeleteQuestion)
-                                <flux:table.cell><flux:checkbox wire:model.live="selectedQuestionIds" value="{{ $question->id }}" aria-label="Select question {{ $question->id }}" /></flux:table.cell>
+                                <flux:table.cell class="w-16 pl-4"><flux:checkbox wire:model.live="selectedQuestionIds" value="{{ $question->id }}" aria-label="Select question {{ $question->id }}" /></flux:table.cell>
                             @endif
                             <flux:table.cell class="min-w-80">
                                 <div class="font-medium text-zinc-900 dark:text-zinc-100">{{ str(strip_tags($question->title))->limit(100) }}</div>

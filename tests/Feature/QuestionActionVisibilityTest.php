@@ -18,6 +18,14 @@ it('shows create button when user has create permission', function () {
         ->assertSee('New Question');
 });
 
+it('adds left padding to question selection checkboxes', function () {
+    $admin = User::factory()->admin()->create();
+
+    Livewire::actingAs($admin)
+        ->test(Questions::class)
+        ->assertSeeHtml('class="w-16 pl-4"');
+});
+
 it('hides create button when user does not have create permission', function () {
     $student = User::factory()->create();
 
