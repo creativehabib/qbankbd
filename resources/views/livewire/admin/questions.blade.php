@@ -53,7 +53,7 @@
                     @endforeach
                 </flux:select>
 
-                <flux:select wire:model.live="subjectId" placeholder="All subjects">
+                <flux:select wire:model.live="subjectId" :disabled="$academicClassId === ''" placeholder="All subjects">
                     <option value="">All subjects</option>
                     @foreach($subjects as $subject)
                         <option value="{{ $subject->id }}">{{ $subject->name }}</option>
@@ -68,14 +68,14 @@
                     <option value="written">Written</option>
                 </flux:select>
 
-                <flux:select wire:model.live="chapterId" placeholder="All chapters">
+                <flux:select wire:model.live="chapterId" :disabled="$subjectId === ''" placeholder="All chapters">
                     <option value="">All chapters</option>
                     @foreach($chapters as $chapter)
                         <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
                     @endforeach
                 </flux:select>
 
-                <flux:select wire:model.live="topicId" placeholder="All topics">
+                <flux:select wire:model.live="topicId" :disabled="$chapterId === ''" placeholder="All topics">
                     <option value="">All topics</option>
                     @foreach($topics as $topic)
                         <option value="{{ $topic->id }}">{{ $topic->name }}</option>

@@ -26,7 +26,7 @@ it('hides create button when user does not have create permission', function () 
         ->assertDontSee('New Question');
 });
 
-it('shows class-related taxonomy filters and question marks and payment columns', function () {
+it('activates taxonomy filters in class, subject, chapter sequence and shows question marks and payment columns', function () {
     $admin = User::factory()->admin()->create();
 
     $class = AcademicClass::query()->create([
@@ -132,11 +132,16 @@ it('shows class-related taxonomy filters and question marks and payment columns'
         ->test(Questions::class)
         ->set('academicClassId', (string) $class->id)
         ->assertSee('Mathematics')
-        ->assertSee('Algebra')
-        ->assertSee('Equations')
+        ->assertDontSee('Algebra')
+        ->assertDontSee('Equations')
         ->assertDontSee('Physics')
         ->assertDontSee('Mechanics')
         ->assertDontSee('Motion')
+        ->set('subjectId', (string) $subject->id)
+        ->assertSee('Algebra')
+        ->assertDontSee('Equations')
+        ->set('chapterId', (string) $chapter->id)
+        ->assertSee('Equations')
         ->assertSee('Paid algebra question')
         ->assertSee('Unpaid algebra question')
         ->assertSee('MARKS')
