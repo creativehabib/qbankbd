@@ -99,7 +99,7 @@
         </div>
 
         <div class="overflow-x-auto border-t border-zinc-200 dark:border-zinc-700">
-            <flux:table>
+            <flux:table class="px-6">
                 <flux:table.columns>
                     @if($canDeleteQuestion)<flux:table.column class="w-16 pl-4"><flux:checkbox wire:model.live="selectPage" aria-label="Select all questions" /></flux:table.column>@endif
                     <flux:table.column>QUESTION</flux:table.column>
