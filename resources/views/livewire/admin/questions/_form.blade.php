@@ -402,7 +402,7 @@
 </div>
 
 @push('scripts')
-    <!-- TomSelect CSS & JS (Required to fix dropdown issues) -->
+    <!-- TomSelect CSS & JS -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
@@ -416,6 +416,20 @@
         window.tsTopic = window.tsTopic || null;
         window.tsTags = window.tsTags || null;
         window.tsExamCategories = window.tsExamCategories || null;
+
+        // 🌟 Helper function to wrap MathJax formulas
+        function wrapMathForCKEditor(html) {
+            if (!html || typeof html !== 'string') return html;
+
+            // Remove existing <span class="math-tex"> tags to avoid double wrapping safely
+            let cleanHtml = html.replace(/<span class="math-tex">([\s\S]*?)<\/span>/g, '$1');
+
+            // Wrap \( ... \) and \[ ... \] correctly
+            cleanHtml = cleanHtml.replace(/\\\(([\s\S]*?)\\\)/g, '<span class="math-tex">\\($1\\)</span>');
+            cleanHtml = cleanHtml.replace(/\\\[([\s\S]*?)\\\]/g, '<span class="math-tex">\\[$1\\]</span>');
+
+            return cleanHtml;
+        }
 
         function generateSlug(text) {
             let div = document.createElement("div");
@@ -459,6 +473,15 @@
                 height: isAdvanced ? 180 : 120,
                 allowedContent: true,
                 uiColor: document.documentElement.classList.contains('dark') ? '#2d3748' : '#f9fafb'
+            });
+
+            // 🌟 On Load: automatically format the loaded data for math
+            editor.on('instanceReady', function() {
+                let currentData = editor.getData();
+                let formattedData = wrapMathForCKEditor(currentData);
+                if (currentData !== formattedData) {
+                    editor.setData(formattedData);
+                }
             });
 
             let ckDebounceTimer;
@@ -611,12 +634,14 @@
 
         window.addEventListener('ai-data-filled', e => {
             let data = e.detail;
-            if (CKEDITOR.instances['editor']) CKEDITOR.instances['editor'].setData(data.title);
+
+            // 🌟 Wrap math formats for AI response automatically
+            if (CKEDITOR.instances['editor']) CKEDITOR.instances['editor'].setData(wrapMathForCKEditor(data.title));
             if (data.options && data.options.length > 0) {
                 data.options.forEach((opt, index) => {
                     let optEditorId = 'opt_editor_' + index;
                     if (CKEDITOR.instances[optEditorId]) {
-                        CKEDITOR.instances[optEditorId].setData(opt.option_text);
+                        CKEDITOR.instances[optEditorId].setData(wrapMathForCKEditor(opt.option_text));
                     }
                 });
             }

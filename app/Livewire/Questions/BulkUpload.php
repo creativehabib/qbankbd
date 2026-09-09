@@ -145,6 +145,8 @@ class BulkUpload extends Component
         if ($rawText === '' && $this->sourceFile) {
             $rawText = $this->extractTextFromFile();
             $this->rawText = $rawText;
+            // 🌟 OCR সম্পন্ন হলে এডিটর আপডেট করার ইভেন্ট
+            $this->dispatch('update-editor', text: $rawText);
         }
 
         if ($rawText === '') {
@@ -158,11 +160,18 @@ class BulkUpload extends Component
             'rawText.min' => 'কমপক্ষে ২০ অক্ষরের প্রশ্ন টেক্সট দিন।',
         ]);
 
-        $parsed = QuestionTextParser::parseMcqText($validated['rawText']);
+        // 🌟 CKEditor থেকে আসা HTML ট্যাগ রিমুভ করে প্লেইন টেক্সটে কনভার্ট করা (Math/LaTeX নষ্ট না করে)
+        $cleanText = $validated['rawText'];
+        $cleanText = preg_replace('/<p[^>]*>/i', '', $cleanText);
+        $cleanText = preg_replace('/<\/p>/i', "\n", $cleanText);
+        $cleanText = preg_replace('/<br\s*\/?>/i', "\n", $cleanText);
+        $cleanText = strip_tags($cleanText);
+        $cleanText = html_entity_decode($cleanText, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $parsed = QuestionTextParser::parseMcqText($cleanText);
 
         if (empty($parsed)) {
             $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি।');
-
             return;
         }
 
@@ -173,7 +182,12 @@ class BulkUpload extends Component
         }
 
         $this->processedQuestions = $parsed;
-        $this->rawText = $this->formatProcessedQuestionsForTextarea();
+
+        // 🌟 ফরমেট করা টেক্সট আবার এডিটরে পাঠানোর জন্য
+        $formattedText = $this->formatProcessedQuestionsForTextarea();
+        $this->rawText = $formattedText;
+        $this->dispatch('update-editor', text: str_replace("\n", '<br>', $formattedText));
+
         session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস হয়েছে।');
     }
 
