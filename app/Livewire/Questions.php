@@ -308,9 +308,15 @@ class Questions extends Component
         return view('livewire.admin.questions', [
             'questions' => $questions,
             'academicClasses' => AcademicClass::query()->orderBy('order_sequence')->orderBy('name')->get(),
-            'subjects' => Subject::query()->when($this->academicClassId !== '', fn (Builder $query): Builder => $query->where('academic_class_id', $this->academicClassId))->orderBy('name')->get(),
-            'chapters' => Chapter::query()->when($this->subjectId !== '', fn (Builder $query): Builder => $query->where('subject_id', $this->subjectId))->orderBy('order_sequence')->orderBy('name')->get(),
-            'topics' => Topic::query()->when($this->chapterId !== '', fn (Builder $query): Builder => $query->where('chapter_id', $this->chapterId))->orderBy('order_sequence')->orderBy('name')->get(),
+            'subjects' => $this->academicClassId === ''
+                ? collect()
+                : Subject::query()->where('academic_class_id', $this->academicClassId)->orderBy('name')->get(),
+            'chapters' => $this->subjectId === ''
+                ? collect()
+                : Chapter::query()->where('subject_id', $this->subjectId)->orderBy('order_sequence')->orderBy('name')->get(),
+            'topics' => $this->chapterId === ''
+                ? collect()
+                : Topic::query()->where('chapter_id', $this->chapterId)->orderBy('order_sequence')->orderBy('name')->get(),
             'allQuestionsCount' => (clone $baseQuery)->count(),
             'mineQuestionsCount' => (clone $baseQuery)->where('user_id', auth()->id())->count(),
             'publishedQuestionsCount' => (clone $baseQuery)->where('status', 'active')->count(),
