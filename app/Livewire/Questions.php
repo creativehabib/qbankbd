@@ -309,8 +309,19 @@ class Questions extends Component
             'questions' => $questions,
             'academicClasses' => AcademicClass::query()->orderBy('order_sequence')->orderBy('name')->get(),
             'subjects' => Subject::query()->when($this->academicClassId !== '', fn (Builder $query): Builder => $query->where('academic_class_id', $this->academicClassId))->orderBy('name')->get(),
-            'chapters' => Chapter::query()->when($this->subjectId !== '', fn (Builder $query): Builder => $query->where('subject_id', $this->subjectId))->orderBy('order_sequence')->orderBy('name')->get(),
-            'topics' => Topic::query()->when($this->chapterId !== '', fn (Builder $query): Builder => $query->where('chapter_id', $this->chapterId))->orderBy('order_sequence')->orderBy('name')->get(),
+            'chapters' => Chapter::query()
+                ->when($this->subjectId !== '', fn (Builder $query): Builder => $query->where('subject_id', $this->subjectId))
+                ->when($this->subjectId === '' && $this->academicClassId !== '', fn (Builder $query): Builder => $query->whereRelation('subject', 'academic_class_id', $this->academicClassId))
+                ->orderBy('order_sequence')
+                ->orderBy('name')
+                ->get(),
+            'topics' => Topic::query()
+                ->when($this->chapterId !== '', fn (Builder $query): Builder => $query->where('chapter_id', $this->chapterId))
+                ->when($this->chapterId === '' && $this->subjectId !== '', fn (Builder $query): Builder => $query->whereRelation('chapter', 'subject_id', $this->subjectId))
+                ->when($this->chapterId === '' && $this->subjectId === '' && $this->academicClassId !== '', fn (Builder $query): Builder => $query->whereRelation('chapter.subject', 'academic_class_id', $this->academicClassId))
+                ->orderBy('order_sequence')
+                ->orderBy('name')
+                ->get(),
             'allQuestionsCount' => (clone $baseQuery)->count(),
             'mineQuestionsCount' => (clone $baseQuery)->where('user_id', auth()->id())->count(),
             'publishedQuestionsCount' => (clone $baseQuery)->where('status', 'active')->count(),
