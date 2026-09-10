@@ -218,8 +218,8 @@
                                      init() {
                                          let timeout;
                                          const renderMath = () => {
-                                             if (window.MathJax) {
-                                                 window.renderMathJax(this.$el);
+                                             if (window.renderMathJax) {
+                                                 window.renderMathJax();
                                              }
                                          };
 
@@ -268,7 +268,7 @@
                                                 renderMath() {
                                                     if(window.MathJax) {
                                                         this.$nextTick(() => {
-                                                            if(this.$refs.display) window.renderMathJax(this.$refs.display);
+                                                            if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
                                                         });
                                                     }
                                                 }
@@ -331,7 +331,7 @@
                                                         renderMath() {
                                                             if(window.MathJax) {
                                                                 this.$nextTick(() => {
-                                                                    if(this.$refs.display) window.renderMathJax(this.$refs.display);
+                                                                    if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
                                                                 });
                                                             }
                                                         }
@@ -558,26 +558,22 @@
                             Metadata
                         </h3>
 
-                        <div class="relative z-20">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Search and select)</span></label>
-                            <div wire:ignore>
-                                <select id="bulk-tag-ids" multiple placeholder="Select tags" class="w-full">
+                        <div wire:ignore class="relative z-20">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Type & Enter)</span></label>
+                            <select id="bulk_tags" class="w-full ts-control" multiple>
                                 @foreach($allTags as $tag)
-                                    <option value="{{ $tag->id }}" @selected(in_array($tag->id, $tagIds))>{{ $tag->name }}</option>
+                                    <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
                                 @endforeach
-                                </select>
-                            </div>
+                            </select>
                         </div>
 
-                        <div class="relative z-10">
+                        <div wire:ignore class="relative z-10">
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience <span class="text-red-500">*</span></label>
-                            <div wire:ignore>
-                                <select id="bulk-exam-category-ids" multiple placeholder="Select Exams (e.g. BCS, HSC)" class="w-full">
+                            <select id="bulk_exam_categories" class="w-full ts-control" multiple placeholder="Select Exams (e.g. BCS, HSC)">
                                 @foreach($allExamCategories as $category)
-                                    <option value="{{ $category->id }}" @selected(in_array($category->id, $exam_category_ids))>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
-                                </select>
-                            </div>
+                            </select>
                             @error('exam_category_ids') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -595,89 +591,80 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 @endpush
 
-@script
+@push('scripts')
+    {{-- TomSelect CSS & JS --}}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    {{-- MathJax is now loaded globally via head.blade.php --}}
+    <!-- CKEditor 4 -->
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
+
+    <script>
         function wrapMathForCKEditor(html) {
-            if (!html || typeof html !== 'string') return html;
-
-            let cleanHtml = html.replace(/<span class="math-tex">([\s\S]*?)<\/span>/g, '$1');
-
-            cleanHtml = cleanHtml.replace(/\\\(([\s\S]*?)\\\)/g, '<span class="math-tex">\\($1\\)</span>');
-            cleanHtml = cleanHtml.replace(/\\\[([\s\S]*?)\\\]/g, '<span class="math-tex">\\[$1\\]</span>');
-
-            return cleanHtml;
+            return window.wrapMathForCKEditor ? window.wrapMathForCKEditor(html) : html;
         }
 
-        const initializeEditor = () => {
-            if (typeof CKEDITOR !== 'undefined' && document.getElementById('raw_text_editor')) {
-                if (CKEDITOR.instances['raw_text_editor']) {
-                    CKEDITOR.instances['raw_text_editor'].destroy(true);
+        if (!window.hasRegisteredBulkUploadEvents) {
+            window.initBulkUploadTomSelect = () => {
+                if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
+                const tagsEl = document.getElementById('bulk_tags');
+                if (tagsEl && typeof TomSelect !== 'undefined') {
+                    window.bulkTsTags = new TomSelect(tagsEl, {
+                        plugins: ['remove_button', 'dropdown_input'],
+                        persist: false, create: true,
+                        dropdownParent: 'body',
+                        onChange: (v) => @this.set('tagIds', v),
+                    });
                 }
 
-                const editor = CKEDITOR.replace('raw_text_editor', {
-                    extraPlugins: 'mathjax',
-                    mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML',
-                    toolbar: [
-                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Subscript', 'Superscript'] },
-                        { name: 'insert', items: ['SpecialCharacter', 'Mathjax'] },
-                        { name: 'document', items: ['Source'] }
-                    ],
-                    height: 250,
-                    uiColor: document.documentElement.classList.contains('dark') ? '#1e293b' : '#f9fafb'
-                });
+                if (window.bulkTsExamCategories) { window.bulkTsExamCategories.destroy(); window.bulkTsExamCategories = null; }
+                const examCategoriesEl = document.getElementById('bulk_exam_categories');
+                if (examCategoriesEl && typeof TomSelect !== 'undefined') {
+                    window.bulkTsExamCategories = new TomSelect(examCategoriesEl, {
+                        plugins: ['remove_button', 'dropdown_input'],
+                        persist: false, create: false,
+                        dropdownParent: 'body',
+                        onChange: (v) => @this.set('exam_category_ids', v),
+                    });
+                }
+            };
 
-                editor.on('paste', function(evt) {
-                    evt.data.dataValue = wrapMathForCKEditor(evt.data.dataValue);
-                });
+            window.initBulkUploadEditor = () => {
+                if (window.initGlobalCkEditor) {
+                    window.initGlobalCkEditor('raw_text_editor', @this, 'rawText');
+                }
+            };
 
-                editor.on('instanceReady', function() {
-                    let currentData = editor.getData();
-                    let formattedData = wrapMathForCKEditor(currentData);
-                    if (currentData !== formattedData) {
-                        editor.setData(formattedData);
-                    }
-                });
+            window.initBulkUploadComponents = () => {
+                window.initBulkUploadTomSelect();
+                window.initBulkUploadEditor();
+            };
 
-                let ckDebounceTimer;
-                editor.on('change', function () {
-                    clearTimeout(ckDebounceTimer);
-                    ckDebounceTimer = setTimeout(() => {
-                    $wire.set('rawText', editor.getData());
-                    }, 500);
-                });
-
-                window.addEventListener('update-editor', event => {
-                    let text = event.detail.text || event.detail[0].text;
-                    let htmlText = text.replace(/\n/g, '<br>');
-                    editor.setData(wrapMathForCKEditor(htmlText));
-                });
-            }
-        };
-
-        window.whenCkEditorReady(initializeEditor);
-
-        const initializeMetadataSelects = () => {
-            if (typeof TomSelect === 'undefined') {
-                console.error('TomSelect is not loaded!');
-
-                return;
-            }
-
-            const selectConfig = (property) => ({
-                plugins: ['remove_button', 'dropdown_input'],
-                maxOptions: 50,
-                onChange: (value) => $wire.set(property, value),
+            window.addEventListener('update-editor', event => {
+                let text = event.detail.text || event.detail[0].text;
+                let htmlText = text.replace(/\n/g, '<br>');
+                if (CKEDITOR && CKEDITOR.instances['raw_text_editor']) {
+                    CKEDITOR.instances['raw_text_editor'].setData(wrapMathForCKEditor(htmlText));
+                }
             });
 
-            const tagSelect = document.getElementById('bulk-tag-ids');
-            if (tagSelect && ! tagSelect.tomselect) {
-                new TomSelect(tagSelect, selectConfig('tagIds'));
-            }
+            document.addEventListener('livewire:load', () => setTimeout(window.initBulkUploadComponents, 100));
+            document.addEventListener('livewire:navigated', () => setTimeout(window.initBulkUploadComponents, 100));
 
-            const examCategorySelect = document.getElementById('bulk-exam-category-ids');
-            if (examCategorySelect && ! examCategorySelect.tomselect) {
-                new TomSelect(examCategorySelect, selectConfig('exam_category_ids'));
-            }
-        };
+            document.addEventListener('livewire:navigating', () => {
+                if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['raw_text_editor']) {
+                    try { CKEDITOR.instances['raw_text_editor'].destroy(true); } catch(e) {}
+                }
+                if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
+                if (window.bulkTsExamCategories) { window.bulkTsExamCategories.destroy(); window.bulkTsExamCategories = null; }
+            });
 
-        initializeMetadataSelects();
-@endscript
+            window.hasRegisteredBulkUploadEvents = true;
+        } else {
+            setTimeout(() => {
+                if (window.initBulkUploadComponents) window.initBulkUploadComponents();
+            }, 100);
+        }
+    </script>
+@endpush

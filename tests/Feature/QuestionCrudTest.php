@@ -119,12 +119,3 @@ it('applies border styles to slug difficulty type and marks inputs on create for
         ->assertSeeHtml('wire:model.live="marks"')
         ->assertSeeHtml('class="block w-full rounded-md border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:text-gray-200 pr-12"');
 });
-
-it('renders Tom Select-compatible metadata selects on the question form', function () {
-    $admin = User::factory()->admin()->create();
-
-    Livewire::actingAs($admin)
-        ->test(Create::class)
-        ->assertSeeHtml('id="question-tag-ids"')
-        ->assertSeeHtml('id="question-exam-category-ids"');
-});

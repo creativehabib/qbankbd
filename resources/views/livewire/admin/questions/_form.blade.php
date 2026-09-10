@@ -368,26 +368,22 @@
                 </h3>
 
                 <div class="space-y-5">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-gray-400 dark:text-gray-500 font-normal">(Search and select)</span></label>
-                        <div wire:ignore>
-                            <select id="question-tag-ids" multiple placeholder="Select tags" class="w-full">
-                            @foreach($allTags as $tag)
-                                <option value="{{ $tag->id }}" @selected(in_array($tag->id, $tagIds))>{{ $tag->name }}</option>
-                            @endforeach
-                            </select>
-                        </div>
+                    <div wire:ignore>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-gray-400 dark:text-gray-500 font-normal">(Type and press enter)</span></label>
+                        <select id="tags" class="w-full" multiple>
+                            @foreach($allTags as $tag) <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option> @endforeach
+                        </select>
                     </div>
 
-                    <div>
+                    <div wire:ignore>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category <span class="text-red-500">*</span></label>
-                        <div wire:ignore>
-                            <select id="question-exam-category-ids" multiple placeholder="Select Exam (BCS, HSC...)" class="w-full">
+                        <select id="exam_categories" class="w-full" multiple placeholder="Select Exam (BCS, HSC...)">
                             @foreach($allExamCategories as $category)
-                                <option value="{{ $category->id }}" @selected(in_array($category->id, $exam_category_ids))>{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
-                            </select>
-                        </div>
+                        </select>
                         @error('exam_category_ids')<span class="text-xs text-red-500 mt-1.5 block font-medium bg-red-50 dark:bg-red-950 p-2 rounded-lg border border-red-100 dark:border-red-900">{{ $message }}</span>@enderror
                     </div>
                 </div>
@@ -405,7 +401,15 @@
     </form>
 </div>
 
-@script
+@push('scripts')
+    <!-- TomSelect CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    <!-- CKEditor 4 -->
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
+
+    <script>
         window.tsClass = window.tsClass || null;
         window.tsSubject = window.tsSubject || null;
         window.tsChapter = window.tsChapter || null;
@@ -415,16 +419,7 @@
 
         // 🌟 Helper function to wrap MathJax formulas
         function wrapMathForCKEditor(html) {
-            if (!html || typeof html !== 'string') return html;
-
-            // Remove existing <span class="math-tex"> tags to avoid double wrapping safely
-            let cleanHtml = html.replace(/<span class="math-tex">([\s\S]*?)<\/span>/g, '$1');
-
-            // Wrap \( ... \) and \[ ... \] correctly
-            cleanHtml = cleanHtml.replace(/\\\(([\s\S]*?)\\\)/g, '<span class="math-tex">\\($1\\)</span>');
-            cleanHtml = cleanHtml.replace(/\\\[([\s\S]*?)\\\]/g, '<span class="math-tex">\\[$1\\]</span>');
-
-            return cleanHtml;
+            return window.wrapMathForCKEditor ? window.wrapMathForCKEditor(html) : html;
         }
 
         function generateSlug(text) {
@@ -435,70 +430,9 @@
         }
 
         function initCkEditor4(elementId, livewireProperty, isAdvanced = false) {
-            const el = document.getElementById(elementId);
-            if (!el || el.offsetParent === null) return;
-
-            if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances[elementId]) {
-                try { CKEDITOR.instances[elementId].destroy(true); } catch(e) {}
+            if (window.initGlobalCkEditor) {
+                return window.initGlobalCkEditor(elementId, @this, livewireProperty, isAdvanced);
             }
-
-            let toolbarConfig = [
-                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Subscript', 'Superscript'] },
-                { name: 'insert', items: ['SpecialCharacter', 'Mathjax'] },
-                { name: 'colors', items: ['TextColor', 'BGColor'] },
-                { name: 'document', items: ['Source'] }
-            ];
-
-            if (isAdvanced) {
-                toolbarConfig = [
-                    { name: 'clipboard', items: ['Undo', 'Redo'] },
-                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
-                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-                    { name: 'links', items: ['Link', 'Unlink'] },
-                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialCharacter', 'Mathjax'] },
-                    { name: 'colors', items: ['TextColor', 'BGColor'] },
-                    { name: 'tools', items: ['Maximize'] },
-                    { name: 'document', items: ['Source'] }
-                ];
-            }
-
-            const editor = CKEDITOR.replace(elementId, {
-                extraPlugins: 'mathjax,tableresize,wordcount,notification,justify,font,colorbutton',
-                mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML',
-                toolbar: toolbarConfig,
-                height: isAdvanced ? 180 : 120,
-                allowedContent: true,
-                uiColor: document.documentElement.classList.contains('dark') ? '#2d3748' : '#f9fafb'
-            });
-
-            // 🌟 On Load: automatically format the loaded data for math
-            editor.on('instanceReady', function() {
-                let currentData = editor.getData();
-                let formattedData = wrapMathForCKEditor(currentData);
-                if (currentData !== formattedData) {
-                    editor.setData(formattedData);
-                }
-            });
-
-            let ckDebounceTimer;
-            editor.on('change', function () {
-                let data = editor.getData();
-                clearTimeout(ckDebounceTimer);
-                ckDebounceTimer = setTimeout(() => {
-                @this.set(livewireProperty, data);
-                    if (livewireProperty === 'title') {
-                        let isEditMode = window.location.href.includes('/edit');
-                        let slugInput = document.getElementById('slug_input');
-                        if (slugInput) {
-                            let isManualEdited = slugInput.getAttribute('data-manual') === 'true';
-                            if (!isEditMode && !isManualEdited) {
-                                let newSlug = generateSlug(data);
-                                window.dispatchEvent(new CustomEvent('slug-auto-updated', { detail: newSlug }));
-                            }
-                        }
-                    }
-                }, 500);
-            });
         }
 
         function initEditors() {
@@ -535,7 +469,7 @@
                 const tsMultiConfig = {
                     plugins: ['remove_button', 'dropdown_input'],
                     persist: false,
-                    create: false,
+                    create: true,
                 };
 
                 const updateLivewire = (property, value) => {
@@ -558,12 +492,11 @@
                 const topicEl = document.getElementById('topic');
                 if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, onChange: (v) => updateLivewire('topic_id', v) });
 
-                const tagEl = document.getElementById('question-tag-ids');
-                if (tagEl && !tagEl.tomselect) new TomSelect(tagEl, {...tsConfig, ...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
+                const tagsEl = document.getElementById('tags');
+                if (tagsEl && !tagsEl.tomselect) window.tsTags = new TomSelect(tagsEl, {...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
 
-                const examCategoryEl = document.getElementById('question-exam-category-ids');
-                if (examCategoryEl && !examCategoryEl.tomselect) new TomSelect(examCategoryEl, {...tsConfig, ...tsMultiConfig, onChange: (v) => updateLivewire('exam_category_ids', v) });
-
+                const examCategoriesEl = document.getElementById('exam_categories');
+                if (examCategoriesEl && !examCategoriesEl.tomselect) window.tsExamCategories = new TomSelect(examCategoriesEl, { ...tsMultiConfig, create: false, onChange: (v) => updateLivewire('exam_category_ids', v) });
             } else {
                 console.error("TomSelect is not loaded!");
             }
@@ -608,9 +541,11 @@
                 window.tsExamCategories?.clear(true);
             });
 
-            window.addEventListener('refresh-editors', () => window.whenCkEditorReady(initEditors));
+            window.addEventListener('refresh-editors', () => setTimeout(initEditors, 350));
 
-            document.addEventListener('livewire:navigated', () => window.whenCkEditorReady(initEditors));
+            document.addEventListener('livewire:load', () => setTimeout(initEditors, 100));
+            document.addEventListener('livewire:navigated', () => setTimeout(initEditors, 100));
+            document.addEventListener('livewire:update', () => setTimeout(initEditors, 350));
 
             document.addEventListener('livewire:navigating', () => {
                 for (let instanceName in CKEDITOR.instances) {
@@ -641,6 +576,5 @@
                 });
             }
         });
-
-        window.whenCkEditorReady(initEditors);
-@endscript
+    </script>
+@endpush
