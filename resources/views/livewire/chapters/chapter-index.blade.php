@@ -201,17 +201,4 @@
     </div>
 </div>
 
-@push('scripts')
-    <script>
-        window.addEventListener('chapterSaved', e => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: e.detail.message, position: 'top-end', showConfirmButton: false, timer: 2000 });
-            }
-        });
-        window.addEventListener('chapterDeleted', e => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: e.detail.message, position: 'top-end', showConfirmButton: false, timer: 2000 });
-            }
-        });
-    </script>
-@endpush
+

@@ -185,17 +185,4 @@
     </div>
 </div>
 
-@push('scripts')
-    <script>
-        window.addEventListener('subjectSaved', e => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: e.detail.message, position: 'top-end', showConfirmButton: false, timer: 2000 });
-            }
-        });
-        window.addEventListener('subjectDeleted', e => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: e.detail.message, position: 'top-end', showConfirmButton: false, timer: 2000 });
-            }
-        });
-    </script>
-@endpush
+

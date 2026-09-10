@@ -94,19 +94,3 @@
         </form>
     </flux:modal>
 </div>
-
-@push('scripts')
-    <script>
-        window.addEventListener('entity-saved', event => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: event.detail.message, position: 'top-end', timer: 1500, showConfirmButton: false });
-            }
-        });
-
-        window.addEventListener('entity-deleted', event => {
-            if (window.Swal) {
-                Swal.fire({ toast: true, icon: 'success', title: event.detail.message, position: 'top-end', timer: 1500, showConfirmButton: false });
-            }
-        });
-    </script>
-@endpush

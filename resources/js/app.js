@@ -1,35 +1,29 @@
 import $ from 'jquery';
-import toastr from 'toastr';
-import 'toastr/build/toastr.min.css';
-import Swal from 'sweetalert2';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import { collapse } from "@alpinejs/collapse";
-import Choices from 'choices.js';
-import 'choices.js/public/assets/styles/choices.min.css';
 
 // Alpine & Plugins
 Alpine.plugin(collapse);
 
 // Global Window Objects
-window.Swal = Swal;
-window.Choices = Choices;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.$ = window.jQuery = $;
-window.toastr = toastr;
-
-// Toastr ডিফল্ট অপশন
-toastr.options = {
-    "progressBar": true,
-    "positionClass": "toast-top-right",
-    "timeOut": "3000",
-};
 
 // --- লাইভওয়্যার টোস্ট ইভেন্টস ---
-window.addEventListener('success', event => toastr.success(event.detail.message));
-window.addEventListener('warning', event => toastr.warning(event.detail.message));
-window.addEventListener('error', event => toastr.error(event.detail.message));
+window.addEventListener('success', event => {
+    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'success' });
+});
+window.addEventListener('warning', event => {
+    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'warning' });
+});
+window.addEventListener('error', event => {
+    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'danger' });
+});
 
 // --- MathJax রেন্ডারিং লজিক (একীভূত করা হয়েছে) ---
 window.renderMathJax = function () {

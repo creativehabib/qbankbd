@@ -69,7 +69,7 @@
                         Main Question / Stimulus (উদ্দীপক) <span class="text-red-500">*</span>
                     </label>
                     <div wire:ignore class="ck-editor-container">
-                        <textarea id="editor">{!! $title !!}</textarea>
+                        <textarea id="editor" autocomplete="off">{!! $title !!}</textarea>
                     </div>
                     @error('title')<span class="text-sm text-red-600 mt-2 block font-medium">{{ $message }}</span>@enderror
                 </section>
@@ -161,7 +161,7 @@
                                 </div>
 
                                 <div wire:ignore class="ck-editor-container options-editor">
-                                    <textarea id="opt_editor_{{ $i }}">{!! $opt['option_text'] ?? '' !!}</textarea>
+                                    <textarea id="opt_editor_{{ $i }}" autocomplete="off">{!! $opt['option_text'] ?? '' !!}</textarea>
                                 </div>
                             </div>
                         @endforeach
@@ -205,7 +205,7 @@
                                 <div class="mb-4">
                                     <span class="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase block mb-2 tracking-wide">Question (প্রশ্ন)</span>
                                     <div wire:ignore class="ck-editor-container cq-editor">
-                                        <textarea id="cq_editor_{{ $part['id'] ?? $index }}" class="cq-dynamic-editor" data-index="{{ $index }}">{!! $part['text'] ?? '' !!}</textarea>
+                                        <textarea id="cq_editor_{{ $part['id'] ?? $index }}" class="cq-dynamic-editor" data-index="{{ $index }}" autocomplete="off">{!! $part['text'] ?? '' !!}</textarea>
                                     </div>
                                 </div>
 
@@ -234,7 +234,7 @@
 
                                     <div x-show="showAnswer" x-transition class="mt-4" style="display: none;">
                                         <div wire:ignore class="ck-editor-container answer-editor">
-                                            <textarea id="cq_answer_{{ $part['id'] ?? $index }}">{!! $part['answer'] ?? '' !!}</textarea>
+                                            <textarea id="cq_answer_{{ $part['id'] ?? $index }}" autocomplete="off">{!! $part['answer'] ?? '' !!}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@
                         General Solution / Description <span class="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full ml-1">Optional</span>
                     </label>
                     <div wire:ignore class="ck-editor-container description-editor">
-                        <textarea id="description_editor">{!! $description !!}</textarea>
+                        <textarea id="description_editor" autocomplete="off">{!! $description !!}</textarea>
                     </div>
                 </section>
 

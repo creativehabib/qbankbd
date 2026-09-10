@@ -58,27 +58,26 @@
         </div>
     </form>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
-        const initPrimaryFontChoices = () => {
+        const initPrimaryFontTomSelect = () => {
             const select = document.getElementById('primary-font-select');
             const hiddenInput = document.getElementById('primary-font-value');
 
-            if (!select || !hiddenInput || select.dataset.choicesInitialized === 'true' || !window.Choices) {
+            if (!select || !hiddenInput || select.dataset.tomselectInitialized === 'true' || !window.TomSelect) {
                 return;
             }
 
-            new window.Choices(select, {
-                searchEnabled: true,
-                shouldSort: false,
-                itemSelectText: '',
-                allowHTML: false,
-                renderChoiceLimit: -1,
-                searchResultLimit: 2000,
+            new window.TomSelect(select, {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                }
             });
 
-            select.dataset.choicesInitialized = 'true';
+            select.dataset.tomselectInitialized = 'true';
 
             select.addEventListener('change', () => {
                 hiddenInput.value = select.value;
@@ -86,22 +85,13 @@
             });
         };
 
-        document.addEventListener('DOMContentLoaded', initPrimaryFontChoices);
-        document.addEventListener('livewire:navigated', initPrimaryFontChoices);
+        document.addEventListener('DOMContentLoaded', initPrimaryFontTomSelect);
+        document.addEventListener('livewire:navigated', initPrimaryFontTomSelect);
 
         window.addEventListener('theme-options-saved', (event) => {
-            if (!window.Swal) {
-                return;
+            if (window.Flux) {
+                window.Flux.toast({ variant: 'success', text: event.detail.message || 'Saved' });
             }
-
-            window.Swal.fire({
-                toast: true,
-                icon: 'success',
-                title: event.detail.message || 'Saved',
-                position: 'top-end',
-                timer: 1500,
-                showConfirmButton: false,
-            });
         });
     </script>
 </div>

@@ -66,34 +66,34 @@
 
 @push('scripts')
 <script>
-    function showToast(message) {
-        if (!window.Swal) return;
-        Swal.fire({
-            toast: true,
-            icon: 'success',
-            title: message,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-        });
-    }
-
     function confirmDelete(id) {
         window.confirmDeleteAction(() => {
             Livewire.dispatch('deleteTagConfirmed', { id: id });
         });
     }
 
+    window.addEventListener('tag-saved', event => {
+        if (window.Flux) {
+            window.Flux.toast({ variant: 'success', text: event.detail.message });
+        }
+    });
+
+    window.addEventListener('tag-deleted', event => {
+        if (window.Flux) {
+            window.Flux.toast({ variant: 'success', text: event.detail.message });
+        }
+    });
+
     window.addEventListener('tagSaved', e => {
-        showToast(e.detail.message || 'Tag added successfully.');
+        if (window.Flux) window.Flux.toast({ variant: 'success', text: e.detail.message || 'Tag added successfully.' });
     });
 
     window.addEventListener('tagUpdated', e => {
-        showToast(e.detail.message || 'Tag updated successfully.');
+        if (window.Flux) window.Flux.toast({ variant: 'success', text: e.detail.message || 'Tag updated successfully.' });
     });
 
     window.addEventListener('tagDeleted', e => {
-        showToast(e.detail.message || 'Tag deleted successfully.');
+        if (window.Flux) window.Flux.toast({ variant: 'success', text: e.detail.message || 'Tag deleted successfully.' });
     });
 </script>
 @endpush

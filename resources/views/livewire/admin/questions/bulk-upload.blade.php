@@ -88,7 +88,7 @@
                         </div>
 
                         <div wire:ignore wire:key="raw-editor-box" class="ck-editor-container">
-                            <textarea id="raw_text_editor" rows="12"
+                            <textarea id="raw_text_editor" rows="12" autocomplete="off"
                                       placeholder="১. শব্দটির অর্থ কী?&#10;(ক) আলো&#10;(খ) জল&#10;(গ) বায়ু&#10;(ঘ) মাটি&#10;&#10;২. ...">{!! $rawText !!}</textarea>
                         </div>
                         @error('rawText')

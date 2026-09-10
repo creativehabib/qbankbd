@@ -388,7 +388,6 @@
                 </div>
                 <div class="space-y-3 px-6 py-5">
                     <a
-                        wire:navigate
                         href="{{ route('teacher.questions.create') }}"
                         class="group flex items-center justify-between rounded-xl border border-indigo-100 px-4 py-3 text-sm font-medium text-indigo-600 transition hover:border-indigo-200 hover:bg-indigo-50 dark:border-indigo-500/30 dark:text-indigo-300 dark:hover:border-indigo-400/40 dark:hover:bg-indigo-500/10"
                     >

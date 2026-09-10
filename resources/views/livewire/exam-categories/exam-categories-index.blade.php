@@ -142,28 +142,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        function showToast(message) {
-            if (!window.Swal) return;
-            Swal.fire({
-                toast: true,
-                icon: 'success',
-                title: message,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-            });
-        }
-
-        window.addEventListener('examSaved', e => {
-            showToast(e.detail.message);
-        });
-
-        window.addEventListener('examDeleted', e => {
-            showToast(e.detail.message || 'Exam has been deleted successfully.');
-        });
-    </script>
-@endpush

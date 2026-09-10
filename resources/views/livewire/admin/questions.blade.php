@@ -16,8 +16,8 @@
 
                 <div class="flex flex-wrap gap-2">
                     @if($canCreateQuestion)
-                        <flux:button href="{{ route('questions.bulk-upload') }}" wire:navigate variant="outline" icon="arrow-up-tray">Bulk upload</flux:button>
-                        <flux:button href="{{ route('questions.create') }}" wire:navigate variant="primary" icon="plus">New question</flux:button>
+                        <flux:button href="{{ route('questions.bulk-upload') }}" variant="outline" icon="arrow-up-tray">Bulk upload</flux:button>
+                        <flux:button href="{{ route('questions.create') }}" variant="primary" icon="plus">New question</flux:button>
                     @endif
                 </div>
             </div>
@@ -151,7 +151,7 @@
                                             @endif
                                         @endif
                                         @if($currentUser?->hasPermission('questions.update') && (! $currentUser->isTeacher() || $question->user_id === $currentUser->id))
-                                            <flux:button size="sm" variant="ghost" icon="pencil-square" href="{{ route('questions.edit', $question) }}" wire:navigate aria-label="Edit question" />
+                                            <flux:button size="sm" variant="ghost" icon="pencil-square" href="{{ route('questions.edit', $question) }}" aria-label="Edit question" />
                                         @endif
                                         @if($canDeleteQuestion && (! $currentUser->isTeacher() || $question->user_id === $currentUser->id))
                                             <flux:button size="sm" variant="danger" icon="trash" wire:click="confirmAction('trash', {{ $question->id }})" aria-label="Move question to trash" />
