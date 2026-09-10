@@ -3,45 +3,45 @@
 
         @if(auth()->user()?->hasRole('teacher'))
             {{-- ─── TEACHER DASHBOARD VIEW ────────────────────────────────────── --}}
-            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
+            <flux:card>
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div class="space-y-1">
-                        <h2 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 sm:text-xl">{{ auth()->user()?->institution_name ?: $welcomeTitle }}</h2>
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ auth()->user()?->institution_address ?: 'প্রতিষ্ঠানের ঠিকানা যোগ করুন' }}</p>
+                        <flux:heading size="xl">{{ auth()->user()?->institution_name ?: $welcomeTitle }}</flux:heading>
+                        <flux:subheading size="lg">{{ auth()->user()?->institution_address ?: 'Add Institution Address' }}</flux:subheading>
                     </div>
 
-                    <div class="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
-                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">তথ্য পরিবর্তন</a>
-                        <a href="#" class="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700">প্রতিষ্ঠান তথ্য</a>
+                    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                        <flux:button href="{{ route('profile.edit') }}" variant="primary">Update Profile</flux:button>
+                        <flux:button href="#" variant="outline">Institution Details</flux:button>
                     </div>
                 </div>
-            </section>
+            </flux:card>
 
-            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
+            <flux:card>
                 <div class="space-y-2 text-center">
-                    <h3 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">প্রশ্ন তৈরি করুন</h3>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">E-Question Builder ব্যবহার করে একাডেমিক, ভর্তি ও চাকরির প্রস্তুতির জন্য নিজের প্রশ্নপত্র তৈরি করুন।</p>
+                    <flux:heading size="xl">Create Questions</flux:heading>
+                    <flux:subheading>Use the E-Question Builder to create custom question papers for academic, admission, and job preparations.</flux:subheading>
                 </div>
 
                 <div
                     x-data="{ selectedClass: '', selectedSubject: '', classes: {{ Js::from(($academicClasses ?? collect())->map(fn ($class) => ['id' => (string) $class->id, 'name' => $class->name, 'subjects' => $class->subjects->map(fn ($subject) => ['id' => (string) $subject->id, 'name' => $subject->name])->values()])->values()) }}, get filteredSubjects() { if (!this.selectedClass) { return []; } const foundClass = this.classes.find((item) => item.id === this.selectedClass); return foundClass ? foundClass.subjects : []; } }"
-                    class="mt-4 rounded-xl border border-dashed border-zinc-300 p-3 sm:p-4"
+                    class="mt-6 rounded-xl border border-dashed border-zinc-300 p-4 dark:border-zinc-700"
                 >
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex flex-wrap gap-2">
                             <template x-for="academicClass in classes" :key="academicClass.id">
                                 <button
                                     type="button"
                                     @click="selectedClass = academicClass.id; selectedSubject = '';"
-                                    class="rounded-full border px-2 py-1.5 text-sm font-medium"
-                                    :class="selectedClass === academicClass.id ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-zinc-300 text-zinc-700'"
+                                    class="rounded-full border px-4 py-2 text-sm font-semibold transition-all shadow-sm"
+                                    :class="selectedClass === academicClass.id ? 'border-indigo-600 bg-indigo-600 text-white shadow-indigo-200 dark:shadow-none' : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700'"
                                     x-text="academicClass.name"
                                 ></button>
                             </template>
                         </div>
 
                         <div class="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
-                            <select x-model="selectedSubject" class="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm text-zinc-700 sm:min-w-80">
+                            <select x-model="selectedSubject" class="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 sm:min-w-80">
                                 <option value="">Select Subject</option>
                                 <template x-for="subject in filteredSubjects" :key="subject.id">
                                     <option :value="subject.id" x-text="subject.name"></option>
@@ -50,39 +50,39 @@
 
                             <a
                                 :href="selectedSubject ? `{{ route('question.set-create') ?? '#' }}?subject_id=${selectedSubject}` : '#'"
-                                class="inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-sm font-semibold sm:min-w-32"
-                                :class="selectedSubject ? 'bg-indigo-600 text-white' : 'cursor-not-allowed bg-indigo-200 text-white'"
-                            >পরবর্তী ধাপ →</a>
+                                class="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-bold shadow-sm transition-all sm:min-w-32"
+                                :class="selectedSubject ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'cursor-not-allowed bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600'"
+                            >Next Step &rarr;</a>
                         </div>
                     </div>
                 </div>
-            </section>
+            </flux:card>
 
-            <section class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-6">
-                <div class="space-y-2 text-center">
-                    <h3 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">{{ __('ড্যাশবোর্ড ওভারভিউ') }}</h3>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $description }}</p>
+            <flux:card>
+                <div class="space-y-1 mb-6 text-center">
+                    <flux:heading size="lg">Dashboard Overview</flux:heading>
+                    <flux:subheading>{{ $description }}</flux:subheading>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
-                    <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('মোট প্রশ্ন') }}</p>
-                        <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_question_sets'] ?? 0 }}</p>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="rounded-xl border border-zinc-100 bg-zinc-50/50 p-5 dark:border-zinc-700/50 dark:bg-zinc-800/50">
+                        <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Questions</p>
+                        <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_question_sets'] ?? 0 }}</p>
                     </div>
-                    <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('মোট MCQ প্রশ্ন') }}</p>
-                        <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_mcq_questions'] ?? 0 }}</p>
+                    <div class="rounded-xl border border-zinc-100 bg-zinc-50/50 p-5 dark:border-zinc-700/50 dark:bg-zinc-800/50">
+                        <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total MCQ</p>
+                        <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_mcq_questions'] ?? 0 }}</p>
                     </div>
-                    <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('মোট লিখিত প্রশ্ন') }}</p>
-                        <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_written_questions'] ?? 0 }}</p>
+                    <div class="rounded-xl border border-zinc-100 bg-zinc-50/50 p-5 dark:border-zinc-700/50 dark:bg-zinc-800/50">
+                        <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Written</p>
+                        <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-zinc-100">{{ $teacherStats['total_written_questions'] ?? 0 }}</p>
                     </div>
-                    <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('মোট খরচ') }}</p>
-                        <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">৳ {{ number_format($teacherStats['total_cost'] ?? 0, 2) }}</p>
+                    <div class="rounded-xl border border-zinc-100 bg-zinc-50/50 p-5 dark:border-zinc-700/50 dark:bg-zinc-800/50">
+                        <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Cost</p>
+                        <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-zinc-100">৳ {{ number_format($teacherStats['total_cost'] ?? 0, 2) }}</p>
                     </div>
                 </div>
-            </section>
+            </flux:card>
 
         @else
             {{-- ─── NON-TEACHER ROLES (STUDENT / ADMIN) ────────────────────────── --}}
@@ -90,15 +90,15 @@
                 {{-- ─── STUDENT DASHBOARD VIEW ────────────────────────────────── --}}
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div class="flex flex-wrap gap-2 sm:gap-4">
-                        <a href="{{ route('students.practice.index') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
+                        <a href="{{ route('students.practice.index') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
                             <flux:icon.play-circle class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Practice</span>
                         </a>
-                        <a href="{{ route('student.mistakes') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
+                        <a href="{{ route('student.mistakes') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
                             <flux:icon.exclamation-circle class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">Mistakes</span>
                         </a>
-                        <a href="{{ route('student.test-history') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800">
+                        <a href="{{ route('student.test-history') ?? '#' }}" class="flex flex-col items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm border border-zinc-100 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 transition">
                             <flux:icon.clock class="size-6 text-emerald-500 mb-1" />
                             <span class="text-xs font-medium text-zinc-600 dark:text-zinc-400">History</span>
                         </a>
@@ -120,8 +120,8 @@
                 </div>
 
                 <div>
-                    <div class="flex items-center justify-between mb-4 mt-5">
-                        <h2 class="text-sm font-bold text-zinc-700 dark:text-zinc-300">Your Study Stats Last {{ $range ?? 7 }} Days</h2>
+                    <div class="flex items-center justify-between mb-4 mt-6">
+                        <flux:heading size="lg">Your Study Stats Last {{ $range ?? 7 }} Days</flux:heading>
 
                         <div class="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800">
                             <a href="?range=7" wire:navigate class="rounded px-3 py-1 text-[10px] font-bold transition {{ ($range ?? 7) == 7 ? 'bg-emerald-500 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400' }}">7D</a>
@@ -132,19 +132,19 @@
 
                     <div class="grid grid-cols-1 gap-4 lg:grid-cols-4">
                         <div class="flex flex-col gap-4">
-                            <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 h-full flex flex-col justify-center relative overflow-hidden">
-                                <flux:icon.clock class="absolute -right-2 -top-2 size-12 text-zinc-50 opacity-10 dark:text-white" />
+                            <flux:card class="h-full flex flex-col justify-center relative overflow-hidden">
+                                <flux:icon.clock class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800" />
                                 <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Study Time</p>
                                 <p class="mt-2 text-2xl font-black text-zinc-900 dark:text-white">{{ $studentStats['study_time'] ?? '0m' }}</p>
-                            </div>
-                            <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 h-full flex flex-col justify-center relative overflow-hidden">
-                                <flux:icon.pencil-square class="absolute -right-2 -top-2 size-12 text-zinc-50 opacity-10 dark:text-white" />
+                            </flux:card>
+                            <flux:card class="h-full flex flex-col justify-center relative overflow-hidden">
+                                <flux:icon.pencil-square class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800" />
                                 <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Exam Taken</p>
                                 <p class="mt-2 text-2xl font-black text-zinc-900 dark:text-white">{{ $studentStats['exam_taken'] ?? 0 }}</p>
-                            </div>
+                            </flux:card>
                         </div>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 flex flex-col items-center">
+                        <flux:card class="flex flex-col items-center">
                             <div class="w-full flex justify-between mb-2">
                                 <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-tight dark:text-zinc-200">Accuracy</h3>
                                 <flux:icon.arrow-right class="size-4 text-zinc-300" />
@@ -155,20 +155,20 @@
                                 <span class="flex items-center gap-1"><span class="size-1.5 rounded-full bg-emerald-500"></span> {{ $studentStats['accuracy']['right'] ?? 0 }} Right</span>
                                 <span class="flex items-center gap-1"><span class="size-1.5 rounded-full bg-zinc-300"></span> {{ $studentStats['accuracy']['skipped'] ?? 0 }} Skipped</span>
                             </div>
-                        </div>
+                        </flux:card>
 
-                        <div class="md:col-span-2 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                        <flux:card class="md:col-span-2">
                             <h3 class="text-xs font-bold text-zinc-800 uppercase tracking-tight mb-4 dark:text-zinc-200">Your Engagement</h3>
                             <div id="engagementChart" class="w-full h-32" wire:ignore></div>
-                        </div>
+                        </flux:card>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 mt-5">
-                    <div class="col-span-1 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:col-span-2">
+                <div class="grid grid-cols-1 gap-5 lg:grid-cols-3 mt-6">
+                    <flux:card class="lg:col-span-2">
                         <div class="flex justify-between items-center border-b border-zinc-100 pb-3 dark:border-zinc-800">
                             <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Attended Exams</h3>
-                            <a href="{{ route('student.test-history') ?? '#' }}" class="text-xs text-indigo-600 hover:underline">View All →</a>
+                            <a href="{{ route('student.test-history') ?? '#' }}" class="text-xs text-indigo-600 hover:underline font-medium">View All &rarr;</a>
                         </div>
                         <div class="mt-4 space-y-4">
                             @forelse($attendedExams ?? [] as $exam)
@@ -195,18 +195,18 @@
                                 </div>
                             @empty
                                 <div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                                    এখনো কোনো মক টেস্ট দেওয়া হয়নি।
+                                    No mock test attended yet.
                                 </div>
                             @endforelse
                         </div>
-                    </div>
+                    </flux:card>
 
-                    <div class="col-span-1 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                    <flux:card>
                         <div class="flex justify-between items-center border-b border-zinc-100 pb-3 dark:border-zinc-800">
                             <h3 class="flex items-center gap-2 text-base font-bold {{ auth()->user()->league_icon }}">
                                 <flux:icon.trophy class="size-5" /> {{ auth()->user()->league_name }}
                             </h3>
-                            <a href="{{ route('student.leaderboard') ?? '#' }}" class="text-xs text-zinc-500 hover:underline">Leaderboard →</a>
+                            <a href="{{ route('student.leaderboard') ?? '#' }}" class="text-xs text-zinc-500 hover:underline font-medium">Leaderboard &rarr;</a>
                         </div>
 
                         <div class="mt-4 space-y-3">
@@ -226,10 +226,10 @@
                                     <span class="font-bold text-zinc-500">{{ $player->xp }} XP</span>
                                 </div>
                             @empty
-                                <div class="text-center text-xs text-zinc-500 py-4">এখনো কেউ পয়েন্ট পায়নি।</div>
+                                <div class="text-center text-xs text-zinc-500 py-4">No points earned yet.</div>
                             @endforelse
                         </div>
-                    </div>
+                    </flux:card>
                 </div>
 
                 @push('scripts')
@@ -309,70 +309,69 @@
                 {{-- ─── ADMIN DASHBOARD VIEW (ADVANCED CONTEXT) ────────────────── --}}
                 <div class="space-y-6">
 
-                    {{-- ১. কুইক স্ট্যাটস কাউন্টার (Overview Counters) --}}
+                    {{-- ১. Overview Counters --}}
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                        <flux:card class="relative overflow-hidden group">
                             <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
                                 <flux:icon.document-text class="size-12" />
                             </div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('মোট প্রশ্ন সংখ্যা') }}</p>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Total Questions</p>
                             <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">
                                 {{ number_format($adminStats['total_questions'] ?? 0) }}
                                 @if(($adminStats['today_questions'] ?? 0) > 0)
-                                    <span class="text-xs font-bold text-emerald-500 ml-1 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">+{{ $adminStats['today_questions'] }} আজ</span>
+                                    <flux:badge size="sm" color="emerald" class="ml-1">+{{ $adminStats['today_questions'] }} today</flux:badge>
                                 @endif
                             </p>
-                        </div>
+                        </flux:card>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                        <flux:card class="relative overflow-hidden group">
                             <div class="absolute -right-2 -top-2 size-12 text-amber-100 dark:text-amber-900 opacity-20 transition-transform group-hover:scale-110">
                                 <flux:icon.clock class="size-12" />
                             </div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('পেন্ডিং রিভিউ') }}</p>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Pending Reviews</p>
                             <p class="mt-2 text-3xl font-black {{ ($adminStats['pending_reviews'] ?? 0) > 0 ? 'text-amber-500' : 'text-zinc-400' }}">
-                                {{ $adminStats['pending_reviews'] ?? 0 }} <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">টি</span>
+                                {{ $adminStats['pending_reviews'] ?? 0 }}
                             </p>
-                        </div>
+                        </flux:card>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                        <flux:card class="relative overflow-hidden group">
                             <div class="absolute -right-2 -top-2 size-12 text-rose-100 dark:text-rose-900 opacity-20 transition-transform group-hover:scale-110">
                                 <flux:icon.banknotes class="size-12" />
                             </div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('পেন্ডিং উইথড্রাল') }}</p>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Pending Withdrawals</p>
                             <p class="mt-2 text-3xl font-black {{ ($pendingWithdrawSum ?? 0) > 0 ? 'text-rose-500' : 'text-zinc-400' }}">
                                 ৳{{ number_format($pendingWithdrawSum ?? 0, 2) }}
                             </p>
-                        </div>
+                        </flux:card>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative overflow-hidden group">
+                        <flux:card class="relative overflow-hidden group">
                             <div class="absolute -right-2 -top-2 size-12 text-emerald-100 dark:text-emerald-900 opacity-20 transition-transform group-hover:scale-110">
                                 <flux:icon.adjustments-horizontal class="size-12" />
                             </div>
-                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">{{ __('OMR এভালুয়েশন') }}</p>
+                            <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">OMR Evaluations</p>
                             <p class="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
                                 {{ number_format($adminStats['total_omr_evaluations'] ?? 0) }}
                                 @if(isset($omrStats['started']) && $omrStats['started'] > 0)
-                                    <span class="text-[10px] font-medium text-zinc-400 block mt-0.5">রানিং/চলতি ওএমআর পরীক্ষা: {{ $omrStats['started'] }} টি</span>
+                                    <span class="text-[10px] font-medium text-zinc-400 block mt-0.5">Running OMR Exams: {{ $omrStats['started'] }}</span>
                                 @endif
                             </p>
-                        </div>
+                        </flux:card>
                     </div>
 
-                    {{-- ২. শ্রেণিভিত্তিক প্রশ্ন বন্টন এবং টপ কন্ট্রিবিউটর শিক্ষক --}}
+                    {{-- 2. Class-wise Question Distribution & Top Contributors --}}
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
-                        <div class="lg:col-span-2 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 flex flex-col justify-between">
+                        <flux:card class="lg:col-span-2 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
                                     <flux:icon.chart-pie class="size-5 text-indigo-500" />
-                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">{{ __('শ্রেণিভিত্তিক প্রশ্ন বন্টন') }}</h3>
+                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">Class-wise Question Distribution</h3>
                                 </div>
                                 <div class="mt-4 space-y-4 max-h-60 overflow-y-auto pr-1">
                                     @forelse($classWiseDistribution ?? [] as $class)
                                         <div class="space-y-1">
                                             <div class="flex justify-between text-xs font-medium">
                                                 <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ $class->name }}</span>
-                                                <span class="text-zinc-500">{{ $class->questions_count }} টি প্রশ্ন</span>
+                                                <span class="text-zinc-500">{{ $class->questions_count }} questions</span>
                                             </div>
                                             <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
                                                 @php
@@ -382,23 +381,23 @@
                                             </div>
                                         </div>
                                     @empty
-                                        <div class="text-center text-xs text-zinc-500 py-8">{{ __('কোনো ডেটা পাওয়া যায়নি।') }}</div>
+                                        <div class="text-center text-xs text-zinc-500 py-8">No data available.</div>
                                     @endforelse
                                 </div>
                             </div>
 
                             <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between text-[11px] font-semibold text-zinc-400 uppercase">
-                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-blue-500"></span> {{ $adminStats['total_teachers'] ?? 0 }} জন শিক্ষক</span>
-                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-emerald-500"></span> {{ $adminStats['total_students'] ?? 0 }} জন শিক্ষার্থী</span>
-                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-zinc-400"></span> {{ $adminStats['total_users'] ?? 0 }} মোট অ্যাকাউন্ট</span>
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-blue-500"></span> {{ $adminStats['total_teachers'] ?? 0 }} Teachers</span>
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-emerald-500"></span> {{ $adminStats['total_students'] ?? 0 }} Students</span>
+                                <span class="flex items-center gap-1"><span class="size-2 rounded-full bg-zinc-400"></span> {{ $adminStats['total_users'] ?? 0 }} Accounts</span>
                             </div>
-                        </div>
+                        </flux:card>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 flex flex-col justify-between">
+                        <flux:card class="flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800">
                                     <flux:icon.trophy class="size-5 text-amber-500" />
-                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">{{ __('সেরা কন্ট্রিবিউটর (শিক্ষক)') }}</h3>
+                                    <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">Top Contributors (Teachers)</h3>
                                 </div>
                                 <div class="mt-4 space-y-3">
                                     @forelse($topTeachers ?? [] as $index => $teacher)
@@ -411,55 +410,52 @@
                                                     {{ $teacher->user?->name ?? 'Unknown Teacher' }}
                                                 </span>
                                             </div>
-                                            <span class="font-bold text-zinc-500 shrink-0 ml-2">{{ $teacher->total_added }} টি প্রশ্ন</span>
+                                            <span class="font-bold text-zinc-500 shrink-0 ml-2">{{ $teacher->total_added }} added</span>
                                         </div>
                                     @empty
-                                        <div class="text-center text-xs text-zinc-500 py-4">{{ __('এখনো কেউ প্রশ্ন যুক্ত করেনি।') }}</div>
+                                        <div class="text-center text-xs text-zinc-500 py-4">No questions added yet.</div>
                                     @endforelse
                                 </div>
                             </div>
 
                             <div class="mt-6 space-y-2">
-                                <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">{{ __('দ্রুত অ্যাকশন লিংক') }}</h4>
-                                <a href="{{ route('questions.index') }}" class="flex w-full items-center justify-center gap-1.5 rounded-lg bg-zinc-900 py-2 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition shadow-sm">
-                                    <flux:icon.check-circle class="size-4" /> {{ __('নতুন প্রশ্ন মডারেট করুন') }}
-                                </a>
-                                <a href="{{ route('admin.wallet-approvals') }}" class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-300 py-2 text-xs font-semibold text-zinc-700 dark:border-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
-                                    <flux:icon.wallet class="size-4" /> {{ __('ওয়ালেট ও টোকেন রিকোয়েস্ট') }}
-                                </a>
+                                <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Quick Links</h4>
+                                <flux:button href="{{ route('questions.index') }}" class="w-full justify-center">
+                                    <flux:icon.check-circle class="size-4" /> Moderate New Questions
+                                </flux:button>
+                                <flux:button href="{{ route('admin.wallet-approvals') }}" variant="outline" class="w-full justify-center">
+                                    <flux:icon.wallet class="size-4" /> Wallet & Token Requests
+                                </flux:button>
                             </div>
-                        </div>
+                        </flux:card>
                     </div>
 
-                    {{-- ৩. অ্যাডভান্সড কন্টেন্ট হেলথ এবং ভুল রিপোর্টেড প্রশ্ন অ্যালার্ট গ্রিড (স্টুডেন্ট ফিডব্যাক সহ) --}}
+                    {{-- 3. Advanced Content Health and Error Alerts --}}
                     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                        <flux:card>
                             <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800 mb-3">
                                 <flux:icon.exclamation-circle class="size-5 text-amber-500" />
                                 <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
-                                    {{ __('প্রশ্ন বাড়াতে হবে (Low Content Chapters)') }}
+                                    Low Content Chapters
                                 </h3>
                             </div>
                             <ul class="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs">
                                 @forelse($weakChapters ?? [] as $chapter)
                                     <li class="py-2.5 flex justify-between items-center">
                                         <span class="text-zinc-700 dark:text-zinc-300 font-medium">{{ $chapter->name }}</span>
-                                        <span class="rounded-full bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 font-bold text-amber-600 dark:text-amber-400">
-                                            {{ $chapter->questions_count }} টি প্রশ্ন
-                                        </span>
+                                        <flux:badge size="sm" color="amber">{{ $chapter->questions_count }} Questions</flux:badge>
                                     </li>
                                 @empty
-                                    <div class="text-center text-xs text-zinc-400 py-6">সব চ্যাপ্টারে পর্যাপ্ত প্রশ্ন আছে! 👍</div>
+                                    <div class="text-center text-xs text-zinc-400 py-6">All chapters have enough questions! 👍</div>
                                 @endforelse
                             </ul>
-                        </div>
+                        </flux:card>
 
-                        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                        <flux:card>
                             <div class="flex items-center gap-2 border-b border-zinc-100 pb-3 dark:border-zinc-800 mb-3">
                                 <flux:icon.flag class="size-5 text-red-500" />
                                 <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
-                                    {{ __('জরুরি সংশোধন প্রয়োজন (Critical Question Errors)') }}
+                                    Critical Question Errors
                                 </h3>
                             </div>
                             <div class="mt-4 space-y-4 max-h-[350px] overflow-y-auto pr-1">
@@ -468,31 +464,30 @@
                                         <div class="flex justify-between items-start gap-2">
                                             <div class="min-w-0 flex-1">
                                                 <p class="text-zinc-800 dark:text-zinc-200 font-bold text-xs truncate">
-                                                    {{ Str::limit(strip_tags($alert->question->title ?? 'প্রশ্ন পাওয়া যায়নি'), 55) }}
+                                                    {{ Str::limit(strip_tags($alert->question->title ?? 'Question Not Found'), 55) }}
                                                 </p>
                                                 <span class="text-[10px] text-zinc-400 block mt-0.5">
-                                                    👨‍🏫 শিক্ষক: <span class="font-semibold text-zinc-500 dark:text-zinc-400">{{ $alert->question->user->name ?? 'Unknown' }}</span>
+                                                    👨‍🏫 Teacher: <span class="font-semibold text-zinc-500 dark:text-zinc-400">{{ $alert->question->user->name ?? 'Unknown' }}</span>
                                                 </span>
                                             </div>
-                                            <a href="{{ route('questions.edit', $alert->question_id) }}" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline shrink-0 text-[10px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded shadow-sm">
-                                                {{ __('ঠিক করুন') }} →
-                                            </a>
+                                            <flux:button href="{{ route('questions.edit', $alert->question_id) }}" size="sm" variant="outline" class="shrink-0">
+                                                Fix It &rarr;
+                                            </flux:button>
                                         </div>
 
                                         <div class="flex flex-wrap items-center gap-1.5 pt-1 text-[10px] font-medium">
                                             @php
                                                 $reasonLabels = [
-                                                    'wrong_answer' => 'ভুল উত্তর',
-                                                    'typing_mistake' => 'বানান ভুল',
-                                                    'wrong_explanation' => 'ভুল ব্যাখ্যা',
-                                                    'blurry_image' => 'অস্পষ্ট ছবি',
-                                                    'other' => 'অন্যান্য'
+                                                    'wrong_answer' => 'Wrong Answer',
+                                                    'typing_mistake' => 'Typing Mistake',
+                                                    'wrong_explanation' => 'Wrong Explanation',
+                                                    'blurry_image' => 'Blurry Image',
+                                                    'other' => 'Other'
                                                 ];
-                                                $reasonClass = $alert->reason === 'wrong_answer' ? 'bg-red-50 text-red-600 dark:bg-red-950/30' : 'bg-amber-50 text-amber-600 dark:bg-amber-950/30';
                                             @endphp
-                                            <span class="px-2 py-0.5 rounded font-bold uppercase tracking-wide {{ $reasonClass }}">
-                                                ⚠️ {{ $reasonLabels[$alert->reason] ?? 'অন্যান্য' }}
-                                            </span>
+                                            <flux:badge size="sm" color="{{ $alert->reason === 'wrong_answer' ? 'red' : 'amber' }}">
+                                                ⚠️ {{ $reasonLabels[$alert->reason] ?? 'Other' }}
+                                            </flux:badge>
                                             <span class="text-zinc-400">by {{ $alert->user->name ?? 'Student' }}</span>
                                         </div>
 
@@ -503,10 +498,10 @@
                                         @endif
                                     </div>
                                 @empty
-                                    <div class="text-center text-xs text-zinc-400 py-8">কোনো ভুল রিপোর্টেড প্রশ্ন নেই, ডাটাবেজ কন্টেন্ট হেলদি আছে! ✨</div>
+                                    <div class="text-center text-xs text-zinc-400 py-8">No reported question errors, database content is healthy! ✨</div>
                                 @endforelse
                             </div>
-                        </div>
+                        </flux:card>
                     </div>
 
                 </div>

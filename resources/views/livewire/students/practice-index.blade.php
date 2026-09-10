@@ -54,7 +54,7 @@
                                 </div>
                             @endif
 
-                            @if($selectedSubjectId)
+                            @if($selectedClassId)
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-zinc-200 pt-5 dark:border-zinc-700">
 
                                     <div class="space-y-2">
@@ -87,11 +87,11 @@
                                 <button
                                     type="button"
                                     wire:click="startMockTest"
-                                    @if(!$selectedClassId || !$selectedSubjectId) disabled @endif
+                                    @if(!$selectedClassId) disabled @endif
                                     class="w-full flex justify-center items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 hover:bg-emerald-700 shadow-sm"
                                 >
                                     <flux:icon.play class="size-5" />
-                                    {{ __('মক টেস্ট শুরু করুন') }} {{ $selectedSubjectId ? "($questionCount মিনিট)" : '' }}
+                                    {{ __('মক টেস্ট শুরু করুন') }} {{ $selectedClassId ? "($questionCount মিনিট)" : '' }}
                                 </button>
 
                                 @if($mockTestError ?? false)
@@ -134,6 +134,9 @@
                                 @endforeach
                                 @foreach($filterSubjects as $id)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">{{ $filterOptions['subjects'][$id] ?? '' }}</span>
+                                @endforeach
+                                @foreach($filterExamCategories as $id)
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-500/20 dark:text-rose-300">{{ $filterOptions['exam_categories'][$id] ?? '' }}</span>
                                 @endforeach
                                 @foreach($filterTeachers as $id)
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">{{ $filterOptions['teachers'][$id] ?? '' }}</span>

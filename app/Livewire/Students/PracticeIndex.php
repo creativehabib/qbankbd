@@ -40,6 +40,8 @@ class PracticeIndex extends Component
 
     public array $filterSubjects = [];
 
+    public array $filterExamCategories = [];
+
     public array $filterTeachers = [];
 
     public string $filterSearch = '';
@@ -55,7 +57,7 @@ class PracticeIndex extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->isStudent(), 403);
+        abort_unless(auth()->user()?->isStudent() || auth()->user()?->isJobSeeker(), 403);
     }
 
     public function updated($property): void
@@ -70,6 +72,7 @@ class PracticeIndex extends Component
         $hasFilters = ! empty($this->filterQuestionTypes)
             || ! empty($this->filterClasses)
             || ! empty($this->filterSubjects)
+            || ! empty($this->filterExamCategories)
             || ! empty($this->filterTeachers)
             || filled($this->filterSearch);
 
@@ -92,6 +95,7 @@ class PracticeIndex extends Component
         $this->filterQuestionTypes = [];
         $this->filterClasses = [];
         $this->filterSubjects = [];
+        $this->filterExamCategories = [];
         $this->filterTeachers = [];
         $this->filterSearch = '';
 
@@ -182,22 +186,28 @@ class PracticeIndex extends Component
     {
         $this->mockTestError = null;
 
-        if (! $this->selectedClassId || ! $this->selectedSubjectId) {
-            $this->mockTestError = 'দয়া করে শ্রেণি এবং বিষয় নির্বাচন করুন।';
+        if (! $this->selectedClassId) {
+            $this->mockTestError = 'দয়া করে অন্তত একটি ক্যাটাগরি বা শ্রেণি নির্বাচন করুন।';
 
             return;
         }
 
-        $questions = Question::query()
-            ->where('subject_id', $this->selectedSubjectId)
+        $query = Question::query()
             ->where('question_type', 'mcq')
-            ->where('status', 'active')
-            ->inRandomOrder()
-            ->limit(20)
+            ->where('status', 'active');
+
+        if ($this->selectedSubjectId) {
+            $query->where('subject_id', $this->selectedSubjectId);
+        } else {
+            $query->where('academic_class_id', $this->selectedClassId);
+        }
+
+        $questions = $query->inRandomOrder()
+            ->limit((int)$this->questionCount)
             ->get();
 
         if ($questions->isEmpty()) {
-            $this->mockTestError = 'দুঃখিত! এই বিষয়ে মক টেস্ট তৈরি করার মতো কোনো প্রশ্ন পাওয়া যায়নি।';
+            $this->mockTestError = 'দুঃখিত! এই ক্যাটাগরিতে মক টেস্ট তৈরি করার মতো কোনো প্রশ্ন পাওয়া যায়নি।';
 
             return;
         }
@@ -207,7 +217,7 @@ class PracticeIndex extends Component
             'academic_class_id' => $this->selectedClassId,
             'subject_id' => $this->selectedSubjectId,
             'total_questions' => $questions->count(),
-            'duration_minutes' => 20,
+            'duration_minutes' => (int)$this->questionCount,
             'status' => 'started',
             'started_at' => now(),
         ]);
@@ -321,6 +331,7 @@ class PracticeIndex extends Component
         return [
             'classes' => AcademicClass::where('is_active', true)->orderBy('name')->pluck('name', 'id')->toArray(),
             'subjects' => Subject::where('is_active', true)->orderBy('name')->pluck('name', 'id')->toArray(),
+            'exam_categories' => \App\Models\ExamCategory::orderBy('name')->pluck('name', 'id')->toArray(),
             'teachers' => User::role('teacher')->orderBy('name')->pluck('name', 'id')->toArray(),
         ];
     }
@@ -381,9 +392,10 @@ class PracticeIndex extends Component
             ->where('status', 'active')
             ->when(! empty($this->filterClasses), fn (Builder $query) => $query->whereIn('academic_class_id', $this->filterClasses))
             ->when(! empty($this->filterSubjects), fn (Builder $query) => $query->whereIn('subject_id', $this->filterSubjects))
+            ->when(! empty($this->filterExamCategories), fn (Builder $query) => $query->whereHas('examCategories', fn($q) => $q->whereIn('exam_category_id', $this->filterExamCategories)))
             ->when(! empty($this->filterTeachers), fn (Builder $query) => $query->whereIn('user_id', $this->filterTeachers))
             ->when(filled($this->filterSearch), fn (Builder $query) => $query->where('title', 'like', '%'.$this->filterSearch.'%'))
-            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name'])
+            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
             ->withExists([
                 'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),

@@ -43,11 +43,15 @@ class TopicIndex extends Component
         $this->modalChapterId = null;
     }
 
-    public function openModal()
+    public function cancelEdit()
     {
         $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->resetValidation();
-        $this->showModal = true;
+    }
+
+    public function openModal()
+    {
+        $this->cancelEdit();
     }
 
     public function edit($id)
@@ -59,8 +63,6 @@ class TopicIndex extends Component
         $this->modalSubjectId = $topic->subject_id;
         $this->modalChapterId = $topic->chapter_id;
         $this->name = $topic->name;
-
-        $this->showModal = true;
     }
 
     public function save()
@@ -103,7 +105,6 @@ class TopicIndex extends Component
         }
 
         $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
-        $this->showModal = false;
         $this->dispatch('topicSaved', message: $message);
         $this->toastSuccess($message);
     }
@@ -112,10 +113,16 @@ class TopicIndex extends Component
     {
         $topic = Topic::find($id);
         if ($topic) {
+            $hasQuestions = \App\Models\Question::where('topic_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This topic is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+
             $topic->delete();
             $this->resetPage();
             $this->dispatch('topicDeleted', message: 'Topic deleted successfully.');
-        $this->toastSuccess('Topic deleted successfully.');
+            $this->toastSuccess('Topic deleted successfully.');
         }
     }
 

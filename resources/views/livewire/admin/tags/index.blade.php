@@ -1,68 +1,100 @@
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-    <div class="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
-        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search tags..."
-               class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+<x-split-layout>
+    <x-slot:form>
+        <form wire:submit="save" class="space-y-4">
+            <div>
+                <flux:heading size="lg">{{ $editingId ? 'Edit Tag' : 'Create Tag' }}</flux:heading>
+                <flux:text class="mt-1">Add or update tag details.</flux:text>
+            </div>
 
-        @if($canCreate)
-            <form wire:submit.prevent="save" class="flex gap-2">
-                <input type="text" wire:model="name" placeholder="Tag name"
-                       class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-                <button type="submit"
-                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Add</button>
-            </form>
+            <flux:field>
+                <flux:label>Tag Name</flux:label>
+                <flux:input wire:model="name" placeholder="e.g. PHP" />
+                <flux:error name="name" />
+            </flux:field>
+
+            <div class="flex justify-end gap-2 pt-2">
+                @if($editingId)
+                    <flux:button type="button" wire:click="cancelEdit" variant="ghost">Cancel</flux:button>
+                @endif
+                @if(($editingId && $canUpdate) || (!$editingId && $canCreate))
+                    <flux:button type="submit" variant="primary">
+                        <span wire:loading.remove wire:target="save">Save</span>
+                        <span wire:loading wire:target="save">Saving...</span>
+                    </flux:button>
+                @endif
+            </div>
+        </form>
+    </x-slot:form>
+
+    <x-slot:table>
+        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <flux:heading size="lg">Tags</flux:heading>
+                    <flux:text>Manage tags for subjects and questions.</flux:text>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <flux:input
+                    wire:model.live.debounce.300ms="search"
+                    icon="magnifying-glass"
+                    placeholder="Search tags..."
+                />
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-700/40 dark:text-gray-300">
+                    <tr>
+                        <th class="px-5 py-3 text-left font-semibold w-24">#ID</th>
+                        <th class="px-5 py-3 text-left font-semibold">Name</th>
+                        <th class="px-5 py-3 text-right font-semibold w-32">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    @forelse($tags as $tag)
+                        <tr wire:key="tag-{{ $tag->id }}" class="transition hover:bg-indigo-50/40 dark:hover:bg-gray-700/30">
+                            <td class="px-5 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                    #{{ $tag->id }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3 font-medium text-gray-900 dark:text-gray-100">
+                                {{ $tag->name }}
+                            </td>
+                            <td class="px-5 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    @if($canUpdate)
+                                        <flux:button wire:click="edit({{ $tag->id }})" variant="ghost" size="sm" icon="pencil-square" aria-label="Edit Tag" />
+                                    @endif
+                                    @if($canDelete)
+                                        <flux:button type="button" onclick="confirmDelete({{ $tag->id }})" variant="danger" size="sm" icon="trash" aria-label="Delete Tag" />
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-5 py-10 text-center">
+                                <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                                    <p class="text-lg font-medium">No tags found</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($tags->hasPages())
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-800/30">
+                {{ $tags->links() }}
+            </div>
         @endif
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Name</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            @forelse($tags as $tag)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $tag->id }}</td>
-                    <td class="px-4 py-2">
-                        @if($editingId === $tag->id)
-                            <form wire:submit.prevent="update" class="flex w-full gap-2">
-                                <input type="text" wire:model="editingName"
-                                       class="flex-1 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-                                <button type="submit" class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Save</button>
-                                <button type="button" wire:click="cancelEdit"
-                                        class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
-                            </form>
-                        @else
-                            <span class="text-gray-700 dark:text-gray-300">{{ $tag->name }}</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2 space-x-2">
-                        @if($editingId !== $tag->id)
-                            @if($canUpdate)
-                                <button wire:click="edit({{ $tag->id }})"
-                                        class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</button>
-                            @endif
-
-                            @if($canDelete)
-                                <button type="button" onclick="confirmDelete({{ $tag->id }})"
-                                        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
-                            @endif
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="3" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No tags found.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4">{{ $tags->links() }}</div>
-</div>
+    </x-slot:table>
+</x-split-layout>
 
 @push('scripts')
 <script>

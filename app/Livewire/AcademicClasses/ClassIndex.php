@@ -140,8 +140,16 @@ class ClassIndex extends Component
 
     public function deleteClass(int $id): void
     {
-        AcademicClass::query()->findOrFail($id)->delete();
-        $this->toastDanger('Academic class deleted successfully.', 'Deleted');
+        $class = AcademicClass::query()->find($id);
+        if ($class) {
+            $hasQuestions = \App\Models\Question::where('academic_class_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This class is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+            $class->delete();
+            $this->toastDanger('Academic class deleted successfully.', 'Deleted');
+        }
     }
 
     public function openSubjectModal(): void
@@ -210,8 +218,16 @@ class ClassIndex extends Component
 
     public function deleteSubject(int $id): void
     {
-        Subject::query()->findOrFail($id)->delete();
-        $this->toastDanger('Subject deleted successfully.', 'Delete');
+        $subject = Subject::query()->find($id);
+        if ($subject) {
+            $hasQuestions = \App\Models\Question::where('subject_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This subject is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+            $subject->delete();
+            $this->toastDanger('Subject deleted successfully.', 'Delete');
+        }
     }
 
     public function openChapterModal(): void
@@ -280,8 +296,16 @@ class ClassIndex extends Component
 
     public function deleteChapter(int $id): void
     {
-        Chapter::query()->findOrFail($id)->delete();
-        $this->toastDanger('Chapter deleted successfully.', 'Delete');
+        $chapter = Chapter::query()->find($id);
+        if ($chapter) {
+            $hasQuestions = \App\Models\Question::where('chapter_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This chapter is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+            $chapter->delete();
+            $this->toastDanger('Chapter deleted successfully.', 'Delete');
+        }
     }
 
     public function openTopicModal(): void
@@ -347,8 +371,16 @@ class ClassIndex extends Component
 
     public function deleteTopic(int $id): void
     {
-        Topic::query()->findOrFail($id)->delete();
-        $this->toastDanger('Topic deleted successfully.', 'Delete');
+        $topic = Topic::query()->find($id);
+        if ($topic) {
+            $hasQuestions = \App\Models\Question::where('topic_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This topic is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+            $topic->delete();
+            $this->toastDanger('Topic deleted successfully.', 'Delete');
+        }
     }
 
     public function render(): View
@@ -382,7 +414,7 @@ class ClassIndex extends Component
         ])->layout('layouts.app', ['title' => 'Academic Content CRUD']);
     }
 
-    private function resetClassForm(): void
+    public function resetClassForm(): void
     {
         $this->editingClassId = null;
         $this->class_name = '';
@@ -390,9 +422,10 @@ class ClassIndex extends Component
         $this->class_is_active = true;
         $this->class_is_premium = false;
         $this->showClassModal = false;
+        $this->resetValidation();
     }
 
-    private function resetSubjectForm(): void
+    public function resetSubjectForm(): void
     {
         $this->editingSubjectId = null;
         $this->subject_academic_class_id = null;
@@ -402,9 +435,10 @@ class ClassIndex extends Component
         $this->subject_is_active = true;
         $this->subject_is_premium = false;
         $this->showSubjectModal = false;
+        $this->resetValidation();
     }
 
-    private function resetChapterForm(): void
+    public function resetChapterForm(): void
     {
         $this->editingChapterId = null;
         $this->chapter_subject_id = null;
@@ -414,9 +448,10 @@ class ClassIndex extends Component
         $this->chapter_is_active = true;
         $this->chapter_is_premium = false;
         $this->showChapterModal = false;
+        $this->resetValidation();
     }
 
-    private function resetTopicForm(): void
+    public function resetTopicForm(): void
     {
         $this->editingTopicId = null;
         $this->topic_chapter_id = null;
@@ -425,6 +460,7 @@ class ClassIndex extends Component
         $this->topic_is_active = true;
         $this->topic_is_premium = false;
         $this->showTopicModal = false;
+        $this->resetValidation();
     }
 
     private function uniqueSlug(string $modelClass, string $name, ?int $ignoreId = null): string

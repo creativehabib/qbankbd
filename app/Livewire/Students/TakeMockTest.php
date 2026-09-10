@@ -31,7 +31,7 @@ class TakeMockTest extends Component
 
         // পরীক্ষা যদি ইতোমধ্যে শেষ হয়ে থাকে, তবে প্র্যাকটিস পেজে পাঠিয়ে দেওয়া
         if ($this->mockTest->status === 'completed') {
-            return redirect()->route('student.practice.index');
+            return redirect()->route('students.practice.index');
         }
 
         // সময় ক্যালকুলেশন (পেজ রিলোড দিলেও যেন সময় ঠিক থাকে)

@@ -28,15 +28,17 @@ class ExamCategoriesIndex extends Component
         $this->resetPage();
     }
 
-    // ক্রিয়েট বাটনে ক্লিক করলে ফর্ম রিসেট হবে এবং মডাল ওপেন হবে
-    public function openModal()
+    public function cancelEdit()
     {
         $this->reset(['name', 'editId']);
         $this->resetValidation();
-        $this->showModal = true; // <-- মডাল ওপেন করার জন্য true করা হলো
     }
 
-    // এডিট বাটনে ক্লিক করলে ডেটা লোড হবে এবং মডাল ওপেন হবে
+    public function openModal()
+    {
+        $this->cancelEdit();
+    }
+
     public function edit($id)
     {
         $this->resetValidation();
@@ -44,8 +46,6 @@ class ExamCategoriesIndex extends Component
 
         $this->editId = $examCategory->id;
         $this->name = $examCategory->name;
-
-        $this->showModal = true; // <-- মডাল ওপেন করার জন্য true করা হলো
     }
 
     // সেভ বা আপডেট করার মেথড
@@ -80,7 +80,6 @@ class ExamCategoriesIndex extends Component
         }
 
         $this->reset(['name', 'editId']);
-        $this->showModal = false; // <-- সেভ হওয়ার পর মডাল ক্লোজ করার জন্য false করা হলো
 
         $this->dispatch('examCategorySaved', message: $message);
         $this->toastSuccess($message);
@@ -91,10 +90,16 @@ class ExamCategoriesIndex extends Component
     {
         $examCategory = ExamCategory::find($id);
         if ($examCategory) {
+            $hasQuestions = $examCategory->questions()->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This exam category is attached to questions, so it cannot be deleted.', 'Cannot Delete');
+                return;
+            }
+
             $examCategory->delete();
             $this->resetPage();
             $this->dispatch('examCategoryDeleted', message: 'Exam category deleted successfully.');
-        $this->toastSuccess('Exam category deleted successfully.');
+            $this->toastSuccess('Exam category deleted successfully.');
         }
     }
 

@@ -16,7 +16,7 @@ class BookmarkedQuestions extends Component
 
     public function mount(): void
     {
-        abort_unless(auth()->user()?->isStudent(), 403);
+        abort_unless(auth()->user()?->isStudent() || auth()->user()?->isJobSeeker(), 403);
     }
 
     // --- Dynamic Actions ---

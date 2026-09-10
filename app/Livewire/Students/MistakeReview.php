@@ -20,7 +20,7 @@ class MistakeReview extends Component
 
     public function mount()
     {
-        abort_unless(auth()->user()?->isStudent(), 403);
+        abort_unless(auth()->user()?->isStudent() || auth()->user()?->isJobSeeker(), 403);
     }
 
     // ফিল্টার পরিবর্তন করার মেথড

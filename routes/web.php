@@ -12,6 +12,7 @@ use App\Livewire\OMR\EvaluateOmr;
 use App\Livewire\OMR\ManageTokens;
 use App\Livewire\OMR\MapAnswers;
 use App\Livewire\OmrGenerator;
+use App\Livewire\OmrScanner;
 use App\Livewire\PermissionManager;
 use App\Livewire\Questions;
 use App\Livewire\Questions\BulkUpload;
@@ -23,7 +24,6 @@ use App\Livewire\Students\Leaderboard;
 use App\Livewire\Students\MistakeReview;
 use App\Livewire\Students\MockTestHistory;
 use App\Livewire\Students\MockTestResult;
-use App\Livewire\OmrScanner;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Students\TakeMockTest;
 use App\Livewire\Subjects\SubjectIndex;
@@ -56,7 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- প্রশ্ন ভান্ডার (Question Bank) Routes ---
     Route::get('/questions', Questions::class)->name('questions.index');
     Route::get('/questions/create', Create::class)->name('questions.create');
-//    Route::get('/questions/{question}/show', App\Livewire\ShowQuestion::class)->name('questions.show');
+    //    Route::get('/questions/{question}/show', App\Livewire\ShowQuestion::class)->name('questions.show');
     Route::get('/questions/bulk-upload', BulkUpload::class)->name('questions.bulk-upload');
     Route::get('/questions/{question}/edit', Edit::class)->name('questions.edit');
 

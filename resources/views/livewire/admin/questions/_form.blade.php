@@ -82,43 +82,13 @@
                         </div>
                         Reference Image / Attachment <span class="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full ml-1">Optional</span>
                     </label>
-                    <div class="flex justify-center px-6 pt-6 pb-6 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl hover:border-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30">
-                        <div class="space-y-2 text-center w-full">
-                            @if ($image)
-                                <div class="relative w-max mx-auto mb-4 group p-1 bg-white dark:bg-gray-800 rounded-xl shadow-md border dark:border-gray-700">
-                                    <img src="{{ $image->temporaryUrl() }}" class="mx-auto h-48 object-contain rounded-lg">
-                                    <button type="button" wire:click="$set('image', null)" class="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-lg transition opacity-100 sm:opacity-0 group-hover:opacity-100">
-                                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
-                                </div>
-                            @elseif(!empty($existingImage))
-                                <div class="relative w-max mx-auto mb-4 group p-1 bg-white dark:bg-gray-800 rounded-xl shadow-md border dark:border-gray-700">
-                                    <img src="{{ Storage::url($existingImage) }}" class="mx-auto h-48 object-contain rounded-lg">
-                                    <button type="button" wire:click="removeExistingImage" class="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-lg transition opacity-100 sm:opacity-0 group-hover:opacity-100" title="Remove Image">
-                                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
-                                </div>
-                            @else
-                                <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-full inline-block mb-2">
-                                    <svg class="mx-auto h-10 w-10 text-gray-500 dark:text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                            @endif
-
-                            <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
-                                <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-700 rounded-xl font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition shadow-sm focus-within:outline-none">
-                                    <span>Upload a file</span>
-                                    <input id="file-upload" wire:model="image" type="file" class="sr-only" accept="image/png, image/jpeg, image/jpg, image/webp">
-                                </label>
-                            </div>
-                            <p class="text-xs text-gray-500 pt-2">PNG, JPG, WEBP up to 2MB</p>
-
-                            <div wire:loading wire:target="image" class="text-sm text-indigo-600 dark:text-indigo-400 font-bold mt-3 animate-pulse flex items-center justify-center gap-2">
-                                <svg class="animate-spin size-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-                                Uploading image...
-                            </div>
-                        </div>
+                    <div class="p-4 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl hover:border-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30">
+                        @include('mediamanager::includes.media-input', [
+                            'name'  => 'image',
+                            'id'    => 'image',
+                            'label' => 'Select Attachment Image',
+                            'value' => $image ?? null,
+                        ])
                     </div>
                 </section>
 
@@ -376,7 +346,7 @@
                     </div>
 
                     <div wire:ignore>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category</label>
                         <select id="exam_categories" class="w-full" multiple placeholder="Select Exam (BCS, HSC...)">
                             @foreach($allExamCategories as $category)
                                 <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>

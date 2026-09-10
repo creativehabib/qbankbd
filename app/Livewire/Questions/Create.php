@@ -16,11 +16,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class Create extends Component
 {
-    use AuthorizesRequests, SlugValidationTrait, WithFileUploads, InteractsWithFluxToasts; // WithFileUploads যুক্ত করা হলো
+    use AuthorizesRequests, SlugValidationTrait, InteractsWithFluxToasts;
 
     public $subject_id;
 
@@ -170,41 +169,41 @@ class Create extends Component
         $this->dispatch('refresh-editors');
     }
 
-    // 🌟 AI জেনারেটর ফাংশন
+    // 🌟 AI Generator Function
     public function generateAiQuestion(): void
     {
         $this->validate([
             'aiPrompt' => 'required|string|max:255',
         ]);
 
-        // প্রশ্ন টাইপ অটোমেটিক MCQ করে দেওয়া হচ্ছে
+        // Auto-set question type to MCQ
         $this->question_type = 'mcq';
         if (empty($this->options)) {
             $this->resetToMcq();
         }
 
-        // 🌟 AI এর জন্য কড়া প্রম্পট (Random Answer) 🌟
-        $prompt = "Create 1 multiple-choice question in Bengali language about '{$this->aiPrompt}'.
+        // 🌟 Strict Prompt for AI (Random Answer) 🌟
+        $prompt = "Create 1 multiple-choice question about '{$this->aiPrompt}'.
         IMPORTANT RULE: RANDOMLY place the correct answer in A, B, C, or D. Do NOT always make 'A' the correct answer.
         You MUST return the response strictly in the following JSON format, and nothing else (no markdown, no extra text):
         {
-            \"question\": \"এখানে প্রশ্ন থাকবে?\",
+            \"question\": \"Question text here?\",
             \"options\": {
-                \"A\": \"প্রথম অপশন\",
-                \"B\": \"দ্বিতীয় অপশন\",
-                \"C\": \"তৃতীয় অপশন\",
-                \"D\": \"চতুর্থ অপশন\"
+                \"A\": \"First option\",
+                \"B\": \"Second option\",
+                \"C\": \"Third option\",
+                \"D\": \"Fourth option\"
             },
-            \"answer\": \"সঠিক অপশনের Letter (যেমন: B বা C বা D)\"
+            \"answer\": \"Letter of correct option (e.g., B, C, or D)\"
         }";
 
         try {
-            // 🌟 আমাদের তৈরি করা সার্ভিস ক্লাস ব্যবহার করা হচ্ছে (৬০ সেকেন্ড টাইমআউট) 🌟
+            // 🌟 Use our generated service class (60 sec timeout) 🌟
             $geminiService = new GeminiService;
             $aiData = $geminiService->generateJson($prompt, 60);
 
             if (is_array($aiData) && isset($aiData['question'], $aiData['options'])) {
-                // 🌟 ফর্মের ফিল্ডগুলো অটোমেটিক পূরণ করা হচ্ছে 🌟
+                // 🌟 Auto-fill form fields 🌟
                 $this->title = $aiData['question'];
 
                 $this->options = [
@@ -214,19 +213,19 @@ class Create extends Component
                     ['option_text' => $aiData['options']['D'], 'is_correct' => $aiData['answer'] === 'D'],
                 ];
 
-                // 🌟 CKEditor রিলোড করার সিগন্যাল 🌟
+                // 🌟 Signal to reload CKEditor 🌟
                 $this->dispatch('refresh-editors');
                 $this->dispatch('ai-data-filled', title: $this->title, options: $this->options);
-                session()->flash('ai_success', 'AI দিয়ে সফলভাবে প্রশ্ন অটো-ফিল করা হয়েছে!');
+                session()->flash('ai_success', 'Question successfully auto-filled using AI!');
             } else {
-                $this->addError('aiPrompt', 'AI সঠিক ফরম্যাটে উত্তর দিতে পারেনি।');
+                $this->addError('aiPrompt', 'AI failed to respond in the correct format.');
             }
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
-            // 🌟 কোটা লিমিট শেষ হলে সুন্দর বাংলা মেসেজ 🌟
+            // 🌟 Handle quota limit with a nice message 🌟
             if (str_contains($errorMessage, 'Quota exceeded') || str_contains($errorMessage, '429')) {
-                $this->addError('aiPrompt', 'AI সার্ভারে এখন অনেক চাপ। অনুগ্রহ করে ১ মিনিট অপেক্ষা করে আবার চেষ্টা করুন।');
+                $this->addError('aiPrompt', 'AI server is currently overloaded. Please wait a minute and try again.');
             } else {
                 $this->addError('aiPrompt', 'Error: '.$errorMessage);
             }
@@ -268,11 +267,9 @@ class Create extends Component
         $this->dispatch('topicsUpdated', topics: $topics);
     }
 
-    public function save()
+    public function rules()
     {
         $currentUser = auth()->user();
-
-        abort_unless($currentUser?->hasPermission('questions.create'), 403);
 
         $rules = [
             'academic_class_id' => 'required|exists:academic_classes,id',
@@ -282,13 +279,13 @@ class Create extends Component
             'title' => 'required|string',
             'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
-            'question_type' => 'required|in:mcq,cq,short,written', // written যুক্ত করা হয়েছে
-            'marks' => 'required|integer|min:0',
+            'question_type' => 'required|in:mcq,cq,short,written', // written added
+            'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
-            'exam_category_ids' => 'required|array|min:1', // Target Audience Required
+            'exam_category_ids' => 'nullable|array', // Target Audience Optional
             'exam_category_ids.*' => 'exists:exam_categories,id',
             'slug' => ['required', 'string', 'max:255', Rule::unique('questions', 'slug')],
-            'image' => 'nullable|image|max:2048', // ইমেজের ভ্যালিডেশন
+            'image' => 'nullable|string', // Image validation
         ];
 
         if ($this->question_type === 'mcq') {
@@ -296,7 +293,24 @@ class Create extends Component
             $rules['options.*.option_text'] = 'required|string';
         }
 
-        $validated = $this->validate($rules);
+        // CQ parts validation
+        if ($this->question_type === 'cq') {
+            $rules['cq'] = 'required|array|min:1';
+            $rules['cq.*.label'] = 'required|string';
+            $rules['cq.*.text'] = 'required|string';
+            $rules['cq.*.marks'] = 'required|numeric|min:0';
+        }
+
+        return $rules;
+    }
+
+    public function save()
+    {
+        $currentUser = auth()->user();
+
+        abort_unless($currentUser?->hasPermission('questions.create'), 403);
+
+        $validated = $this->validate($this->rules());
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
@@ -317,10 +331,10 @@ class Create extends Component
                 $extraData = $this->cq;
             } elseif ($this->question_type === 'mcq') {
                 $extraData = $this->options;
-            } elseif ($this->question_type === 'written') {
+            } elseif (in_array($this->question_type, ['written', 'short'])) {
                 $imagePath = null;
                 if ($this->image) {
-                    $imagePath = $this->image->store('questions', 'public');
+                    $imagePath = $this->image;
                 }
                 $extraData = ['image' => $imagePath];
             }

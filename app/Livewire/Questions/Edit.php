@@ -16,11 +16,10 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Livewire\WithFileUploads; // Image delete এর জন্য
 
 class Edit extends Component
 {
-    use AuthorizesRequests, SlugValidationTrait, WithFileUploads; // WithFileUploads যুক্ত করা হলো
+    use AuthorizesRequests, SlugValidationTrait;
 
     public Question $question;
 
@@ -53,8 +52,6 @@ class Edit extends Component
     public $exam_category_ids = [];
 
     public $image; // নতুন ইমেজ আপলোডের জন্য
-
-    public $existingImage = null; // ডাটাবেজে থাকা ইমেজের জন্য
 
     public function mount(Question $question)
     {
@@ -97,8 +94,8 @@ class Edit extends Component
                 $this->resetToMcq();
             }
             $this->setCqDefaults();
-        } elseif ($this->question_type === 'written') {
-            $this->existingImage = $extraData['image'] ?? null; // বিদ্যমান ইমেজ লোড করা হলো
+        } elseif (in_array($this->question_type, ['written', 'short'])) {
+            $this->image = $extraData['image'] ?? null; 
             $this->resetToMcq();
             $this->setCqDefaults();
         } else {
@@ -242,16 +239,7 @@ class Edit extends Component
         $this->dispatch('topicsUpdated', topics: $topics);
     }
 
-    // নতুন মেথড: ইউজার যদি এডিট পেজ থেকে বর্তমান ছবি ডিলিট করতে চায়
-    public function removeExistingImage()
-    {
-        if ($this->existingImage) {
-            Storage::disk('public')->delete($this->existingImage);
-            $this->existingImage = null;
-        }
-    }
-
-    public function save()
+    public function rules()
     {
         abort_unless(auth()->user()?->hasPermission('questions.update'), 403);
 
@@ -267,13 +255,13 @@ class Edit extends Component
             'title' => 'required|string',
             'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
-            'question_type' => 'required|in:mcq,cq,short,written', // written যুক্ত করা হয়েছে
-            'marks' => 'required|integer|min:0',
+            'question_type' => 'required|in:mcq,cq,short,written', // written added
+            'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
-            'exam_category_ids' => 'required|array|min:1', // Target Audience Required
+            'exam_category_ids' => 'nullable|array', // Target Audience Optional
             'exam_category_ids.*' => 'exists:exam_categories,id',
             'slug' => ['required', 'string', 'max:255', Rule::unique('questions', 'slug')->ignore($this->question->id)],
-            'image' => 'nullable|image|max:2048', // ইমেজের ভ্যালিডেশন
+            'image' => 'nullable|string', // Image validation
         ];
 
         if ($this->question_type === 'mcq') {
@@ -281,7 +269,23 @@ class Edit extends Component
             $rules['options.*.option_text'] = 'required|string';
         }
 
-        $validated = $this->validate($rules);
+        // CQ parts validation
+        if ($this->question_type === 'cq') {
+            $rules['cq'] = 'required|array|min:1';
+            $rules['cq.*.label'] = 'required|string';
+            $rules['cq.*.text'] = 'required|string';
+            $rules['cq.*.marks'] = 'required|numeric|min:0';
+        }
+
+        return $rules;
+    }
+
+    public function update()
+    {
+        $currentUser = auth()->user();
+        abort_unless($currentUser?->hasPermission('questions.update'), 403);
+
+        $validated = $this->validate($this->rules());
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
@@ -297,20 +301,13 @@ class Edit extends Component
         DB::transaction(function () use ($subject) {
             $extraData = null;
 
+            // টাইপ অনুযায়ী extra_content আপডেট
             if ($this->question_type === 'cq') {
                 $extraData = $this->cq;
             } elseif ($this->question_type === 'mcq') {
                 $extraData = $this->options;
-            } elseif ($this->question_type === 'written') {
-                $imagePath = $this->existingImage;
-                if ($this->image) {
-                    // নতুন ছবি দিলে আগেরটা ডিলিট করে নতুনটা সেভ করবে
-                    if ($this->existingImage) {
-                        Storage::disk('public')->delete($this->existingImage);
-                    }
-                    $imagePath = $this->image->store('questions', 'public');
-                }
-                $extraData = ['image' => $imagePath];
+            } elseif (in_array($this->question_type, ['written', 'short'])) {
+                $extraData = ['image' => $this->image];
             }
 
             $this->question->update([

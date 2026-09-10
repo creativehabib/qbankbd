@@ -27,6 +27,14 @@
         ],
         [
             'type' => 'link',
+            'label' => __('Media'),
+            'route' => 'mediamanager.index',
+            'match' => 'mediamanager.*',
+            'icon' => 'photo',
+            'visible' => auth()->user()->hasRole(['admin', 'super_admin']),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Question Create'),
             'route' => 'question.set-create',
             'match' => 'question.set-create',
@@ -103,7 +111,7 @@
             'route' => 'students.practice.index',
             'match' => 'students.practice.*',
             'icon' => 'academic-cap',
-            'visible' => auth()->user()->isStudent(),
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
         ],
         [
             'type' => 'link',
@@ -111,7 +119,7 @@
             'route' => 'student.bookmarks',
             'match' => 'student.bookmarks',
             'icon' => 'bookmark',
-            'visible' => auth()->user()->isStudent(),
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
         ],
         [
             'type' => 'group',
@@ -135,7 +143,7 @@
             'route' => 'student.leaderboard',
             'match' => 'student.leaderboard',
             'icon' => 'trophy',
-            'visible' => auth()->user()->isStudent(),
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
         ],
         [
             'type' => 'link',
@@ -143,7 +151,7 @@
             'route' => 'student.mistakes',
             'match' => 'student.mistakes',
             'icon' => 'exclamation-circle',
-            'visible' => auth()->user()->isStudent()
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker()
         ],
         [
             'type' => 'link',
@@ -151,7 +159,7 @@
             'route' => 'student.test-history',
             'match' => 'student.test-history',
             'icon' => 'clock',
-            'visible' => auth()->user()->isStudent()
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker()
         ],
         [
             'type' => 'group',
@@ -428,5 +436,6 @@
 
 @fluxScripts
 @stack('scripts')
+@include('mediamanager::includes.media-modal')
 </body>
 </html>

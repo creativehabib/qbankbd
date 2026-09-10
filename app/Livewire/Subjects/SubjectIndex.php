@@ -7,13 +7,12 @@ use App\Models\AcademicClass;
 use App\Models\Subject;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class SubjectIndex extends Component
 {
     use InteractsWithFluxToasts;
-    use WithFileUploads, WithPagination;
+    use WithPagination;
 
     public $search = '';
 
@@ -32,9 +31,7 @@ class SubjectIndex extends Component
 
     public $is_premium = false;
 
-    public $newImage;
-
-    public $oldImage;
+    public $image;
 
     protected $listeners = ['deleteSubjectConfirmed' => 'delete'];
 
@@ -43,18 +40,20 @@ class SubjectIndex extends Component
         $this->resetPage();
     }
 
-    public function openModal()
+    public function cancelEdit()
     {
-        // ১. আগে ডেটা রিসেট হবে
         $this->reset([
             'editId', 'academic_class_id', 'name', 'subject_code',
-            'description', 'newImage', 'oldImage',
+            'description', 'image',
         ]);
         $this->is_active = true;
         $this->is_premium = false;
         $this->resetValidation();
+    }
 
-        // ২. সব কাজ শেষ হলে ব্রাউজারে সিগন্যাল পাঠাবে মডাল ওপেন করার জন্য
+    public function openModal()
+    {
+        $this->cancelEdit();
         $this->dispatch('open-subject-modal');
     }
 
@@ -70,7 +69,7 @@ class SubjectIndex extends Component
         $this->description = $subject->description;
         $this->is_active = $subject->is_active;
         $this->is_premium = $subject->is_premium;
-        $this->oldImage = $subject->image;
+        $this->image = $subject->image;
 
         // ডেটা লোড হওয়ার পর মডাল ওপেন হবে
         $this->dispatch('open-subject-modal');
@@ -85,7 +84,7 @@ class SubjectIndex extends Component
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'is_premium' => 'boolean',
-            'newImage' => 'nullable|image|max:2048',
+            'image' => 'nullable|string',
         ]);
 
         $slug = Str::slug($this->name);
@@ -102,11 +101,8 @@ class SubjectIndex extends Component
             'description' => $this->description,
             'is_active' => $this->is_active,
             'is_premium' => $this->is_premium,
+            'image' => $this->image,
         ];
-
-        if ($this->newImage) {
-            $data['image'] = $this->newImage->store('subjects', 'public');
-        }
 
         if ($this->editId) {
             Subject::where('id', $this->editId)->update($data);
@@ -128,10 +124,17 @@ class SubjectIndex extends Component
     {
         $subject = Subject::find($id);
         if ($subject) {
+            // Check if attached to any question
+            $hasQuestions = \App\Models\Question::where('subject_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This subject is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+
             $subject->delete();
             $this->resetPage();
             $this->dispatch('subjectDeleted', message: 'Subject deleted successfully.');
-        $this->toastSuccess('Subject deleted successfully.');
+            $this->toastSuccess('Subject deleted successfully.');
         }
     }
 

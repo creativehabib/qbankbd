@@ -42,11 +42,37 @@
             />
 
 
-            <div x-data="{ registrationRole: '{{ old('registration_role', 'student') }}' }" class="space-y-4">
+            <div x-data="{ registrationRole: '{{ old('registration_role', 'job_seeker') }}' }" class="space-y-4">
                 <flux:select name="registration_role" x-model="registrationRole" :label="__('I want to register as')">
+                    <option value="job_seeker">{{ __('Job Seeker') }}</option>
                     <option value="student">{{ __('Student') }}</option>
                     <option value="teacher">{{ __('Teacher') }}</option>
                 </flux:select>
+
+                @php
+                    $academicClasses = \App\Models\AcademicClass::whereNotIn('name', ['Jobs', 'BCS'])->get();
+                    $deptClasses = $academicClasses->filter(function($c) {
+                        return in_array($c->name, ['Class 9', 'Class 10', 'এসএসসি', 'এইচ এস সি', 'Admission']);
+                    })->pluck('id')->toArray();
+                @endphp
+
+                <div x-data="{ selectedClass: '{{ old('academic_class_id', '') }}', deptClasses: {{ json_encode($deptClasses) }} }" x-show="registrationRole === 'student'" x-cloak class="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                    <flux:select name="academic_class_id" x-model="selectedClass" :label="__('Select Class')">
+                        <option value="">{{ __('Select your class') }}</option>
+                        @foreach($academicClasses as $class)
+                            <option value="{{ $class->id }}">{{ $class->name }}</option>
+                        @endforeach
+                    </flux:select>
+                    
+                    <div x-show="deptClasses.includes(parseInt(selectedClass))" x-cloak>
+                       <flux:select name="department" :label="__('Department')">
+                            <option value="">{{ __('Select Department') }}</option>
+                            <option value="Science">{{ __('Science') }}</option>
+                            <option value="Arts">{{ __('Arts') }}</option>
+                            <option value="Commerce">{{ __('Commerce') }}</option>
+                       </flux:select>
+                    </div>
+                </div>
 
                 <div x-show="registrationRole === 'teacher'" x-cloak class="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
                     <flux:input name="institution_name" :label="__('Institution name')" :value="old('institution_name')" type="text" :placeholder="__('Institution name')" />

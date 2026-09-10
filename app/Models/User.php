@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'xp', 'password', 'registration_role', 'institution_name', 'institution_type', 'institution_address'])]
+#[Fillable(['name', 'email', 'xp', 'password', 'registration_role', 'institution_name', 'institution_type', 'institution_address', 'academic_class_id', 'department'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -40,6 +40,11 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->hasRole('student');
+    }
+
+    public function isJobSeeker(): bool
+    {
+        return $this->hasRole('job_seeker');
     }
 
     public function isTeacher(): bool

@@ -8,13 +8,12 @@ use App\Models\Chapter;
 use App\Models\Subject;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class ChapterIndex extends Component
 {
     use InteractsWithFluxToasts;
-    use WithFileUploads, WithPagination;
+    use WithPagination;
 
     public string $search = '';
 
@@ -33,9 +32,7 @@ class ChapterIndex extends Component
 
     public bool $is_premium = false;
 
-    public $newImage;
-
-    public $oldImage;
+    public $image;
 
     protected $listeners = ['deleteSubjectConfirmed' => 'delete'];
 
@@ -44,18 +41,20 @@ class ChapterIndex extends Component
         $this->resetPage();
     }
 
-    public function openModal()
+    public function cancelEdit()
     {
-        // ১. আগে ডেটা রিসেট হবে
         $this->reset([
             'editId', 'subject_id', 'name',
-            'academic_class_id', 'description', 'newImage', 'oldImage',
+            'academic_class_id', 'description', 'image',
         ]);
         $this->is_active = true;
         $this->is_premium = false;
         $this->resetValidation();
+    }
 
-        // ২. সব কাজ শেষ হলে ব্রাউজারে সিগন্যাল পাঠাবে মডাল ওপেন করার জন্য
+    public function openModal()
+    {
+        $this->cancelEdit();
         $this->dispatch('open-chapter-modal');
     }
 
@@ -71,7 +70,7 @@ class ChapterIndex extends Component
         $this->description = $chapter->description;
         $this->is_active = $chapter->is_active;
         $this->is_premium = $chapter->is_premium;
-        $this->oldImage = $chapter->image;
+        $this->image = $chapter->image;
 
         // ডেটা লোড হওয়ার পর মডাল ওপেন হবে
         $this->dispatch('open-chapter-modal');
@@ -86,7 +85,7 @@ class ChapterIndex extends Component
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'is_premium' => 'boolean',
-            'newImage' => 'nullable|image|max:2048',
+            'image' => 'nullable|string',
         ]);
 
         $subject = Subject::query()
@@ -113,11 +112,8 @@ class ChapterIndex extends Component
             'description' => $this->description,
             'is_active' => $this->is_active,
             'is_premium' => $this->is_premium,
+            'image' => $this->image,
         ];
-
-        if ($this->newImage) {
-            $data['image'] = $this->newImage->store('chapters', 'public');
-        }
 
         if ($this->editId) {
             Chapter::where('id', $this->editId)->update($data);
@@ -137,12 +133,18 @@ class ChapterIndex extends Component
 
     public function delete($id)
     {
-        $subject = Chapter::find($id);
-        if ($subject) {
-            $subject->delete();
+        $chapter = Chapter::find($id);
+        if ($chapter) {
+            $hasQuestions = \App\Models\Question::where('chapter_id', $id)->exists();
+            if ($hasQuestions) {
+                $this->toastWarning('This chapter is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+                return;
+            }
+
+            $chapter->delete();
             $this->resetPage();
-            $this->dispatch('subjectDeleted', message: 'Subject deleted successfully.');
-        $this->toastSuccess('Subject deleted successfully.');
+            $this->dispatch('subjectDeleted', message: 'Chapter deleted successfully.');
+            $this->toastSuccess('Chapter deleted successfully.');
         }
     }
 

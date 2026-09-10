@@ -22,10 +22,12 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
-            'registration_role' => ['required', 'in:student,teacher'],
+            'registration_role' => ['required', 'in:student,teacher,job_seeker'],
             'institution_name' => ['nullable', 'string', 'max:255', 'required_if:registration_role,teacher'],
             'institution_type' => ['nullable', 'string', 'max:255', 'required_if:registration_role,teacher'],
             'institution_address' => ['nullable', 'string', 'max:1000', 'required_if:registration_role,teacher'],
+            'academic_class_id' => ['nullable', 'exists:academic_classes,id', 'required_if:registration_role,student'],
+            'department' => ['nullable', 'string', 'in:Science,Arts,Commerce'],
         ])->validate();
 
         $user = User::create([
@@ -36,6 +38,8 @@ class CreateNewUser implements CreatesNewUsers
             'institution_name' => $input['registration_role'] === 'teacher' ? $input['institution_name'] : null,
             'institution_type' => $input['registration_role'] === 'teacher' ? $input['institution_type'] : null,
             'institution_address' => $input['registration_role'] === 'teacher' ? $input['institution_address'] : null,
+            'academic_class_id' => $input['registration_role'] === 'student' ? $input['academic_class_id'] : null,
+            'department' => $input['registration_role'] === 'student' ? ($input['department'] ?? null) : null,
         ]);
 
         $user->assignRole($input['registration_role']);

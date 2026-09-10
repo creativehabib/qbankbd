@@ -43,10 +43,26 @@ class Leaderboard extends Component
 
         $currentLeague = $leagues[$this->league_id];
 
-        // ডাটাবেস কোয়েরি: নির্দিষ্ট লিগের স্টুডেন্টদের আনা হচ্ছে
-        $query = User::role('student')
-            ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']])
-            ->orderByDesc('xp');
+        $user = auth()->user();
+        $isJobSeeker = $user?->isJobSeeker();
+
+        // ডাটাবেস কোয়েরি: নির্দিষ্ট লিগের ইউজারদের আনা হচ্ছে
+        $query = User::query()
+            ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']]);
+
+        if ($isJobSeeker) {
+            $query->role('job_seeker');
+        } else {
+            $query->role('student');
+            if ($user?->academic_class_id) {
+                $query->where('academic_class_id', $user->academic_class_id);
+            }
+            if ($user?->department) {
+                $query->where('department', $user->department);
+            }
+        }
+
+        $query->orderByDesc('xp');
 
         $totalStudents = $query->count();
         $topStudents = $query->take(50)->get();
@@ -56,8 +72,8 @@ class Leaderboard extends Component
         $myActualLeagueId = 1;
         $userInTopList = false;
 
-        if (auth()->check()) {
-            $myXp = auth()->user()->xp ?? 0;
+        if ($user) {
+            $myXp = $user->xp ?? 0;
 
             // ইউজারের বর্তমান আসল লিগ বের করা
             foreach ($leagues as $id => $l) {
@@ -69,12 +85,25 @@ class Leaderboard extends Component
 
             // ইউজারের র‍্যাংক বের করা যদি সে বর্তমান নির্বাচিত লিগে থাকে
             if ($myActualLeagueId == $this->league_id) {
-                $userInTopList = $topStudents->contains('id', auth()->id());
+                $userInTopList = $topStudents->contains('id', $user->id);
                 if ($myXp > 0) {
-                    $myRank = User::role('student')
+                    $rankQuery = User::query()
                         ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']])
-                        ->where('xp', '>', $myXp)
-                        ->count() + 1;
+                        ->where('xp', '>', $myXp);
+                    
+                    if ($isJobSeeker) {
+                        $rankQuery->role('job_seeker');
+                    } else {
+                        $rankQuery->role('student');
+                        if ($user->academic_class_id) {
+                            $rankQuery->where('academic_class_id', $user->academic_class_id);
+                        }
+                        if ($user->department) {
+                            $rankQuery->where('department', $user->department);
+                        }
+                    }
+
+                    $myRank = $rankQuery->count() + 1;
                 }
             }
         }

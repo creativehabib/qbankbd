@@ -16,7 +16,6 @@ class Index extends Component
 
     public ?int $editingId = null;
 
-    public string $editingName = '';
 
     public string $search = '';
 
@@ -32,27 +31,48 @@ class Index extends Component
 
     public function save(): void
     {
-        abort_unless(auth()->user()?->hasPermission('tags.create'), 403);
+        if ($this->editingId) {
+            abort_unless(auth()->user()?->hasPermission('tags.update'), 403);
+            $this->validate([
+                'name' => 'required|string|unique:tags,name,'.$this->editingId,
+            ]);
 
-        $this->validate([
-            'name' => 'required|string|unique:tags,name',
-        ]);
+            Tag::query()->findOrFail($this->editingId)->update(['name' => $this->name]);
 
-        Tag::query()->create([
-            'name' => $this->name,
-        ]);
+            $this->editingId = null;
+            $this->name = '';
+            $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
+            $this->toastSuccess('Tag updated successfully.');
+        } else {
+            abort_unless(auth()->user()?->hasPermission('tags.create'), 403);
+            $this->validate([
+                'name' => 'required|string|unique:tags,name',
+            ]);
 
-        $this->name = '';
-        $this->resetPage();
-        $this->dispatch('tagSaved', message: 'Tag added successfully.');
-        $this->toastSuccess('Tag added successfully.');
+            Tag::query()->create([
+                'name' => $this->name,
+            ]);
+
+            $this->name = '';
+            $this->resetPage();
+            $this->dispatch('tagSaved', message: 'Tag added successfully.');
+            $this->toastSuccess('Tag added successfully.');
+        }
     }
 
     public function delete(int $id): void
     {
         abort_unless(auth()->user()?->hasPermission('tags.delete'), 403);
 
-        Tag::query()->findOrFail($id)->delete();
+        $tag = Tag::query()->findOrFail($id);
+        
+        $hasQuestions = $tag->questions()->exists();
+        if ($hasQuestions) {
+            $this->toastWarning('This tag is attached to questions, so it cannot be deleted.', 'Cannot Delete');
+            return;
+        }
+
+        $tag->delete();
 
         $this->resetPage();
         $this->dispatch('tagDeleted', message: 'Tag deleted successfully.');
@@ -65,29 +85,13 @@ class Index extends Component
 
         $tag = Tag::query()->findOrFail($id);
         $this->editingId = $tag->id;
-        $this->editingName = $tag->name;
-    }
-
-    public function update(): void
-    {
-        abort_unless(auth()->user()?->hasPermission('tags.update'), 403);
-
-        $this->validate([
-            'editingName' => 'required|string|unique:tags,name,'.$this->editingId,
-        ]);
-
-        Tag::query()->findOrFail($this->editingId)->update(['name' => $this->editingName]);
-
-        $this->editingId = null;
-        $this->editingName = '';
-        $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
-        $this->toastSuccess('Tag updated successfully.');
+        $this->name = $tag->name;
     }
 
     public function cancelEdit(): void
     {
         $this->editingId = null;
-        $this->editingName = '';
+        $this->name = '';
     }
 
     public function render()
