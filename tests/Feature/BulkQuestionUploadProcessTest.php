@@ -18,11 +18,13 @@ it('processes raw mcq text into preview questions before submit', function () {
         ->assertSee('(ঘ) বাড়ি');
 });
 
-it('renders Flux pillboxes for bulk upload metadata', function () {
+it('renders Tom Select-compatible metadata selects for bulk upload', function () {
     $tag = Tag::query()->create(['name' => 'Algebra']);
     $examCategory = ExamCategory::query()->create(['name' => 'SSC', 'slug' => 'ssc']);
 
     Livewire::test(BulkUpload::class)
+        ->assertSeeHtml('id="bulk-tag-ids"')
+        ->assertSeeHtml('id="bulk-exam-category-ids"')
         ->assertSee('Algebra')
         ->assertSee('SSC')
         ->set('tagIds', [(string) $tag->id])

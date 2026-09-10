@@ -560,20 +560,24 @@
 
                         <div class="relative z-20">
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Search and select)</span></label>
-                            <flux:pillbox wire:model="tagIds" multiple searchable placeholder="Select tags">
+                            <div wire:ignore>
+                                <select id="bulk-tag-ids" multiple placeholder="Select tags" class="w-full">
                                 @foreach($allTags as $tag)
-                                    <flux:pillbox.option value="{{ $tag->id }}">{{ $tag->name }}</flux:pillbox.option>
+                                    <option value="{{ $tag->id }}" @selected(in_array($tag->id, $tagIds))>{{ $tag->name }}</option>
                                 @endforeach
-                            </flux:pillbox>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="relative z-10">
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience <span class="text-red-500">*</span></label>
-                            <flux:pillbox wire:model="exam_category_ids" multiple searchable placeholder="Select Exams (e.g. BCS, HSC)">
+                            <div wire:ignore>
+                                <select id="bulk-exam-category-ids" multiple placeholder="Select Exams (e.g. BCS, HSC)" class="w-full">
                                 @foreach($allExamCategories as $category)
-                                    <flux:pillbox.option value="{{ $category->id }}">{{ $category->name }}</flux:pillbox.option>
+                                    <option value="{{ $category->id }}" @selected(in_array($category->id, $exam_category_ids))>{{ $category->name }}</option>
                                 @endforeach
-                            </flux:pillbox>
+                                </select>
+                            </div>
                             @error('exam_category_ids') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -650,4 +654,30 @@
         };
 
         window.whenCkEditorReady(initializeEditor);
+
+        const initializeMetadataSelects = () => {
+            if (typeof TomSelect === 'undefined') {
+                console.error('TomSelect is not loaded!');
+
+                return;
+            }
+
+            const selectConfig = (property) => ({
+                plugins: ['remove_button', 'dropdown_input'],
+                maxOptions: 50,
+                onChange: (value) => $wire.set(property, value),
+            });
+
+            const tagSelect = document.getElementById('bulk-tag-ids');
+            if (tagSelect && ! tagSelect.tomselect) {
+                new TomSelect(tagSelect, selectConfig('tagIds'));
+            }
+
+            const examCategorySelect = document.getElementById('bulk-exam-category-ids');
+            if (examCategorySelect && ! examCategorySelect.tomselect) {
+                new TomSelect(examCategorySelect, selectConfig('exam_category_ids'));
+            }
+        };
+
+        initializeMetadataSelects();
 @endscript
