@@ -219,7 +219,7 @@
                                          let timeout;
                                          const renderMath = () => {
                                              if (window.MathJax) {
-                                                 MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$el]);
+                                                 window.renderMathJax(this.$el);
                                              }
                                          };
 
@@ -268,7 +268,7 @@
                                                 renderMath() {
                                                     if(window.MathJax) {
                                                         this.$nextTick(() => {
-                                                            if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
+                                                            if(this.$refs.display) window.renderMathJax(this.$refs.display);
                                                         });
                                                     }
                                                 }
@@ -331,7 +331,7 @@
                                                         renderMath() {
                                                             if(window.MathJax) {
                                                                 this.$nextTick(() => {
-                                                                    if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
+                                                                    if(this.$refs.display) window.renderMathJax(this.$refs.display);
                                                                 });
                                                             }
                                                         }
@@ -558,22 +558,22 @@
                             Metadata
                         </h3>
 
-                        <div wire:ignore class="relative z-20">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Type & Enter)</span></label>
-                            <select id="bulk_tags" class="w-full ts-control" multiple>
+                        <div class="relative z-20">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Search and select)</span></label>
+                            <flux:pillbox wire:model="tagIds" multiple searchable placeholder="Select tags">
                                 @foreach($allTags as $tag)
-                                    <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
+                                    <flux:pillbox.option value="{{ $tag->id }}">{{ $tag->name }}</flux:pillbox.option>
                                 @endforeach
-                            </select>
+                            </flux:pillbox>
                         </div>
 
-                        <div wire:ignore class="relative z-10">
+                        <div class="relative z-10">
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience <span class="text-red-500">*</span></label>
-                            <select id="bulk_exam_categories" class="w-full ts-control" multiple placeholder="Select Exams (e.g. BCS, HSC)">
+                            <flux:pillbox wire:model="exam_category_ids" multiple searchable placeholder="Select Exams (e.g. BCS, HSC)">
                                 @foreach($allExamCategories as $category)
-                                    <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    <flux:pillbox.option value="{{ $category->id }}">{{ $category->name }}</flux:pillbox.option>
                                 @endforeach
-                            </select>
+                            </flux:pillbox>
                             @error('exam_category_ids') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -591,13 +591,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 @endpush
 
-@push('scripts')
-    {{-- MathJax Script --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS_HTML"></script>
-    <!-- CKEditor 4 -->
-    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
-
-    <script>
+@script
         function wrapMathForCKEditor(html) {
             if (!html || typeof html !== 'string') return html;
 
@@ -609,35 +603,7 @@
             return cleanHtml;
         }
 
-        document.addEventListener('livewire:initialized', function () {
-
-            // 1. TomSelect Initialization
-            const initBulkUploadTomSelect = () => {
-                if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
-                const tagsEl = document.getElementById('bulk_tags');
-                if (tagsEl) {
-                    window.bulkTsTags = new TomSelect(tagsEl, {
-                        plugins: ['remove_button', 'dropdown_input'],
-                        persist: false, create: true,
-                        dropdownParent: 'body',
-                        onChange: (v) => @this.set('tagIds', v),
-                    });
-                }
-
-                if (window.bulkTsExamCategories) { window.bulkTsExamCategories.destroy(); window.bulkTsExamCategories = null; }
-                const examCategoriesEl = document.getElementById('bulk_exam_categories');
-                if (examCategoriesEl) {
-                    window.bulkTsExamCategories = new TomSelect(examCategoriesEl, {
-                        plugins: ['remove_button', 'dropdown_input'],
-                        persist: false, create: false,
-                        dropdownParent: 'body',
-                        onChange: (v) => @this.set('exam_category_ids', v),
-                    });
-                }
-            };
-            initBulkUploadTomSelect();
-
-            // 2. CKEditor Initialization
+        const initializeEditor = () => {
             if (typeof CKEDITOR !== 'undefined' && document.getElementById('raw_text_editor')) {
                 if (CKEDITOR.instances['raw_text_editor']) {
                     CKEDITOR.instances['raw_text_editor'].destroy(true);
@@ -671,7 +637,7 @@
                 editor.on('change', function () {
                     clearTimeout(ckDebounceTimer);
                     ckDebounceTimer = setTimeout(() => {
-                    @this.set('rawText', editor.getData());
+                    $wire.set('rawText', editor.getData());
                     }, 500);
                 });
 
@@ -681,6 +647,7 @@
                     editor.setData(wrapMathForCKEditor(htmlText));
                 });
             }
-        });
-    </script>
-@endpush
+        };
+
+        window.whenCkEditorReady(initializeEditor);
+@endscript
