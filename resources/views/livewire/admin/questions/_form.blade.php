@@ -370,20 +370,24 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-gray-400 dark:text-gray-500 font-normal">(Search and select)</span></label>
-                        <flux:pillbox wire:model="tagIds" multiple searchable placeholder="Select tags">
+                        <div wire:ignore>
+                            <select id="question-tag-ids" multiple placeholder="Select tags" class="w-full">
                             @foreach($allTags as $tag)
-                                <flux:pillbox.option value="{{ $tag->id }}">{{ $tag->name }}</flux:pillbox.option>
+                                <option value="{{ $tag->id }}" @selected(in_array($tag->id, $tagIds))>{{ $tag->name }}</option>
                             @endforeach
-                        </flux:pillbox>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category <span class="text-red-500">*</span></label>
-                        <flux:pillbox wire:model="exam_category_ids" multiple searchable placeholder="Select Exam (BCS, HSC...)">
+                        <div wire:ignore>
+                            <select id="question-exam-category-ids" multiple placeholder="Select Exam (BCS, HSC...)" class="w-full">
                             @foreach($allExamCategories as $category)
-                                <flux:pillbox.option value="{{ $category->id }}">{{ $category->name }}</flux:pillbox.option>
+                                <option value="{{ $category->id }}" @selected(in_array($category->id, $exam_category_ids))>{{ $category->name }}</option>
                             @endforeach
-                        </flux:pillbox>
+                            </select>
+                        </div>
                         @error('exam_category_ids')<span class="text-xs text-red-500 mt-1.5 block font-medium bg-red-50 dark:bg-red-950 p-2 rounded-lg border border-red-100 dark:border-red-900">{{ $message }}</span>@enderror
                     </div>
                 </div>
@@ -531,7 +535,7 @@
                 const tsMultiConfig = {
                     plugins: ['remove_button', 'dropdown_input'],
                     persist: false,
-                    create: true,
+                    create: false,
                 };
 
                 const updateLivewire = (property, value) => {
@@ -553,6 +557,12 @@
 
                 const topicEl = document.getElementById('topic');
                 if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, onChange: (v) => updateLivewire('topic_id', v) });
+
+                const tagEl = document.getElementById('question-tag-ids');
+                if (tagEl && !tagEl.tomselect) new TomSelect(tagEl, {...tsConfig, ...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
+
+                const examCategoryEl = document.getElementById('question-exam-category-ids');
+                if (examCategoryEl && !examCategoryEl.tomselect) new TomSelect(examCategoryEl, {...tsConfig, ...tsMultiConfig, onChange: (v) => updateLivewire('exam_category_ids', v) });
 
             } else {
                 console.error("TomSelect is not loaded!");
