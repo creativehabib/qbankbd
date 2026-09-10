@@ -368,22 +368,22 @@
                 </h3>
 
                 <div class="space-y-5">
-                    <div wire:ignore>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-gray-400 dark:text-gray-500 font-normal">(Type and press enter)</span></label>
-                        <select id="tags" class="w-full" multiple>
-                            @foreach($allTags as $tag) <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option> @endforeach
-                        </select>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-gray-400 dark:text-gray-500 font-normal">(Search and select)</span></label>
+                        <flux:pillbox wire:model="tagIds" multiple searchable placeholder="Select tags">
+                            @foreach($allTags as $tag)
+                                <flux:pillbox.option value="{{ $tag->id }}">{{ $tag->name }}</flux:pillbox.option>
+                            @endforeach
+                        </flux:pillbox>
                     </div>
 
-                    <div wire:ignore>
+                    <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category <span class="text-red-500">*</span></label>
-                        <select id="exam_categories" class="w-full" multiple placeholder="Select Exam (BCS, HSC...)">
+                        <flux:pillbox wire:model="exam_category_ids" multiple searchable placeholder="Select Exam (BCS, HSC...)">
                             @foreach($allExamCategories as $category)
-                                <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
+                                <flux:pillbox.option value="{{ $category->id }}">{{ $category->name }}</flux:pillbox.option>
                             @endforeach
-                        </select>
+                        </flux:pillbox>
                         @error('exam_category_ids')<span class="text-xs text-red-500 mt-1.5 block font-medium bg-red-50 dark:bg-red-950 p-2 rounded-lg border border-red-100 dark:border-red-900">{{ $message }}</span>@enderror
                     </div>
                 </div>
@@ -401,15 +401,7 @@
     </form>
 </div>
 
-@push('scripts')
-    <!-- TomSelect CSS & JS -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-
-    <!-- CKEditor 4 -->
-    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
-
-    <script>
+@script
         window.tsClass = window.tsClass || null;
         window.tsSubject = window.tsSubject || null;
         window.tsChapter = window.tsChapter || null;
@@ -562,11 +554,6 @@
                 const topicEl = document.getElementById('topic');
                 if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, onChange: (v) => updateLivewire('topic_id', v) });
 
-                const tagsEl = document.getElementById('tags');
-                if (tagsEl && !tagsEl.tomselect) window.tsTags = new TomSelect(tagsEl, {...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
-
-                const examCategoriesEl = document.getElementById('exam_categories');
-                if (examCategoriesEl && !examCategoriesEl.tomselect) window.tsExamCategories = new TomSelect(examCategoriesEl, { ...tsMultiConfig, create: false, onChange: (v) => updateLivewire('exam_category_ids', v) });
             } else {
                 console.error("TomSelect is not loaded!");
             }
@@ -611,11 +598,9 @@
                 window.tsExamCategories?.clear(true);
             });
 
-            window.addEventListener('refresh-editors', () => setTimeout(initEditors, 350));
+            window.addEventListener('refresh-editors', () => window.whenCkEditorReady(initEditors));
 
-            document.addEventListener('livewire:load', () => setTimeout(initEditors, 100));
-            document.addEventListener('livewire:navigated', () => setTimeout(initEditors, 100));
-            document.addEventListener('livewire:update', () => setTimeout(initEditors, 350));
+            document.addEventListener('livewire:navigated', () => window.whenCkEditorReady(initEditors));
 
             document.addEventListener('livewire:navigating', () => {
                 for (let instanceName in CKEDITOR.instances) {
@@ -646,5 +631,6 @@
                 });
             }
         });
-    </script>
-@endpush
+
+        window.whenCkEditorReady(initEditors);
+@endscript

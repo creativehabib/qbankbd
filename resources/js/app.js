@@ -31,27 +31,43 @@ window.addEventListener('success', event => toastr.success(event.detail.message)
 window.addEventListener('warning', event => toastr.warning(event.detail.message));
 window.addEventListener('error', event => toastr.error(event.detail.message));
 
-// --- MathJax রেন্ডারিং লজিক (একীভূত করা হয়েছে) ---
-window.renderMathJax = function () {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-        // ছোট ডিলে দেওয়া হয়েছে যাতে ডোম (DOM) আপডেট হওয়ার পর্যাপ্ত সময় পায়
-        setTimeout(() => {
-            window.MathJax.typesetPromise()
-                .catch((err) => console.warn('MathJax error:', err));
-        }, 100);
+let mathJaxRenderTimer;
+
+window.whenCkEditorReady = function (callback) {
+    if (window.CKEDITOR) {
+        callback();
+
+        return;
     }
+
+    window.setTimeout(() => window.whenCkEditorReady(callback), 50);
 };
 
-// MathJax এর জন্য ইভেন্ট লিসেনারসমূহ
-document.addEventListener('livewire:navigated', window.renderMathJax);
-window.addEventListener('practice-content-updated', window.renderMathJax);
+window.renderMathJax = function (elements = undefined) {
+    clearTimeout(mathJaxRenderTimer);
 
-// সরাসরি বাটন (যেমন: Explanation) ক্লিক করলে রেন্ডার করার জন্য
-document.addEventListener('click', (e) => {
-    if (e.target.closest('button')) {
-        setTimeout(window.renderMathJax, 400);
+    mathJaxRenderTimer = window.setTimeout(() => {
+        if (! window.MathJax?.typesetPromise) {
+            return;
+        }
+
+        const targets = elements instanceof Element ? [elements] : elements;
+
+        window.MathJax.typesetClear?.(targets);
+        window.MathJax.typesetPromise(targets)
+            .catch((error) => console.warn('MathJax rendering failed:', error));
+    }, 100);
+};
+
+document.addEventListener('livewire:navigated', () => window.renderMathJax());
+window.addEventListener('practice-content-updated', () => window.renderMathJax());
+window.addEventListener('load', () => window.renderMathJax());
+
+new MutationObserver((mutations) => {
+    if (mutations.some((mutation) => [...mutation.addedNodes].some((node) => ! node.classList?.contains('MathJax')))) {
+        window.renderMathJax();
     }
-});
+}).observe(document.body, { childList: true, subtree: true });
 
 // --- Flux UI delete confirmation ---
 window.confirmDeleteAction = function (callback) {
