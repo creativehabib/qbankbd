@@ -100,6 +100,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/users', UserRoleManagement::class)->name('users.index');
 
+        Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
+        Route::get('/admin/wallet-approvals', WalletApprovalPanel::class)->name('admin.wallet-approvals');
+        Route::get('/admin/packages', PackageManagement::class)->name('admin.packages');
+        Route::get('/admin/theme-options/fonts', function () {
+            return Cache::remember('theme-options-fonts', now()->addHours(12), function () {
+                $response = Http::timeout(20)->get('https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json');
+
+                if (! $response->successful()) {
+                    return [];
+                }
+
+                return $response->json();
+            });
+        })->name('admin.theme-options.fonts');
+    });
+
+    Route::middleware('role:admin|super_admin')->group(function (): void {
         // Admin Settings
         Route::get('/admin/settings', Index::class)->name('admin.settings.index');
         Route::get('/admin/settings/general', GeneralSetting::class)->name('admin.settings.general');
@@ -116,21 +133,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/superadmin/settings/cache', CacheManagement::class)->middleware('role:super_admin')->name('superadmin.settings.cache');
         Route::get('/superadmin/settings/system-info', SystemInformation::class)->middleware('role:super_admin')->name('superadmin.settings.system-info');
         Route::get('/superadmin/settings/activity-logs', ActivityLogs::class)->middleware('role:super_admin')->name('superadmin.settings.activity-logs');
-
-        Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
-        Route::get('/admin/wallet-approvals', WalletApprovalPanel::class)->name('admin.wallet-approvals');
-        Route::get('/admin/packages', PackageManagement::class)->name('admin.packages');
-        Route::get('/admin/theme-options/fonts', function () {
-            return Cache::remember('theme-options-fonts', now()->addHours(12), function () {
-                $response = Http::timeout(20)->get('https://cdn.jsdelivr.net/gh/hasinhayder/google-fonts/fonts.json');
-
-                if (! $response->successful()) {
-                    return [];
-                }
-
-                return $response->json();
-            });
-        })->name('admin.theme-options.fonts');
     });
 
     Route::middleware('permission:users.manage_permissions')->group(function (): void {
