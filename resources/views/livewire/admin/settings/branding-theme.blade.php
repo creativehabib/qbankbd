@@ -215,7 +215,7 @@
             </flux:card>
 
             <!-- Text Color -->
-                        <flux:card>
+            <flux:card>
                 <div class="mb-4">
                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Text color</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400">The color of text and icons sitting on accent-filled buttons. Pick the one with the best contrast.</p>
@@ -240,6 +240,58 @@
                         </div>
                         <span class="text-sm font-medium text-zinc-600 dark:text-zinc-300 w-16">{{ strtoupper($text_color) }}</span>
                     </label>
+                </div>
+            </flux:card>
+
+            <!-- Dark Theme Background Color -->
+            <flux:card>
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Dark theme background</h3>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">The main background color used across the app when in Dark Mode.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Suggested Dark</label>
+                        <div class="flex flex-wrap gap-2">
+                            @php
+                                $darkColors = [
+                                    '#18181b', // Zinc 900
+                                    '#27272a', // Zinc 800
+                                    '#0f172a', // Slate 900
+                                    '#1e293b', // Slate 800
+                                    '#111827', // Gray 900
+                                    '#1f2937', // Gray 800
+                                    '#171717', // Neutral 900
+                                    '#262626', // Neutral 800
+                                    '#000000', // Pitch Black
+                                ];
+                            @endphp
+                            @foreach($darkColors as $color)
+                                <button type="button" wire:click="$set('dark_bg_color', '{{ $color }}')" 
+                                        class="w-8 h-8 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-offset-zinc-900
+                                        {{ $dark_bg_color === $color ? 'ring-2 ring-accent ring-offset-2 dark:ring-offset-zinc-900' : 'border border-zinc-200 dark:border-zinc-700' }}"
+                                        style="background-color: {{ $color }};">
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <label class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Custom</label>
+                        <div class="flex items-center">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <div class="relative flex items-center justify-center size-10 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg p-1 shadow-sm">
+                                    <div class="w-full h-full rounded-[4px]" style="background-color: {{ $dark_bg_color }};"></div>
+                                    <input type="color" wire:model.live="dark_bg_color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                                </div>
+                                <span class="text-sm font-medium text-zinc-600 dark:text-zinc-300 w-16">{{ strtoupper($dark_bg_color) }}</span>
+                            </label>
+                            <button type="button" wire:click="$set('dark_bg_color', '#18181b')" class="text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors ml-4">
+                                Reset to default
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </flux:card>
 

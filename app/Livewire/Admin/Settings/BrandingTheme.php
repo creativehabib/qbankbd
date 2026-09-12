@@ -20,6 +20,8 @@ class BrandingTheme extends Component
 
     public string $text_color = '#ffffff';
 
+    public string $dark_bg_color = '#18181b';
+
     public string $default_theme = 'Dark';
 
     public $logo_light_upload;
@@ -53,6 +55,7 @@ class BrandingTheme extends Component
         $this->footer_text = (string) ($settings['footer_text'] ?? $this->footer_text);
         $this->accent_color = (string) ($settings['accent_color'] ?? $this->accent_color);
         $this->text_color = (string) ($settings['text_color'] ?? $this->text_color);
+        $this->dark_bg_color = (string) ($settings['dark_bg_color'] ?? $this->dark_bg_color);
         $this->default_theme = (string) ($settings['default_theme'] ?? $this->default_theme);
 
         $this->logo_light = (string) ($settings['logo_light'] ?? null);
@@ -71,6 +74,7 @@ class BrandingTheme extends Component
             'footer_text' => ['nullable', 'string', 'max:255'],
             'accent_color' => ['nullable', 'string', 'max:50'],
             'text_color' => ['nullable', 'string', 'max:50'],
+            'dark_bg_color' => ['nullable', 'string', 'max:50'],
             'default_theme' => ['required', 'string', 'in:Dark,Light,System'],
         ]);
 
@@ -95,6 +99,7 @@ class BrandingTheme extends Component
             'footer_text' => trim($validated['footer_text'] ?? ''),
             'accent_color' => trim($validated['accent_color'] ?? '#3b82f6'),
             'text_color' => trim($validated['text_color'] ?? '#ffffff'),
+            'dark_bg_color' => trim($validated['dark_bg_color'] ?? '#18181b'),
             'default_theme' => trim($validated['default_theme']),
 
             'logo_light' => $this->logo_light,

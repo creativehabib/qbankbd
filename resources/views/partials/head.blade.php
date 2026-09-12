@@ -7,6 +7,7 @@
     $favicon = !empty($branding['favicon']) ? (\Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon'])) : '/favicon.ico';
     $accentColor = $branding['accent_color'] ?? '#3b82f6';
     $textColor = $branding['text_color'] ?? '#ffffff';
+    $darkBgColor = $branding['dark_bg_color'] ?? '#18181b';
     $defaultTheme = $branding['default_theme'] ?? 'System';
 @endphp
 
@@ -26,6 +27,10 @@
         --app-dark-active-bg: color-mix(in srgb, var(--color-accent) 15%, transparent);
         --app-dark-active-text: var(--color-accent);
         --app-dark-border: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+    
+    html.dark body {
+        background-color: {{ $darkBgColor }};
     }
 </style>
 
