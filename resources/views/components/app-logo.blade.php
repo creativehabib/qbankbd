@@ -5,10 +5,10 @@
 @php
     $branding = \App\Support\SettingsStore::group('branding');
     $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
-    $logoLight = $branding['logo_light'] ? \Illuminate\Support\Str::startsWith($branding['logo_light'], ['http://', 'https://']) ? $branding['logo_light'] : asset('storage/'.$branding['logo_light']) : null;
-    $logoDark = $branding['logo_dark'] ? \Illuminate\Support\Str::startsWith($branding['logo_dark'], ['http://', 'https://']) ? $branding['logo_dark'] : asset('storage/'.$branding['logo_dark']) : null;
-    $iconLight = $branding['icon_light'] ? \Illuminate\Support\Str::startsWith($branding['icon_light'], ['http://', 'https://']) ? $branding['icon_light'] : asset('storage/'.$branding['icon_light']) : null;
-    $iconDark = $branding['icon_dark'] ? \Illuminate\Support\Str::startsWith($branding['icon_dark'], ['http://', 'https://']) ? $branding['icon_dark'] : asset('storage/'.$branding['icon_dark']) : null;
+    $logoLight = !empty($branding['logo_light']) ? (\Illuminate\Support\Str::startsWith($branding['logo_light'], ['http://', 'https://']) ? $branding['logo_light'] : asset('storage/'.$branding['logo_light'])) : null;
+    $logoDark = !empty($branding['logo_dark']) ? (\Illuminate\Support\Str::startsWith($branding['logo_dark'], ['http://', 'https://']) ? $branding['logo_dark'] : asset('storage/'.$branding['logo_dark'])) : null;
+    $iconLight = !empty($branding['icon_light']) ? (\Illuminate\Support\Str::startsWith($branding['icon_light'], ['http://', 'https://']) ? $branding['icon_light'] : asset('storage/'.$branding['icon_light'])) : null;
+    $iconDark = !empty($branding['icon_dark']) ? (\Illuminate\Support\Str::startsWith($branding['icon_dark'], ['http://', 'https://']) ? $branding['icon_dark'] : asset('storage/'.$branding['icon_dark'])) : null;
 @endphp
 
 @if($sidebar)

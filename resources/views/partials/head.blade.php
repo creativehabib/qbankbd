@@ -4,7 +4,7 @@
 @php
     $branding = \App\Support\SettingsStore::group('branding');
     $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
-    $favicon = $branding['favicon'] ? \Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon']) : '/favicon.ico';
+    $favicon = !empty($branding['favicon']) ? (\Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon'])) : '/favicon.ico';
     $accentColor = $branding['accent_color'] ?? '#3b82f6';
     $textColor = $branding['text_color'] ?? '#ffffff';
     $defaultTheme = $branding['default_theme'] ?? 'System';
