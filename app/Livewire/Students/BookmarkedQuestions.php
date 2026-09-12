@@ -12,6 +12,8 @@ use Livewire\WithPagination;
 
 class BookmarkedQuestions extends Component
 {
+    public $perPage = 10;
+
     use WithPagination;
 
     public function mount(): void
@@ -48,10 +50,10 @@ class BookmarkedQuestions extends Component
 
     public function recordView(int $questionId): void
     {
-        $viewerId = auth()->check() ? 'user_' . auth()->id() : 'ip_' . request()->ip();
+        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
         $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
 
-        if (!Cache::has($cacheKey)) {
+        if (! Cache::has($cacheKey)) {
             Question::where('id', $questionId)->increment('views_count');
             Cache::put($cacheKey, true, now()->addHours(24));
         }
@@ -73,7 +75,7 @@ class BookmarkedQuestions extends Component
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
             ])
             ->latest('id')
-            ->paginate(20);
+            ->paginate($this->perPage);
     }
 
     public function render(): View

@@ -11,6 +11,8 @@ use Livewire\WithPagination;
 
 class MistakeReview extends Component
 {
+    public $perPage = 10;
+
     use WithPagination;
 
     public ?string $aiError = null;
@@ -81,7 +83,7 @@ class MistakeReview extends Component
             ->whereIn('id', $filteredQuestionIds)
             ->with(['academicClass:id,name', 'subject:id,name'])
             ->latest('id')
-            ->paginate(15);
+            ->paginate($this->perPage);
 
         // ৩. ডানদিকের Subjects Report এর জন্য ডাইনামিক ডাটা তৈরি
         // শুধুমাত্র সেই সাবজেক্টগুলো আনবে যেগুলোতে প্রশ্ন আছে

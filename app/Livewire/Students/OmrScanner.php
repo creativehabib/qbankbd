@@ -8,9 +8,12 @@ use Symfony\Component\Process\Process;
 
 class OmrScanner extends Component
 {
+    public $perPage = 10;
+
     use WithFileUploads;
 
     public $omrImage;
+
     public $scanResult = null;
 
     protected $rules = [
@@ -30,12 +33,13 @@ class OmrScanner extends Component
         $scriptPath = str_replace('\\', '/', base_path('scripts/omr_scanner.py'));
 
         // ৩. Python কে কল করা (প্রয়োজনে python এর বদলে python3 বা py ব্যবহার করবেন)
-        $process = new \Symfony\Component\Process\Process(['python3', $scriptPath, $fullPath]);
+        $process = new Process(['python3', $scriptPath, $fullPath]);
         $process->run();
 
         // ৪. সফল না হলে এরর দেখানো
-        if (!$process->isSuccessful()) {
-            $this->addError('omrImage', 'স্ক্রিপ্ট রান করতে সমস্যা হয়েছে: ' . $process->getErrorOutput());
+        if (! $process->isSuccessful()) {
+            $this->addError('omrImage', 'স্ক্রিপ্ট রান করতে সমস্যা হয়েছে: '.$process->getErrorOutput());
+
             return;
         }
 
@@ -44,7 +48,8 @@ class OmrScanner extends Component
 
         // ৬. পাইথন কোনো এরর দিলে সেটা দেখানো
         if (isset($output['error'])) {
-            $this->addError('omrImage', 'স্ক্যান এরর: ' . $output['error']);
+            $this->addError('omrImage', 'স্ক্যান এরর: '.$output['error']);
+
             return;
         }
 

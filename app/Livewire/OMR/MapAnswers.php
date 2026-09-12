@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class MapAnswers extends Component
 {
+    public $perPage = 10;
+
     public $token;
 
     public $answers = [];

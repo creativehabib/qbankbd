@@ -179,16 +179,16 @@
             'label' =>  __('Settings'),
             'icon'  =>  'cog-8-tooth',
             'flyout'   => 'settings',
-            'active'    => request()->routeIs([]),
-            'visible'   => true,
+            'active'    => request()->routeIs(['admin.settings.*', 'users.index']),
+            'visible'   => auth()->user()->hasRole(['admin', 'super_admin']),
             'items'     => [
-                ['label' => __('General Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'adjustments-horizontal', 'visible' => true],
-                ['label' => __('Brand Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'sparkles', 'visible' => true],
-                ['label' => __('Email Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'envelope', 'visible' => true],
-                ['label' => __('AI Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'cpu-chip', 'visible' => true],
-                ['label' => __('Languages'), 'route' => 'dashboard', 'match' => '', 'icon' => 'language', 'visible' => true],
-                ['label' => __('Website Tracking'), 'route' => 'dashboard', 'match' => '', 'icon' => 'chart-bar', 'visible' => true],
-                ['label' => __('User Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'user-group', 'visible' => true],
+                ['label' => __('General Setting'), 'route' => 'admin.settings.general', 'match' => 'admin.settings.general', 'icon' => 'adjustments-horizontal', 'visible' => true],
+                ['label' => __('Brand Setting'), 'route' => 'admin.settings.branding', 'match' => 'admin.settings.branding', 'icon' => 'sparkles', 'visible' => true],
+                ['label' => __('Email Setting'), 'route' => 'admin.settings.email', 'match' => 'admin.settings.email', 'icon' => 'envelope', 'visible' => true],
+                ['label' => __('AI Setting'), 'route' => 'admin.settings.ai', 'match' => 'admin.settings.ai', 'icon' => 'cpu-chip', 'visible' => true],
+                ['label' => __('Languages'), 'route' => 'admin.settings.languages', 'match' => 'admin.settings.languages', 'icon' => 'language', 'visible' => true],
+                ['label' => __('Website Tracking'), 'route' => 'admin.settings.tracking', 'match' => 'admin.settings.tracking', 'icon' => 'chart-bar', 'visible' => true],
+                ['label' => __('User Manage'), 'route' => 'users.index', 'match' => 'users.index', 'icon' => 'user-group', 'visible' => true],
             ]
         ],
         [
@@ -196,15 +196,15 @@
             'label' =>  __('System Settings'),
             'icon'  =>  'server-stack',
             'flyout'   => 'system-settings',
-            'active'    => request()->routeIs([]),
-            'visible'   => true,
+            'active'    => request()->routeIs(['superadmin.settings.*']),
+            'visible'   => auth()->user()->hasRole('super_admin'),
             'items'     => [
-                ['label' => __('Sitemap Setting'), 'route' => 'dashboard', 'match' => '', 'icon' => 'globe-alt', 'visible' => true],
-                ['label' => __('Htaccess'), 'route' => 'dashboard', 'match' => '', 'icon' => 'code-bracket', 'visible' => true],
-                ['label' => __('Backups'), 'route' => 'dashboard', 'match' => '', 'icon' => 'circle-stack', 'visible' => true],
-                ['label' => __('Cache Management'), 'route' => 'dashboard', 'match' => '', 'icon' => 'trash', 'visible' => true],
-                ['label' => __('System Information'), 'route' => 'dashboard', 'match' => '', 'icon' => 'information-circle', 'visible' => true],
-                ['label' => __('Activity Logs'), 'route' => 'dashboard', 'match' => '', 'icon' => 'clipboard-document-list', 'visible' => true],
+                ['label' => __('Sitemap Setting'), 'route' => 'superadmin.settings.sitemap', 'match' => 'superadmin.settings.sitemap', 'icon' => 'globe-alt', 'visible' => true],
+                ['label' => __('Htaccess'), 'route' => 'superadmin.settings.htaccess', 'match' => 'superadmin.settings.htaccess', 'icon' => 'code-bracket', 'visible' => true],
+                ['label' => __('Backups'), 'route' => 'superadmin.settings.backups', 'match' => 'superadmin.settings.backups', 'icon' => 'circle-stack', 'visible' => true],
+                ['label' => __('Cache Management'), 'route' => 'superadmin.settings.cache', 'match' => 'superadmin.settings.cache', 'icon' => 'trash', 'visible' => true],
+                ['label' => __('System Information'), 'route' => 'superadmin.settings.system-info', 'match' => 'superadmin.settings.system-info', 'icon' => 'information-circle', 'visible' => true],
+                ['label' => __('Activity Logs'), 'route' => 'superadmin.settings.activity-logs', 'match' => 'superadmin.settings.activity-logs', 'icon' => 'clipboard-document-list', 'visible' => true],
             ]
         ]
     ];
@@ -219,7 +219,8 @@
     x-data="{
         settingsOpen: false,
         helpOpen: false,
-        mode: localStorage.getItem('flux.appearance') || localStorage.getItem('theme') || 'system',
+        defaultTheme: '{{ strtolower(\App\Support\SettingsStore::group('branding')['default_theme'] ?? 'system') }}',
+        mode: localStorage.getItem('flux.appearance') || localStorage.getItem('theme') || '{{ strtolower(\App\Support\SettingsStore::group('branding')['default_theme'] ?? 'system') }}',
         applyAppearance(selected) {
             this.mode = selected;
 
@@ -242,6 +243,11 @@
             }
 
             window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: selected } }));
+        },
+        init() {
+            if (!localStorage.getItem('flux.appearance') && !localStorage.getItem('theme')) {
+                this.applyAppearance(this.defaultTheme);
+            }
         }
     }"
     x-on:keydown.escape.window="settingsOpen = false; helpOpen = false"
@@ -345,8 +351,9 @@
                     @endif
 
                 @elseif($item['type'] === 'group')
-                    <flux:sidebar.group expandable :icon="$item['icon']" :heading="$item['label']" :expanded="$item['active']" class="grid">
-                        @foreach($item['items'] as $subItem)
+                    <flux:sidebar.group expandable :icon="$item['icon']" :heading="$item['label']" :expanded="$item['active']" >
+                        <div class="flex flex-col w-full ">
+                            @foreach($item['items'] as $subItem)
                             @if($subItem['visible'])
                                 <flux:sidebar.item
                                     :icon="$subItem['icon'] ?? null"
@@ -358,6 +365,7 @@
                                 </flux:sidebar.item>
                             @endif
                         @endforeach
+                        </div>
                     </flux:sidebar.group>
                 @endif
 

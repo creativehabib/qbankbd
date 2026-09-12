@@ -5,6 +5,7 @@ namespace App\Livewire\Chapters;
 use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
+use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -12,6 +13,20 @@ use Livewire\WithPagination;
 
 class ChapterIndex extends Component
 {
+    public $toggleTargetId = null;
+
+    public $toggleTargetName = '';
+
+    public $toggleTargetState = false;
+
+    public $showToggleModal = false;
+
+    public $isCreating = false;
+
+    public $perPage = 10;
+
+    public $sortField = 'default';
+
     use InteractsWithFluxToasts;
     use WithPagination;
 
@@ -43,6 +58,7 @@ class ChapterIndex extends Component
 
     public function cancelEdit()
     {
+        $this->isCreating = false;
         $this->reset([
             'editId', 'subject_id', 'name',
             'academic_class_id', 'description', 'image',
@@ -60,8 +76,9 @@ class ChapterIndex extends Component
 
     public function edit($id)
     {
+        $this->isCreating = false;
         $this->resetValidation();
-        $chapter = Chapter::with('subject.academicClass')->findOrFail($id);
+        $chapter = Chapter::withCount('questions')->with('subject.academicClass')->findOrFail($id);
 
         $this->editId = $chapter->id;
         $this->subject_id = (string) $chapter->subject_id;
@@ -135,9 +152,10 @@ class ChapterIndex extends Component
     {
         $chapter = Chapter::find($id);
         if ($chapter) {
-            $hasQuestions = \App\Models\Question::where('chapter_id', $id)->exists();
+            $hasQuestions = Question::where('chapter_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This chapter is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
 
@@ -153,26 +171,64 @@ class ChapterIndex extends Component
         $this->subject_id = '';
     }
 
+    public function toggleActive($id)
+    {
+        $item = Chapter::findOrFail($id);
+        $this->toggleTargetId = $id;
+        $this->toggleTargetName = $item->name;
+        $this->toggleTargetState = ! $item->is_active;
+
+        // Open modal via Flux
+        $this->showToggleModal = true;
+    }
+
+    public function performToggle()
+    {
+        if (! $this->toggleTargetId) {
+            return;
+        }
+
+        $item = Chapter::findOrFail($this->toggleTargetId);
+        $item->is_active = $this->toggleTargetState;
+        $item->save();
+
+        $this->toastSuccess('Status updated successfully.');
+        $this->showToggleModal = false;
+        $this->toggleTargetId = null;
+    }
+
+    public function create()
+    {
+        $this->cancelEdit();
+        $this->isCreating = true;
+    }
+
     public function render()
     {
-        $chapters = Chapter::with('subject.academicClass')
+        $chapters = Chapter::withCount('questions')->with('subject.academicClass')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('description', 'like', '%'.$this->search.'%');
             })
-            ->orderBy('name')
-            ->paginate(10);
+            ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())
+            ->paginate($this->perPage);
 
         $subjects = Subject::query()
             ->with('academicClass')
             ->when($this->academic_class_id !== '', function ($query): void {
                 $query->where('academic_class_id', $this->academic_class_id);
             })
-            ->orderBy(AcademicClass::query()->select('name')->whereColumn('academic_classes.id', 'subjects.academic_class_id'))
-            ->orderBy('name')
+            ->orderBy(AcademicClass::query()->withCount('questions')->select('name')->whereColumn('academic_classes.id', 'subjects.academic_class_id'))
+            ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())
             ->get();
 
-        $classes = AcademicClass::query()->orderBy('name')->get();
+        $classes = AcademicClass::query()->withCount('questions')->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())->get();
 
         return view('livewire.chapters.chapter-index', compact('chapters', 'subjects', 'classes'))
             ->layout('layouts.app', ['title' => 'Manage Chapters']);

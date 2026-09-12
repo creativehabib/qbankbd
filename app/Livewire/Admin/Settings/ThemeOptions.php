@@ -10,6 +10,8 @@ use Livewire\Component;
 
 class ThemeOptions extends Component
 {
+    public $perPage = 10;
+
     public string $primary_font = 'Nunito';
 
     public string $primary_font_weights = '300;400;500;600;700';

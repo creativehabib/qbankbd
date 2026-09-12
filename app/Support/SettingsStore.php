@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsStore
 {
@@ -11,18 +12,20 @@ class SettingsStore
      */
     public static function group(string $group): array
     {
-        return Setting::query()
-            ->forGroup($group)
-            ->orderBy('key')
-            ->get()
-            ->mapWithKeys(function (Setting $setting): array {
-                return [$setting->key => static::decodeValue($setting->value)];
-            })
-            ->all();
+        return Cache::remember('settings_group_'.$group, 3600, function () use ($group) {
+            return Setting::query()
+                ->forGroup($group)
+                ->orderBy('key')
+                ->get()
+                ->mapWithKeys(function (Setting $setting): array {
+                    return [$setting->key => static::decodeValue($setting->value)];
+                })
+                ->all();
+        });
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param  array<string, mixed>  $values
      */
     public static function saveGroup(string $group, array $values, bool $autoload = true): void
     {
@@ -38,6 +41,7 @@ class SettingsStore
                 ]
             );
         }
+        Cache::forget('settings_group_'.$group);
     }
 
     private static function encodeValue(mixed $value): ?string

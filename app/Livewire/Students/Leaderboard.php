@@ -9,6 +9,8 @@ use Livewire\Component;
 
 class Leaderboard extends Component
 {
+    public $perPage = 10;
+
     /**
      * URL এ ?league_id=2 দেখানোর জন্য এবং স্টেট ধরে রাখার জন্য।
      */
@@ -90,7 +92,7 @@ class Leaderboard extends Component
                     $rankQuery = User::query()
                         ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']])
                         ->where('xp', '>', $myXp);
-                    
+
                     if ($isJobSeeker) {
                         $rankQuery->role('job_seeker');
                     } else {

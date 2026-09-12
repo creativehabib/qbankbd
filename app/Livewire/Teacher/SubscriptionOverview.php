@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class SubscriptionOverview extends Component
 {
+    public $perPage = 10;
+
     public function render(): View
     {
         $subscription = UserSubscription::query()

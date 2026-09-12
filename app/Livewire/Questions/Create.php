@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Questions;
 
-use App\Livewire\Traits\SlugValidationTrait;
 use App\Livewire\Traits\InteractsWithFluxToasts;
+use App\Livewire\Traits\SlugValidationTrait;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
 use App\Models\ExamCategory; // Image Upload এর জন্য
@@ -19,7 +19,9 @@ use Livewire\Component;
 
 class Create extends Component
 {
-    use AuthorizesRequests, SlugValidationTrait, InteractsWithFluxToasts;
+    public $perPage = 10;
+
+    use AuthorizesRequests, InteractsWithFluxToasts, SlugValidationTrait;
 
     public $subject_id;
 

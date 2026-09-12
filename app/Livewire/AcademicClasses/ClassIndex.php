@@ -5,6 +5,7 @@ namespace App\Livewire\AcademicClasses;
 use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
 use App\Models\Chapter;
+use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
 use Illuminate\Contracts\View\View;
@@ -13,7 +14,22 @@ use Livewire\Component;
 
 class ClassIndex extends Component
 {
+    public $toggleTargetId = null;
+
+    public $toggleTargetName = '';
+
+    public $toggleTargetState = false;
+
+    public $showToggleModal = false;
+
+    public $isCreating = false;
+
+    public $perPage = 10;
+
+    public $sortField = 'default';
+
     use InteractsWithFluxToasts;
+
     public string $classSearch = '';
 
     public string $subjectSearch = '';
@@ -94,7 +110,8 @@ class ClassIndex extends Component
 
     public function editClass(int $id): void
     {
-        $academicClass = AcademicClass::query()->findOrFail($id);
+        $this->isCreating = false;
+        $academicClass = AcademicClass::query()->withCount('questions')->findOrFail($id);
 
         $this->editingClassId = $academicClass->id;
         $this->class_name = $academicClass->name;
@@ -124,12 +141,12 @@ class ClassIndex extends Component
         ];
 
         if ($this->editingClassId !== null) {
-            AcademicClass::query()->whereKey($this->editingClassId)->update($payload);
+            AcademicClass::query()->withCount('questions')->whereKey($this->editingClassId)->update($payload);
             $message = 'Academic class updated successfully.';
         } else {
             $payload['uuid'] = (string) Str::uuid();
-            $payload['order_sequence'] = (AcademicClass::query()->max('order_sequence') ?? 0) + 1;
-            AcademicClass::query()->create($payload);
+            $payload['order_sequence'] = (AcademicClass::query()->withCount('questions')->max('order_sequence') ?? 0) + 1;
+            AcademicClass::query()->withCount('questions')->create($payload);
             $message = 'Academic class created successfully.';
         }
 
@@ -140,11 +157,12 @@ class ClassIndex extends Component
 
     public function deleteClass(int $id): void
     {
-        $class = AcademicClass::query()->find($id);
+        $class = AcademicClass::query()->withCount('questions')->find($id);
         if ($class) {
-            $hasQuestions = \App\Models\Question::where('academic_class_id', $id)->exists();
+            $hasQuestions = Question::where('academic_class_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This class is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
             $class->delete();
@@ -220,9 +238,10 @@ class ClassIndex extends Component
     {
         $subject = Subject::query()->find($id);
         if ($subject) {
-            $hasQuestions = \App\Models\Question::where('subject_id', $id)->exists();
+            $hasQuestions = Question::where('subject_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This subject is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
             $subject->delete();
@@ -298,9 +317,10 @@ class ClassIndex extends Component
     {
         $chapter = Chapter::query()->find($id);
         if ($chapter) {
-            $hasQuestions = \App\Models\Question::where('chapter_id', $id)->exists();
+            $hasQuestions = Question::where('chapter_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This chapter is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
             $chapter->delete();
@@ -373,9 +393,10 @@ class ClassIndex extends Component
     {
         $topic = Topic::query()->find($id);
         if ($topic) {
-            $hasQuestions = \App\Models\Question::where('topic_id', $id)->exists();
+            $hasQuestions = Question::where('topic_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This topic is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
             $topic->delete();
@@ -383,13 +404,45 @@ class ClassIndex extends Component
         }
     }
 
+    public function toggleActive($id)
+    {
+        $item = AcademicClass::findOrFail($id);
+        $this->toggleTargetId = $id;
+        $this->toggleTargetName = $item->name;
+        $this->toggleTargetState = ! $item->is_active;
+
+        // Open modal via Flux
+        $this->showToggleModal = true;
+    }
+
+    public function performToggle()
+    {
+        if (! $this->toggleTargetId) {
+            return;
+        }
+
+        $item = AcademicClass::findOrFail($this->toggleTargetId);
+        $item->is_active = $this->toggleTargetState;
+        $item->save();
+
+        $this->toastSuccess('Status updated successfully.');
+        $this->showToggleModal = false;
+        $this->toggleTargetId = null;
+    }
+
+    public function create()
+    {
+        $this->resetClassForm();
+        $this->isCreating = true;
+    }
+
     public function render(): View
     {
         return view('livewire.academic-classes.class-index', [
-            'academicClasses' => AcademicClass::query()
+            'academicClasses' => AcademicClass::query()->withCount('questions')
                 ->when($this->classSearch, fn ($query) => $query->where('name', 'like', '%'.$this->classSearch.'%'))
                 ->latest()
-                ->get(),
+                ->paginate($this->perPage),
             'subjects' => Subject::query()
                 ->with('academicClass')
                 ->when($this->subjectSearch, function ($query): void {
@@ -408,14 +461,21 @@ class ClassIndex extends Component
                 ->when($this->topicSearch, fn ($query) => $query->where('name', 'like', '%'.$this->topicSearch.'%'))
                 ->latest()
                 ->get(),
-            'allClasses' => AcademicClass::query()->orderBy('name')->get(),
-            'allSubjects' => Subject::query()->orderBy('name')->get(),
-            'allChapters' => Chapter::query()->orderBy('name')->get(),
+            'allClasses' => AcademicClass::query()->withCount('questions')->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+                ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+                ->when($this->sortField === 'default', fn ($q) => $q->latest())->get(),
+            'allSubjects' => Subject::query()->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+                ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+                ->when($this->sortField === 'default', fn ($q) => $q->latest())->get(),
+            'allChapters' => Chapter::query()->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+                ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+                ->when($this->sortField === 'default', fn ($q) => $q->latest())->get(),
         ])->layout('layouts.app', ['title' => 'Academic Content CRUD']);
     }
 
     public function resetClassForm(): void
     {
+        $this->isCreating = false;
         $this->editingClassId = null;
         $this->class_name = '';
         $this->class_description = null;

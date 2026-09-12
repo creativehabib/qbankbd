@@ -11,21 +11,31 @@ use Livewire\Component;
 
 class CreateQuestionSet extends Component
 {
+    public $perPage = 10;
+
     // Form Properties
     public $name;
+
     public $type = 'mcq';
+
     public $quantity;
 
     // Selection Properties (Blade এ যেভাবে আছে ঠিক সেভাবে)
     public $selectedClass = null;
+
     public $selectedSubjects = [];
+
     public $selectedChapters = [];
+
     public $selectedTopics = [];
 
     // List Properties (Blade এ যেগুলো ব্যবহার হচ্ছে)
     public $classes = [];
+
     public $subjects = [];
+
     public $chapters = [];
+
     public $topics = [];
 
     // Validation Rules
@@ -51,7 +61,7 @@ class CreateQuestionSet extends Component
     // ক্লাস পরিবর্তন → সাবজেক্ট লোড
     public function updatedSelectedClass($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             $this->subjects = Subject::where('academic_class_id', $value)
                 ->orderBy('name')
                 ->get();
@@ -70,7 +80,7 @@ class CreateQuestionSet extends Component
     // সাবজেক্ট পরিবর্তন → চ্যাপ্টার লোড
     public function updatedSelectedSubjects()
     {
-        if (!empty($this->selectedSubjects)) {
+        if (! empty($this->selectedSubjects)) {
             $this->chapters = Chapter::whereIn('subject_id', $this->selectedSubjects)
                 ->orderBy('name')
                 ->get();
@@ -87,7 +97,7 @@ class CreateQuestionSet extends Component
     // চ্যাপ্টার পরিবর্তন → টপিক লোড
     public function updatedSelectedChapters()
     {
-        if (!empty($this->selectedChapters)) {
+        if (! empty($this->selectedChapters)) {
             $this->topics = Topic::whereIn('chapter_id', $this->selectedChapters)
                 ->orderBy('name')
                 ->get();
@@ -108,11 +118,11 @@ class CreateQuestionSet extends Component
             'user_id' => auth()->id(),
             'generation_criteria' => [
                 'academic_class_id' => $this->selectedClass,
-                'subject_ids'       => $this->selectedSubjects,
-                'chapter_ids'       => $this->selectedChapters,
-                'topic_ids'         => $this->selectedTopics,
-                'type'              => $this->type,
-                'quantity'          => $this->quantity,
+                'subject_ids' => $this->selectedSubjects,
+                'chapter_ids' => $this->selectedChapters,
+                'topic_ids' => $this->selectedTopics,
+                'type' => $this->type,
+                'quantity' => $this->quantity,
             ],
         ]);
 
@@ -130,7 +140,7 @@ class CreateQuestionSet extends Component
         session()->flash('success', 'প্রশ্ন সফলভাবে তৈরি হয়েছে!');
 
         // রিডাইরেক্ট করতে চাইলে:
-         return redirect()->route('qset.generated', ['qset' => $questionSet->id]);
+        return redirect()->route('qset.generated', ['qset' => $questionSet->id]);
     }
 
     public function render()

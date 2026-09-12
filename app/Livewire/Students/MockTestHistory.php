@@ -8,6 +8,8 @@ use Livewire\WithPagination;
 
 class MockTestHistory extends Component
 {
+    public $perPage = 10;
+
     use WithPagination;
 
     public function mount()
@@ -21,10 +23,10 @@ class MockTestHistory extends Component
             ->where('user_id', auth()->id())
             ->with(['academicClass:id,name', 'subject:id,name'])
             ->latest()
-            ->paginate(12);
+            ->paginate($this->perPage);
 
         return view('livewire.students.mock-test-history', [
-            'histories' => $histories
+            'histories' => $histories,
         ])->layout('layouts.app', ['title' => 'পরীক্ষার ইতিহাস']);
     }
 }

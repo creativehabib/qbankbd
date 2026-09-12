@@ -9,6 +9,8 @@ use Livewire\Component;
 
 class WalletTransactions extends Component
 {
+    public $perPage = 10;
+
     public string $activeTab = 'recharge';
 
     public ?float $amount = null;

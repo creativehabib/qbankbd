@@ -4,26 +4,46 @@ namespace App\Livewire\Topics;
 
 use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Chapter;
+use App\Models\Question;
 use App\Models\Subject;
-use App\Models\Topic;
-use Illuminate\Support\Str; // <-- Str ক্লাস ইমপোর্ট করা হলো
+use App\Models\Topic; // <-- Str ক্লাস ইমপোর্ট করা হলো
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class TopicIndex extends Component
 {
+    public $toggleTargetId = null;
+
+    public $toggleTargetName = '';
+
+    public $toggleTargetState = false;
+
+    public $showToggleModal = false;
+
+    public $isCreating = false;
+
     use InteractsWithFluxToasts;
     use WithPagination;
 
     public $search = '';
+
+    public $perPage = 10;
+
+    public $sortField = 'default';
+
     public $subjectId = '';
 
     // Modal Properties
     public $showModal = false;
+
     public $name = '';
+
     public $modalSubjectId = '';
+
     public $modalChapterId = null;
+
     public $editId = null;
 
     protected $listeners = ['deleteTopicConfirmed' => 'delete'];
@@ -45,7 +65,8 @@ class TopicIndex extends Component
 
     public function cancelEdit()
     {
-        $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
+        $this->isCreating = false;
+        $this->reset(['isCreating', 'name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->resetValidation();
     }
 
@@ -56,6 +77,7 @@ class TopicIndex extends Component
 
     public function edit($id)
     {
+        $this->isCreating = false;
         $this->resetValidation();
         $topic = Topic::findOrFail($id);
 
@@ -104,7 +126,7 @@ class TopicIndex extends Component
             $message = 'Topic created successfully!';
         }
 
-        $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
+        $this->reset(['isCreating', 'name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->dispatch('topicSaved', message: $message);
         $this->toastSuccess($message);
     }
@@ -113,9 +135,10 @@ class TopicIndex extends Component
     {
         $topic = Topic::find($id);
         if ($topic) {
-            $hasQuestions = \App\Models\Question::where('topic_id', $id)->exists();
+            $hasQuestions = Question::where('topic_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This topic is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
 
@@ -126,16 +149,52 @@ class TopicIndex extends Component
         }
     }
 
+    public function create()
+    {
+        $this->cancelEdit();
+        $this->isCreating = true;
+    }
+
+    public function toggleActive($id)
+    {
+        $item = Topic::findOrFail($id);
+        $this->toggleTargetId = $id;
+        $this->toggleTargetName = $item->name;
+        $this->toggleTargetState = ! $item->is_active;
+
+        // Open modal via Flux
+        $this->showToggleModal = true;
+    }
+
+    public function performToggle()
+    {
+        if (! $this->toggleTargetId) {
+            return;
+        }
+
+        $item = Topic::findOrFail($this->toggleTargetId);
+        $item->is_active = $this->toggleTargetState;
+        $item->save();
+
+        $this->toastSuccess('Status updated successfully.');
+        $this->showToggleModal = false;
+        $this->toggleTargetId = null;
+    }
+
     public function render()
     {
-        $topics = Topic::with('subject', 'chapter')
+        $topics = Topic::with('subject', 'chapter')->withCount('questions')
             ->when($this->subjectId, fn ($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->search, fn ($q) => $q->where('name', 'like', '%'.$this->search.'%'))
-            ->orderBy('name')
-            ->paginate(10);
+            ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())
+            ->paginate($this->perPage);
 
         $modalChapters = $this->modalSubjectId
-            ? Chapter::where('subject_id', $this->modalSubjectId)->orderBy('name')->get()
+            ? Chapter::where('subject_id', $this->modalSubjectId)->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+                ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+                ->when($this->sortField === 'default', fn ($q) => $q->latest())->get()
             : [];
 
         return view('livewire.topics.topic-index', [

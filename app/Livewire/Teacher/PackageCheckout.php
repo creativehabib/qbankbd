@@ -11,6 +11,8 @@ use Livewire\Component;
 
 class PackageCheckout extends Component
 {
+    public $perPage = 10;
+
     public Package $package;
 
     public string $paymentMethod = 'wallet';

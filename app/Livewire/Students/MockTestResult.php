@@ -10,6 +10,8 @@ use Livewire\Component;
 
 class MockTestResult extends Component
 {
+    public $perPage = 10;
+
     public MockTest $mockTest;
 
     public $aiError = null;

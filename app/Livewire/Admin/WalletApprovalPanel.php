@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class WalletApprovalPanel extends Component
 {
+    public $perPage = 10;
+
     public function approve(int $transactionId): void
     {
         $transaction = WalletTransaction::query()->where('status', 'pending')->findOrFail($transactionId);

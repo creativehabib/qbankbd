@@ -9,6 +9,8 @@ use Symfony\Component\Process\Process;
 
 class EvaluateOmr extends Component
 {
+    public $perPage = 10;
+
     use WithFileUploads;
 
     public $tokenId;

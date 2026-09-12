@@ -2,34 +2,48 @@
 
 namespace App\Livewire\Teacher;
 
-use Livewire\Component;
 use App\Models\QuestionSet;
-use Illuminate\Http\Request;
 use App\Support\Fonts;
+use Illuminate\Http\Request;
+use Livewire\Component;
 
 class QuestionPaper extends Component
 {
+    public $perPage = 10;
+
     public QuestionSet $questionSet;
+
     public $questions;
 
     // Header Info
     public $instituteName;
+
     public $subject;
+
     public $chapter;
+
     public $topics;
 
     // Formatting & Layout Properties
     public string $fontFamily = 'Bangla';
+
     public int $fontSize = 14;
+
     public string $textAlign = 'justify';
+
     public int $columnCount = 2;
+
     public string $paperSize = 'A4';
+
     public string $optionStyle = 'circle';
+
     public string $setCode = 'ক';
 
     // Watermark Properties (ছবি অনুযায়ী)
     public int $watermarkOpacity = 20;
+
     public int $watermarkSize = 30;
+
     public string $watermarkText = 'অনলাইন ডিজিটাল স্কুল';
 
     public array $previewOptions = [
@@ -66,26 +80,53 @@ class QuestionPaper extends Component
         $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
 
         // ডিফল্ট ওয়াটারমার্ক টেক্সট
-        if(empty($this->watermarkText)) {
+        if (empty($this->watermarkText)) {
             $this->watermarkText = $this->instituteName;
         }
     }
 
     // --- Customization Methods ---
-    public function setTextAlign($align) { $this->textAlign = $align; }
-    public function setColumnCount($count) { $this->columnCount = $count; }
-    public function setPaperSize($size) { $this->paperSize = $size; }
-    public function setOptionStyle($style) { $this->optionStyle = $style; }
-    public function increaseFontSize() { if($this->fontSize < 24) $this->fontSize++; }
-    public function decreaseFontSize() { if($this->fontSize > 10) $this->fontSize--; }
+    public function setTextAlign($align)
+    {
+        $this->textAlign = $align;
+    }
+
+    public function setColumnCount($count)
+    {
+        $this->columnCount = $count;
+    }
+
+    public function setPaperSize($size)
+    {
+        $this->paperSize = $size;
+    }
+
+    public function setOptionStyle($style)
+    {
+        $this->optionStyle = $style;
+    }
+
+    public function increaseFontSize()
+    {
+        if ($this->fontSize < 24) {
+            $this->fontSize++;
+        }
+    }
+
+    public function decreaseFontSize()
+    {
+        if ($this->fontSize > 10) {
+            $this->fontSize--;
+        }
+    }
 
     // --- Shuffle & Set Code ---
     public function shuffleQuestions()
     {
         // প্রশ্নগুলো এলোমেলো (Shuffle)
         $this->questions = collect($this->questions)->shuffle();
-        $this->setCode = collect(['ক','খ','গ','ঘ'])
-            ->reject(fn($c) => $c === $this->setCode)
+        $this->setCode = collect(['ক', 'খ', 'গ', 'ঘ'])
+            ->reject(fn ($c) => $c === $this->setCode)
             ->random();
     }
 

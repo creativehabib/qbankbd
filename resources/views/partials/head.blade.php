@@ -1,13 +1,33 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+@php
+    $branding = \App\Support\SettingsStore::group('branding');
+    $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
+    $favicon = $branding['favicon'] ? \Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon']) : '/favicon.ico';
+    $accentColor = $branding['accent_color'] ?? '#3b82f6';
+    $textColor = $branding['text_color'] ?? '#ffffff';
+    $defaultTheme = $branding['default_theme'] ?? 'System';
+@endphp
+
 <title>
-    {{ filled($title ?? null) ? $title.' - '.config('app.name', 'Question Bank') : config('app.name', 'Question Bank') }}
+    {{ filled($title ?? null) ? $title.' - '.$appName : $appName }}
 </title>
 
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="{{ $favicon }}" sizes="any">
+<link rel="apple-touch-icon" href="{{ $favicon }}">
+
+<style>
+    :root, .dark {
+        --color-accent: {{ $accentColor }};
+        --color-accent-content: {{ $accentColor }};
+        --color-accent-foreground: {{ $textColor }};
+        
+        --app-dark-active-bg: color-mix(in srgb, var(--color-accent) 15%, transparent);
+        --app-dark-active-text: var(--color-accent);
+        --app-dark-border: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+</style>
 
 @if($primaryFont = setting('primary_font'))
     @php
@@ -61,4 +81,41 @@
 <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @stack('styles')
-@fluxAppearance
+<style>
+    :root.dark {
+        color-scheme: dark;
+    }
+</style>
+<script>
+    window.Flux = {
+        applyAppearance (appearance, saveToStorage = true) {
+            let applyDark = () => document.documentElement.classList.add('dark')
+            let applyLight = () => document.documentElement.classList.remove('dark')
+
+            if (appearance === 'system') {
+                let media = window.matchMedia('(prefers-color-scheme: dark)')
+
+                if (saveToStorage) window.localStorage.removeItem('flux.appearance')
+
+                media.matches ? applyDark() : applyLight()
+            } else if (appearance === 'dark') {
+                if (saveToStorage) window.localStorage.setItem('flux.appearance', 'dark')
+
+                applyDark()
+            } else if (appearance === 'light') {
+                if (saveToStorage) window.localStorage.setItem('flux.appearance', 'light')
+
+                applyLight()
+            }
+        }
+    }
+
+    const userPref = window.localStorage.getItem('flux.appearance') || window.localStorage.getItem('theme');
+    const adminDefault = '{{ strtolower($defaultTheme) }}';
+
+    if (userPref) {
+        window.Flux.applyAppearance(userPref, false);
+    } else {
+        window.Flux.applyAppearance(adminDefault, false);
+    }
+</script>

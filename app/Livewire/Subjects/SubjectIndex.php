@@ -4,6 +4,7 @@ namespace App\Livewire\Subjects;
 
 use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\AcademicClass;
+use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -11,10 +12,24 @@ use Livewire\WithPagination;
 
 class SubjectIndex extends Component
 {
+    public $toggleTargetId = null;
+
+    public $toggleTargetName = '';
+
+    public $toggleTargetState = false;
+
+    public $showToggleModal = false;
+
+    public $isCreating = false;
+
     use InteractsWithFluxToasts;
     use WithPagination;
 
     public $search = '';
+
+    public $perPage = 10;
+
+    public $sortField = 'default';
 
     // Form Properties
     public $editId = null;
@@ -42,6 +57,7 @@ class SubjectIndex extends Component
 
     public function cancelEdit()
     {
+        $this->isCreating = false;
         $this->reset([
             'editId', 'academic_class_id', 'name', 'subject_code',
             'description', 'image',
@@ -59,6 +75,7 @@ class SubjectIndex extends Component
 
     public function edit($id)
     {
+        $this->isCreating = false;
         $this->resetValidation();
         $subject = Subject::findOrFail($id);
 
@@ -125,9 +142,10 @@ class SubjectIndex extends Component
         $subject = Subject::find($id);
         if ($subject) {
             // Check if attached to any question
-            $hasQuestions = \App\Models\Question::where('subject_id', $id)->exists();
+            $hasQuestions = Question::where('subject_id', $id)->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This subject is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
+
                 return;
             }
 
@@ -138,15 +156,49 @@ class SubjectIndex extends Component
         }
     }
 
+    public function toggleActive($id)
+    {
+        $item = Subject::findOrFail($id);
+        $this->toggleTargetId = $id;
+        $this->toggleTargetName = $item->name;
+        $this->toggleTargetState = ! $item->is_active;
+
+        // Open modal via Flux
+        $this->showToggleModal = true;
+    }
+
+    public function performToggle()
+    {
+        if (! $this->toggleTargetId) {
+            return;
+        }
+
+        $item = Subject::findOrFail($this->toggleTargetId);
+        $item->is_active = $this->toggleTargetState;
+        $item->save();
+
+        $this->toastSuccess('Status updated successfully.');
+        $this->showToggleModal = false;
+        $this->toggleTargetId = null;
+    }
+
+    public function create()
+    {
+        $this->cancelEdit();
+        $this->isCreating = true;
+    }
+
     public function render()
     {
-        $subjects = Subject::with('academicClass')
+        $subjects = Subject::withCount('questions')->with('academicClass')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('subject_code', 'like', '%'.$this->search.'%');
             })
-            ->orderBy('name')
-            ->paginate(10);
+            ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())
+            ->paginate($this->perPage);
 
         $classes = AcademicClass::orderBy('name')->get();
 

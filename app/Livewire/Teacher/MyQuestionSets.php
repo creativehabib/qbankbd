@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class MyQuestionSets extends Component
 {
+    public $perPage = 10;
+
     public function render(): View
     {
         $questionSets = QuestionSet::query()

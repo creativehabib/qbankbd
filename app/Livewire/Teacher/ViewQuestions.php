@@ -15,6 +15,8 @@ use Livewire\Component;
 
 class ViewQuestions extends Component
 {
+    public $perPage = 10;
+
     // UI State Properties
     public $showExplanationFor = null;
 

@@ -9,13 +9,26 @@ use Livewire\WithPagination;
 
 class Index extends Component
 {
+    public $toggleTargetId = null;
+
+    public $toggleTargetName = '';
+
+    public $toggleTargetState = false;
+
+    public $showToggleModal = false;
+
+    public $isCreating = false;
+
+    public $perPage = 10;
+
+    public $sortField = 'default';
+
     use InteractsWithFluxToasts;
     use WithPagination;
 
     public string $name = '';
 
     public ?int $editingId = null;
-
 
     public string $search = '';
 
@@ -37,8 +50,9 @@ class Index extends Component
                 'name' => 'required|string|unique:tags,name,'.$this->editingId,
             ]);
 
-            Tag::query()->findOrFail($this->editingId)->update(['name' => $this->name]);
+            Tag::query()->withCount('questions')->findOrFail($this->editingId)->update(['name' => $this->name]);
 
+            $this->isCreating = false;
             $this->editingId = null;
             $this->name = '';
             $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
@@ -49,10 +63,11 @@ class Index extends Component
                 'name' => 'required|string|unique:tags,name',
             ]);
 
-            Tag::query()->create([
+            Tag::query()->withCount('questions')->create([
                 'name' => $this->name,
             ]);
 
+            $this->isCreating = false;
             $this->name = '';
             $this->resetPage();
             $this->dispatch('tagSaved', message: 'Tag added successfully.');
@@ -64,11 +79,12 @@ class Index extends Component
     {
         abort_unless(auth()->user()?->hasPermission('tags.delete'), 403);
 
-        $tag = Tag::query()->findOrFail($id);
-        
+        $tag = Tag::query()->withCount('questions')->findOrFail($id);
+
         $hasQuestions = $tag->questions()->exists();
         if ($hasQuestions) {
             $this->toastWarning('This tag is attached to questions, so it cannot be deleted.', 'Cannot Delete');
+
             return;
         }
 
@@ -81,17 +97,51 @@ class Index extends Component
 
     public function edit(int $id): void
     {
+        $this->isCreating = false;
         abort_unless(auth()->user()?->hasPermission('tags.update'), 403);
 
-        $tag = Tag::query()->findOrFail($id);
+        $tag = Tag::query()->withCount('questions')->findOrFail($id);
         $this->editingId = $tag->id;
         $this->name = $tag->name;
     }
 
     public function cancelEdit(): void
     {
+        $this->isCreating = false;
         $this->editingId = null;
         $this->name = '';
+    }
+
+    public function create()
+    {
+        $this->cancelEdit();
+        $this->isCreating = true;
+    }
+
+    public function toggleActive($id)
+    {
+        $item = Tag::findOrFail($id);
+        $this->toggleTargetId = $id;
+        $this->toggleTargetName = $item->name;
+        $this->toggleTargetState = ! $item->is_active;
+
+        // Open modal via Flux
+        $this->showToggleModal = true;
+    }
+
+    public function performToggle()
+    {
+        if (! $this->toggleTargetId) {
+            return;
+        }
+
+        $item = Tag::findOrFail($this->toggleTargetId);
+        $item->is_active = $this->toggleTargetState;
+        $item->save();
+
+        $this->toastSuccess('Status updated successfully.');
+        $this->showToggleModal = false;
+        $this->toggleTargetId = null;
     }
 
     public function render()
@@ -101,10 +151,12 @@ class Index extends Component
             403
         );
 
-        $tags = Tag::query()
+        $tags = Tag::query()->withCount('questions')
             ->when($this->search, fn ($query) => $query->where('name', 'like', '%'.$this->search.'%'))
-            ->orderBy('name')
-            ->paginate(10);
+            ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
+            ->when($this->sortField === 'default', fn ($q) => $q->latest())
+            ->paginate($this->perPage);
 
         return view('livewire.admin.tags.index', [
             'tags' => $tags,

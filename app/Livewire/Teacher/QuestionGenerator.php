@@ -12,6 +12,8 @@ use Livewire\Component;
 
 class QuestionGenerator extends Component
 {
+    public $perPage = 10;
+
     public string $examName = '';
 
     public ?int $subjectId = null;

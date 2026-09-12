@@ -4,9 +4,11 @@ namespace App\Livewire\Students;
 
 use App\Models\AcademicClass;
 use App\Models\Chapter;
+use App\Models\ExamCategory;
 use App\Models\MockTest;
 use App\Models\MockTestQuestion;
 use App\Models\Question;
+use App\Models\QuestionReport;
 use App\Models\Subject;
 use App\Models\User;
 use App\Services\GeminiService;
@@ -20,6 +22,8 @@ use Livewire\WithPagination;
 
 class PracticeIndex extends Component
 {
+    public $perPage = 10;
+
     use WithPagination;
 
     public string $level = 'classes';
@@ -203,7 +207,7 @@ class PracticeIndex extends Component
         }
 
         $questions = $query->inRandomOrder()
-            ->limit((int)$this->questionCount)
+            ->limit((int) $this->questionCount)
             ->get();
 
         if ($questions->isEmpty()) {
@@ -217,7 +221,7 @@ class PracticeIndex extends Component
             'academic_class_id' => $this->selectedClassId,
             'subject_id' => $this->selectedSubjectId,
             'total_questions' => $questions->count(),
-            'duration_minutes' => (int)$this->questionCount,
+            'duration_minutes' => (int) $this->questionCount,
             'status' => 'started',
             'started_at' => now(),
         ]);
@@ -298,12 +302,12 @@ class PracticeIndex extends Component
         // ১. মূল প্রশ্ন টেবিলে এরর ফ্ল্যাগ ট্র্রিগার করা (এডমিন অ্যালার্টের জন্য)
         if (\Schema::hasColumn('questions', 'has_error')) {
             $question->update([
-                'has_error' => true
+                'has_error' => true,
             ]);
         }
 
         // ২. ডেডিকেটেড রিপোর্টে সমস্ত তথ্য ডাটাবেজে সংরক্ষণ করা
-        \App\Models\QuestionReport::create([
+        QuestionReport::create([
             'user_id' => auth()->id(),
             'question_id' => $questionId,
             'reason' => $reason,
@@ -313,6 +317,7 @@ class PracticeIndex extends Component
         // টোস্ট বা নোটিফিকেশন ডিসপ্যাচ
         $this->dispatch('notify', ['type' => 'success', 'message' => 'রিপোর্ট সফলভাবে জমা হয়েছে! এডমিন দ্রুত এটি যাচাই করবেন।']);
     }
+
     public function recordView(int $questionId): void
     {
         $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
@@ -331,7 +336,7 @@ class PracticeIndex extends Component
         return [
             'classes' => AcademicClass::where('is_active', true)->orderBy('name')->pluck('name', 'id')->toArray(),
             'subjects' => Subject::where('is_active', true)->orderBy('name')->pluck('name', 'id')->toArray(),
-            'exam_categories' => \App\Models\ExamCategory::orderBy('name')->pluck('name', 'id')->toArray(),
+            'exam_categories' => ExamCategory::orderBy('name')->pluck('name', 'id')->toArray(),
             'teachers' => User::role('teacher')->orderBy('name')->pluck('name', 'id')->toArray(),
         ];
     }
@@ -382,7 +387,7 @@ class PracticeIndex extends Component
                 'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
             ])
-            ->latest('id')->paginate(20);
+            ->latest('id')->paginate($this->perPage);
     }
 
     protected function filteredQuestions(): LengthAwarePaginator
@@ -392,7 +397,7 @@ class PracticeIndex extends Component
             ->where('status', 'active')
             ->when(! empty($this->filterClasses), fn (Builder $query) => $query->whereIn('academic_class_id', $this->filterClasses))
             ->when(! empty($this->filterSubjects), fn (Builder $query) => $query->whereIn('subject_id', $this->filterSubjects))
-            ->when(! empty($this->filterExamCategories), fn (Builder $query) => $query->whereHas('examCategories', fn($q) => $q->whereIn('exam_category_id', $this->filterExamCategories)))
+            ->when(! empty($this->filterExamCategories), fn (Builder $query) => $query->whereHas('examCategories', fn ($q) => $q->whereIn('exam_category_id', $this->filterExamCategories)))
             ->when(! empty($this->filterTeachers), fn (Builder $query) => $query->whereIn('user_id', $this->filterTeachers))
             ->when(filled($this->filterSearch), fn (Builder $query) => $query->where('title', 'like', '%'.$this->filterSearch.'%'))
             ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
@@ -401,7 +406,7 @@ class PracticeIndex extends Component
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
             ])
             ->latest('id')
-            ->paginate(20);
+            ->paginate($this->perPage);
     }
 
     public function render(): View

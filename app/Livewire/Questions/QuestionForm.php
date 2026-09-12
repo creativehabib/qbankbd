@@ -12,6 +12,8 @@ use Livewire\Component;
 
 class QuestionForm extends Component
 {
+    public $perPage = 10;
+
     use AuthorizesRequests;
 
     public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে

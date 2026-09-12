@@ -9,7 +9,10 @@ use Livewire\Component;
 
 class PackageManagement extends Component
 {
+    public $perPage = 10;
+
     use InteractsWithFluxToasts;
+
     public ?int $editingId = null;
 
     public string $name = '';

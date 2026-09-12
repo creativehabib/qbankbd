@@ -10,6 +10,8 @@ use Livewire\Component;
 
 class TakeMockTest extends Component
 {
+    public $perPage = 10;
+
     public MockTest $mockTest;
 
     public $testQuestions;

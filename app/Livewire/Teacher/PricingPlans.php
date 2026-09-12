@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class PricingPlans extends Component
 {
+    public $perPage = 10;
+
     public function render(): View
     {
         return view('livewire.teacher.pricing-plans', [

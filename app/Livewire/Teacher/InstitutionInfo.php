@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class InstitutionInfo extends Component
 {
+    public $perPage = 10;
+
     public string $institutionName = '';
 
     public string $institutionType = '';

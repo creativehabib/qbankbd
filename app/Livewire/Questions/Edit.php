@@ -13,12 +13,13 @@ use App\Models\Topic;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Edit extends Component
 {
+    public $perPage = 10;
+
     use AuthorizesRequests, SlugValidationTrait;
 
     public Question $question;
@@ -95,7 +96,7 @@ class Edit extends Component
             }
             $this->setCqDefaults();
         } elseif (in_array($this->question_type, ['written', 'short'])) {
-            $this->image = $extraData['image'] ?? null; 
+            $this->image = $extraData['image'] ?? null;
             $this->resetToMcq();
             $this->setCqDefaults();
         } else {
@@ -280,7 +281,7 @@ class Edit extends Component
         return $rules;
     }
 
-    public function update()
+    public function save()
     {
         $currentUser = auth()->user();
         abort_unless($currentUser?->hasPermission('questions.update'), 403);

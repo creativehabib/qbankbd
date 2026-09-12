@@ -1,6 +1,18 @@
 <x-split-layout>
+    <x-slot:header>
+        <x-modern-page-header title="Academic Class"
+                    subtitle="{{ $class->questions_count ?? 0 }} Questions" description="Create, search and manage classes from one place." modelName="class"></x-modern-page-header>
+    </x-slot:header>
+
     <x-slot:form>
-        <form wire:submit="saveClass" class="space-y-4">
+        <div>
+            @if(!$isCreating && !$editingClassId)
+            <div>
+                <x-modern-empty-state icon="academic-cap" title="Select a class"
+                    subtitle="{{ $class->questions_count ?? 0 }} Questions" description='Pick a row to view its details, or click "New class" to add one.' />
+            </div>
+        @else
+            <form wire:submit="saveClass" class="space-y-4" x-show="isCreating || {{ $editingClassId ? 'true' : 'false' }}" x-cloak>
             <div>
                 <flux:heading size="lg">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</flux:heading>
                 <flux:text class="mt-1">Add the class details and availability settings.</flux:text>
@@ -24,68 +36,45 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-2">
-                @if($editingClassId)
-                    <flux:button type="button" wire:click="resetClassForm" variant="ghost">Cancel</flux:button>
-                @endif
+                <flux:button type="button" wire:click="resetClassForm" variant="ghost">Cancel</flux:button>
                 <flux:button type="submit" variant="primary">Save</flux:button>
             </div>
         </form>
+        @endif
+        </div>
     </x-slot:form>
 
     <x-slot:table>
-        <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <flux:heading size="lg">Academic Class</flux:heading>
-                    <flux:text>Create, search and manage classes from one place.</flux:text>
+
+        <x-modern-list-header :total="$academicClasses->total()" model="classSearch" />
+
+        <x-modern-list>
+            @forelse($academicClasses as $academicClass)
+                <x-modern-list-item 
+                    :active="$editingClassId === $academicClass->id"
+                    icon="academic-cap"
+                    title="{{ $academicClass->name }}"
+                    subtitle="{{ $class->questions_count ?? 0 }} Questions"
+                    editAction="editClass({{ $academicClass->id }})"
+                    deleteAction="deleteClass({{ $academicClass->id }})" toggleAction="toggleActive({{ $academicClass->id }})" :toggleState="$academicClass->is_active"
+                >
+
+                                    <x-slot:end>
+                        {{ $academicClass->is_premium ? 'Premium' : 'Standard' }}
+                    </x-slot:end>
+                </x-modern-list-item>
+            @empty
+                <div class="py-10 text-center flex flex-col items-center justify-center text-gray-400">
+                    <flux:icon icon="academic-cap" class="size-10 mb-2 opacity-20" />
+                    <p class="text-lg font-medium">No class found</p>
+                    <p class="text-sm mt-1">Try adjusting your search.</p>
                 </div>
-            </div>
+            @endforelse
+        </x-modern-list>
 
-            <div class="mt-4">
-                <flux:input
-                    wire:model.live.debounce.300ms="classSearch"
-                    icon="magnifying-glass"
-                    placeholder="Search class..."
-                />
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-700/40 dark:text-gray-300">
-                    <tr>
-                        <th class="px-5 py-3 text-left font-semibold">Class</th>
-                        <th class="px-5 py-3 text-left font-semibold">ID</th>
-                        <th class="px-5 py-3 text-right font-semibold">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @forelse($academicClasses as $academicClass)
-                        <tr wire:key="academic-class-{{ $academicClass->id }}" class="transition hover:bg-indigo-50/40 dark:hover:bg-gray-700/30">
-                            <td class="px-5 py-3">
-                                <div class="font-medium text-gray-900 dark:text-gray-100">{{ $academicClass->name }}</div>
-                            </td>
-                            <td class="px-5 py-3">
-                                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                                    #{{ $academicClass->id }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3">
-                                <div class="flex items-center justify-end gap-2">
-                                    <flux:button wire:click="editClass({{ $academicClass->id }})" variant="ghost" size="sm" icon="pencil-square" aria-label="Edit class" />
-                                    <flux:button x-data x-on:click="window.confirmDeleteAction(() => $wire.deleteClass({{ $academicClass->id }}))" variant="danger" size="sm" icon="trash" aria-label="Delete class" />
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                                No class found.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+        @if(method_exists($academicClasses, 'hasPages') && $academicClasses->hasPages())
+            {{ $academicClasses->links('components.modern-pagination') }}
+        @endif
     </x-slot:table>
+    <x-modern-toggle-modal />
 </x-split-layout>

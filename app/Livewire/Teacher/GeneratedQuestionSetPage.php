@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class GeneratedQuestionSetPage extends Component
 {
+    public $perPage = 10;
+
     public QuestionSet $questionSet;
 
     public $subject;

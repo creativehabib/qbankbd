@@ -4,7 +4,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Livewire\AcademicClasses\ClassIndex;
 use App\Livewire\Admin\PackageManagement;
+use App\Livewire\Admin\Settings\AiSetting;
+use App\Livewire\Admin\Settings\BrandingTheme;
+use App\Livewire\Admin\Settings\EmailSetting;
+use App\Livewire\Admin\Settings\GeneralSetting;
+use App\Livewire\Admin\Settings\Index;
+use App\Livewire\Admin\Settings\Languages;
 use App\Livewire\Admin\Settings\ThemeOptions;
+use App\Livewire\Admin\Settings\WebsiteTracking;
 use App\Livewire\Admin\WalletApprovalPanel;
 use App\Livewire\Chapters\ChapterIndex;
 use App\Livewire\ExamCategories\ExamCategoriesIndex;
@@ -27,6 +34,12 @@ use App\Livewire\Students\MockTestResult;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
 use App\Livewire\Students\TakeMockTest;
 use App\Livewire\Subjects\SubjectIndex;
+use App\Livewire\SuperAdmin\Settings\ActivityLogs;
+use App\Livewire\SuperAdmin\Settings\Backups;
+use App\Livewire\SuperAdmin\Settings\CacheManagement;
+use App\Livewire\SuperAdmin\Settings\Htaccess;
+use App\Livewire\SuperAdmin\Settings\SitemapSetting;
+use App\Livewire\SuperAdmin\Settings\SystemInformation;
 use App\Livewire\Tags\Index as TagIndex;
 use App\Livewire\Teacher\CreateQuestionSet;
 use App\Livewire\Teacher\GeneratedQuestionSetPage;
@@ -86,6 +99,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('permission:users.manage_roles')->group(function (): void {
         Route::get('/users', UserRoleManagement::class)->name('users.index');
+
+        // Admin Settings
+        Route::get('/admin/settings', Index::class)->name('admin.settings.index');
+        Route::get('/admin/settings/general', GeneralSetting::class)->name('admin.settings.general');
+        Route::get('/admin/settings/branding-theme', BrandingTheme::class)->name('admin.settings.branding');
+        Route::get('/admin/settings/email', EmailSetting::class)->name('admin.settings.email');
+        Route::get('/admin/settings/ai', AiSetting::class)->name('admin.settings.ai');
+        Route::get('/admin/settings/languages', Languages::class)->name('admin.settings.languages');
+        Route::get('/admin/settings/tracking', WebsiteTracking::class)->name('admin.settings.tracking');
+
+        // Super Admin Settings
+        Route::get('/superadmin/settings/sitemap', SitemapSetting::class)->middleware('role:super_admin')->name('superadmin.settings.sitemap');
+        Route::get('/superadmin/settings/htaccess', Htaccess::class)->middleware('role:super_admin')->name('superadmin.settings.htaccess');
+        Route::get('/superadmin/settings/backups', Backups::class)->middleware('role:super_admin')->name('superadmin.settings.backups');
+        Route::get('/superadmin/settings/cache', CacheManagement::class)->middleware('role:super_admin')->name('superadmin.settings.cache');
+        Route::get('/superadmin/settings/system-info', SystemInformation::class)->middleware('role:super_admin')->name('superadmin.settings.system-info');
+        Route::get('/superadmin/settings/activity-logs', ActivityLogs::class)->middleware('role:super_admin')->name('superadmin.settings.activity-logs');
+
         Route::get('/admin/theme-options', ThemeOptions::class)->name('admin.theme-options');
         Route::get('/admin/wallet-approvals', WalletApprovalPanel::class)->name('admin.wallet-approvals');
         Route::get('/admin/packages', PackageManagement::class)->name('admin.packages');

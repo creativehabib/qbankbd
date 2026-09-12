@@ -9,14 +9,21 @@ use Livewire\Component;
 
 class ManageTokens extends Component
 {
+    public $perPage = 10;
+
     public bool $showModal = false;
 
     // ফর্ম ইনপুট ভ্যারিয়েবলস
     public $title;
+
     public $selectedTemplateId;
+
     public $templateType = 'signature';
+
     public $totalQuestions;
+
     public $unique_code;
+
     public string $negativeMark = '';
 
     protected function rules()
@@ -45,6 +52,7 @@ class ManageTokens extends Component
             'negativeMark.required' => 'নেগেটিভ মার্কিং সিলেক্ট করুন!',
         ];
     }
+
     public function openModal()
     {
         $this->reset(['title', 'selectedTemplateId', 'totalQuestions', 'negativeMark', 'unique_code', 'templateType']);

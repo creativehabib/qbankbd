@@ -9,6 +9,8 @@ use Livewire\Component;
 
 class MyEarnings extends Component
 {
+    public $perPage = 10;
+
     public function render(): View
     {
         $wallet = Wallet::query()->with('transactions')->where('user_id', auth()->id())->first();

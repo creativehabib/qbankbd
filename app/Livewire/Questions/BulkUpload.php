@@ -30,6 +30,8 @@ use RuntimeException;
 
 class BulkUpload extends Component
 {
+    public $perPage = 10;
+
     use WithFileUploads;
 
     public ?int $academic_class_id = null;
@@ -151,6 +153,7 @@ class BulkUpload extends Component
 
         if ($rawText === '') {
             $this->dispatch('error', 'অনুগ্রহ করে প্রশ্নের টেক্সট দিন অথবা একটি ইমেজ/PDF আপলোড করুন।');
+
             return;
         }
 
@@ -172,6 +175,7 @@ class BulkUpload extends Component
 
         if (empty($parsed)) {
             $this->addError('rawText', 'টেক্সট থেকে কোন MCQ প্রশ্ন পাওয়া যায়নি।');
+
             return;
         }
 

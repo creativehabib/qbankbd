@@ -9,7 +9,7 @@
             <flux:modal.close>
                 <flux:button variant="ghost">Cancel</flux:button>
             </flux:modal.close>
-            <flux:button variant="danger" x-on:click="window.confirmPendingDeletion()">Delete</flux:button>
+            <flux:button variant="primary" icon="trash" x-on:click="window.confirmPendingDeletion()">Delete</flux:button>
         </div>
     </div>
 </flux:modal>

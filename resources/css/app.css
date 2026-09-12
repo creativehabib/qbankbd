@@ -30,6 +30,18 @@
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
 
+    --color-indigo-50: color-mix(in oklab, var(--color-accent) 10%, white);
+    --color-indigo-100: color-mix(in oklab, var(--color-accent) 20%, white);
+    --color-indigo-200: color-mix(in oklab, var(--color-accent) 40%, white);
+    --color-indigo-300: color-mix(in oklab, var(--color-accent) 60%, white);
+    --color-indigo-400: color-mix(in oklab, var(--color-accent) 80%, white);
+    --color-indigo-500: var(--color-accent);
+    --color-indigo-600: color-mix(in oklab, var(--color-accent) 85%, black);
+    --color-indigo-700: color-mix(in oklab, var(--color-accent) 70%, black);
+    --color-indigo-800: color-mix(in oklab, var(--color-accent) 55%, black);
+    --color-indigo-900: color-mix(in oklab, var(--color-accent) 40%, black);
+    --color-indigo-950: color-mix(in oklab, var(--color-accent) 25%, black);
+
     --app-dark-bg: #020a1f;
     --app-dark-panel: #0b1428;
     --app-dark-border: rgba(6, 182, 212, 0.2);
@@ -71,28 +83,28 @@ select:focus[data-flux-control] {
 
 @layer components {
     .app-form-input {
-        @apply block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
+        @apply block w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-accent focus:ring-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white;
     }
     .app-form-select {
-        @apply block w-full rounded-lg border border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white;
+        @apply block w-full rounded-lg border border-zinc-200 py-2 pl-3 pr-8 text-sm focus:border-accent focus:ring-accent dark:border-zinc-700 dark:bg-zinc-800 dark:text-white;
     }
     .app-form-button {
-        @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+        @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
     }
     .app-form-control {
-        @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white;
+        @apply block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white;
     }
     .app-search-input {
-        @apply block w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+        @apply block w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 text-sm text-gray-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
     }
     .app-primary-action-btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground shadow-sm transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 dark:focus:ring-offset-gray-800;
     }
     .app-primary-submit-btn {
-        @apply inline-flex items-center gap-2 rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
+        @apply inline-flex items-center gap-2 rounded-md border border-transparent bg-accent px-4 py-2 text-sm font-medium text-accent-foreground shadow-sm transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 dark:focus:ring-offset-gray-800;
     }
     .app-icon-btn-edit {
-        @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-indigo-100 text-indigo-500 transition-colors hover:border-transparent hover:bg-indigo-500 hover:text-white dark:border-gray-600 dark:hover:bg-indigo-600;
+        @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-accent/20 text-accent transition-colors hover:border-transparent hover:bg-accent hover:text-accent-foreground dark:border-gray-600;
     }
     .app-icon-btn-delete {
         @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-100 text-red-500 transition-colors hover:border-transparent hover:bg-red-500 hover:text-white dark:border-gray-600 dark:hover:bg-red-600;
