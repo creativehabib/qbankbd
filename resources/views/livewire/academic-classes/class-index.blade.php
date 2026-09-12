@@ -12,7 +12,7 @@
                     subtitle="{{ $class->questions_count ?? 0 }} Questions" description='Pick a row to view its details, or click "New class" to add one.' />
             </div>
         @else
-            <form wire:submit="saveClass" class="space-y-4" x-show="isCreating || {{ $editingClassId ? 'true' : 'false' }}" x-cloak>
+            <form wire:submit="saveClass" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</flux:heading>
                 <flux:text class="mt-1">Add the class details and availability settings.</flux:text>
