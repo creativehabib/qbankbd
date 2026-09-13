@@ -1,4 +1,4 @@
-<x-layouts::app title="Super Admin Panel">
+<x-layouts::app title="Super Admin Dashboard">
     <div class="space-y-6">
 
         @if (session('success'))
@@ -6,102 +6,128 @@
                 {{ session('success') }}
             </div>
         @endif
+        
+        <div class="space-y-1 mb-2">
+            <flux:heading size="xl">Super Admin Overview</flux:heading>
+            <flux:subheading size="lg">Manage platform content, users, and overall system health.</flux:subheading>
+        </div>
 
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <h3 class="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">সুপার অ্যাডমিন ওভারভিউ</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <flux:card class="relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
+                    <flux:icon.document-text class="size-12" />
+                </div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Total Questions</p>
+                <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">{{ $overviewStats['total_questions'] }}</p>
+            </flux:card>
+            <flux:card class="relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
+                    <flux:icon.users class="size-12" />
+                </div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Total Users</p>
+                <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">{{ $overviewStats['total_users'] }}</p>
+            </flux:card>
+            <flux:card class="relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
+                    <flux:icon.academic-cap class="size-12" />
+                </div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Total Exams</p>
+                <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">{{ $overviewStats['total_exam_categories'] }}</p>
+            </flux:card>
+            <flux:card class="relative overflow-hidden group">
+                <div class="absolute -right-2 -top-2 size-12 text-zinc-100 dark:text-zinc-800 opacity-20 transition-transform group-hover:scale-110">
+                    <flux:icon.currency-dollar class="size-12" />
+                </div>
+                <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Revenue</p>
+                <p class="mt-2 text-3xl font-black text-zinc-900 dark:text-white">৳ {{ number_format($overviewStats['monthly_revenue']) }}</p>
+            </flux:card>
+            <flux:card class="relative overflow-hidden group border-amber-200 dark:border-amber-900/50">
+                <div class="absolute -right-2 -top-2 size-12 text-amber-100 dark:text-amber-900/30 opacity-20 transition-transform group-hover:scale-110">
+                    <flux:icon.clock class="size-12" />
+                </div>
+                <p class="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-500">Pending Approval</p>
+                <p class="mt-2 text-3xl font-black text-amber-600 dark:text-amber-500">{{ $overviewStats['pending_approval'] }}</p>
+            </flux:card>
+        </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Questions</p>
-                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_questions'] }}</p>
-                </div>
-                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Users/Students</p>
-                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_users'] }}</p>
-                </div>
-                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Total Categories/Exams</p>
-                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['total_exam_categories'] }}</p>
-                </div>
-                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Monthly Revenue</p>
-                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">৳ {{ number_format($overviewStats['monthly_revenue']) }}</p>
-                </div>
-                <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">Pending Approval</p>
-                    <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ $overviewStats['pending_approval'] }}</p>
-                </div>
+        <flux:card class="!p-0 overflow-hidden">
+            <div class="p-5 border-b border-zinc-200 dark:border-zinc-700">
+                <flux:heading size="lg">Creator Summary</flux:heading>
+                <flux:text class="!text-sm">Summary of content created by teachers.</flux:text>
             </div>
-            <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Monthly Revenue বর্তমানে placeholder হিসাবে 0 দেখানো হচ্ছে। সাবস্ক্রিপশন/পেমেন্ট মডিউল যুক্ত হলে এটি লাইভ ডেটা দেখাবে।</p>
-        </section>
+            
+            <flux:table>
+                <flux:table.columns>
+                    <flux:table.column>User</flux:table.column>
+                    <flux:table.column>Total Sets</flux:table.column>
+                    <flux:table.column>Total Questions</flux:table.column>
+                    <flux:table.column>Types</flux:table.column>
+                </flux:table.columns>
+                <flux:table.rows>
+                    @forelse ($creatorSummary as $item)
+                        <flux:table.row>
+                            <flux:table.cell class="font-medium">{{ $item['user_name'] }}</flux:table.cell>
+                            <flux:table.cell>{{ $item['question_set_count'] }}</flux:table.cell>
+                            <flux:table.cell>{{ $item['question_total'] }}</flux:table.cell>
+                            <flux:table.cell>
+                                <div class="flex flex-wrap gap-1">
+                                @foreach ($item['types'] as $type => $count)
+                                    <flux:badge size="sm" color="zinc">{{ strtoupper($type) }}: {{ $count }}</flux:badge>
+                                @endforeach
+                                </div>
+                            </flux:table.cell>
+                        </flux:table.row>
+                    @empty
+                        <flux:table.row>
+                            <flux:table.cell colspan="4" class="text-center text-zinc-500">No data found.</flux:table.cell>
+                        </flux:table.row>
+                    @endforelse
+                </flux:table.rows>
+            </flux:table>
+        </flux:card>
 
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <h3 class="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">প্রস্তুতকারী ভিত্তিক সারাংশ</h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-700">
-                    <thead>
-                        <tr class="text-left text-zinc-500 dark:text-zinc-400">
-                            <th class="px-3 py-2">ইউজার</th>
-                            <th class="px-3 py-2">মোট প্রশ্ন সেট</th>
-                            <th class="px-3 py-2">মোট প্রশ্ন (quantity)</th>
-                            <th class="px-3 py-2">ধরণ</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                        @forelse ($creatorSummary as $item)
-                            <tr>
-                                <td class="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">{{ $item['user_name'] }}</td>
-                                <td class="px-3 py-2">{{ $item['question_set_count'] }}</td>
-                                <td class="px-3 py-2">{{ $item['question_total'] }}</td>
-                                <td class="px-3 py-2 text-xs">
-                                    @foreach ($item['types'] as $type => $count)
-                                        <span class="mb-1 mr-1 inline-flex rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-800">{{ strtoupper($type) }}: {{ $count }}</span>
-                                    @endforeach
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-3 py-4 text-center text-zinc-500">কোনো ডেটা পাওয়া যায়নি।</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-            <h3 class="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Question Sets ম্যানেজমেন্ট</h3>
-            <div class="space-y-3">
+        <flux:card>
+            <flux:heading size="lg" class="mb-4">Question Sets Management</flux:heading>
+            
+            <div class="space-y-4">
                 @forelse ($questionSets as $questionSet)
-                    <div class="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
-                        <div class="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
-                            তৈরি করেছেন: <span class="font-semibold text-zinc-700 dark:text-zinc-200">{{ $questionSet->user?->name ?? 'Unknown' }}</span>
-                            · তৈরি: {{ $questionSet->created_at?->format('d M Y, h:i A') }}
+                    <div class="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+                        <div class="mb-3 text-sm text-zinc-500 dark:text-zinc-400">
+                            Created by: <span class="font-semibold text-zinc-700 dark:text-zinc-200">{{ $questionSet->user?->name ?? 'Unknown' }}</span>
+                            · Date: {{ $questionSet->created_at?->format('d M Y, h:i A') }}
                         </div>
 
-                        <form method="POST" action="{{ route('dashboard.question-sets.update', $questionSet) }}" class="grid gap-2 md:grid-cols-4">
+                        <form method="POST" action="{{ route('dashboard.question-sets.update', $questionSet) }}" class="flex flex-col sm:flex-row gap-3 items-end">
                             @csrf
                             @method('PATCH')
-                            <input type="text" name="name" value="{{ $questionSet->name }}" class="rounded-lg border-zinc-300 text-sm dark:border-zinc-700 dark:bg-zinc-900" required>
-                            <select name="type" class="rounded-lg border-zinc-300 text-sm dark:border-zinc-700 dark:bg-zinc-900" required>
-                                @foreach (['mcq' => 'MCQ', 'cq' => 'CQ', 'short' => 'SHORT', 'written' => 'WRITTEN', 'combine' => 'COMBINE'] as $key => $label)
-                                    <option value="{{ $key }}" @selected(($questionSet->generation_criteria['type'] ?? 'mcq') === $key)>{{ $label }}</option>
-                                @endforeach
-                            </select>
-                            <input type="number" min="1" max="500" name="quantity" value="{{ (int) ($questionSet->generation_criteria['quantity'] ?? 1) }}" class="rounded-lg border-zinc-300 text-sm dark:border-zinc-700 dark:bg-zinc-900" required>
-                            <button type="submit" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white">আপডেট</button>
+                            <div class="w-full sm:w-1/3">
+                                <flux:input type="text" name="name" value="{{ $questionSet->name }}" label="Name" required />
+                            </div>
+                            <div class="w-full sm:w-1/4">
+                                <flux:select name="type" label="Type" required>
+                                    @foreach (['mcq' => 'MCQ', 'cq' => 'CQ', 'short' => 'SHORT', 'written' => 'WRITTEN', 'combine' => 'COMBINE'] as $key => $label)
+                                        <option value="{{ $key }}" @selected(($questionSet->generation_criteria['type'] ?? 'mcq') === $key)>{{ $label }}</option>
+                                    @endforeach
+                                </flux:select>
+                            </div>
+                            <div class="w-full sm:w-1/4">
+                                <flux:input type="number" min="1" max="500" name="quantity" value="{{ (int) ($questionSet->generation_criteria['quantity'] ?? 1) }}" label="Quantity" required />
+                            </div>
+                            <div class="w-full sm:w-auto mt-2 sm:mt-0 flex gap-2">
+                                <flux:button type="submit" variant="primary" class="w-full sm:w-auto">Update</flux:button>
+                                <flux:button type="button" variant="danger" icon="trash" class="w-full sm:w-auto" onclick="if(confirm('Are you sure?')) document.getElementById('delete-form-{{ $questionSet->id }}').submit();" />
+                            </div>
                         </form>
-
-                        <form method="POST" action="{{ route('dashboard.question-sets.destroy', $questionSet) }}" class="mt-2" onsubmit="return confirm('আপনি কি নিশ্চিত?');">
+                        
+                        <form id="delete-form-{{ $questionSet->id }}" method="POST" action="{{ route('dashboard.question-sets.destroy', $questionSet) }}" class="hidden">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white">ডিলিট</button>
                         </form>
                     </div>
                 @empty
-                    <p class="text-sm text-zinc-500">কোনো Question Set নেই।</p>
+                    <div class="text-center text-sm text-zinc-500 py-4">No Question Sets found.</div>
                 @endforelse
             </div>
-        </section>
+        </flux:card>
     </div>
 </x-layouts::app>
