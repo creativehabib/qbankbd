@@ -83,7 +83,35 @@ class GeneralSetting extends Component
 
         SettingsStore::saveGroup('general', $validated);
 
+        if (isset($validated['default_timezone'])) {
+            $this->setEnvironmentValue('APP_TIMEZONE', $validated['default_timezone']);
+        }
+
         $this->toastSuccess('General settings saved successfully.');
+    }
+
+    protected function setEnvironmentValue($envKey, $envValue)
+    {
+        $envFile = app()->environmentFilePath();
+        $str = file_get_contents($envFile);
+        
+        // Add a newline to the beginning just in case the last line doesn't have one
+        $str = "\n" . $str . "\n";
+        
+        $envValue = trim($envValue);
+        
+        // Match the exact key
+        if (preg_match("/\n{$envKey}=(.*)/", $str)) {
+            $str = preg_replace("/\n{$envKey}=.*/", "\n{$envKey}=\"{$envValue}\"", $str);
+        } else {
+            $str .= "{$envKey}=\"{$envValue}\"\n";
+        }
+        
+        file_put_contents($envFile, trim($str) . "\n");
+        
+        try {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+        } catch (\Exception $e) {}
     }
     
     public function getTimezonesProperty(): array
