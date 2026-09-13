@@ -11,7 +11,7 @@ use App\Models\Question;
 use App\Models\QuestionReport;
 use App\Models\Subject;
 use App\Models\User;
-use App\Services\GeminiService;
+use App\Services\AiService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,6 +25,11 @@ class PracticeIndex extends Component
     public $perPage = 10;
 
     use WithPagination;
+
+    public function loadMore(): void
+    {
+        $this->perPage += 10;
+    }
 
     public string $level = 'classes';
 
@@ -174,7 +179,7 @@ class PracticeIndex extends Component
             $question = Question::findOrFail($questionId);
 
             // 🌟 সার্ভিস ক্লাস কল করে ম্যাজিক! 🌟
-            $geminiService = new GeminiService;
+            $geminiService = new AiService;
             $geminiService->generateAndSaveExplanation($question);
 
             // সফল হলে UI রিফ্রেশ
@@ -382,7 +387,7 @@ class PracticeIndex extends Component
             ->where('question_type', 'mcq')->where('status', 'active')
             ->when($this->selectedChapterId !== null, fn (Builder $q) => $q->where('chapter_id', $this->selectedChapterId))
             ->when($this->selectedChapterId === null && $this->selectedSubjectId !== null, fn (Builder $q) => $q->where('subject_id', $this->selectedSubjectId))
-            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
+            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name', 'tags:id,name'])
             ->withExists([
                 'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
@@ -400,7 +405,7 @@ class PracticeIndex extends Component
             ->when(! empty($this->filterExamCategories), fn (Builder $query) => $query->whereHas('examCategories', fn ($q) => $q->whereIn('exam_category_id', $this->filterExamCategories)))
             ->when(! empty($this->filterTeachers), fn (Builder $query) => $query->whereIn('user_id', $this->filterTeachers))
             ->when(filled($this->filterSearch), fn (Builder $query) => $query->where('title', 'like', '%'.$this->filterSearch.'%'))
-            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name'])
+            ->with(['academicClass:id,name', 'subject:id,name', 'chapter:id,name', 'examCategories:id,name', 'tags:id,name'])
             ->withExists([
                 'likes as is_liked' => fn (Builder $q) => $q->where('user_id', auth()->id()),
                 'bookmarks as is_bookmarked' => fn (Builder $q) => $q->where('user_id', auth()->id()),

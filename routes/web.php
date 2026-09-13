@@ -117,6 +117,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::middleware('role:admin|super_admin')->group(function (): void {
+        // Model Tests (Admin created Mock Tests)
+        Route::get('/admin/model-tests', \App\Livewire\Admin\ModelTests\ModelTestIndex::class)->name('admin.model-tests.index');
+        Route::get('/admin/model-tests/create', \App\Livewire\Admin\ModelTests\ModelTestCreate::class)->name('admin.model-tests.create');
+
         // Admin Settings
         Route::get('/admin/settings', Index::class)->name('admin.settings.index');
         Route::get('/admin/settings/general', GeneralSetting::class)->name('admin.settings.general');
@@ -161,6 +165,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/bookmarks', BookmarkedQuestions::class)->name('student.bookmarks');
     Route::get('/student/mock-test/{testId}', TakeMockTest::class)->name('student.mock-test.take');
     Route::get('/student/mock-test/{testId}/result', MockTestResult::class)->name('student.mock-test.result');
+
+    // New Model Tests (Admin Created)
+    Route::get('/student/model-tests', \App\Livewire\Students\ModelTests\ModelTestIndex::class)->name('student.model-tests.index');
+    Route::get('/student/model-tests/{modelTest}', \App\Livewire\Students\ModelTests\ModelTestAttempt::class)->name('student.model-tests.attempt');
+    Route::get('/student/model-tests/result/{resultId}', \App\Livewire\Students\ModelTests\ModelTestResultPage::class)->name('student.model-tests.result');
     Route::get('/student/leaderboard', Leaderboard::class)->name('student.leaderboard');
     Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
     Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');

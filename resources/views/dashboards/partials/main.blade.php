@@ -176,7 +176,7 @@
                                     <div class="flex justify-between">
                                         <div class="space-y-1">
                                             <h4 class="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                                                <a href="{{ route('student.mock-test.result', ['testId' => $exam['id']]) ?? '#' }}" class="hover:underline hover:text-emerald-600">
+                                                <a href="{{ $exam['url'] ?? '#' }}" class="hover:underline hover:text-emerald-600">
                                                     {{ $exam['name'] }}
                                                 </a>
                                             </h4>

@@ -22,15 +22,18 @@ class QuestionTextParser
             $block = trim($block);
             if ($block === '') continue;
 
-            // বাংলা অপশন: (ক) (খ) (গ) (ঘ) বা (a) (b) (c) (d)
-            $optionPattern = '/\(\s*([কখগঘa-dA-D])\s*\)\s*(.+)/u';
+            // Options pattern: allows a., (a), a), ক., (ক), ক)
+            $prefixRegex = '(?:\()?([কখগঘa-dA-D])[\)\.]';
+            $optionPattern = '/(?:^|\s+)' . $prefixRegex . '\s+(.+?)(?=(?:\s+' . $prefixRegex . '\s+)|$)/us';
+            
             preg_match_all($optionPattern, $block, $optionMatches, PREG_SET_ORDER);
 
             if (count($optionMatches) < 2) continue;
 
             // প্রশ্নের title বের করা
-            $titleLine = preg_split('/\n/', $block, 2)[0];
-            $title     = trim(preg_replace('/^[০-৯\d]+[.)।]\s*/u', '', $titleLine));
+            $firstOptionStart = mb_strpos($block, $optionMatches[0][0]);
+            $titleRaw = mb_substr($block, 0, $firstOptionStart);
+            $title = trim(preg_replace('/^[০-৯\d]+[.)।]\s*/u', '', trim($titleRaw)));
 
             $options = [];
             foreach ($optionMatches as $match) {
@@ -60,7 +63,10 @@ class QuestionTextParser
             return null;
         }
 
-        preg_match_all('/\(([কখগঘ]|[a-dA-D])\)\s*(.+?)(?=(?:\s*\([কখগঘa-dA-D]\)\s*)|$)/us', $chunk, $matches, PREG_SET_ORDER);
+        $prefixRegex = '(?:\()?([কখগঘa-dA-D])[\)\.]';
+        $optionPattern = '/(?:^|\s+)' . $prefixRegex . '\s+(.+?)(?=(?:\s+' . $prefixRegex . '\s+)|$)/us';
+
+        preg_match_all($optionPattern, $chunk, $matches, PREG_SET_ORDER);
 
         if (count($matches) < 2) {
             return null;

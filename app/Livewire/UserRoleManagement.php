@@ -19,6 +19,8 @@ class UserRoleManagement extends Component
 
     public int $perPage = 10;
 
+    public string $sortOrder = 'default';
+
     public bool $showEditModal = false;
 
     public ?int $editingUserId = null;
@@ -34,6 +36,11 @@ class UserRoleManagement extends Component
     public string $password_confirmation = '';
 
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+    
+    public function updatingSortOrder(): void
     {
         $this->resetPage();
     }
@@ -178,15 +185,23 @@ class UserRoleManagement extends Component
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
 
-        $users = User::query()
+        $query = User::query()
             ->with('roles')
             ->when($this->search !== '', function ($query): void {
                 $searchTerm = '%'.$this->search.'%';
                 $query->where('name', 'like', $searchTerm)
                     ->orWhere('email', 'like', $searchTerm);
-            })
-            ->latest()
-            ->paginate($this->perPage);
+            });
+            
+        match ($this->sortOrder) {
+            'name_asc' => $query->orderBy('name', 'asc'),
+            'name_desc' => $query->orderBy('name', 'desc'),
+            'id_asc' => $query->orderBy('id', 'asc'),
+            'id_desc' => $query->orderBy('id', 'desc'),
+            default => $query->latest(),
+        };
+
+        $users = $query->paginate($this->perPage);
 
         return view('livewire.user-role-management', [
             'users' => $users,

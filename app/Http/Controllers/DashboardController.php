@@ -214,8 +214,13 @@ class DashboardController extends Controller
             ->where('status', 'completed')
             ->where('created_at', '>=', $startDate)
             ->get();
+            
+        $lastDaysModelTests = \App\Models\ModelTestResult::with('modelTest')
+            ->where('user_id', $userId)
+            ->where('created_at', '>=', $startDate)
+            ->get();
 
-        $examTakenCount = $lastDaysTests->count();
+        $examTakenCount = $lastDaysTests->count() + $lastDaysModelTests->count();
         $totalStudyMinutes = 0;
         $totalRight = 0;
         $totalWrong = 0;
@@ -232,8 +237,8 @@ class DashboardController extends Controller
         }
 
         foreach ($lastDaysTests as $test) {
-            $start = Carbon::parse($test->started_at);
-            $end = $test->completed_at ? Carbon::parse($test->completed_at) : $start->copy()->addMinutes($test->duration_minutes ?? 20);
+            $start = \Carbon\Carbon::parse($test->started_at);
+            $end = $test->completed_at ? \Carbon\Carbon::parse($test->completed_at) : $start->copy()->addMinutes($test->duration_minutes ?? 20);
 
             $actualMinutesTaken = $start->diffInMinutes($end);
             $allocatedMinutes = $test->duration_minutes ?? 20;
@@ -250,6 +255,19 @@ class DashboardController extends Controller
                 $engagementMap[$dateKey] += 1;
             }
         }
+        
+        foreach ($lastDaysModelTests as $test) {
+            $totalStudyMinutes += ceil(($test->time_taken_seconds ?? 0) / 60);
+
+            $totalRight += (int) $test->correct_count;
+            $totalWrong += (int) $test->wrong_count;
+            $totalSkipped += (int) $test->unanswered_count;
+
+            $dateKey = $test->created_at->format('Y-m-d');
+            if (isset($engagementMap[$dateKey])) {
+                $engagementMap[$dateKey] += 1;
+            }
+        }
 
         $engagementValues = array_values($engagementMap);
 
@@ -260,15 +278,21 @@ class DashboardController extends Controller
         $totalQuestionsCount = $totalRight + $totalWrong + $totalSkipped;
         $accuracyPercentage = $totalQuestionsCount > 0 ? round(($totalRight / $totalQuestionsCount) * 100, 1) : 0;
 
-        $myTotalScore = MockTest::where('user_id', $userId)->sum('correct_answers');
-        $betterUsersCount = User::whereHas('mockTests')
-            ->withSum('mockTests as total_score', 'correct_answers')
-            ->having('total_score', '>', $myTotalScore)
-            ->count();
-
-        $myDynamicRank = $betterUsersCount + 1;
+        $myDynamicRank = User::where('xp', '>', $user->xp)->count() + 1;
+        
         $lastTest = MockTest::where('user_id', $userId)->latest('created_at')->first();
-        $streakDays = ($lastTest && $lastTest->created_at->isToday()) ? 1 : 0;
+        $lastModelTest = \App\Models\ModelTestResult::where('user_id', $userId)->latest('created_at')->first();
+        
+        $lastActivityDate = null;
+        if ($lastTest && $lastModelTest) {
+            $lastActivityDate = $lastTest->created_at->gt($lastModelTest->created_at) ? $lastTest->created_at : $lastModelTest->created_at;
+        } elseif ($lastTest) {
+            $lastActivityDate = $lastTest->created_at;
+        } elseif ($lastModelTest) {
+            $lastActivityDate = $lastModelTest->created_at;
+        }
+        
+        $streakDays = ($lastActivityDate && $lastActivityDate->isToday()) ? 1 : 0;
 
         $studentStats = [
             'streak_days' => $streakDays,
@@ -296,18 +320,19 @@ class DashboardController extends Controller
             ->take(5)
             ->get(['id', 'name', 'xp']);
 
-        $attendedExams = MockTest::with('subject:id,name')
+        $mockExamsList = MockTest::with('subject:id,name')
             ->where('user_id', $userId)
             ->where('status', 'completed')
             ->latest('completed_at')
             ->take(5)
             ->get()
             ->map(function($test) {
-                $start = Carbon::parse($test->started_at);
-                $end = $test->completed_at ? Carbon::parse($test->completed_at) : now();
+                $start = \Carbon\Carbon::parse($test->started_at);
+                $end = $test->completed_at ? \Carbon\Carbon::parse($test->completed_at) : now();
                 $skipped = $test->total_questions - ($test->correct_answers + $test->wrong_answers);
                 return [
-                    'id' => $test->id,
+                    'id' => 'mock_'.$test->id,
+                    'url' => route('student.mock-test.result', ['testId' => $test->id]),
                     'name' => $test->subject ? $test->subject->name . ' এর মক টেস্ট' : 'সাধারণ মক টেস্ট',
                     'score' => $test->total_score,
                     'total' => $test->total_questions,
@@ -315,9 +340,38 @@ class DashboardController extends Controller
                     'right' => $test->correct_answers,
                     'wrong' => $test->wrong_answers,
                     'skipped' => $skipped > 0 ? $skipped : 0,
+                    'date_obj' => $test->created_at,
                     'date' => $test->created_at->diffForHumans()
                 ];
             });
+            
+        $modelExamsList = \App\Models\ModelTestResult::with('modelTest')
+            ->where('user_id', $userId)
+            ->latest('created_at')
+            ->take(5)
+            ->get()
+            ->map(function($test) {
+                $timeMins = ceil(($test->time_taken_seconds ?? 0) / 60);
+                $total = $test->correct_count + $test->wrong_count + $test->unanswered_count;
+                return [
+                    'id' => 'model_'.$test->id,
+                    'url' => route('student.model-tests.result', ['resultId' => $test->id]),
+                    'name' => ($test->modelTest->title ?? 'মডেল টেস্ট'),
+                    'score' => $test->total_score,
+                    'total' => $total,
+                    'time' => $timeMins . ' Mins',
+                    'right' => $test->correct_count,
+                    'wrong' => $test->wrong_count,
+                    'skipped' => $test->unanswered_count,
+                    'date_obj' => $test->created_at,
+                    'date' => $test->created_at->diffForHumans()
+                ];
+            });
+            
+        $attendedExams = $mockExamsList->concat($modelExamsList)
+            ->sortByDesc('date_obj')
+            ->take(5)
+            ->values();
 
         return view('dashboards.student', [
             'studentStats' => $studentStats,

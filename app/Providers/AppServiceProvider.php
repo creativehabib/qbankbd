@@ -27,6 +27,33 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->shareThemeTypography();
+        $this->configureDynamicSettings();
+    }
+
+    /**
+     * Override config with values from the database settings
+     */
+    protected function configureDynamicSettings(): void
+    {
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                $mailSettings = \App\Support\SettingsStore::group('mail');
+                if (!empty($mailSettings['mail_mailer'])) {
+                    config([
+                        'mail.default' => $mailSettings['mail_mailer'],
+                        'mail.mailers.smtp.host' => $mailSettings['mail_host'] ?? config('mail.mailers.smtp.host'),
+                        'mail.mailers.smtp.port' => $mailSettings['mail_port'] ?? config('mail.mailers.smtp.port'),
+                        'mail.mailers.smtp.username' => $mailSettings['mail_username'] ?? config('mail.mailers.smtp.username'),
+                        'mail.mailers.smtp.password' => $mailSettings['mail_password'] ?? config('mail.mailers.smtp.password'),
+                        'mail.mailers.smtp.encryption' => $mailSettings['mail_encryption'] ?? config('mail.mailers.smtp.encryption'),
+                        'mail.from.address' => $mailSettings['mail_from_address'] ?? config('mail.from.address'),
+                        'mail.from.name' => $mailSettings['mail_from_name'] ?? config('mail.from.name'),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore during setup/migrations
+        }
     }
 
     /**

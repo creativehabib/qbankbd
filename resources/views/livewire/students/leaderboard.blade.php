@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-2xl h-full">
-    <div class="w-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+    <div class="w-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden isolate">
 
         <div class="bg-gradient-to-b from-[#f59e0b] to-[#ea580c] dark:from-amber-700 dark:to-amber-900 px-6 py-8 text-center relative overflow-hidden">
 
@@ -62,7 +62,7 @@
                         draggable="false"
                         @click="if(dragged || {{ $isActive ? 'true' : 'false' }}) { $event.preventDefault(); return; }"
                         class="relative flex flex-col items-center transition-all duration-500 transform shrink-0
-                               {{ $isActive ? 'active-league-card scale-[1.7] z-20 opacity-100 mx-5' : 'scale-90 opacity-40 hover:scale-110 hover:opacity-100 z-10 cursor-pointer' }}"
+                               {{ $isActive ? 'active-league-card scale-[1.5] z-20 opacity-100 mx-5' : 'scale-90 opacity-40 hover:scale-110 hover:opacity-100 z-10 cursor-pointer' }}"
                     >
                         <div class="w-12 h-12 md:w-14 md:h-14 relative drop-shadow-xl transition-transform duration-300 {{ $isActive ? 'rounded-full' : '' }}">
                             <img src="https://sattacademy.com/images/icons/{{ $league['icon'] }}-league.png" draggable="false" class="w-full h-full object-contain pointer-events-none">
@@ -114,7 +114,9 @@
                             }
                         @endphp
 
-                        <div class="flex items-center justify-between p-3.5 transition-all hover:scale-[1.02]  rounded-xl border-2 {{ $cardBg }} shadow-sm">
+                        <div x-data="{ show: false }" x-init="setTimeout(() => show = true, {{ $index * 100 }})"
+                             :class="show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+                             class="flex items-center justify-between p-3.5 transition-all duration-500 hover:scale-[1.02] rounded-xl border-2 {{ $cardBg }} shadow-sm">
                             <div class="flex items-center gap-4">
                                 <div class="w-8 text-center flex justify-center">
                                     @if($rank === 1)
@@ -154,7 +156,9 @@
                 <div class="border-t-[3px] border-dotted border-zinc-200 dark:border-zinc-700 my-6"></div>
 
                 @if($myRank > 3)
-                    <div class="flex items-center justify-between p-3.5 mb-3 rounded-xl border border-[#bbf7d0] bg-[#dcfce7] shadow-sm">
+                    <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 300)"
+                         :class="show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+                         class="flex items-center justify-between p-3.5 mb-3 rounded-xl border border-[#bbf7d0] bg-[#dcfce7] shadow-sm transition-all duration-500">
                         <div class="flex items-center gap-4">
                             <span class="w-8 text-center font-bold text-zinc-600 text-sm">{{ $myRank }}th</span>
                             <div class="size-10 overflow-hidden rounded-full border-2 border-white shadow-sm bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold">
@@ -184,7 +188,9 @@
                         @endphp
 
                         @if($student->id !== auth()->id())
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-transparent hover:bg-zinc-100 transition-colors">
+                            <div x-data="{ show: false }" x-init="setTimeout(() => show = true, {{ 300 + ($index * 50) }})"
+                                 :class="show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
+                                 class="flex items-center justify-between p-3 rounded-xl bg-transparent hover:bg-zinc-100 transition-all duration-300">
                                 <div class="flex items-center gap-4">
                                     <span class="w-8 text-center font-bold text-zinc-500 text-sm">{{ $rank }}{{ $suffix }}</span>
                                     <div class="size-10 overflow-hidden rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold">

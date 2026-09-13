@@ -39,7 +39,20 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <flux:button variant="ghost" size="sm" icon="arrows-up-down" class="text-zinc-500">Sort</flux:button>
+                <flux:dropdown>
+                    <flux:button variant="ghost" size="sm" icon="arrows-up-down" icon-trailing="chevron-down" class="text-zinc-500">Sort</flux:button>
+                    <flux:menu class="w-48">
+                        <flux:menu.radio.group wire:model.live="sortOrder">
+                            <flux:menu.radio value="default">Default order</flux:menu.radio>
+                            <flux:menu.separator />
+                            <flux:menu.radio value="name_asc">Name A &rarr; Z</flux:menu.radio>
+                            <flux:menu.radio value="name_desc">Name Z &rarr; A</flux:menu.radio>
+                            <flux:menu.separator />
+                            <flux:menu.radio value="id_asc">ID (lowest first)</flux:menu.radio>
+                            <flux:menu.radio value="id_desc">ID (highest first)</flux:menu.radio>
+                        </flux:menu.radio.group>
+                    </flux:menu>
+                </flux:dropdown>
                 <flux:button variant="ghost" size="sm" icon="arrow-path" wire:click="$refresh" class="text-zinc-500" />
             </div>
         </div>

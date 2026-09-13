@@ -4,7 +4,7 @@ namespace App\Livewire\Students;
 
 use App\Models\MockTest;
 use App\Models\Question;
-use App\Services\GeminiService;
+use App\Services\AiService;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
@@ -47,7 +47,7 @@ class MockTestResult extends Component
             $question = Question::findOrFail($questionId);
 
             // 🌟 আমাদের তৈরি করা মাস্টার সার্ভিস ক্লাস ব্যবহার করা হচ্ছে 🌟
-            $geminiService = new GeminiService;
+            $geminiService = new AiService;
             $geminiService->generateAndSaveExplanation($question);
 
             // সফল হলে ডাটা রিফ্রেশ এবং ইভেন্ট ডিসপ্যাচ

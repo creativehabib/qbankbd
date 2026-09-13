@@ -9,11 +9,47 @@
     $textColor = $branding['text_color'] ?? '#ffffff';
     $darkBgColor = $branding['dark_bg_color'] ?? '#18181b';
     $defaultTheme = $branding['default_theme'] ?? 'System';
+    
+    $tracking = \App\Support\SettingsStore::group('tracking');
 @endphp
 
 <title>
     {{ filled($title ?? null) ? $title.' - '.$appName : $appName }}
 </title>
+
+@if(!empty($tracking['google_analytics_id']))
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $tracking['google_analytics_id'] }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ $tracking['google_analytics_id'] }}');
+    </script>
+@endif
+
+@if(!empty($tracking['facebook_pixel_id']))
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ $tracking['facebook_pixel_id'] }}');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id={{ $tracking['facebook_pixel_id'] }}&ev=PageView&noscript=1"
+    /></noscript>
+@endif
+
+@if(!empty($tracking['custom_header_script']))
+    {!! $tracking['custom_header_script'] !!}
+@endif
 
 <link rel="icon" href="{{ $favicon }}" sizes="any">
 <link rel="apple-touch-icon" href="{{ $favicon }}">
@@ -84,6 +120,28 @@
     };
 </script>
 <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    // Re-render MathJax after Livewire page navigation (wire:navigate)
+    document.addEventListener('livewire:navigated', () => {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise();
+        }
+    });
+
+    // Re-render MathJax after Livewire component updates (modals, pagination, actions)
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.hook('commit', ({ succeed }) => {
+            succeed(() => {
+                requestAnimationFrame(() => {
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        // We use try-catch to avoid breaking UI if MathJax is already processing
+                        window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err));
+                    }
+                });
+            });
+        });
+    });
+</script>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @stack('styles')
 <style>

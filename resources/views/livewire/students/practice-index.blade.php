@@ -1,6 +1,11 @@
 <div x-data="{ filterOpen: false }" @keydown.escape.window="if(filterOpen) { filterOpen = false; } else if(document.activeElement.tagName !== 'INPUT') Livewire.dispatch('back')" class="relative flex flex-col lg:flex-row gap-5 lg:gap-6">
 
     <div class="w-full min-w-0 lg:flex-1">
+        
+        <div class="mb-6">
+            @livewire('students.ai-magic-search')
+        </div>
+
         <div class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 relative">
 
             <div wire:loading.remove="hidden" class="hidden absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/60 backdrop-blur-sm dark:bg-zinc-900/60">
@@ -162,9 +167,9 @@
                                             <h5 class="text-lg font-bold text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($filteredQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
 
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
-                                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
-                                                <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->question_type) }}</span>
+                                                @foreach($question->tags as $tag)
+                                                    <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">#{{ $tag->name }}</span>
+                                                @endforeach
                                             </div>
                                             <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
                                                 @foreach($options as $option)
@@ -225,7 +230,18 @@
                                         </article>
                                     @endforeach
                                 </div>
-                                <div class="pt-2">{{ $filteredQuestions->links() }}</div>
+                                <div class="pt-6 pb-2 text-center" x-intersect.full="$wire.loadMore()">
+                                    @if($filteredQuestions->hasMorePages())
+                                        <div wire:loading wire:target="loadMore" class="inline-flex items-center gap-2 text-zinc-500 font-medium text-sm">
+                                            <svg class="animate-spin h-5 w-5 text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            আরও লোড হচ্ছে...
+                                        </div>
+                                    @else
+                                        <div class="text-zinc-500 font-medium text-sm py-4">
+                                            🎉 আর কোনো প্রশ্ন নেই
+                                        </div>
+                                    @endif
+                                </div>
                             @endif
                         </div>
 
@@ -346,9 +362,9 @@
                                                 <h5 class="text-lg text-zinc-900 dark:text-zinc-100" data-math-content>{!! ($latestQuestions->firstItem() + $loop->index) . '. ' . $questionTitle !!}</h5>
 
                                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                                                    <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->academicClass?->name }}</span>
-                                                    <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ $question->subject?->name }}</span>
-                                                    <span class="rounded-full border border-zinc-300 px-2 py-0.5 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">{{ strtoupper($question->difficulty ?? 'MCQ') }}</span>
+                                                    @foreach($question->tags as $tag)
+                                                        <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">#{{ $tag->name }}</span>
+                                                    @endforeach
                                                 </div>
 
                                                 <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -433,7 +449,18 @@
                                             </article>
                                         @endforeach
                                     </div>
-                                    <div class="pt-2">{{ $latestQuestions->links() }}</div>
+                                    <div class="pt-6 pb-2 text-center" x-intersect.full="$wire.loadMore()">
+                                        @if($latestQuestions->hasMorePages())
+                                            <div wire:loading wire:target="loadMore" class="inline-flex items-center gap-2 text-zinc-500 font-medium text-sm">
+                                                <svg class="animate-spin h-5 w-5 text-zinc-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                                আরও লোড হচ্ছে...
+                                            </div>
+                                        @else
+                                            <div class="text-zinc-500 font-medium text-sm py-4">
+                                                🎉 আর কোনো প্রশ্ন নেই
+                                            </div>
+                                        @endif
+                                    </div>
                                 @endif
                             @endif
                         @endif

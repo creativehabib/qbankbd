@@ -9,7 +9,7 @@ use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
-use App\Services\GeminiService;
+use App\Services\AiService;
 use App\Support\QuestionTextParser;
 use Google\Cloud\Vision\V1\AnnotateFileRequest;
 use Google\Cloud\Vision\V1\AnnotateImageRequest;
@@ -103,13 +103,38 @@ class BulkUpload extends Component
 
         $this->isGeneratingAi = true;
 
-        // AI কে কড়া নির্দেশ দেওয়া হচ্ছে যেন সে আপনার Processed Questions এর ফরমেটেই ডাটা দেয়
+        // Find existing questions related to the prompt to prevent duplicates
+        $keywords = array_filter(explode(' ', trim($this->aiPrompt)), fn($w) => mb_strlen($w) > 2);
+        $query = \App\Models\Question::query();
+        if (!empty($keywords)) {
+            $query->where(function($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $q->orWhere('title', 'LIKE', '%' . $word . '%');
+                }
+            });
+        } else {
+            $query->where('title', 'LIKE', '%' . $this->aiPrompt . '%');
+        }
+        
+        $existingTitles = $query->latest()->limit(150)->pluck('title')->toArray();
+        
+        $avoidRule = '';
+        if (!empty($existingTitles)) {
+            $avoidRule = "IMPORTANT RULE 4: DO NOT generate any of the following questions because they already exist in my database:\n" . json_encode($existingTitles, JSON_UNESCAPED_UNICODE) . "\n";
+        }
+
         $prompt = "Create {$this->aiQuestionCount} multiple-choice questions in Bengali language about '{$this->aiPrompt}'.
-        IMPORTANT RULE: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
+        IMPORTANT RULE 1: ONLY generate authentic questions that have previously appeared in various competitive exams in Bangladesh (such as BCS, NTRCA, Bank Jobs, Primary Teacher Recruitment, University Admissions, etc.). Do not make up new fictional questions.
+        IMPORTANT RULE 2: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
+        IMPORTANT RULE 3: For each question, you MUST provide 1 to 3 highly accurate tags indicating the exact exams and years/sessions it appeared in (e.g., '৩৬ তম বিসিএস', '18th NTRCA', 'প্রাইমারি সহকারী শিক্ষক ২০২২', 'DU Admission', etc.). Do NOT generate duplicate tags.
+        IMPORTANT RULE 4: For each question, provide a detailed 3-4 line explanation (ব্যাখ্যা) explaining why the correct answer is correct and providing some extra related information.
+        {$avoidRule}
         You MUST return the response STRICTLY as a JSON array in the exact format below, and nothing else (no markdown, no extra text):
         [
             {
                 \"title\": \"এখানে প্রশ্ন থাকবে?\",
+                \"tags\": [\"BCS 40th\", \"Bank Job\"],
+                \"explanation\": \"সঠিক উত্তরের বিস্তারিত ব্যাখ্যা এখানে থাকবে।\",
                 \"options\": [
                     {\"option_text\": \"প্রথম অপশন\", \"is_correct\": false},
                     {\"option_text\": \"দ্বিতীয় অপশন\", \"is_correct\": true},
@@ -120,14 +145,10 @@ class BulkUpload extends Component
         ]";
 
         try {
-            // 🌟 আমাদের তৈরি করা সার্ভিস ক্লাস ব্যবহার করা হচ্ছে 🌟
-            $geminiService = new GeminiService;
-
-            // ৩০০ সেকেন্ড টাইমআউট দিয়ে কল
-            $aiData = $geminiService->generateJson($prompt);
+            $aiService = new AiService;
+            $aiData = $aiService->generateJson($prompt);
 
             if (is_array($aiData) && count($aiData) > 0) {
-                // 🌟 AI এর ডাটা সরাসরি Processed লিস্টে বসিয়ে দেওয়া হলো! 🌟
                 $this->processedQuestions = $aiData;
                 session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন AI দ্বারা তৈরি হয়েছে। দয়া করে রিভিউ করে সাবমিট করুন।');
             } else {
@@ -182,6 +203,18 @@ class BulkUpload extends Component
         foreach ($parsed as $qi => $question) {
             foreach ($question['options'] as $oi => $option) {
                 $parsed[$qi]['options'][$oi]['is_correct'] = (bool) ($option['is_correct'] ?? false);
+            }
+            
+            // 🌟 Smart Duplicate Detection
+            // Check if a question with a very similar title already exists
+            $titleStart = mb_substr(trim($question['title']), 0, 40);
+            if (mb_strlen($titleStart) > 10) {
+                $exists = \App\Models\Question::query()
+                    ->where('title', 'LIKE', '%' . $titleStart . '%')
+                    ->exists();
+                $parsed[$qi]['is_duplicate'] = $exists;
+            } else {
+                $parsed[$qi]['is_duplicate'] = false;
             }
         }
 
@@ -442,6 +475,9 @@ class BulkUpload extends Component
             'sourceFile' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
             'processedQuestions' => 'required|array|min:1',
             'processedQuestions.*.title' => 'required|string',
+            'processedQuestions.*.explanation' => 'nullable|string',
+            'processedQuestions.*.tags' => 'nullable|array',
+            'processedQuestions.*.tags.*' => 'nullable|string',
             'processedQuestions.*.options' => 'required|array|min:2',
             'processedQuestions.*.options.*.option_text' => 'required|string',
             'processedQuestions.*.options.*.is_correct' => 'required|boolean',
@@ -493,19 +529,24 @@ class BulkUpload extends Component
                     'marks' => (float) $this->marks == floor((float) $this->marks) ? (int) $this->marks : (float) $this->marks,
                     'status' => $currentUser?->hasPermission('questions.publish') ? 'active' : 'pending',
                     'extra_content' => $formattedOptions,
+                    'description' => !empty($parsedQuestion['explanation']) ? nl2br(e(trim($parsedQuestion['explanation']))) : null,
                     'user_id' => $currentUser?->id,
                 ]);
 
                 $question->examCategories()->sync($this->exam_category_ids);
 
-                $tagIds = collect($validated['tagIds'] ?? [])
-                    ->map(fn (mixed $tag): int => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => trim((string) $tag)])->id)
+                $globalTagIds = collect($validated['tagIds'] ?? [])->map(fn (mixed $tag): int => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => trim((string) $tag)])->id)->toArray();
+                
+                $aiTagIds = collect($parsedQuestion['tags'] ?? [])->filter()->map(fn (string $tag): int => Tag::firstOrCreate(['name' => trim($tag)])->id)->toArray();
+                
+                $allTagIds = collect(array_merge($globalTagIds, $aiTagIds))
                     ->filter(fn (int $tagId): bool => $tagId > 0)
+                    ->unique()
                     ->values()
                     ->toArray();
 
-                if (! empty($tagIds)) {
-                    $question->tags()->sync($tagIds);
+                if (! empty($allTagIds)) {
+                    $question->tags()->sync($allTagIds);
                 }
             }
         });

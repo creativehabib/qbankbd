@@ -13,10 +13,11 @@
             'label' => __('Question Bank'),
             'icon' => 'circle-stack',
             'flyout' => 'question-bank',
-            'active' => request()->routeIs(['questions.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
+            'active' => request()->routeIs(['questions.*', 'admin.model-tests.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
             'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
             'items' => [
                 ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'icon' => 'document-text', 'visible' => true],
+                ['label' => __('Model Tests'), 'route' => 'admin.model-tests.index', 'match' => 'admin.model-tests.*', 'icon' => 'clock', 'visible' => auth()->user()->hasRole(['admin', 'super_admin'])],
                 ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'icon' => 'folder', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
                 ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'icon' => 'academic-cap', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
                 ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'icon' => 'book-open', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
@@ -115,6 +116,14 @@
         ],
         [
             'type' => 'link',
+            'label' => __('Model Tests'),
+            'route' => 'student.model-tests.index',
+            'match' => 'student.model-tests.*',
+            'icon' => 'clock',
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Bookmarks'),
             'route' => 'student.bookmarks',
             'match' => 'student.bookmarks',
@@ -188,7 +197,6 @@
                 ['label' => __('AI Setting'), 'route' => 'admin.settings.ai', 'match' => 'admin.settings.ai', 'icon' => 'cpu-chip', 'visible' => true],
                 ['label' => __('Languages'), 'route' => 'admin.settings.languages', 'match' => 'admin.settings.languages', 'icon' => 'language', 'visible' => true],
                 ['label' => __('Website Tracking'), 'route' => 'admin.settings.tracking', 'match' => 'admin.settings.tracking', 'icon' => 'chart-bar', 'visible' => true],
-                ['label' => __('User Manage'), 'route' => 'users.index', 'match' => 'users.index', 'icon' => 'user-group', 'visible' => true],
             ]
         ],
         [
@@ -445,5 +453,12 @@
 @fluxScripts
 @stack('scripts')
 @include('mediamanager::includes.media-modal')
+
+@php
+    $tracking = \App\Support\SettingsStore::group('tracking');
+@endphp
+@if(!empty($tracking['custom_footer_script']))
+    {!! $tracking['custom_footer_script'] !!}
+@endif
 </body>
 </html>

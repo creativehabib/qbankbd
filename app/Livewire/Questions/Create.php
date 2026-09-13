@@ -11,7 +11,7 @@ use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
-use App\Services\GeminiService;
+use App\Services\AiService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -201,7 +201,7 @@ class Create extends Component
 
         try {
             // 🌟 Use our generated service class (60 sec timeout) 🌟
-            $geminiService = new GeminiService;
+            $geminiService = new AiService;
             $aiData = $geminiService->generateJson($prompt, 60);
 
             if (is_array($aiData) && isset($aiData['question'], $aiData['options'])) {

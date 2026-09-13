@@ -5,7 +5,7 @@ namespace App\Livewire\Students;
 use App\Models\MockTestQuestion;
 use App\Models\Question;
 use App\Models\Subject;
-use App\Services\GeminiService;
+use App\Services\AiService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -41,7 +41,7 @@ class MistakeReview extends Component
             $question = Question::findOrFail($questionId);
 
             // 🌟 সার্ভিস ক্লাস কল করে ম্যাজিক! 🌟
-            $geminiService = new GeminiService;
+            $geminiService = new AiService;
             $geminiService->generateAndSaveExplanation($question);
 
             // সফল হলে UI রিফ্রেশ

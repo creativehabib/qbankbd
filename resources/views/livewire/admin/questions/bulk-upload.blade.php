@@ -288,7 +288,7 @@
                                                        type="text"
                                                        x-model="text"
                                                        class="block w-full rounded-xl border border-indigo-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-4 py-2.5 text-base font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-['Noto_Serif_Bengali',_serif]"
-                                                       placeholder="প্রশ্নের শিরোনাম">
+                                                       placeholder="প্রশ্নটি এখানে লিখুন...">
                                             </div>
 
                                             @if($hasCorrect)
@@ -298,11 +298,44 @@
                                                 </span>
                                             @else
                                                 <span class="flex-shrink-0 inline-flex items-center gap-1.5 text-sm text-red-700 dark:text-red-400 font-bold bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-700 px-3 py-2 rounded-lg mt-0.5 shadow-sm animate-pulse">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                                     চিহ্নিত নেই
                                                 </span>
                                             @endif
                                         </div>
+
+                                        {{-- 🌟 Smart Duplicate Warning --}}
+                                        @if(!empty($question['is_duplicate']))
+                                            <div class="flex items-center gap-2 ml-11 mb-2 mt-[-0.25rem] px-3 py-2 text-xs font-semibold rounded-lg bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800">
+                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                এই প্রশ্নটি আপনার ডাটাবেজে আগে থেকেই আছে!
+                                            </div>
+                                        @endif
+
+                                        {{-- 🌟 AI Generated Tags Preview --}}
+                                        @if(!empty($question['tags']))
+                                            <div class="flex flex-wrap gap-2 ml-11 mb-1 mt-[-0.25rem]">
+                                                @foreach(collect($question['tags'])->unique() as $tag)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                                        {{ $tag }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- 🌟 AI Explanation Preview --}}
+                                        @if(!empty($question['explanation']))
+                                            <div class="ml-11 mb-3 mt-1 p-2.5 rounded-lg bg-emerald-50 border border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/30">
+                                                <div class="flex items-start gap-2">
+                                                    <svg class="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <p class="text-xs text-emerald-800 dark:text-emerald-200 leading-relaxed">
+                                                        <span class="font-semibold block mb-0.5">ব্যাখ্যা:</span>
+                                                        {{ $question['explanation'] }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         {{-- 🌟 Options with INLINE EDIT & PREVIEW --}}
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-11">
