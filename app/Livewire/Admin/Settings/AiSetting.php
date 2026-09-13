@@ -17,6 +17,7 @@ class AiSetting extends Component
     public ?string $gemini_model = 'gemini-1.5-flash';
     public ?string $gemini_fallback_model = 'gemini-1.5-pro';
     public bool $enable_gemini_fallback = false;
+    public ?string $google_vision_credentials = '';
 
     public function mount()
     {
@@ -31,6 +32,8 @@ class AiSetting extends Component
         $this->gemini_model = $settings['gemini_model'] ?? 'gemini-1.5-flash';
         $this->gemini_fallback_model = $settings['gemini_fallback_model'] ?? 'gemini-1.5-pro';
         $this->enable_gemini_fallback = (bool) ($settings['enable_gemini_fallback'] ?? false);
+        
+        $this->google_vision_credentials = $settings['google_vision_credentials'] ?? '';
     }
 
     public function save()
@@ -45,11 +48,37 @@ class AiSetting extends Component
             'gemini_model' => ['nullable', 'string'],
             'gemini_fallback_model' => ['nullable', 'string'],
             'enable_gemini_fallback' => ['boolean'],
+            'google_vision_credentials' => ['nullable', 'string'],
         ]);
 
         SettingsStore::saveGroup('ai', $validated);
+        
+        if (!empty($validated['google_vision_credentials'])) {
+            $path = storage_path('google-credentials.json');
+            file_put_contents($path, trim($validated['google_vision_credentials']));
+            $this->setEnvironmentValue('GOOGLE_VISION_CREDENTIALS', escapeshellarg($path));
+        }
 
-        $this->toastSuccess('AI settings saved successfully.');
+        log_activity('updated_settings', 'Updated AI Settings'); $this->toastSuccess('AI settings saved successfully.');
+    }
+    
+    protected function setEnvironmentValue($envKey, $envValue)
+    {
+        $envFile = app()->environmentFilePath();
+        $str = file_get_contents($envFile);
+        $str = "\n" . $str . "\n";
+        
+        if (preg_match("/\n{$envKey}=(.*)/", $str)) {
+            $str = preg_replace("/\n{$envKey}=.*/", "\n{$envKey}={$envValue}", $str);
+        } else {
+            $str .= "{$envKey}={$envValue}\n";
+        }
+        
+        file_put_contents($envFile, trim($str) . "\n");
+        
+        try {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+        } catch (\Exception $e) {}
     }
 
     public function render()

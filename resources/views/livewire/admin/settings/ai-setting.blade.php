@@ -90,6 +90,39 @@
                     </div>
                 </flux:card>
             @endif
+            
+            <flux:card>
+                <div class="mb-6">
+                    <flux:heading size="lg">Google Vision OCR Settings</flux:heading>
+                    <flux:text class="!text-sm">Enter your Google Cloud Vision Service Account JSON credentials for Optical Character Recognition (OCR).</flux:text>
+                </div>
+                
+                <div class="space-y-4">
+                    <flux:textarea rows="10" wire:model="google_vision_credentials" label="Google Vision Credentials (JSON)" placeholder='{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "...",
+  ...
+}' />
+                    <div class="space-y-2 text-sm text-zinc-500">
+                        <p>Paste the raw JSON content from your Google Cloud Service Account key file. When you save, it will automatically generate the credentials file and update your .env configuration.</p>
+                        
+                        <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
+                            <p class="font-medium text-blue-800 dark:text-blue-300 mb-1 flex items-center gap-1.5">
+                                <flux:icon.information-circle class="w-4 h-4" />
+                                How to get Google Vision Credentials?
+                            </p>
+                            <ol class="list-decimal ml-5 space-y-1 text-blue-700/90 dark:text-blue-300/80">
+                                <li>Go to <a href="https://console.cloud.google.com/" target="_blank" class="underline font-medium hover:text-blue-900 dark:hover:text-blue-200">Google Cloud Console</a> and create a project.</li>
+                                <li>Enable the <a href="https://console.cloud.google.com/apis/library/vision.googleapis.com" target="_blank" class="underline font-medium hover:text-blue-900 dark:hover:text-blue-200">Cloud Vision API</a> for your project.</li>
+                                <li>Go to <strong>IAM & Admin > Service Accounts</strong>, create a new service account.</li>
+                                <li>Create a new <strong>JSON Key</strong> for that service account, download it, and paste its entire content here.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </flux:card>
+            
         </div>
     </div>
 </div>

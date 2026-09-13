@@ -12,11 +12,19 @@
     </div>
 
     <flux:card>
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
             <flux:heading size="lg">Recent Activity</flux:heading>
             
-            <div class="w-64">
-                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Search logs..." />
+            <div class="flex items-center gap-3">
+                <div class="w-full sm:w-64">
+                    <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Search logs..." />
+                </div>
+                
+                @if($logs instanceof \Illuminate\Pagination\LengthAwarePaginator && $logs->total() > 0)
+                    <flux:button wire:click="clearLogs" wire:confirm="আপনি কি নিশ্চিত যে সম্পূর্ণ লগ ডিলিট করতে চান?" size="sm" variant="danger" icon="trash">
+                        Clear All
+                    </flux:button>
+                @endif
             </div>
         </div>
         

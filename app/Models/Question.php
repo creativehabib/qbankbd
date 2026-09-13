@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class Question extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, \App\Traits\LogsActivity;
 
     protected $guarded = [];
 

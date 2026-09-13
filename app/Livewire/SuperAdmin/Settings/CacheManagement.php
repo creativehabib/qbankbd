@@ -61,7 +61,7 @@ class CacheManagement extends Component
     {
         abort_unless(auth()->user()?->hasRole('super_admin'), 403);
         Artisan::call('cache:clear');
-        $this->toastSuccess('অ্যাপিকেশন ক্যাশ সফলভাবে ক্লিয়ার করা হয়েছে।');
+        log_activity('cleared_cache', 'Cleared Application Cache'); $this->toastSuccess('অ্যাপিকেশন ক্যাশ সফলভাবে ক্লিয়ার করা হয়েছে।');
     }
 
     public function clearViewCache()

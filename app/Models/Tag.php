@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class Tag extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\LogsActivity;
 
     protected $fillable = ['name', 'slug'];
 

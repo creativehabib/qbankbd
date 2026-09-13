@@ -87,7 +87,7 @@ class GeneralSetting extends Component
             $this->setEnvironmentValue('APP_TIMEZONE', $validated['default_timezone']);
         }
 
-        $this->toastSuccess('General settings saved successfully.');
+        log_activity('updated_settings', 'Updated General Settings'); $this->toastSuccess('General settings saved successfully.');
     }
 
     protected function setEnvironmentValue($envKey, $envValue)

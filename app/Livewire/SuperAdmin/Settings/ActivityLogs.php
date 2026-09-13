@@ -5,16 +5,31 @@ namespace App\Livewire\SuperAdmin\Settings;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\ActivityLog;
+use App\Livewire\Traits\InteractsWithFluxToasts;
 
 class ActivityLogs extends Component
 {
-    use WithPagination;
+    use WithPagination, InteractsWithFluxToasts;
 
     public $search = '';
 
     public function updatedSearch()
     {
         $this->resetPage();
+    }
+    
+    public function clearLogs()
+    {
+        abort_unless(auth()->user()?->hasRole('super_admin'), 403);
+        
+        if (\Illuminate\Support\Facades\Schema::hasTable('activity_logs')) {
+            ActivityLog::truncate();
+            $this->toastSuccess('সবগুলো অ্যাক্টিভিটি লগ সফলভাবে মুছে ফেলা হয়েছে!');
+            $this->resetPage();
+            
+            // Log this specific action too
+            log_activity('cleared_logs', 'Cleared all activity logs');
+        }
     }
 
     public function render()

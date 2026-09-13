@@ -28,6 +28,31 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->shareThemeTypography();
         $this->configureDynamicSettings();
+        $this->registerActivityLogListeners();
+    }
+    
+    /**
+     * Register listeners for automatic activity logging
+     */
+    protected function registerActivityLogListeners(): void
+    {
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
+            log_activity('login', 'User logged into the system', $event->user->id);
+        });
+        
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Logout::class, function ($event) {
+            if ($event->user) {
+                log_activity('logout', 'User logged out of the system', $event->user->id);
+            }
+        });
+        
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Registered::class, function ($event) {
+            log_activity('registered', 'New user registered', $event->user->id);
+        });
+        
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\PasswordReset::class, function ($event) {
+            log_activity('password_reset', 'User reset their password', $event->user->id);
+        });
     }
 
     /**

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class AcademicClass extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, \App\Traits\LogsActivity, HasUuids;
 
     protected $guarded = [];
 

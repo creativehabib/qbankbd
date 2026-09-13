@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Chapter extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, \App\Traits\LogsActivity, HasUuids;
 
     protected $guarded = [];
 
