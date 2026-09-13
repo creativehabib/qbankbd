@@ -71,17 +71,8 @@ class Backups extends Component
         $disk = Storage::disk($diskName);
         
         if ($disk->exists($file)) {
-            if ($diskName === 'local') {
-                return response()->download($disk->path($file));
-            }
-            
-            return response()->streamDownload(function () use ($disk, $file) {
-                $stream = $disk->readStream($file);
-                fpassthru($stream);
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
-            }, basename($file));
+            // Livewire will trigger a front-end redirect to this route, preventing Livewire from buffering the file
+            return redirect()->route('superadmin.settings.backups.download', ['file' => base64_encode($file)]);
         }
         
         $this->toastError('ফাইলটি পাওয়া যায়নি!');

@@ -134,6 +134,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/superadmin/settings/sitemap', SitemapSetting::class)->middleware('role:super_admin')->name('superadmin.settings.sitemap');
         Route::get('/superadmin/settings/htaccess', Htaccess::class)->middleware('role:super_admin')->name('superadmin.settings.htaccess');
         Route::get('/superadmin/settings/backups', Backups::class)->middleware('role:super_admin')->name('superadmin.settings.backups');
+        Route::get('/superadmin/settings/backups/download', [\App\Http\Controllers\BackupDownloadController::class, 'download'])->middleware('role:super_admin')->name('superadmin.settings.backups.download');
         Route::get('/superadmin/settings/cache', CacheManagement::class)->middleware('role:super_admin')->name('superadmin.settings.cache');
         Route::get('/superadmin/settings/system-info', SystemInformation::class)->middleware('role:super_admin')->name('superadmin.settings.system-info');
         Route::get('/superadmin/settings/activity-logs', ActivityLogs::class)->middleware('role:super_admin')->name('superadmin.settings.activity-logs');
