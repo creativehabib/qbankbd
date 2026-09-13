@@ -17,6 +17,8 @@ class UserRoleManagement extends Component
 
     public string $search = '';
 
+    public int $perPage = 10;
+
     public bool $showEditModal = false;
 
     public ?int $editingUserId = null;
@@ -139,6 +141,39 @@ class UserRoleManagement extends Component
         $this->toastSuccess('User deleted successfully.');
     }
 
+    public function toggleStatus(int $userId): void
+    {
+        abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
+
+        $targetUser = User::query()->findOrFail($userId);
+
+        if ($targetUser->id === auth()->id()) {
+            $this->toastError('নিজের account inactive করা যাবে না।');
+            return;
+        }
+
+        $targetUser->is_active = !$targetUser->is_active;
+        $targetUser->save();
+
+        $this->toastSuccess('User status updated successfully.');
+    }
+
+    public function signOutEverywhere(int $userId): void
+    {
+        abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
+
+        $targetUser = User::query()->findOrFail($userId);
+
+        if (config('session.driver') === 'database') {
+            \Illuminate\Support\Facades\DB::table('sessions')->where('user_id', $targetUser->id)->delete();
+        }
+        
+        // Also update remember_token to log them out of "remember me"
+        $targetUser->update(['remember_token' => null]);
+
+        $this->toastSuccess('User has been signed out from all devices.');
+    }
+
     public function render(): View
     {
         abort_unless(auth()->user()?->hasPermission('users.manage_roles'), 403);
@@ -151,7 +186,7 @@ class UserRoleManagement extends Component
                     ->orWhere('email', 'like', $searchTerm);
             })
             ->latest()
-            ->paginate(10);
+            ->paginate($this->perPage);
 
         return view('livewire.user-role-management', [
             'users' => $users,
