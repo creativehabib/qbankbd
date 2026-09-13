@@ -67,9 +67,21 @@ class Backups extends Component
     {
         abort_unless(auth()->user()?->hasRole('super_admin'), 403);
         
-        $disk = Storage::disk(config('backup.backup.destination.disks')[0] ?? 'local');
+        $diskName = config('backup.backup.destination.disks')[0] ?? 'local';
+        $disk = Storage::disk($diskName);
+        
         if ($disk->exists($file)) {
-            return $disk->download($file);
+            if ($diskName === 'local') {
+                return response()->download($disk->path($file));
+            }
+            
+            return response()->streamDownload(function () use ($disk, $file) {
+                $stream = $disk->readStream($file);
+                fpassthru($stream);
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+            }, basename($file));
         }
         
         $this->toastError('ফাইলটি পাওয়া যায়নি!');
