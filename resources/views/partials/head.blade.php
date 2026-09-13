@@ -3,8 +3,16 @@
 
 @php
     $branding = \App\Support\SettingsStore::group('branding');
+    $general = \App\Support\SettingsStore::group('general');
     $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
+    $siteDesc = $general['site_description'] ?? 'বাংলাদেশের সেরা ডিজিটাল প্রশ্নভান্ডার ও অনলাইন লার্নিং প্ল্যাটফর্ম।';
     $favicon = !empty($branding['favicon']) ? (\Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon'])) : '/favicon.ico';
+    
+    // SEO Meta Tags Dynamic Setup
+    $ogImage = !empty($branding['logo_dark']) ? (\Illuminate\Support\Str::startsWith($branding['logo_dark'], ['http://', 'https://']) ? $branding['logo_dark'] : asset('storage/'.$branding['logo_dark'])) : asset('images/og-image.png');
+    $pageTitle = filled($title ?? null) ? $title.' - '.$appName : $appName;
+    $currentUrl = url()->current();
+
     $accentColor = $branding['accent_color'] ?? '#3b82f6';
     $textColor = $branding['text_color'] ?? '#ffffff';
     $darkBgColor = $branding['dark_bg_color'] ?? '#18181b';
@@ -13,9 +21,26 @@
     $tracking = \App\Support\SettingsStore::group('tracking');
 @endphp
 
-<title>
-    {{ filled($title ?? null) ? $title.' - '.$appName : $appName }}
-</title>
+<title>{{ $pageTitle }}</title>
+<meta name="title" content="{{ $pageTitle }}">
+<meta name="description" content="{{ $siteDesc }}">
+<meta name="author" content="{{ $appName }}">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ $currentUrl }}">
+<meta property="og:title" content="{{ $pageTitle }}">
+<meta property="og:description" content="{{ $siteDesc }}">
+<meta property="og:image" content="{{ $ogImage }}">
+<meta property="og:site_name" content="{{ $appName }}">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ $currentUrl }}">
+<meta property="twitter:title" content="{{ $pageTitle }}">
+<meta property="twitter:description" content="{{ $siteDesc }}">
+<meta property="twitter:image" content="{{ $ogImage }}">
 
 @if(!empty($tracking['google_analytics_id']))
     <!-- Google tag (gtag.js) -->
@@ -111,9 +136,7 @@
             processEscapes: true,
         },
         options: {
-            // এটি দিলে নির্দিষ্ট ক্লাসের প্রয়োজন হবে না, সব জায়গাই স্ক্যান করবে
             skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            // তবে আপনি যদি নির্দিষ্ট ক্লাস ব্যবহার করতে চান, তবে নিচের ২টি লাইন রাখতে পারেন
             ignoreHtmlClass: 'tex2jax_ignore',
             processHtmlClass: 'tex2jax_process'
         },
@@ -121,20 +144,17 @@
 </script>
 <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
-    // Re-render MathJax after Livewire page navigation (wire:navigate)
     document.addEventListener('livewire:navigated', () => {
         if (window.MathJax && window.MathJax.typesetPromise) {
             window.MathJax.typesetPromise();
         }
     });
 
-    // Re-render MathJax after Livewire component updates (modals, pagination, actions)
     document.addEventListener('livewire:initialized', () => {
         Livewire.hook('commit', ({ succeed }) => {
             succeed(() => {
                 requestAnimationFrame(() => {
                     if (window.MathJax && window.MathJax.typesetPromise) {
-                        // We use try-catch to avoid breaking UI if MathJax is already processing
                         window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err));
                     }
                 });
