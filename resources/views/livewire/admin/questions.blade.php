@@ -43,42 +43,42 @@
         </div>
 
         <div class="space-y-4 p-5">
-            <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                <flux:input wire:model.live.debounce.400ms="search" icon="magnifying-glass" placeholder="Search question, subject, chapter..." class="xl:col-span-2" />
+            <div class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+                <flux:input wire:model.live.debounce.400ms="search" icon="magnifying-glass" placeholder="Search questions..."  />
 
                 <flux:select wire:model.live="academicClassId" placeholder="All classes">
-                    <option value="">All classes</option>
+                    <flux:select.option value="">All classes</flux:select.option>
                     @foreach($academicClasses as $academicClass)
-                        <option value="{{ $academicClass->id }}">{{ $academicClass->name }}</option>
+                        <flux:select.option value="{{ $academicClass->id }}">{{ $academicClass->name }}</flux:select.option>
                     @endforeach
                 </flux:select>
 
                 <flux:select wire:model.live="subjectId" :disabled="$academicClassId === ''" placeholder="All subjects">
-                    <option value="">All subjects</option>
+                    <flux:select.option value="">All subjects</flux:select.option>
                     @foreach($subjects as $subject)
-                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                        <flux:select.option value="{{ $subject->id }}">{{ $subject->name }}</flux:select.option>
                     @endforeach
                 </flux:select>
 
                 <flux:select wire:model.live="questionTypeFilter" placeholder="All formats">
-                    <option value="">All formats</option>
-                    <option value="mcq">MCQ</option>
-                    <option value="cq">CQ</option>
-                    <option value="short">Short</option>
-                    <option value="written">Written</option>
+                    <flux:select.option value="">All formats</flux:select.option>
+                    <flux:select.option value="mcq">MCQ</flux:select.option>
+                    <flux:select.option value="cq">CQ</flux:select.option>
+                    <flux:select.option value="short">Short</flux:select.option>
+                    <flux:select.option value="written">Written</flux:select.option>
                 </flux:select>
 
                 <flux:select wire:model.live="chapterId" :disabled="$subjectId === ''" placeholder="All chapters">
-                    <option value="">All chapters</option>
+                    <flux:select.option value="">All chapters</flux:select.option>
                     @foreach($chapters as $chapter)
-                        <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
+                        <flux:select.option value="{{ $chapter->id }}">{{ $chapter->name }}</flux:select.option>
                     @endforeach
                 </flux:select>
 
                 <flux:select wire:model.live="topicId" :disabled="$chapterId === ''" placeholder="All topics">
-                    <option value="">All topics</option>
+                    <flux:select.option value="">All topics</flux:select.option>
                     @foreach($topics as $topic)
-                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                        <flux:select.option value="{{ $topic->id }}">{{ $topic->name }}</flux:select.option>
                     @endforeach
                 </flux:select>
             </div>

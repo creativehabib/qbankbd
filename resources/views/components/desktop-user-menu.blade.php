@@ -6,7 +6,9 @@
             </div>
             <div class="in-data-flux-sidebar-collapsed-desktop:hidden mx-2 flex-1 flex flex-col text-left overflow-hidden">
                 <span class="text-sm text-zinc-900 dark:text-white font-semibold truncate">{{ auth()->user()->name }}</span>
-                @if(auth()->user()->hasActiveSubscription())
+                @if(auth()->user()->isAdmin())
+                    <span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1"><flux:icon.shield-check class="size-3"/> Admin</span>
+                @elseif(auth()->user()->hasActiveSubscription())
                     <span class="text-xs text-amber-600 dark:text-amber-500 font-bold flex items-center gap-1"><flux:icon.sparkles class="size-3"/> Pro</span>
                 @else
                     <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Free</span>
@@ -48,7 +50,7 @@
         </flux:menu.radio.group>
     </flux:menu>
 </flux:dropdown>
-    @if(!auth()->user()->hasActiveSubscription())
+    @if(!auth()->user()->hasActiveSubscription() && !auth()->user()->isAdmin())
         <a href="{{ route('student.pricing') }}" wire:navigate class="in-data-flux-sidebar-collapsed-desktop:hidden shrink-0 text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white px-2 py-1.5 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 transition">
             Upgrade
         </a>

@@ -22,15 +22,16 @@
                 $paymentSettings = \App\Support\SettingsStore::group('payment');
                 $bkashEnabled = $paymentSettings['bkash_active'] ?? false;
                 $sslEnabled = $paymentSettings['sslcommerz_active'] ?? false;
+                $nagadEnabled = $paymentSettings['nagad_active'] ?? false;
             @endphp
 
-            @if(!$bkashEnabled && !$sslEnabled)
+            @if(!$bkashEnabled && !$sslEnabled && !$nagadEnabled)
                 <div class="p-4 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-xl text-center font-medium border border-amber-100 dark:border-amber-800">
                     <flux:icon.exclamation-triangle class="size-6 mx-auto mb-2" />
                     পেমেন্ট সিস্টেম বর্তমানে বন্ধ আছে। দয়া করে এডমিনের সাথে যোগাযোগ করুন।
                 </div>
             @else
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     @if($bkashEnabled)
                     <form action="{{ route('payment.bkash.pay', $package->id) }}" method="POST" class="w-full h-full block">
                         @csrf
@@ -41,6 +42,16 @@
                     </form>
                     @endif
                     
+                    @if($nagadEnabled)
+                    <form action="{{ route('payment.nagad.pay', $package->id) }}" method="POST" class="w-full h-full block">
+                        @csrf
+                        <button type="submit" class="w-full h-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition text-zinc-700 dark:text-zinc-300">
+                            <img src="{{ asset('images/nagad_logo.svg') }}" alt="Nagad" class="h-10 object-contain">
+                            <span class="font-bold">Pay with Nagad</span>
+                        </button>
+                    </form>
+                    @endif
+
                     @if($sslEnabled)
                     <form action="{{ route('payment.ssl.pay', $package->id) }}" method="POST" class="w-full h-full block">
                         @csrf

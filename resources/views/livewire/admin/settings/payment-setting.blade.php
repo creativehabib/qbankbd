@@ -56,6 +56,32 @@
             </div>
         </flux:card>
 
+                <!-- Nagad Settings -->
+        <flux:card>
+            <div class="flex items-center gap-4 mb-4 border-b border-zinc-100 pb-4 dark:border-zinc-800">
+                <img src="{{ asset('images/nagad_logo.svg') }}" alt="Nagad" class="h-10 object-contain">
+                <div>
+                    <h3 class="text-lg font-bold text-zinc-800 dark:text-zinc-100">Nagad Payment Gateway</h3>
+                    <p class="text-sm text-zinc-500">Enable and configure Nagad PGW API.</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <flux:switch wire:model.live="nagad_active" label="Enable Nagad" description="Allow users to pay directly via Nagad API." />
+
+                <div x-show="$wire.nagad_active" class="space-y-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <flux:input wire:model="nagad_merchant_id" label="Merchant ID" placeholder="Enter Merchant ID" />
+                        <flux:input wire:model="nagad_merchant_number" label="Merchant Number" placeholder="Enter Merchant Number" />
+                        <flux:input wire:model="nagad_public_key" label="Public Key" placeholder="Enter Public Key" />
+                        <flux:input wire:model="nagad_private_key" label="Private Key" type="password" placeholder="Enter Private Key" viewable />
+                    </div>
+
+                    <flux:switch wire:model="nagad_sandbox" label="Sandbox Mode (Test Environment)" description="Enable Nagad sandbox API. Turn off for production." />
+                </div>
+            </div>
+        </flux:card>
+
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">Save Changes</flux:button>
             

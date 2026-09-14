@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\UserSubscription;
 use App\Services\BkashService;
 use App\Services\SSLCommerzService;
+use App\Services\NagadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -52,7 +53,7 @@ class PaymentController extends Controller
         }
 
         $payment->update(['status' => 'failed', 'payment_response' => $createResponse]);
-        return redirect()->route('student.pricing')->with('error', $createResponse['statusMessage'] ?? 'bKash payment initiation failed.');
+        return redirect()->route(auth()->user()->isTeacher() ? 'teacher.pricing' : 'student.pricing')->with('error', $createResponse['statusMessage'] ?? 'bKash payment initiation failed.');
     }
 
     public function bkashCallback(Request $request, BkashService $bkashService)
@@ -75,7 +76,7 @@ class PaymentController extends Controller
 
                 $this->unlockPackage($payment);
                 session()->flash('success', 'Payment successful! bKash TrxID: ' . $executeResponse['trxID']);
-                return response('<script>window.location.href="' . route('student.model-tests.index') . '";</script>');
+                return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.subscription') : route('student.model-tests.index')) . '";</script>');
             } else {
                 $payment->update([
                     'status' => 'failed',
@@ -83,13 +84,13 @@ class PaymentController extends Controller
                 ]);
                 $errorMsg = $executeResponse['statusMessage'] ?? 'Payment execution failed.';
                 session()->flash('error', $errorMsg);
-                return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+                return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
             }
         }
 
         $payment->update(['status' => 'canceled']);
         session()->flash('error', 'bKash payment was ' . $status);
-        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+        return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
     }
 
 
@@ -141,7 +142,7 @@ class PaymentController extends Controller
 
         $payment->update(['status' => 'failed', 'payment_response' => $response]);
         $errorMessage = $response['failedreason'] ?? 'SSLCommerz payment initiation failed. Please check Sandbox API Keys.';
-        return redirect()->route('student.pricing')->with('error', $errorMessage);
+        return redirect()->route(auth()->user()->isTeacher() ? 'teacher.pricing' : 'student.pricing')->with('error', $errorMessage);
     }
 
     public function sslSuccess(Request $request, SSLCommerzService $sslService)
@@ -162,12 +163,12 @@ class PaymentController extends Controller
             ]);
             $this->unlockPackage($payment);
             session()->flash('success', 'Payment successful!');
-            return response('<script>window.location.href="' . route('student.model-tests.index') . '";</script>');
+            return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.subscription') : route('student.model-tests.index')) . '";</script>');
         }
 
         $payment->update(['status' => 'failed', 'payment_response' => $validationResponse]);
         session()->flash('error', 'Payment validation failed.');
-        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+        return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
     }
 
     public function sslFail(Request $request)
@@ -177,7 +178,7 @@ class PaymentController extends Controller
         auth()->loginUsingId($payment->user_id);
         $payment->update(['status' => 'failed']);
         session()->flash('error', 'Payment failed.');
-        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+        return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
     }
 
     public function sslCancel(Request $request)
@@ -187,7 +188,7 @@ class PaymentController extends Controller
         auth()->loginUsingId($payment->user_id);
         $payment->update(['status' => 'canceled']);
         session()->flash('warning', 'Payment canceled.');
-        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+        return response('<script>window.location.href="' . (auth()->user()->isTeacher() ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
     }
 
     public function sslIpn(Request $request)
@@ -208,7 +209,79 @@ class PaymentController extends Controller
         return response()->json(['message' => 'IPN received']);
     }
 
+    
     /** ============================
+     *  Nagad Integration
+     *  ============================ */
+    public function nagadPay(Request $request, Package $package, NagadService $nagadService)
+    {
+        $user = auth()->user();
+        $invoiceNumber = 'N' . time() . Str::random(4);
+
+        $payment = Payment::create([
+            'user_id' => $user->id,
+            'package_id' => $package->id,
+            'transaction_id' => $invoiceNumber,
+            'amount' => $package->price,
+            'payment_method' => 'nagad',
+            'status' => 'pending',
+        ]);
+
+        $response = $nagadService->initializePayment($invoiceNumber, $package->price);
+
+        if (isset($response['status']) && $response['status'] === 'success') {
+            $payment->update([
+                'transaction_id' => $response['payment_ref_id'] // use the ref id for callback matching
+            ]);
+            return redirect($response['payment_url']);
+        }
+
+        $payment->update(['status' => 'failed', 'payment_response' => $response]);
+        return redirect()->route($user->isTeacher() ? 'teacher.pricing' : 'student.pricing')
+            ->with('error', $response['message'] ?? 'Nagad payment initiation failed. Check API keys.');
+    }
+
+    public function nagadCallback(Request $request, NagadService $nagadService)
+    {
+        $paymentRefId = $request->input('payment_ref_id');
+        $status = $request->input('status');
+
+        if (!$paymentRefId) {
+            session()->flash('error', 'Invalid Nagad callback parameters.');
+            return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
+        }
+
+        $payment = Payment::where('transaction_id', $paymentRefId)->firstOrFail();
+        auth()->loginUsingId($payment->user_id);
+        $isTeacher = $payment->user->isTeacher();
+
+        if ($status === 'Success') {
+            $verifyResponse = $nagadService->verifyPayment($paymentRefId);
+
+            if (isset($verifyResponse['status']) && $verifyResponse['status'] === 'success') {
+                $payment->update([
+                    'status' => 'completed',
+                    'payment_response' => $verifyResponse['data']
+                ]);
+
+                $this->unlockPackage($payment);
+                session()->flash('success', 'Payment successful! Nagad TrxID: ' . ($verifyResponse['data']['issuerPaymentRefNo'] ?? ''));
+                return response('<script>window.location.href="' . ($isTeacher ? route('teacher.subscription') : route('student.model-tests.index')) . '";</script>');
+            } else {
+                $payment->update([
+                    'status' => 'failed',
+                    'payment_response' => $verifyResponse['data'] ?? []
+                ]);
+                session()->flash('error', 'Nagad payment verification failed.');
+                return response('<script>window.location.href="' . ($isTeacher ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
+            }
+        }
+
+        $payment->update(['status' => 'canceled']);
+        session()->flash('error', 'Nagad payment was ' . $status);
+        return response('<script>window.location.href="' . ($isTeacher ? route('teacher.pricing') : route('student.pricing')) . '";</script>');
+    }
+/** ============================
      *  Common Helpers
      *  ============================ */
     protected function unlockPackage(Payment $payment)

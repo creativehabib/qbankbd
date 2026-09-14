@@ -23,6 +23,13 @@ class PaymentSetting extends Component
     public ?string $bkash_password = '';
     public bool $bkash_sandbox = true;
 
+    public bool $nagad_active = false;
+    public ?string $nagad_merchant_id = '';
+    public ?string $nagad_merchant_number = '';
+    public ?string $nagad_public_key = '';
+    public ?string $nagad_private_key = '';
+    public bool $nagad_sandbox = true;
+
     public function mount()
     {
         abort_unless(auth()->user()?->hasRole(['admin', 'super_admin']), 403);
@@ -40,6 +47,13 @@ class PaymentSetting extends Component
         $this->bkash_username = $settings['bkash_username'] ?? '';
         $this->bkash_password = $settings['bkash_password'] ?? '';
         $this->bkash_sandbox = (bool) ($settings['bkash_sandbox'] ?? true);
+
+        $this->nagad_active = (bool) ($settings['nagad_active'] ?? false);
+        $this->nagad_merchant_id = $settings['nagad_merchant_id'] ?? '';
+        $this->nagad_merchant_number = $settings['nagad_merchant_number'] ?? '';
+        $this->nagad_public_key = $settings['nagad_public_key'] ?? '';
+        $this->nagad_private_key = $settings['nagad_private_key'] ?? '';
+        $this->nagad_sandbox = (bool) ($settings['nagad_sandbox'] ?? true);
     }
 
     public function save()
@@ -58,6 +72,13 @@ class PaymentSetting extends Component
             'bkash_username' => ['nullable', 'string', 'max:255'],
             'bkash_password' => ['nullable', 'string', 'max:255'],
             'bkash_sandbox' => ['boolean'],
+
+            'nagad_active' => ['boolean'],
+            'nagad_merchant_id' => ['nullable', 'string', 'max:255'],
+            'nagad_merchant_number' => ['nullable', 'string', 'max:255'],
+            'nagad_public_key' => ['nullable', 'string'],
+            'nagad_private_key' => ['nullable', 'string'],
+            'nagad_sandbox' => ['boolean'],
         ]);
 
         SettingsStore::saveGroup('payment', $validated);

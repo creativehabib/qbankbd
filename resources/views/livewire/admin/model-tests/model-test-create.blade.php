@@ -21,53 +21,39 @@
                 <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">Test Settings</h3>
                 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Title</label>
-                    <input type="text" wire:model="title" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. 45th BCS Model Test 1">
-                    @error('title') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    <flux:input wire:model="title" label="Title" placeholder="e.g. 45th BCS Model Test 1" />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Duration (Minutes)</label>
-                    <input type="number" wire:model="duration_minutes" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
-                    @error('duration_minutes') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    <flux:input type="number" wire:model="duration_minutes" label="Duration (Minutes)" />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Negative Mark Weight</label>
-                    <select wire:model="negative_mark_weight" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="0">No Negative Marking</option>
-                        <option value="0.25">0.25 (1/4th)</option>
-                        <option value="0.50">0.50 (1/2)</option>
-                    </select>
-                    @error('negative_mark_weight') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+                    <flux:select wire:model="negative_mark_weight" label="Negative Mark Weight">
+                        <flux:select.option value="0">No Negative Marking</flux:select.option>
+                        <flux:select.option value="0.25">0.25 (1/4th)</flux:select.option>
+                        <flux:select.option value="0.50">0.50 (1/2)</flux:select.option>
+                    </flux:select>
                 </div>
 
                 <div>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" wire:model="is_published" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Publish Immediately</span>
-                    </label>
+                    <flux:switch wire:model="is_published" label="Publish Immediately" />
                 </div>
 
                 <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 mt-4 space-y-4">
                     <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Premium Access</h3>
                     
                     <div>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" wire:model="is_premium" class="rounded border-zinc-300 text-amber-500 focus:ring-amber-500">
-                            <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1"><flux:icon.sparkles class="size-4 text-amber-500"/> Require Pro Subscription</span>
-                        </label>
+                        <flux:switch wire:model="is_premium" label="Require Pro Subscription" />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Link to Specific Course</label>
-                        <select wire:model="package_id" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="">No specific course</option>
+                        <flux:select wire:model="package_id" label="Link to Specific Course" description="If set, users MUST buy this course to unlock.">
+                            <flux:select.option value="">No specific course</flux:select.option>
                             @foreach($courses as $course)
-                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                <flux:select.option value="{{ $course->id }}">{{ $course->name }}</flux:select.option>
                             @endforeach
-                        </select>
-                        <p class="text-xs text-zinc-500 mt-1">If set, users MUST buy this course to unlock.</p>
+                        </flux:select>
                     </div>
                 </div>
                 
@@ -86,23 +72,23 @@
             <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
-                        <select wire:model.live="class_id" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white text-sm">
-                            <option value="">All Categories/Classes</option>
+                        <flux:select wire:model.live="class_id">
+                            <flux:select.option value="">All Categories/Classes</flux:select.option>
                             @foreach($classes as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                <flux:select.option value="{{ $c->id }}">{{ $c->name }}</flux:select.option>
                             @endforeach
-                        </select>
+                        </flux:select>
                     </div>
                     <div>
-                        <select wire:model.live="subject_id" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white text-sm">
-                            <option value="">All Subjects</option>
+                        <flux:select wire:model.live="subject_id">
+                            <flux:select.option value="">All Subjects</flux:select.option>
                             @foreach($subjects as $s)
-                                <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                <flux:select.option value="{{ $s->id }}">{{ $s->name }}</flux:select.option>
                             @endforeach
-                        </select>
+                        </flux:select>
                     </div>
                     <div>
-                        <input type="text" wire:model.live.debounce.500ms="search" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white text-sm" placeholder="Search questions...">
+                        <flux:input type="text" wire:model.live.debounce.500ms="search" placeholder="Search questions..." icon="magnifying-glass" />
                     </div>
                 </div>
 

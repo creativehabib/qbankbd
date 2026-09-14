@@ -205,4 +205,8 @@ Route::post('/payment/ssl/cancel', [\App\Http\Controllers\PaymentController::cla
 // SSL IPN is usually not authenticated
 Route::post('/payment/ssl/ipn', [\App\Http\Controllers\PaymentController::class, 'sslIpn'])->name('payment.ssl.ipn');
 
+// Nagad Payment Routes
+Route::post('/payment/nagad/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'nagadPay'])->name('payment.nagad.pay');
+Route::get('/payment/nagad/callback', [\App\Http\Controllers\PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
+
 require __DIR__.'/settings.php';
