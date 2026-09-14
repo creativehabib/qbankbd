@@ -303,10 +303,14 @@
     </flux:navbar>
 
     <flux:dropdown align="end">
-        <flux:profile
-            :initials="auth()->user()->initials()"
-            :avatar="filled(auth()->user()->picture) ? asset('storage/' . auth()->user()->picture) : null"
-        />
+        <button type="button" class="group flex items-center rounded-full bg-zinc-100/80 dark:bg-zinc-800 p-1 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition" data-flux-profile>
+            <flux:avatar :initials="auth()->user()->initials()" :src="filled(auth()->user()->picture) ? asset('storage/' . auth()->user()->picture) : null" size="sm" />
+            @if(auth()->user()->hasActiveSubscription())
+                <div class="px-2 hidden sm:flex items-center gap-1 text-xs font-bold text-amber-500">
+                    <flux:icon.sparkles class="size-3" /> Pro
+                </div>
+            @endif
+        </button>
 
         <flux:menu class="min-w-72">
             <div class="px-3 py-3">
@@ -411,10 +415,14 @@
     <flux:spacer />
 
     <flux:dropdown position="top" align="end">
-        <flux:profile
-            :initials="auth()->user()->initials()"
-            icon-trailing="chevron-down"
-        />
+        <button type="button" class="group flex items-center rounded-full bg-zinc-100/80 dark:bg-zinc-800 p-1 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition" data-flux-profile>
+            <flux:avatar :initials="auth()->user()->initials()" size="sm" />
+            @if(auth()->user()->hasActiveSubscription())
+                <div class="px-2 flex items-center gap-1 text-xs font-bold text-amber-500">
+                    <flux:icon.sparkles class="size-3" /> Pro
+                </div>
+            @endif
+        </button>
 
         <flux:menu>
             <flux:menu.radio.group>

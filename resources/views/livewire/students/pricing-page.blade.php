@@ -25,8 +25,16 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                     @foreach($subscriptions as $plan)
-                        <flux:card class="relative flex flex-col {{ $loop->iteration == 2 ? 'border-2 border-indigo-500 shadow-xl' : '' }}">
-                            @if($loop->iteration == 2)
+                        @php
+                            $isActive = auth()->user()->hasActivePackage($plan->id);
+                            $borderClass = $isActive ? 'border-2 border-emerald-500 shadow-xl' : ($loop->iteration == 2 ? 'border-2 border-indigo-500 shadow-xl' : '');
+                        @endphp
+                        <flux:card class="relative flex flex-col {{ $borderClass }}">
+                            @if($isActive)
+                                <div class="absolute -top-3 left-0 right-0 flex justify-center">
+                                    <span class="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><flux:icon.check-badge class="size-4" /> Current Plan</span>
+                                </div>
+                            @elseif($loop->iteration == 2)
                                 <div class="absolute -top-3 left-0 right-0 flex justify-center">
                                     <span class="bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Most Popular</span>
                                 </div>
@@ -44,9 +52,15 @@
                                     <div class="flex items-start gap-2"><flux:icon.check-circle class="size-5 text-emerald-500 shrink-0"/> {{ $plan->description }}</div>
                                 @endif
                             </div>
-                            <flux:button href="{{ route('student.checkout', $plan->id) }}" variant="{{ $loop->iteration == 2 ? 'primary' : 'outline' }}" class="w-full">
-                                Subscribe Now
-                            </flux:button>
+                            @if($isActive)
+                                <flux:button variant="filled" class="w-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 cursor-default">
+                                    Current Plan
+                                </flux:button>
+                            @else
+                                <flux:button href="{{ route('student.checkout', $plan->id) }}" variant="{{ $loop->iteration == 2 ? 'primary' : 'outline' }}" class="w-full">
+                                    Subscribe Now
+                                </flux:button>
+                            @endif
                         </flux:card>
                     @endforeach
                 </div>
@@ -77,7 +91,11 @@
                                 </div>
                                 <div class="mt-4 flex items-center justify-between">
                                     <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">৳{{ number_format($course->price) }}</div>
-                                    <flux:button href="{{ route('student.checkout', $course->id) }}" variant="primary">Enroll Now</flux:button>
+                                    @if(auth()->user()->hasActivePackage($course->id))
+                                        <flux:button variant="filled" class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default">Enrolled</flux:button>
+                                    @else
+                                        <flux:button href="{{ route('student.checkout', $course->id) }}" variant="primary">Enroll Now</flux:button>
+                                    @endif
                                 </div>
                             </div>
                         </flux:card>

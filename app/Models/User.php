@@ -62,9 +62,9 @@ class User extends Authenticatable
         return $this->hasRole('super_admin');
     }
 
-    public function hasAccessToModelTest(\App\Models\ModelTest $test): bool
+    public function hasAccessToModelTest(ModelTest $test): bool
     {
-        if (!$test->is_premium && !$test->package_id) {
+        if (! $test->is_premium && ! $test->package_id) {
             return true;
         }
 
@@ -109,6 +109,26 @@ class User extends Authenticatable
     public function activeSubscription(): HasOne
     {
         return $this->hasOne(UserSubscription::class)->where('status', 'active')->latestOfMany();
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->subscriptions()
+            ->whereHas('package', function ($q) {
+                $q->where('type', 'subscription');
+            })
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
+    public function hasActivePackage($packageId): bool
+    {
+        return $this->subscriptions()
+            ->where('package_id', $packageId)
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
     }
 
     public function wallet(): HasOne
