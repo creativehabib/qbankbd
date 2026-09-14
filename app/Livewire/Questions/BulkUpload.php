@@ -120,14 +120,14 @@ class BulkUpload extends Component
         
         $avoidRule = '';
         if (!empty($existingTitles)) {
-            $avoidRule = "IMPORTANT RULE 4: DO NOT generate any of the following questions because they already exist in my database:\n" . json_encode($existingTitles, JSON_UNESCAPED_UNICODE) . "\n";
+            $avoidRule = "IMPORTANT RULE 5: DO NOT generate any of the following questions because they already exist in my database:\n" . json_encode($existingTitles, JSON_UNESCAPED_UNICODE) . "\n";
         }
 
         $prompt = "Create {$this->aiQuestionCount} multiple-choice questions in Bengali language about '{$this->aiPrompt}'.
         IMPORTANT RULE 1: ONLY generate authentic questions that have previously appeared in various competitive exams in Bangladesh (such as BCS, NTRCA, Bank Jobs, Primary Teacher Recruitment, University Admissions, etc.). Do not make up new fictional questions.
         IMPORTANT RULE 2: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
-        IMPORTANT RULE 3: For each question, you MUST provide 1 to 3 highly accurate tags indicating the exact exams and years/sessions it appeared in (e.g., '৩৬ তম বিসিএস', '18th NTRCA', 'প্রাইমারি সহকারী শিক্ষক ২০২২', 'DU Admission', etc.). Do NOT generate duplicate tags.
-        IMPORTANT RULE 4: For each question, provide a detailed 3-4 line explanation (ব্যাখ্যা) explaining why the correct answer is correct and providing some extra related information.
+        IMPORTANT RULE 3: For tags, ONLY include a competitive exam name/year IF YOU ARE 100% CERTAIN the question actually appeared in that specific exam. If you are not certain, DO NOT add any fake or guessed exam tags. Keep the tags empty or very minimal rather than providing false info.
+        IMPORTANT RULE 4: For each question, provide a highly descriptive and detailed explanation (ব্যাখ্যা) of 4-6 lines. Explain clearly why the correct answer is right, why the other options are wrong, and provide additional background information to deeply educate the student.
         {$avoidRule}
         You MUST return the response STRICTLY as a JSON array in the exact format below, and nothing else (no markdown, no extra text):
         [
