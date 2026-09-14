@@ -9,14 +9,31 @@ class PackageSeeder extends Seeder
 {
     public function run(): void
     {
-        $packages = [
-            ['name' => 'Starter', 'price' => 3000, 'question_create_limit' => 3000, 'page_view_limit' => null, 'is_ad_free' => true, 'validity_days' => 30, 'is_active' => true],
-            ['name' => 'Growth', 'price' => 5000, 'question_create_limit' => 6000, 'page_view_limit' => null, 'is_ad_free' => true, 'validity_days' => 60, 'is_active' => true],
-            ['name' => 'Premium', 'price' => 9000, 'question_create_limit' => 12000, 'page_view_limit' => null, 'is_ad_free' => true, 'validity_days' => 90, 'is_active' => true],
-        ];
+        Package::create([
+            'name' => 'Pro Monthly Subscription',
+            'type' => 'subscription',
+            'price' => 200,
+            'description' => 'Unlock all premium tests for 30 days',
+            'validity_days' => 30,
+            'is_active' => true,
+        ]);
 
-        foreach ($packages as $package) {
-            Package::query()->updateOrCreate(['name' => $package['name']], $package);
-        }
+        Package::create([
+            'name' => 'Pro Yearly Subscription',
+            'type' => 'subscription',
+            'price' => 2000,
+            'description' => 'Save 16% on annual billing',
+            'validity_days' => 365,
+            'is_active' => true,
+        ]);
+
+        Package::create([
+            'name' => '46th BCS Special Model Tests',
+            'type' => 'course',
+            'price' => 500,
+            'description' => 'Exclusive model tests designed specifically for 46th BCS preparation.',
+            'validity_days' => 90,
+            'is_active' => true,
+        ]);
     }
 }

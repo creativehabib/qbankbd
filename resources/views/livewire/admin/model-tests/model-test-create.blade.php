@@ -48,6 +48,28 @@
                         <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Publish Immediately</span>
                     </label>
                 </div>
+
+                <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 mt-4 space-y-4">
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Premium Access</h3>
+                    
+                    <div>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" wire:model="is_premium" class="rounded border-zinc-300 text-amber-500 focus:ring-amber-500">
+                            <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1"><flux:icon.sparkles class="size-4 text-amber-500"/> Require Pro Subscription</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Link to Specific Course</label>
+                        <select wire:model="package_id" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">No specific course</option>
+                            @foreach($courses as $course)
+                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-zinc-500 mt-1">If set, users MUST buy this course to unlock.</p>
+                    </div>
+                </div>
                 
                 <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800">
                     <div class="flex items-center justify-between">

@@ -25,7 +25,7 @@
                 ['title' => 'Numbering', 'desc' => 'Customise number formats for sales, refunds, held orders, and auto-generated product SKUs.', 'icon' => 'hashtag', 'route' => '#'],
                 ['title' => 'Email & SMTP', 'desc' => 'How the system sends mail — password resets, receipts-by-email, and notifications.', 'icon' => 'envelope', 'route' => '#'],
                 ['title' => 'WhatsApp', 'desc' => 'Send transactional documents through free Click-to-Chat or an official API connection.', 'icon' => 'chat-bubble-left-right', 'route' => '#'],
-                ['title' => 'Payment methods', 'desc' => 'Turn manual tender types — Cash, Card, UPI, Bank Transfer, Cheque — on or off.', 'icon' => 'credit-card', 'route' => '#'],
+                ['title' => 'Payment Gateways', 'desc' => 'Configure API keys and credentials for payment gateways like bKash and SSLCommerz.', 'icon' => 'credit-card', 'route' => route('admin.settings.payment')],
             ];
         @endphp
 

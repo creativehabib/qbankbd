@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\ModelTests;
 
 use App\Models\ModelTest;
+use App\Models\Package;
 use App\Models\Question;
 use App\Models\AcademicClass;
 use App\Models\Subject;
@@ -20,6 +21,8 @@ class ModelTestCreate extends Component
     public float $negative_mark_weight = 0.25;
     public int $total_marks = 0;
     public bool $is_published = true;
+    public bool $is_premium = false;
+    public $package_id = '';
 
     // Filters for questions
     public $class_id = '';
@@ -74,6 +77,8 @@ class ModelTestCreate extends Component
             'negative_mark_weight' => $this->negative_mark_weight,
             'total_marks' => count($this->selectedQuestions),
             'is_published' => $this->is_published,
+            'is_premium' => $this->is_premium,
+            'package_id' => $this->package_id ? $this->package_id : null,
         ]);
 
         $syncData = [];
@@ -107,6 +112,7 @@ class ModelTestCreate extends Component
             'questions' => $questions,
             'classes' => AcademicClass::orderBy('name')->get(),
             'subjects' => $this->class_id ? Subject::where('academic_class_id', $this->class_id)->orderBy('name')->get() : collect(),
+            'courses' => Package::where('type', 'course')->get(),
         ])->layout('layouts.app', ['title' => 'Create Model Test']);
     }
 }

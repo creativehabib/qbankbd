@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
         ]);
+        
+        $middleware->validateCsrfTokens(except: [
+            'payment/ssl/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

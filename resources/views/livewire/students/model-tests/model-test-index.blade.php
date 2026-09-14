@@ -9,8 +9,13 @@
             <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-100 to-indigo-50 dark:from-indigo-900/30 dark:to-indigo-900/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 
-                <h3 class="text-xl font-bold text-zinc-900 dark:text-white relative z-10 pr-6 leading-tight mb-3">
+                <h3 class="text-xl font-bold text-zinc-900 dark:text-white relative z-10 pr-6 leading-tight mb-3 flex items-start gap-2">
                     {{ $test->title }}
+                    @if($test->is_premium || $test->package_id)
+                        <span class="inline-flex items-center justify-center p-1 bg-amber-100 text-amber-600 rounded-md dark:bg-amber-900/30 shrink-0" title="Premium Content">
+                            <flux:icon.lock-closed class="size-4" />
+                        </span>
+                    @endif
                 </h3>
                 
                 @if($test->description)
@@ -34,9 +39,16 @@
                     </div>
                 </div>
 
-                <a href="{{ route('student.model-tests.attempt', $test->id) }}" wire:navigate class="block w-full text-center py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition shadow-sm hover:shadow">
-                    Start Exam
-                </a>
+                @if(auth()->user()->hasAccessToModelTest($test))
+                    <a href="{{ route('student.model-tests.attempt', $test->id) }}" wire:navigate class="block w-full text-center py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition shadow-sm hover:shadow">
+                        Start Exam
+                    </a>
+                @else
+                    <a href="{{ route('student.pricing') }}" wire:navigate class="block w-full text-center py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition shadow-sm hover:shadow flex items-center justify-center gap-2">
+                        <flux:icon.lock-closed class="size-4" /> 
+                        {{ $test->package_id ? 'Buy Course' : 'Upgrade to Pro' }}
+                    </a>
+                @endif
             </div>
         @empty
             <div class="col-span-full py-12 text-center bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">

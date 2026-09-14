@@ -13,7 +13,8 @@ class ModelTestIndex extends Component
     public function render()
     {
         return view('livewire.students.model-tests.model-test-index', [
-            'modelTests' => ModelTest::withCount('questions')
+            'modelTests' => ModelTest::with(['package'])
+                ->withCount('questions')
                 ->where('is_published', true)
                 ->latest()
                 ->paginate(15),

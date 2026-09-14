@@ -124,6 +124,14 @@
         ],
         [
             'type' => 'link',
+            'label' => __('Upgrade / Courses'),
+            'route' => 'student.pricing',
+            'match' => 'student.pricing*',
+            'icon' => 'sparkles',
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Model Tests'),
             'route' => 'student.model-tests.index',
             'match' => 'student.model-tests.*',
@@ -206,6 +214,7 @@
                 ['label' => __('AI Setting'), 'route' => 'admin.settings.ai', 'match' => 'admin.settings.ai', 'icon' => 'cpu-chip', 'visible' => true],
                 ['label' => __('Languages'), 'route' => 'admin.settings.languages', 'match' => 'admin.settings.languages', 'icon' => 'language', 'visible' => true],
                 ['label' => __('Website Tracking'), 'route' => 'admin.settings.tracking', 'match' => 'admin.settings.tracking', 'icon' => 'chart-bar', 'visible' => true],
+                ['label' => __('Payment Gateways'), 'route' => 'admin.settings.payment', 'match' => 'admin.settings.payment', 'icon' => 'credit-card', 'visible' => true],
             ]
         ],
         [

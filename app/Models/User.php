@@ -62,6 +62,40 @@ class User extends Authenticatable
         return $this->hasRole('super_admin');
     }
 
+    public function hasAccessToModelTest(\App\Models\ModelTest $test): bool
+    {
+        if (!$test->is_premium && !$test->package_id) {
+            return true;
+        }
+
+        // Admin/Super Admin bypass
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        if ($test->package_id) {
+            // Requires specific course package
+            return $this->subscriptions()
+                ->where('package_id', $test->package_id)
+                ->where('status', 'active')
+                ->where('expires_at', '>', now())
+                ->exists();
+        }
+
+        if ($test->is_premium) {
+            // Requires any active 'subscription' type package
+            return $this->subscriptions()
+                ->whereHas('package', function ($q) {
+                    $q->where('type', 'subscription');
+                })
+                ->where('status', 'active')
+                ->where('expires_at', '>', now())
+                ->exists();
+        }
+
+        return false;
+    }
+
     public function hasPermission(string $permissionSlug): bool
     {
         return $this->can($permissionSlug);

@@ -5,17 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserSubscription extends Model
+class Payment extends Model
 {
     protected $guarded = ['id'];
 
-    protected function casts(): array
-    {
-        return [
-            'started_at' => 'datetime',
-            'expires_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'payment_response' => 'array',
+    ];
 
     public function user(): BelongsTo
     {

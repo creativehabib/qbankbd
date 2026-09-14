@@ -6,18 +6,23 @@ use App\Livewire\Traits\InteractsWithFluxToasts;
 use App\Models\Package;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 class PackageManagement extends Component
 {
     public $perPage = 10;
 
-    use InteractsWithFluxToasts;
+    use InteractsWithFluxToasts, WithFileUploads;
 
     public ?int $editingId = null;
 
+    public string $type = 'subscription'; // 'subscription' or 'course'
     public string $name = '';
-
     public string $price = '';
+    public ?string $description = '';
+    public $thumbnail_image; // for upload
+    public ?string $existing_thumbnail = null; // for preview
 
     public string $questionCreateLimit = '';
 
@@ -39,7 +44,10 @@ class PackageManagement extends Component
         $package = Package::query()->findOrFail($packageId);
 
         $this->editingId = $package->id;
+        $this->type = $package->type ?? 'subscription';
         $this->name = $package->name;
+        $this->description = $package->description;
+        $this->existing_thumbnail = $package->thumbnail_image;
         $this->price = (string) $package->price;
         $this->questionCreateLimit = (string) $package->question_create_limit;
         $this->pageViewLimit = (string) ($package->page_view_limit ?? '');
@@ -51,23 +59,36 @@ class PackageManagement extends Component
     public function save(): void
     {
         $validated = $this->validate([
+            'type' => ['required', 'in:subscription,course'],
             'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0'],
-            'questionCreateLimit' => ['required', 'integer', 'min:0'],
-            'pageViewLimit' => ['nullable', 'integer', 'min:0'],
+            'thumbnail_image' => ['nullable', 'image', 'max:2048'],
+            'questionCreateLimit' => ['nullable', 'integer', 'min:0'],
             'validityDays' => ['required', 'integer', 'min:1'],
-            'isAdFree' => ['boolean'],
             'isActive' => ['boolean'],
         ]);
+
+        $imagePath = $this->existing_thumbnail;
+        if ($this->thumbnail_image) {
+            if ($this->existing_thumbnail) {
+                // Delete old if exists (simplified path logic)
+                $oldPath = str_replace('/storage/', '', $this->existing_thumbnail);
+                Storage::disk('public')->delete($oldPath);
+            }
+            $path = $this->thumbnail_image->store('packages', 'public');
+            $imagePath = '/storage/' . $path;
+        }
 
         Package::query()->updateOrCreate(
             ['id' => $this->editingId],
             [
+                'type' => $validated['type'],
                 'name' => $validated['name'],
+                'description' => $validated['description'],
                 'price' => $validated['price'],
-                'question_create_limit' => $validated['questionCreateLimit'],
-                'page_view_limit' => $validated['pageViewLimit'] !== '' ? $validated['pageViewLimit'] : null,
-                'is_ad_free' => $validated['isAdFree'],
+                'thumbnail_image' => $imagePath,
+                'question_create_limit' => $validated['questionCreateLimit'] ?? 0,
                 'validity_days' => $validated['validityDays'],
                 'is_active' => $validated['isActive'],
             ],
@@ -85,7 +106,7 @@ class PackageManagement extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['editingId', 'name', 'price', 'questionCreateLimit', 'pageViewLimit']);
+        $this->reset(['editingId', 'type', 'name', 'description', 'price', 'thumbnail_image', 'existing_thumbnail', 'questionCreateLimit', 'pageViewLimit']);
         $this->isAdFree = true;
         $this->validityDays = '30';
         $this->isActive = true;

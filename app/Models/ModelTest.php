@@ -8,6 +8,11 @@ class ModelTest extends Model
 {
     protected $guarded = ['id'];
 
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
+    }
+
     public function questions()
     {
         return $this->belongsToMany(Question::class, 'model_test_question')

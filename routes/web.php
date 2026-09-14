@@ -129,6 +129,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/settings/ai', AiSetting::class)->name('admin.settings.ai');
         Route::get('/admin/settings/languages', Languages::class)->name('admin.settings.languages');
         Route::get('/admin/settings/tracking', WebsiteTracking::class)->name('admin.settings.tracking');
+        Route::get('/admin/settings/payment', \App\Livewire\Admin\Settings\PaymentSetting::class)->name('admin.settings.payment');
+
 
         // Super Admin Settings
         Route::get('/superadmin/settings/sitemap', SitemapSetting::class)->middleware('role:super_admin')->name('superadmin.settings.sitemap');
@@ -175,6 +177,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
     Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');
     Route::get('/student/analytics', \App\Livewire\Students\PerformanceAnalytics::class)->name('student.analytics');
+    Route::get('/student/pricing', \App\Livewire\Students\PricingPage::class)->name('student.pricing');
+    Route::get('/student/checkout/{package_id}', \App\Livewire\Students\CheckoutPage::class)->name('student.checkout');
     Route::get('/student/omr-scanner', OmrScanner::class)->name('student.omr-scanner');
 
     Route::get('/tokens', ManageTokens::class)->name('tokens.list');
@@ -185,5 +189,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/omr-generator', OmrGenerator::class)->name('omr.generator');
     });
 });
+
+
+// Payment Routes (bKash & SSLCommerz)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payment/bkash/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'bkashPay'])->name('payment.bkash.pay');
+    Route::get('/payment/bkash/callback', [\App\Http\Controllers\PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
+
+    Route::post('/payment/ssl/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'sslPay'])->name('payment.ssl.pay');
+    Route::post('/payment/ssl/success', [\App\Http\Controllers\PaymentController::class, 'sslSuccess'])->name('payment.ssl.success');
+    Route::post('/payment/ssl/fail', [\App\Http\Controllers\PaymentController::class, 'sslFail'])->name('payment.ssl.fail');
+    Route::post('/payment/ssl/cancel', [\App\Http\Controllers\PaymentController::class, 'sslCancel'])->name('payment.ssl.cancel');
+});
+// SSL IPN is usually not authenticated
+Route::post('/payment/ssl/ipn', [\App\Http\Controllers\PaymentController::class, 'sslIpn'])->name('payment.ssl.ipn');
 
 require __DIR__.'/settings.php';

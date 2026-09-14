@@ -24,6 +24,12 @@ class ModelTestAttempt extends Component
             abort(404);
         }
 
+        if (! auth()->user()->hasAccessToModelTest($modelTest)) {
+            $this->toastError('এই পরীক্ষায় অংশগ্রহণের জন্য আপনার সাবস্ক্রিপশন বা প্যাকেজ প্রয়োজন।');
+            $this->redirectRoute('student.pricing', navigate: true);
+            return;
+        }
+
         $this->modelTest = $modelTest->load('questions');
         $this->questions = $this->modelTest->questions;
         $this->timeRemaining = $this->modelTest->duration_minutes * 60;
