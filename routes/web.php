@@ -174,6 +174,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/leaderboard', Leaderboard::class)->name('student.leaderboard');
     Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
     Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');
+    Route::get('/student/analytics', \App\Livewire\Students\PerformanceAnalytics::class)->name('student.analytics');
     Route::get('/student/omr-scanner', OmrScanner::class)->name('student.omr-scanner');
 
     Route::get('/tokens', ManageTokens::class)->name('tokens.list');

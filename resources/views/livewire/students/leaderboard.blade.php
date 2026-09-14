@@ -133,11 +133,14 @@
                                 </div>
 
                                 <div>
-                                    <span class="font-bold text-zinc-900 text-base block">
+                                    <span class="font-bold text-zinc-900 text-base flex items-center gap-1.5 flex-wrap">
                                         {{ $student->name }}
                                         @if($student->id === auth()->id())
-                                            <span class="text-blue-600 text-sm ml-1 font-semibold">(You)</span>
+                                            <span class="text-blue-600 text-sm font-semibold">(You)</span>
                                         @endif
+                                        @foreach($student->badges as $badge)
+                                            <flux:icon name="{{ $badge->icon }}" class="size-4 text-{{ $badge->color }}-500" title="{{ $badge->name }}" />
+                                        @endforeach
                                     </span>
                                     @if($rank === 1)
                                         <span class="text-xs text-[#d97706] font-bold">League Leader</span>
@@ -164,9 +167,12 @@
                             <div class="size-10 overflow-hidden rounded-full border-2 border-white shadow-sm bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold">
                                 {{ mb_substr(auth()->user()->name, 0, 1) }}
                             </div>
-                            <span class="font-bold text-zinc-900 text-base">
+                            <span class="font-bold text-zinc-900 text-base flex items-center gap-1.5 flex-wrap">
                                 {{ auth()->user()->name }}
-                                <span class="text-emerald-700 text-sm font-semibold ml-1">(You)</span>
+                                <span class="text-emerald-700 text-sm font-semibold">(You)</span>
+                                @foreach(auth()->user()->badges as $badge)
+                                    <flux:icon name="{{ $badge->icon }}" class="size-4 text-{{ $badge->color }}-500" title="{{ $badge->name }}" />
+                                @endforeach
                             </span>
                         </div>
                         <span class="font-bold text-sm text-zinc-800">{{ number_format(auth()->user()->xp ?? 0) }} XP</span>
@@ -196,11 +202,14 @@
                                     <div class="size-10 overflow-hidden rounded-full bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold">
                                         {{ mb_substr($student->name, 0, 1) }}
                                     </div>
-                                    <span class="font-bold text-zinc-800 text-base">
+                                    <span class="font-bold text-zinc-800 text-base flex items-center gap-1.5 flex-wrap">
                                         {{ $student->name }}
                                         @if($student->id === auth()->id())
-                                            <span class="text-emerald-600 text-sm font-semibold ml-1">(You)</span>
+                                            <span class="text-emerald-600 text-sm font-semibold">(You)</span>
                                         @endif
+                                        @foreach($student->badges as $badge)
+                                            <flux:icon name="{{ $badge->icon }}" class="size-4 text-{{ $badge->color }}-500" title="{{ $badge->name }}" />
+                                        @endforeach
                                     </span>
                                 </div>
                                 <span class="font-bold text-zinc-800 text-sm">{{ number_format($student->xp) }} XP</span>

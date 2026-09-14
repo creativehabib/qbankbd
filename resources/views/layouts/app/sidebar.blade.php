@@ -116,9 +116,18 @@
         ],
         [
             'type' => 'link',
+            'label' => __('Analytics'),
+            'route' => 'student.analytics',
+            'match' => 'student.analytics',
+            'icon' => 'chart-bar',
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Model Tests'),
             'route' => 'student.model-tests.index',
             'match' => 'student.model-tests.*',
+
             'icon' => 'clock',
             'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
         ],

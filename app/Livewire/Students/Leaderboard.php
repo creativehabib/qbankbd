@@ -49,7 +49,7 @@ class Leaderboard extends Component
         $isJobSeeker = $user?->isJobSeeker();
 
         // ডাটাবেস কোয়েরি: নির্দিষ্ট লিগের ইউজারদের আনা হচ্ছে
-        $query = User::query()
+        $query = User::with('badges')
             ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']]);
 
         if ($isJobSeeker) {
@@ -89,7 +89,7 @@ class Leaderboard extends Component
             if ($myActualLeagueId == $this->league_id) {
                 $userInTopList = $topStudents->contains('id', $user->id);
                 if ($myXp > 0) {
-                    $rankQuery = User::query()
+                    $rankQuery = User::with('badges')
                         ->whereBetween('xp', [$currentLeague['min'], $currentLeague['max']])
                         ->where('xp', '>', $myXp);
 

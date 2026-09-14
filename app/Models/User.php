@@ -94,6 +94,11 @@ class User extends Authenticatable
             ->implode('');
     }
 
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class)->withTimestamps();
+    }
+
     public function mockTests()
     {
         return $this->hasMany(MockTest::class);

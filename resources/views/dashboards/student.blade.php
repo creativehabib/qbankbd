@@ -3,7 +3,14 @@
         {{-- Student Header --}}
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="space-y-1">
-                <flux:heading size="xl">Welcome, {{ auth()->user()->name }}!</flux:heading>
+                <flux:heading size="xl" class="flex items-center gap-2">
+                    Welcome, {{ auth()->user()->name }}!
+                    @if(auth()->user()->current_streak > 0)
+                        <span class="inline-flex items-center gap-1 bg-orange-100 text-orange-600 text-sm font-bold px-2 py-0.5 rounded-full dark:bg-orange-900/30 dark:text-orange-400">
+                            🔥 {{ auth()->user()->current_streak }} Day Streak
+                        </span>
+                    @endif
+                </flux:heading>
                 <flux:subheading size="lg">Ready for your next challenge?</flux:subheading>
             </div>
             <div class="flex flex-wrap gap-2 sm:gap-4">
@@ -116,6 +123,29 @@
                                 <div class="text-center text-xs text-zinc-500 py-4">No points earned yet.</div>
                             @endforelse
                         </div>
+                    </flux:card>
+                    
+                    <flux:card>
+                        <h3 class="font-bold text-base border-b border-zinc-100 pb-3 mb-4 dark:border-zinc-800 flex items-center gap-2">
+                            <flux:icon.check-badge class="size-5 text-indigo-500" /> My Badges
+                        </h3>
+                        @php
+                            $myBadges = auth()->user()->badges;
+                        @endphp
+                        @if($myBadges->isEmpty())
+                            <div class="text-center text-xs text-zinc-500 py-4">
+                                No badges unlocked yet. Keep practicing!
+                            </div>
+                        @else
+                            <div class="grid grid-cols-3 gap-3">
+                                @foreach($myBadges as $badge)
+                                    <div class="flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-xl text-center border border-zinc-100 dark:border-zinc-800" title="{{ $badge->description }}">
+                                        <flux:icon name="{{ $badge->icon }}" class="size-8 text-{{ $badge->color }}-500 mb-1" />
+                                        <span class="text-[10px] font-bold leading-tight">{{ $badge->name }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </flux:card>
                 </div>
 

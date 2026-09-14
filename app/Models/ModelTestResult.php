@@ -13,6 +13,11 @@ class ModelTestResult extends Model
         return $this->belongsTo(ModelTest::class);
     }
 
+    public function userAnswers()
+    {
+        return $this->hasMany(ModelTestUserAnswer::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

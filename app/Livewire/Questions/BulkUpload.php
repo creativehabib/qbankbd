@@ -23,6 +23,7 @@ use Google\Cloud\Vision\V1\InputConfig;
 use Illuminate\Support\Facades\DB; // 🌟 AI এর জন্য Http ইমপোর্ট করা হলো
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Livewire\Traits\InteractsWithFluxToasts;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -30,6 +31,8 @@ use RuntimeException;
 
 class BulkUpload extends Component
 {
+    use InteractsWithFluxToasts;
+
     public $perPage = 10;
 
     use WithFileUploads;
@@ -82,6 +85,14 @@ class BulkUpload extends Component
         $this->topic_id = null;
     }
 
+    public function removeProcessedQuestion(int $index): void
+    {
+        if (isset($this->processedQuestions[$index])) {
+            unset($this->processedQuestions[$index]);
+            $this->processedQuestions = array_values($this->processedQuestions); // re-index
+        }
+    }
+
     public function setCorrectOption(int $questionIndex, int $optionIndex): void
     {
         if (! isset($this->processedQuestions[$questionIndex])) {
@@ -126,14 +137,14 @@ class BulkUpload extends Component
         $prompt = "Create {$this->aiQuestionCount} multiple-choice questions in Bengali language about '{$this->aiPrompt}'.
         IMPORTANT RULE 1: ONLY generate authentic questions that have previously appeared in various competitive exams in Bangladesh (such as BCS, NTRCA, Bank Jobs, Primary Teacher Recruitment, University Admissions, etc.). Do not make up new fictional questions.
         IMPORTANT RULE 2: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
-        IMPORTANT RULE 3: For tags, ONLY include a competitive exam name/year IF YOU ARE 100% CERTAIN the question actually appeared in that specific exam. If you are not certain, DO NOT add any fake or guessed exam tags. Keep the tags empty or very minimal rather than providing false info.
+        IMPORTANT RULE 3: For tags, ONLY include a competitive exam IF YOU ARE 100% CERTAIN. If not, keep it empty. IMPORTANT: You MUST use strict standardized English formatting for exam tags to prevent duplicates. For BCS: \"[Number]th BCS\" (e.g., \"35th BCS\", \"41st BCS\"). For Primary: \"Primary Teacher [Year]\" (e.g., \"Primary Teacher 2022\"). For NTRCA: \"[Number]th NTRCA\". Do NOT use variations like \"BCS 35th\" or \"৩৫ তম বিসিএস\".
         IMPORTANT RULE 4: For each question, provide a highly descriptive and detailed explanation (ব্যাখ্যা) of 4-6 lines. Explain clearly why the correct answer is right, why the other options are wrong, and provide additional background information to deeply educate the student.
         {$avoidRule}
         You MUST return the response STRICTLY as a JSON array in the exact format below, and nothing else (no markdown, no extra text):
         [
             {
                 \"title\": \"এখানে প্রশ্ন থাকবে?\",
-                \"tags\": [\"BCS 40th\", \"Bank Job\"],
+                \"tags\": [\"40th BCS\", \"Bank Job\"],
                 \"explanation\": \"সঠিক উত্তরের বিস্তারিত ব্যাখ্যা এখানে থাকবে।\",
                 \"options\": [
                     {\"option_text\": \"প্রথম অপশন\", \"is_correct\": false},
@@ -149,8 +160,26 @@ class BulkUpload extends Component
             $aiData = $aiService->generateJson($prompt);
 
             if (is_array($aiData) && count($aiData) > 0) {
+                foreach ($aiData as $qi => $question) {
+                    $exactTitle = trim($question['title']);
+                    $titleStart = mb_substr($exactTitle, 0, 50);
+                    $escapedTitleStart = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $titleStart);
+                    
+                    if (mb_strlen($titleStart) > 10) {
+                        $exists = \App\Models\Question::query()
+                            ->where('title', $exactTitle)
+                            ->orWhere('title', 'LIKE', '%' . $escapedTitleStart . '%')
+                            ->exists();
+                        $aiData[$qi]['is_duplicate'] = $exists;
+                    } else {
+                        $aiData[$qi]['is_duplicate'] = false;
+                    }
+                    if (!isset($aiData[$qi]['tags'])) {
+                        $aiData[$qi]['tags'] = [];
+                    }
+                }
                 $this->processedQuestions = $aiData;
-                session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন AI দ্বারা তৈরি হয়েছে। দয়া করে রিভিউ করে সাবমিট করুন।');
+                $this->toastSuccess(count($this->processedQuestions).'টি প্রশ্ন AI দ্বারা তৈরি হয়েছে। দয়া করে রিভিউ করে সাবমিট করুন।');
             } else {
                 $this->addError('aiPrompt', 'AI সঠিক ফরম্যাটে উত্তর দিতে পারেনি।');
             }
@@ -206,16 +235,21 @@ class BulkUpload extends Component
             }
             
             // 🌟 Smart Duplicate Detection
-            // Check if a question with a very similar title already exists
-            $titleStart = mb_substr(trim($question['title']), 0, 40);
+            $exactTitle = trim($question['title']);
+            $titleStart = mb_substr($exactTitle, 0, 50);
+            // Escape LIKE special characters
+            $escapedTitleStart = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $titleStart);
+            
             if (mb_strlen($titleStart) > 10) {
                 $exists = \App\Models\Question::query()
-                    ->where('title', 'LIKE', '%' . $titleStart . '%')
+                    ->where('title', $exactTitle) // Exact match first
+                    ->orWhere('title', 'LIKE', '%' . $escapedTitleStart . '%') // Fallback to LIKE with escaped math symbols
                     ->exists();
                 $parsed[$qi]['is_duplicate'] = $exists;
             } else {
                 $parsed[$qi]['is_duplicate'] = false;
             }
+            $parsed[$qi]['tags'] = $question['tags'] ?? [];
         }
 
         $this->processedQuestions = $parsed;
@@ -225,7 +259,7 @@ class BulkUpload extends Component
         $this->rawText = $formattedText;
         $this->dispatch('update-editor', text: str_replace("\n", '<br>', $formattedText));
 
-        session()->flash('success', count($this->processedQuestions).'টি প্রশ্ন প্রসেস হয়েছে।');
+        $this->toastSuccess(count($this->processedQuestions).'টি প্রশ্ন প্রসেস হয়েছে।');
     }
 
     protected function extractTextFromFile(): string
@@ -442,20 +476,23 @@ class BulkUpload extends Component
         return trim(implode(PHP_EOL, $lines));
     }
 
-    protected function generateUniqueSlug(string $title): string
+        protected function generateUniqueSlug(string $title): string
     {
         $slug = mb_strtolower(trim($title), 'UTF-8');
         $slug = preg_replace('/[^\p{Bengali}a-z0-9\s]/u', '', $slug);
         $slug = preg_replace('/\s+/u', '-', $slug);
         $slug = preg_replace('/-+/', '-', $slug);
         $slug = trim($slug, '-');
-        $base = $slug ?: Str::lower(Str::random(10));
+        $base = $slug ?: \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(10));
 
-        if (Question::where('slug', $base)->exists()) {
-            throw new \Exception("এই প্রশ্নটি ইতোমধ্যে আছে: \"{$title}\"");
+        $finalSlug = $base;
+        $counter = 1;
+        while (\App\Models\Question::where('slug', $finalSlug)->exists()) {
+            $finalSlug = $base . '-' . $counter;
+            $counter++;
         }
 
-        return $base;
+        return $finalSlug;
     }
 
     public function submitProcessedQuestions(): void
@@ -469,8 +506,8 @@ class BulkUpload extends Component
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
             'difficulty' => 'required|in:easy,medium,hard',
             'marks' => 'required|integer|min:1',
-            'exam_category_ids' => 'required|array|min:1',
-            'exam_category_ids.*' => 'required|exists:exam_categories,id',
+            'exam_category_ids' => 'nullable|array',
+            'exam_category_ids.*' => 'nullable|exists:exam_categories,id',
             'tagIds' => 'nullable|array',
             'sourceFile' => 'nullable|mimes:jpg,jpeg,png,webp,pdf|max:10240',
             'processedQuestions' => 'required|array|min:1',
@@ -486,7 +523,7 @@ class BulkUpload extends Component
         foreach ($validated['processedQuestions'] as $qIndex => $parsedQuestion) {
             $hasCorrect = collect($parsedQuestion['options'])->contains('is_correct', true);
             if (! $hasCorrect) {
-                $this->addError('processedQuestions', ($qIndex + 1).' নম্বর প্রশ্নের সঠিক উত্তর চিহ্নিত করুন।');
+                $this->toastError(($qIndex + 1).' নম্বর প্রশ্নের সঠিক উত্তর চিহ্নিত করুন।');
 
                 return;
             }
@@ -498,7 +535,7 @@ class BulkUpload extends Component
             ->first();
 
         if (! $subject) {
-            $this->addError('subject_id', 'নির্বাচিত ক্লাসের বিষয় সিলেক্ট করুন।');
+            $this->toastError('নির্বাচিত ক্লাসের বিষয় সিলেক্ট করুন।');
 
             return;
         }
@@ -550,7 +587,7 @@ class BulkUpload extends Component
                 }
             }
         });
-        session()->flash('success', count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে সাবমিট হয়েছে।');
+        $this->toastSuccess(count($validated['processedQuestions']).'টি প্রশ্ন সফলভাবে সাবমিট হয়েছে।');
         $this->redirectRoute('questions.index', navigate: true);
     }
 

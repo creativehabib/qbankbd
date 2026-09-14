@@ -306,23 +306,58 @@
 
                                         {{-- 🌟 Smart Duplicate Warning --}}
                                         @if(!empty($question['is_duplicate']))
-                                            <div class="flex items-center gap-2 ml-11 mb-2 mt-[-0.25rem] px-3 py-2 text-xs font-semibold rounded-lg bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800">
-                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                                এই প্রশ্নটি আপনার ডাটাবেজে আগে থেকেই আছে!
+                                            <div class="flex items-center justify-between ml-11 mb-2 mt-[-0.25rem] px-3 py-2 text-xs font-semibold rounded-lg bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                    এই প্রশ্নটি আপনার ডাটাবেজে আগে থেকেই আছে!
+                                                </div>
+                                                <button type="button" wire:click="removeProcessedQuestion({{ $questionIndex }})" title="বাতিল করুন" class="flex items-center justify-center p-1 rounded-md text-orange-600 hover:text-white hover:bg-orange-600 dark:text-orange-400 dark:hover:bg-orange-500 transition-colors">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                </button>
                                             </div>
                                         @endif
 
-                                        {{-- 🌟 AI Generated Tags Preview --}}
-                                        @if(!empty($question['tags']))
-                                            <div class="flex flex-wrap gap-2 ml-11 mb-1 mt-[-0.25rem]">
-                                                @foreach(collect($question['tags'])->unique() as $tag)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                                        {{ $tag }}
+                                        {{-- 🌟 Dynamic Tags Input --}}
+                                        <div x-data="{
+                                            tags: @entangle('processedQuestions.'.$questionIndex.'.tags'),
+                                            newTag: '',
+                                            addTag() {
+                                                let t = this.newTag.trim();
+                                                if (t !== '') {
+                                                    // Initialize if null
+                                                    if (!Array.isArray(this.tags)) this.tags = [];
+                                                    if (!this.tags.includes(t)) {
+                                                        this.tags.push(t);
+                                                    }
+                                                }
+                                                this.newTag = '';
+                                            },
+                                            removeTag(index) {
+                                                this.tags.splice(index, 1);
+                                            }
+                                        }" class="ml-11 mb-2 mt-[-0.25rem]">
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <template x-for="(tag, index) in tags" :key="index">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-300 rounded-md border border-indigo-200 dark:border-indigo-800">
+                                                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                                        <span x-text="tag"></span>
+                                                        <button type="button" @click="removeTag(index)" class="hover:text-red-600 focus:outline-none transition-colors ml-0.5">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
                                                     </span>
-                                                @endforeach
+                                                </template>
+                                                
+                                                <div class="relative flex items-center">
+                                                    <input type="text" 
+                                                           x-model="newTag" 
+                                                           @keydown.enter.prevent="addTag()" 
+                                                           @blur="addTag()"
+                                                           list="allTagsList"
+                                                           placeholder="+ নতুন ট্যাগ" 
+                                                           class="w-36 text-xs px-2.5 py-1 text-gray-700 dark:text-gray-300 border border-dashed border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 hover:bg-white focus:bg-white dark:bg-gray-900/50 dark:hover:bg-gray-800 dark:focus:bg-gray-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all outline-none">
+                                                </div>
                                             </div>
-                                        @endif
+                                        </div>
                                         
                                         {{-- 🌟 AI Explanation Preview --}}
                                         @if(!empty($question['explanation']))
@@ -601,7 +636,7 @@
                         </div>
 
                         <div wire:ignore class="relative z-10">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience</label>
                             <select id="bulk_exam_categories" class="w-full ts-control" multiple placeholder="Select Exams (e.g. BCS, HSC)">
                                 @foreach($allExamCategories as $category)
                                     <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -616,6 +651,11 @@
             </div>
         </div>
     </div>
+    <datalist id="allTagsList">
+        @foreach($allTags as $tag)
+            <option value="{{ $tag->name }}">
+        @endforeach
+    </datalist>
 </div>
 
 @push('styles')
