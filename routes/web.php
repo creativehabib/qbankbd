@@ -191,16 +191,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// Payment Routes (bKash & SSLCommerz)
+// Payment Initiation Routes (Must be logged in)
 Route::middleware(['auth'])->group(function () {
     Route::post('/payment/bkash/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'bkashPay'])->name('payment.bkash.pay');
-    Route::get('/payment/bkash/callback', [\App\Http\Controllers\PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
-
     Route::post('/payment/ssl/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'sslPay'])->name('payment.ssl.pay');
-    Route::post('/payment/ssl/success', [\App\Http\Controllers\PaymentController::class, 'sslSuccess'])->name('payment.ssl.success');
-    Route::post('/payment/ssl/fail', [\App\Http\Controllers\PaymentController::class, 'sslFail'])->name('payment.ssl.fail');
-    Route::post('/payment/ssl/cancel', [\App\Http\Controllers\PaymentController::class, 'sslCancel'])->name('payment.ssl.cancel');
 });
+
+// Payment Callback Routes (Session might be dropped by browser due to cross-site POST)
+Route::get('/payment/bkash/callback', [\App\Http\Controllers\PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
+Route::post('/payment/ssl/success', [\App\Http\Controllers\PaymentController::class, 'sslSuccess'])->name('payment.ssl.success');
+Route::post('/payment/ssl/fail', [\App\Http\Controllers\PaymentController::class, 'sslFail'])->name('payment.ssl.fail');
+Route::post('/payment/ssl/cancel', [\App\Http\Controllers\PaymentController::class, 'sslCancel'])->name('payment.ssl.cancel');
 // SSL IPN is usually not authenticated
 Route::post('/payment/ssl/ipn', [\App\Http\Controllers\PaymentController::class, 'sslIpn'])->name('payment.ssl.ipn');
 

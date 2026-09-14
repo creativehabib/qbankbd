@@ -62,6 +62,7 @@ class PaymentController extends Controller
         $idToken = session()->get('bkash_token');
 
         $payment = Payment::where('transaction_id', $paymentID)->firstOrFail();
+        auth()->loginUsingId($payment->user_id);
 
         if ($status === 'success') {
             $executeResponse = $bkashService->executePayment($idToken, $paymentID);
@@ -74,7 +75,7 @@ class PaymentController extends Controller
 
                 $this->unlockPackage($payment);
                 session()->flash('success', 'Payment successful! bKash TrxID: ' . $executeResponse['trxID']);
-                return redirect()->route('student.model-tests.index');
+                return response('<script>window.location.href="' . route('student.model-tests.index') . '";</script>');
             } else {
                 $payment->update([
                     'status' => 'failed',
@@ -82,13 +83,13 @@ class PaymentController extends Controller
                 ]);
                 $errorMsg = $executeResponse['statusMessage'] ?? 'Payment execution failed.';
                 session()->flash('error', $errorMsg);
-                return redirect()->route('student.pricing');
+                return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
             }
         }
 
         $payment->update(['status' => 'canceled']);
         session()->flash('error', 'bKash payment was ' . $status);
-        return redirect()->route('student.pricing');
+        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
     }
 
 
@@ -149,6 +150,7 @@ class PaymentController extends Controller
         $valId = $request->input('val_id');
 
         $payment = Payment::where('transaction_id', $transactionId)->firstOrFail();
+        auth()->loginUsingId($payment->user_id);
 
         // Validate via Server-to-Server
         $validationResponse = $sslService->validatePayment($valId);
@@ -160,28 +162,32 @@ class PaymentController extends Controller
             ]);
             $this->unlockPackage($payment);
             session()->flash('success', 'Payment successful!');
-            return redirect()->route('student.model-tests.index');
+            return response('<script>window.location.href="' . route('student.model-tests.index') . '";</script>');
         }
 
         $payment->update(['status' => 'failed', 'payment_response' => $validationResponse]);
         session()->flash('error', 'Payment validation failed.');
-        return redirect()->route('student.pricing');
+        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
     }
 
     public function sslFail(Request $request)
     {
         $transactionId = $request->input('tran_id');
-        Payment::where('transaction_id', $transactionId)->update(['status' => 'failed']);
+        $payment = Payment::where('transaction_id', $transactionId)->firstOrFail();
+        auth()->loginUsingId($payment->user_id);
+        $payment->update(['status' => 'failed']);
         session()->flash('error', 'Payment failed.');
-        return redirect()->route('student.pricing');
+        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
     }
 
     public function sslCancel(Request $request)
     {
         $transactionId = $request->input('tran_id');
-        Payment::where('transaction_id', $transactionId)->update(['status' => 'canceled']);
+        $payment = Payment::where('transaction_id', $transactionId)->firstOrFail();
+        auth()->loginUsingId($payment->user_id);
+        $payment->update(['status' => 'canceled']);
         session()->flash('warning', 'Payment canceled.');
-        return redirect()->route('student.pricing');
+        return response('<script>window.location.href="' . route('student.pricing') . '";</script>');
     }
 
     public function sslIpn(Request $request)
