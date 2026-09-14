@@ -35,7 +35,7 @@
                     <form action="{{ route('payment.bkash.pay', $package->id) }}" method="POST" class="w-full h-full block">
                         @csrf
                         <button type="submit" class="w-full h-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-pink-500 dark:hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition text-zinc-700 dark:text-zinc-300">
-                            <div class="font-black text-3xl tracking-tighter" style="color:#e2136e">bKash</div>
+                            <img src="{{ asset('images/bkash_logo.svg') }}" alt="bKash" class="h-10 object-contain">
                             <span class="font-bold">Pay with bKash</span>
                         </button>
                     </form>
@@ -45,7 +45,7 @@
                     <form action="{{ route('payment.ssl.pay', $package->id) }}" method="POST" class="w-full h-full block">
                         @csrf
                         <button type="submit" class="w-full h-full border-2 border-zinc-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition text-zinc-700 dark:text-zinc-300">
-                            <div class="font-black text-2xl tracking-tighter" style="color:#0f5898">SSLCommerz</div>
+                            <img src="{{ asset('images/sslcommerz_logo.png') }}" alt="SSLCommerz" class="h-8 object-contain">
                             <span class="font-bold">Cards / Mobile Banking</span>
                         </button>
                     </form>

@@ -9,7 +9,7 @@
         <!-- SSLCommerz Settings -->
         <flux:card>
             <div class="flex items-center gap-4 mb-4 border-b border-zinc-100 pb-4 dark:border-zinc-800">
-                <div class="font-black text-2xl tracking-tighter" style="color:#0f5898">SSLCommerz</div>
+                <img src="{{ asset('images/sslcommerz_logo.png') }}" alt="SSLCommerz" class="h-8 object-contain">
                 <div>
                     <h3 class="text-lg font-bold text-zinc-800 dark:text-zinc-100">SSLCommerz Settings</h3>
                     <p class="text-sm text-zinc-500">Enable and configure SSLCommerz integration.</p>
@@ -33,7 +33,7 @@
         <!-- bKash Settings -->
         <flux:card>
             <div class="flex items-center gap-4 mb-4 border-b border-zinc-100 pb-4 dark:border-zinc-800">
-                <div class="font-black text-3xl tracking-tighter" style="color:#e2136e">bKash</div>
+                <img src="{{ asset('images/bkash_logo.svg') }}" alt="bKash" class="h-10 object-contain">
                 <div>
                     <h3 class="text-lg font-bold text-zinc-800 dark:text-zinc-100">bKash Payment Gateway</h3>
                     <p class="text-sm text-zinc-500">Enable and configure bKash PGW API.</p>
