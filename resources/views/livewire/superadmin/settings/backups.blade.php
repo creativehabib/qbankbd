@@ -4,7 +4,7 @@
             <flux:heading size="xl">System Backups</flux:heading>
             <flux:subheading>ডাটাবেজ এবং সম্পূর্ণ প্রজেক্টের ব্যাকআপ তৈরি, ডাউনলোড বা মুছে ফেলুন।</flux:subheading>
         </div>
-        
+
         <div class="flex items-center gap-3">
             <flux:button wire:click="cleanBackups" wire:loading.attr="disabled" icon="trash" size="sm" variant="danger">
                 <span wire:loading.remove wire:target="cleanBackups">Clean Old</span>
@@ -22,7 +22,7 @@
     </div>
 
     <flux:card class="!p-0 overflow-hidden">
-        <flux:table>
+        <flux:table class="px-6">
             <flux:table.columns>
                 <flux:table.column>BACKUP NAME</flux:table.column>
                 <flux:table.column>SIZE</flux:table.column>
