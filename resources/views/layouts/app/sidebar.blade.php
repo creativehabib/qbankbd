@@ -116,6 +116,14 @@
         ],
         [
             'type' => 'link',
+            'label' => __('My Goal'),
+            'route' => 'student.goals',
+            'match' => 'student.goals',
+            'icon' => 'academic-cap',
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
+        ],
+        [
+            'type' => 'link',
             'label' => __('Analytics'),
             'route' => 'student.analytics',
             'match' => 'student.analytics',

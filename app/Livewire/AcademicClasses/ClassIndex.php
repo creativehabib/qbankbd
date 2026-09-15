@@ -48,6 +48,7 @@ class ClassIndex extends Component
 
     public ?int $editingClassId = null;
 
+    public $class_parent_id = null;
     public string $class_name = '';
 
     public ?string $class_description = null;
@@ -114,6 +115,7 @@ class ClassIndex extends Component
         $academicClass = AcademicClass::query()->withCount('questions')->findOrFail($id);
 
         $this->editingClassId = $academicClass->id;
+        $this->class_parent_id = $academicClass->parent_id;
         $this->class_name = $academicClass->name;
         $this->class_description = $academicClass->description;
         $this->class_is_active = (bool) $academicClass->is_active;
@@ -126,6 +128,7 @@ class ClassIndex extends Component
     public function saveClass(): void
     {
         $validated = $this->validate([
+            'class_parent_id' => ['nullable', 'exists:academic_classes,id'],
             'class_name' => ['required', 'string', 'max:255'],
             'class_description' => ['nullable', 'string'],
             'class_is_active' => ['boolean'],
@@ -133,6 +136,7 @@ class ClassIndex extends Component
         ]);
 
         $payload = [
+            'parent_id' => $validated['class_parent_id'] ?? null,
             'name' => $validated['class_name'],
             'slug' => $this->uniqueSlug(AcademicClass::class, $validated['class_name'], $this->editingClassId),
             'description' => $validated['class_description'],
@@ -439,7 +443,7 @@ class ClassIndex extends Component
     public function render(): View
     {
         return view('livewire.academic-classes.class-index', [
-            'academicClasses' => AcademicClass::query()->withCount('questions')
+            'academicClasses' => AcademicClass::query()->with(['parent'])->withCount('questions')
                 ->when($this->classSearch, fn ($query) => $query->where('name', 'like', '%'.$this->classSearch.'%'))
                 ->latest()
                 ->paginate($this->perPage),
@@ -461,7 +465,7 @@ class ClassIndex extends Component
                 ->when($this->topicSearch, fn ($query) => $query->where('name', 'like', '%'.$this->topicSearch.'%'))
                 ->latest()
                 ->get(),
-            'allClasses' => AcademicClass::query()->withCount('questions')->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
+            'allClasses' => AcademicClass::query()->with(['parent'])->withCount('questions')->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
                 ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
                 ->when($this->sortField === 'default', fn ($q) => $q->latest())->get(),
             'allSubjects' => Subject::query()->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
@@ -477,6 +481,7 @@ class ClassIndex extends Component
     {
         $this->isCreating = false;
         $this->editingClassId = null;
+        $this->class_parent_id = null;
         $this->class_name = '';
         $this->class_description = null;
         $this->class_is_active = true;

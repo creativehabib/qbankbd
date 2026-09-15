@@ -26,6 +26,16 @@ class AcademicClass extends Model
     ];
 
     // রিলেশনশিপ: একটি ক্লাসের অধীনে অনেক সাবজেক্ট থাকে
+        public function parent()
+    {
+        return $this->belongsTo(AcademicClass::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(AcademicClass::class, 'parent_id')->orderBy('order_sequence');
+    }
+
     public function subjects()
     {
         return $this->hasMany(Subject::class);

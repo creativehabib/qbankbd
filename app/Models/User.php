@@ -37,6 +37,11 @@ class User extends Authenticatable
         ];
     }
 
+        public function currentGoal(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AcademicClass::class, 'current_goal_id');
+    }
+
     public function isStudent(): bool
     {
         return $this->hasRole('student');

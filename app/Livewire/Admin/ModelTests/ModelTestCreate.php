@@ -71,7 +71,7 @@ class ModelTestCreate extends Component
 
         $modelTest = ModelTest::create([
             'title' => $this->title,
-            'slug' => Str::slug($this->title) . '-' . time(),
+            'slug' => Str::slug($this->title) . '-' . time() . '-' . rand(100, 999),
             'description' => $this->description,
             'duration_minutes' => $this->duration_minutes,
             'negative_mark_weight' => $this->negative_mark_weight,

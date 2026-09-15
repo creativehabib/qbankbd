@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\BackupDownloadController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Livewire\AcademicClasses\ClassIndex;
+use App\Livewire\Admin\ModelTests\ModelTestCreate;
+use App\Livewire\Admin\ModelTests\ModelTestIndex;
 use App\Livewire\Admin\PackageManagement;
 use App\Livewire\Admin\Settings\AiSetting;
 use App\Livewire\Admin\Settings\BrandingTheme;
@@ -10,6 +14,7 @@ use App\Livewire\Admin\Settings\EmailSetting;
 use App\Livewire\Admin\Settings\GeneralSetting;
 use App\Livewire\Admin\Settings\Index;
 use App\Livewire\Admin\Settings\Languages;
+use App\Livewire\Admin\Settings\PaymentSetting;
 use App\Livewire\Admin\Settings\ThemeOptions;
 use App\Livewire\Admin\Settings\WebsiteTracking;
 use App\Livewire\Admin\WalletApprovalPanel;
@@ -27,11 +32,17 @@ use App\Livewire\Questions\Create;
 use App\Livewire\Questions\Edit;
 use App\Livewire\RolePermissionManager;
 use App\Livewire\Students\BookmarkedQuestions;
+use App\Livewire\Students\CheckoutPage;
+use App\Livewire\Students\GoalSelection;
 use App\Livewire\Students\Leaderboard;
 use App\Livewire\Students\MistakeReview;
 use App\Livewire\Students\MockTestHistory;
 use App\Livewire\Students\MockTestResult;
+use App\Livewire\Students\ModelTests\ModelTestAttempt;
+use App\Livewire\Students\ModelTests\ModelTestResultPage;
+use App\Livewire\Students\PerformanceAnalytics;
 use App\Livewire\Students\PracticeIndex as StudentPracticeIndex;
+use App\Livewire\Students\PricingPage;
 use App\Livewire\Students\TakeMockTest;
 use App\Livewire\Subjects\SubjectIndex;
 use App\Livewire\SuperAdmin\Settings\ActivityLogs;
@@ -118,8 +129,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:admin|super_admin')->group(function (): void {
         // Model Tests (Admin created Mock Tests)
-        Route::get('/admin/model-tests', \App\Livewire\Admin\ModelTests\ModelTestIndex::class)->name('admin.model-tests.index');
-        Route::get('/admin/model-tests/create', \App\Livewire\Admin\ModelTests\ModelTestCreate::class)->name('admin.model-tests.create');
+        Route::get('/admin/model-tests', ModelTestIndex::class)->name('admin.model-tests.index');
+        Route::get('/admin/model-tests/create', ModelTestCreate::class)->name('admin.model-tests.create');
 
         // Admin Settings
         Route::get('/admin/settings', Index::class)->name('admin.settings.index');
@@ -129,14 +140,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/settings/ai', AiSetting::class)->name('admin.settings.ai');
         Route::get('/admin/settings/languages', Languages::class)->name('admin.settings.languages');
         Route::get('/admin/settings/tracking', WebsiteTracking::class)->name('admin.settings.tracking');
-        Route::get('/admin/settings/payment', \App\Livewire\Admin\Settings\PaymentSetting::class)->name('admin.settings.payment');
-
+        Route::get('/admin/settings/payment', PaymentSetting::class)->name('admin.settings.payment');
 
         // Super Admin Settings
         Route::get('/superadmin/settings/sitemap', SitemapSetting::class)->middleware('role:super_admin')->name('superadmin.settings.sitemap');
         Route::get('/superadmin/settings/htaccess', Htaccess::class)->middleware('role:super_admin')->name('superadmin.settings.htaccess');
         Route::get('/superadmin/settings/backups', Backups::class)->middleware('role:super_admin')->name('superadmin.settings.backups');
-        Route::get('/superadmin/settings/backups/download', [\App\Http\Controllers\BackupDownloadController::class, 'download'])->middleware('role:super_admin')->name('superadmin.settings.backups.download');
+        Route::get('/superadmin/settings/backups/download', [BackupDownloadController::class, 'download'])->middleware('role:super_admin')->name('superadmin.settings.backups.download');
         Route::get('/superadmin/settings/cache', CacheManagement::class)->middleware('role:super_admin')->name('superadmin.settings.cache');
         Route::get('/superadmin/settings/system-info', SystemInformation::class)->middleware('role:super_admin')->name('superadmin.settings.system-info');
         Route::get('/superadmin/settings/activity-logs', ActivityLogs::class)->middleware('role:super_admin')->name('superadmin.settings.activity-logs');
@@ -164,21 +174,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
     Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
+    Route::get('/student/goals', GoalSelection::class)->name('student.goals');
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
     Route::get('/student/bookmarks', BookmarkedQuestions::class)->name('student.bookmarks');
     Route::get('/student/mock-test/{testId}', TakeMockTest::class)->name('student.mock-test.take');
     Route::get('/student/mock-test/{testId}/result', MockTestResult::class)->name('student.mock-test.result');
 
     // New Model Tests (Admin Created)
-    Route::get('/student/model-tests', \App\Livewire\Students\ModelTests\ModelTestIndex::class)->name('student.model-tests.index');
-    Route::get('/student/model-tests/{modelTest}', \App\Livewire\Students\ModelTests\ModelTestAttempt::class)->name('student.model-tests.attempt');
-    Route::get('/student/model-tests/result/{resultId}', \App\Livewire\Students\ModelTests\ModelTestResultPage::class)->name('student.model-tests.result');
+    Route::get('/student/model-tests', App\Livewire\Students\ModelTests\ModelTestIndex::class)->name('student.model-tests.index');
+    Route::get('/student/model-tests/{modelTest}', ModelTestAttempt::class)->name('student.model-tests.attempt');
+    Route::get('/student/model-tests/result/{resultId}', ModelTestResultPage::class)->name('student.model-tests.result');
     Route::get('/student/leaderboard', Leaderboard::class)->name('student.leaderboard');
     Route::get('/student/mistakes', MistakeReview::class)->name('student.mistakes');
     Route::get('/student/test-history', MockTestHistory::class)->name('student.test-history');
-    Route::get('/student/analytics', \App\Livewire\Students\PerformanceAnalytics::class)->name('student.analytics');
-    Route::get('/student/pricing', \App\Livewire\Students\PricingPage::class)->name('student.pricing');
-    Route::get('/student/checkout/{package_id}', \App\Livewire\Students\CheckoutPage::class)->name('student.checkout');
+    Route::get('/student/analytics', PerformanceAnalytics::class)->name('student.analytics');
+    Route::get('/student/pricing', PricingPage::class)->name('student.pricing');
+    Route::get('/student/checkout/{package_id}', CheckoutPage::class)->name('student.checkout');
     Route::get('/student/omr-scanner', OmrScanner::class)->name('student.omr-scanner');
 
     Route::get('/tokens', ManageTokens::class)->name('tokens.list');
@@ -190,23 +201,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-
 // Payment Initiation Routes (Must be logged in)
 Route::middleware(['auth'])->group(function () {
-    Route::post('/payment/bkash/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'bkashPay'])->name('payment.bkash.pay');
-    Route::post('/payment/ssl/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'sslPay'])->name('payment.ssl.pay');
+    Route::post('/payment/bkash/pay/{package}', [PaymentController::class, 'bkashPay'])->name('payment.bkash.pay');
+    Route::post('/payment/ssl/pay/{package}', [PaymentController::class, 'sslPay'])->name('payment.ssl.pay');
 });
 
 // Payment Callback Routes (Session might be dropped by browser due to cross-site POST)
-Route::get('/payment/bkash/callback', [\App\Http\Controllers\PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
-Route::post('/payment/ssl/success', [\App\Http\Controllers\PaymentController::class, 'sslSuccess'])->name('payment.ssl.success');
-Route::post('/payment/ssl/fail', [\App\Http\Controllers\PaymentController::class, 'sslFail'])->name('payment.ssl.fail');
-Route::post('/payment/ssl/cancel', [\App\Http\Controllers\PaymentController::class, 'sslCancel'])->name('payment.ssl.cancel');
+Route::get('/payment/bkash/callback', [PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
+Route::post('/payment/ssl/success', [PaymentController::class, 'sslSuccess'])->name('payment.ssl.success');
+Route::post('/payment/ssl/fail', [PaymentController::class, 'sslFail'])->name('payment.ssl.fail');
+Route::post('/payment/ssl/cancel', [PaymentController::class, 'sslCancel'])->name('payment.ssl.cancel');
 // SSL IPN is usually not authenticated
-Route::post('/payment/ssl/ipn', [\App\Http\Controllers\PaymentController::class, 'sslIpn'])->name('payment.ssl.ipn');
+Route::post('/payment/ssl/ipn', [PaymentController::class, 'sslIpn'])->name('payment.ssl.ipn');
 
 // Nagad Payment Routes
-Route::post('/payment/nagad/pay/{package}', [\App\Http\Controllers\PaymentController::class, 'nagadPay'])->name('payment.nagad.pay');
-Route::get('/payment/nagad/callback', [\App\Http\Controllers\PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
+Route::post('/payment/nagad/pay/{package}', [PaymentController::class, 'nagadPay'])->name('payment.nagad.pay');
+Route::get('/payment/nagad/callback', [PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
 
 require __DIR__.'/settings.php';

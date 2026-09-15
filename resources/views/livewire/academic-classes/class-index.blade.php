@@ -19,8 +19,19 @@
             </div>
 
             <flux:field>
-                <flux:label>Class name</flux:label>
-                <flux:input wire:model="class_name" placeholder="Class name" />
+                <flux:label>Parent Category (Optional)</flux:label>
+                <flux:select wire:model="class_parent_id" placeholder="Select a parent category">
+                    <flux:select.option value="">None (Top-Level Category)</flux:select.option>
+                    @foreach(\App\Models\AcademicClass::whereNull('parent_id')->orderBy('name')->get() as $cat)
+                        <flux:select.option value="{{ $cat->id }}">{{ $cat->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:error name="class_parent_id" />
+            </flux:field>
+
+            <flux:field>
+                <flux:label>Class/Category name</flux:label>
+                <flux:input wire:model="class_name" placeholder="E.g. Job Prep, BCS, Class 6" />
                 <flux:error name="class_name" />
             </flux:field>
 

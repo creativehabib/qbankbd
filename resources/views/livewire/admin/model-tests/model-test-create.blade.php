@@ -8,8 +8,11 @@
             <a href="{{ route('admin.model-tests.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-700 border border-zinc-300 shadow-sm transition hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700">
                 Cancel
             </a>
-            <button type="button" wire:click="save" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-                Save Model Test
+            <button type="button" wire:click="save" wire:loading.attr="disabled" wire:target="save" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-75 disabled:cursor-wait">
+                <flux:icon.check-circle class="size-4" wire:loading.remove wire:target="save" />
+                <flux:icon.arrow-path class="size-4 animate-spin hidden" wire:loading.class.remove="hidden" wire:target="save" />
+                <span wire:loading.remove wire:target="save">Save Model Test</span>
+                <span wire:loading wire:target="save">Saving...</span>
             </button>
         </div>
     </div>
