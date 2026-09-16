@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MathJax Test</title>
+    <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
+        }
+    };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="tex2jax_process">
+        Testing inline math: \((p^{-1} + q^{-1})^{-1}\)
+        <br>
+        Testing with p tag: <p>\(\frac{pq}{p+q}\)</p>
+    </div>
+    
+    <div>
+        Testing WITHOUT tex2jax_process class: \((p^{-1} + q^{-1})^{-1}\)
+    </div>
+</body>
+</html>

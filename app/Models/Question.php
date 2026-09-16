@@ -129,4 +129,9 @@ class Question extends Model
 
         return $finalSlug;
     }
+
+    public function pastExams(): BelongsToMany
+    {
+        return $this->belongsToMany(PastExam::class, 'past_exam_question');
+    }
 }

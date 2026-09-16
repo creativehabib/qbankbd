@@ -13,17 +13,29 @@
             'label' => __('Question Bank'),
             'icon' => 'circle-stack',
             'flyout' => 'question-bank',
-            'active' => request()->routeIs(['questions.*', 'admin.model-tests.*', 'exam-categories.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
+            'active' => request()->routeIs(['questions.*', 'admin.model-tests.*', 'academic-classes.*', 'subjects.*', 'chapters.*', 'topics.*', 'tags.*']),
             'visible' => auth()->user()->hasRole(['teacher', 'admin', 'super_admin']),
             'items' => [
                 ['label' => __('Questions'), 'route' => 'questions.index', 'match' => 'questions.*', 'icon' => 'document-text', 'visible' => true],
                 ['label' => __('Model Tests'), 'route' => 'admin.model-tests.index', 'match' => 'admin.model-tests.*', 'icon' => 'clock', 'visible' => auth()->user()->hasRole(['admin', 'super_admin'])],
-                ['label' => __('Exam Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'icon' => 'folder', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
                 ['label' => __('Academic Class'), 'route' => 'academic-classes.index', 'match' => 'academic-classes.*', 'icon' => 'academic-cap', 'visible' => auth()->user()->hasAnyPermission(['academic_classes.manage'])],
                 ['label' => __('Subjects'), 'route' => 'subjects.index', 'match' => 'subjects.*', 'icon' => 'book-open', 'visible' => auth()->user()->hasAnyPermission(['subjects.manage'])],
                 ['label' => __('Chapter'), 'route' => 'chapters.index', 'match' => 'chapters.*', 'icon' => 'bookmark', 'visible' => auth()->user()->hasAnyPermission(['chapters.manage'])],
                 ['label' => __('Topics'), 'route' => 'topics.index', 'match' => 'topics.*', 'icon' => 'hashtag', 'visible' => auth()->user()->hasAnyPermission(['topics.manage'])],
                 ['label' => __('Tags'), 'route' => 'tags.index', 'match' => 'tags.*', 'icon' => 'tag', 'visible' => auth()->user()->hasAnyPermission(['tags.create', 'tags.update', 'tags.delete'])],
+            ]
+        ],
+        [
+            'type' => 'group',
+            'label' => __('Institutes'),
+            'icon' => 'building-library',
+            'flyout' => 'institutes',
+            'active' => request()->routeIs(['admin.institutions.*', 'admin.past-exams.*', 'exam-categories.*']),
+            'visible' => auth()->user()->hasRole(['admin', 'super_admin']),
+            'items' => [
+                ['label' => __('Institutions'), 'route' => 'admin.institutions.index', 'match' => 'admin.institutions.*', 'icon' => 'building-office-2', 'visible' => true],
+                ['label' => __('Past Exams'), 'route' => 'admin.past-exams.index', 'match' => 'admin.past-exams.*', 'icon' => 'document-text', 'visible' => true],
+                ['label' => __('Categories'), 'route' => 'exam-categories.index', 'match' => 'exam-categories.*', 'icon' => 'folder', 'visible' => auth()->user()->hasAnyPermission(['exam_categories.manage'])],
             ]
         ],
         [
@@ -105,6 +117,14 @@
             'match' => 'teacher.wallet',
             'icon' => 'wallet',
             'visible' => auth()->user()->hasRole(['teacher']),
+        ],
+        [
+            'type' => 'link',
+            'label' => __('Job Solutions'),
+            'route' => 'job-solutions.index',
+            'match' => 'job-solutions.*',
+            'icon' => 'briefcase',
+            'visible' => auth()->user()->isStudent() || auth()->user()->isJobSeeker(),
         ],
         [
             'type' => 'link',

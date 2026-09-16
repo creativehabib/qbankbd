@@ -1,0 +1,462 @@
+<div x-data="{ isQuizMode: false, showAnswers: true, showExplanations: false, activeSubjectId: null, showTopicWeightage: false }" class="space-y-6 pb-12">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-[13px] text-zinc-500 font-medium">
+        <a href="/" class="hover:text-emerald-600 transition-colors flex items-center gap-1"><flux:icon.home class="w-3.5 h-3.5" /> হোম</a>
+        <flux:icon.chevron-right class="w-3 h-3" />
+        <a href="{{ route('job-solutions.index') }}" class="hover:text-emerald-600 transition-colors">জব সলিউশন</a>
+        <flux:icon.chevron-right class="w-3 h-3" />
+        <a href="{{ route('institution.show', $institution->slug) }}" class="hover:text-emerald-600 transition-colors">{{ $institution->name }}</a>
+        <flux:icon.chevron-right class="w-3 h-3" />
+        <span class="text-zinc-900 dark:text-zinc-100">{{ $exam->title }}</span>
+    </div>
+
+    <!-- Top Header Card -->
+            <div class="bg-white dark:bg-zinc-900 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 border-t-4 border-t-teal-500 rounded-2xl p-8 relative overflow-hidden">
+                
+                
+                <div class="flex flex-col md:flex-row justify-between gap-6">
+                    <div class="flex-grow">
+                        <!-- Top Pills -->
+                        <div class="flex flex-wrap items-center gap-2 mb-4">
+                            <span class="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-xs font-bold border border-emerald-100 dark:border-emerald-800">
+                                @if($institution->logo_path)
+                                    <img src="{{ Storage::url($institution->logo_path) }}" alt="Logo" class="w-3 h-3 object-contain">
+                                @else
+                                    <flux:icon.building-office-2 class="w-3 h-3" />
+                                @endif
+                                {{ $institution->name }}
+                            </span>
+                            <span class="px-3 py-1 bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                                {{ $exam->type }}
+                            </span>
+                            @if($exam->exam_date)
+                                <span class="px-3 py-1 text-zinc-500 text-xs font-medium">
+                                    {{ $exam->exam_date->format('d F, Y') }}
+                                </span>
+                            @endif
+                        </div>
+
+                        <h1 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4 leading-tight">
+                            {{ $exam->title }}
+                        </h1>
+
+                        <div x-data="{ expanded: false }">
+                            <div class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4 transition-all duration-300 ease-in-out overflow-hidden" :class="expanded ? 'max-h-[1000px]' : 'max-h-[46px] line-clamp-2'">
+                                @if($exam->description)
+                                    {!! $exam->description !!}
+                                @else
+                                    {{ $institution->name }} এর {{ $exam->title }} পদের নিয়োগ পরীক্ষাটি সরকারি চাকরিপ্রার্থীদের জন্য একটি গুরুত্বপূর্ণ পরীক্ষা। এই পরীক্ষায় সাধারণত {{ $exam->type }} পদ্ধতিতে প্রশ্ন এসে থাকে। নিচে সম্পূর্ণ সমাধান দেওয়া হলো।
+                                @endif
+                            </div>
+                            
+                            <button @click="expanded = !expanded" class="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:text-emerald-700 transition-colors">
+                                <span x-text="expanded ? 'সংক্ষিপ্ত করুন' : 'আরও দেখুন'"></span>
+                                <flux:icon.chevron-down class="w-3 h-3 transition-transform" x-bind:class="expanded ? 'rotate-180' : ''" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Stats Boxes -->
+                    <div class="flex gap-4 shrink-0 mt-4 md:mt-0">
+                        <div class="w-20 h-20 rounded-xl bg-zinc-50 border border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700 flex flex-col items-center justify-center text-center">
+                            <span class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100">{{ $exam->total_marks ?? '-' }}</span>
+                            <span class="text-[10px] text-zinc-500 font-medium mt-1">পূর্ণমান</span>
+                        </div>
+                        <div class="w-20 h-20 rounded-xl bg-emerald-50 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50 flex flex-col items-center justify-center text-center">
+                            <span class="text-xl font-extrabold text-emerald-600">{{ $totalQuestions }}</span>
+                            <span class="text-[10px] text-emerald-700/70 dark:text-emerald-400/70 font-medium mt-1">মোট প্রশ্ন</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Main Content (Cols: 8/12) -->
+        <div class="lg:col-span-8 space-y-6">
+            
+            <!-- Toolbar Row -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-[72px] z-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-3 shadow-sm transition-all">
+                <!-- Modes -->
+                <div class="flex bg-slate-50 dark:bg-zinc-800/50 p-1.5 rounded-xl border border-slate-100 dark:border-zinc-700">
+                    <button @click="isQuizMode = false; showAnswers = true; showExplanations = false" 
+                            :class="!isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-5 py-2 text-[13px] font-bold rounded-lg transition-all">
+                        পড়ার মোড
+                    </button>
+                    <button @click="isQuizMode = true; showAnswers = false; showExplanations = false" 
+                            :class="isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-5 py-2 text-[13px] font-bold rounded-lg transition-all">
+                        কুইজ মোড
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2">
+                    <button @click="showAnswers = !showAnswers" 
+                            :class="showAnswers ? 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/30' : 'border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400'"
+                            class="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-zinc-900 border rounded-full text-xs font-bold transition-colors shadow-sm">
+                        <template x-if="showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye class="w-3.5 h-3.5" /> উত্তর লুকান</div></template>
+                        <template x-if="!showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-3.5 h-3.5" /> উত্তর দেখান</div></template>
+                    </button>
+                    <button @click="showExplanations = !showExplanations" 
+                            :class="showExplanations ? 'border-indigo-300 text-indigo-600 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/30' : 'border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400'"
+                            class="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-zinc-900 border rounded-full text-xs font-bold transition-colors shadow-sm">
+                        <template x-if="showExplanations"><div class="flex items-center gap-1.5"><flux:icon.sparkles class="w-3.5 h-3.5" /> ব্যাখ্যা লুকান</div></template>
+                        <template x-if="!showExplanations"><div class="flex items-center gap-1.5"><flux:icon.sparkles class="w-3.5 h-3.5 opacity-50" /> ব্যাখ্যা দেখান</div></template>
+                    </button>
+                    <button class="w-9 h-9 flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-zinc-500 hover:text-zinc-900 transition-colors shadow-sm">
+                        <flux:icon.share class="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subject Pills -->
+            <div class="flex flex-wrap gap-2 py-2">
+                <button @click="activeSubjectId = null" 
+                        :class="activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
+                        class="px-5 py-2 rounded-full text-xs font-bold transition-all border">
+                    সকল বিষয় ({{ $totalQuestions }})
+                </button>
+                @foreach($subjectsData as $subject)
+                    <button @click="activeSubjectId = {{ $subject['id'] }}" 
+                            :class="activeSubjectId === {{ $subject['id'] }} ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
+                            class="px-5 py-2 rounded-full text-xs font-bold transition-all border">
+                        {{ $subject['name'] }} ({{ $subject['count'] }})
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Topic Weightage Accordion -->
+            <div class="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/50 rounded-xl overflow-hidden transition-all">
+                <button @click="showTopicWeightage = !showTopicWeightage" class="w-full flex items-center justify-between p-4 text-left focus:outline-none">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
+                            <flux:icon.chart-bar class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">এই পরীক্ষার বিষয় ও টপিকভিত্তিক প্রশ্ন বিন্যাস (Topic Weightage)</h3>
+                            <p class="text-xs text-zinc-500 mt-0.5">কোন বিষয় ও টপিক থেকে কত শতাংশ প্রশ্ন এসেছে দেখতে ক্লিক করুন</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-emerald-600 text-xs font-bold px-4">
+                        বিস্তারিত দেখুন
+                        <flux:icon.chevron-down class="w-4 h-4 transition-transform " x-bind:class="showTopicWeightage ? 'rotate-180' : ''" />
+                    </div>
+                </button>
+                
+                <div x-show="showTopicWeightage" x-collapse style="display: none;">
+                <div class="p-6 border-t border-emerald-100 dark:border-emerald-900/50 bg-white dark:bg-zinc-900/50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @forelse($topicWeightage as $subject)
+                            <div class="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-900 shadow-sm">
+                                <!-- Subject Header -->
+                                <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800 border-dashed">
+                                    <div class="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200 text-sm">
+                                        <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> {{ $subject['name'] }}
+                                    </div>
+                                    <div class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                                        {{ $subject['count'] }} টি ({{ $subject['percentage'] }}%)
+                                    </div>
+                                </div>
+                                
+                                <!-- Chapters List -->
+                                <div class="space-y-4">
+                                    @foreach($subject['chapters'] as $chapter)
+                                        <div>
+                                            <div class="flex justify-between items-end mb-1.5 text-xs">
+                                                <span class="text-zinc-600 dark:text-zinc-400 font-medium">{{ $chapter['name'] }}</span>
+                                                <span>
+                                                    <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $chapter['count'] }} টি</span> 
+                                                    <span class="text-zinc-400 text-[11px]">({{ $chapter['percentage'] }}%)</span>
+                                                </span>
+                                            </div>
+                                            <div class="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                                                <div class="bg-emerald-400 dark:bg-emerald-500 h-1.5 rounded-full" style="width: {{ $chapter['percentage'] }}%"></div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-xs text-zinc-500 text-center col-span-2 py-4">কোনো তথ্য নেই</p>
+                        @endforelse
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Questions Area -->
+            <div class="space-y-6 pt-4">
+                @php
+                    $groupedQuestions = $activeQuestions->groupBy('subject_id');
+                    $globalQuestionIndex = 1;
+                @endphp
+
+                @forelse($groupedQuestions as $subId => $groupQs)
+                <div x-show="activeSubjectId === null || activeSubjectId === {{ $subId }}" style="display: none;" x-transition>
+                    @php 
+                        $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অন্যান্য অংশ';
+                        // Add ' অংশ' if it doesn't end with it, just to match screenshot
+                        if (!str_ends_with($subName, ' অংশ')) {
+                            $subName .= ' অংশ';
+                        }
+                    @endphp
+                    
+                    <div class="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-2 mt-8 mb-6 relative">
+                        <div class="absolute -left-0 top-0 bottom-0 w-1.5 bg-emerald-600 rounded-r-md"></div>
+                        <h2 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 pl-4">{{ $subName }}</h2>
+                        @php
+                            $subjectObj = $groupQs->first()->subject ?? null;
+                        @endphp
+                        @if($subjectObj && $subjectObj->slug)
+                            <a href="{{ route('job-solutions.index', ['tab' => 'topics', 'subject' => $subjectObj->slug]) }}" class="text-xs font-bold text-emerald-600 flex items-center gap-1 hover:underline">
+                                বিষয়ভিত্তিক সমাধান <flux:icon.arrow-right class="w-3 h-3" />
+                            </a>
+                        @endif
+                    </div>
+                    
+                    <div class="space-y-4">
+                        @foreach($groupQs as $question)
+                            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
+                                
+                                <!-- Meta row -->
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex gap-2">
+                                        <span class="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 font-bold px-2.5 py-1 rounded-md text-xs">
+                                            {{ $globalQuestionIndex++ }}
+                                        </span>
+                                        <div class="flex items-center gap-1.5 text-[10px] font-medium">
+                                            <span class="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 px-2 py-1 rounded">{{ $question->subject?->name ?? 'N/A' }}</span>
+                                            @if($question->chapter)
+                                                <span class="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 px-2 py-1 rounded">{{ $question->chapter->name }}</span>
+                                            @endif
+                                            @if($question->topic)
+                                                <span class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-2 py-1 rounded flex items-center gap-1"><flux:icon.arrow-turn-down-right class="w-2.5 h-2.5" /> {{ $question->topic->name }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <!-- Question Title -->
+                                <div class="text-[15px] font-bold text-zinc-900 dark:text-zinc-100 leading-snug mb-4">
+                                    @php
+                                        $qTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? '');
+                                    @endphp
+                                    <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-block tex2jax_process" data-math-content>
+                                        {!! $qTitle !!} 
+                                    </a>
+                                    <span class="text-[10px] font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded ml-1 align-middle inline-block">[{{ $institution->name }}]</span>
+                                </div>
+                                
+                                <!-- Options -->
+                                @if($question->question_type === 'mcq' && is_array($question->extra_content))
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        @foreach($question->extra_content as $key => $option)
+                                            @php
+                                                $isCorrect = (isset($option['is_correct']) && $option['is_correct']) ? 'true' : 'false';
+                                            @endphp
+                                            <div class="flex items-center gap-3 p-3 border rounded-xl transition-all cursor-pointer"
+                                                 :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 hover:bg-zinc-50'">
+                                                <div class="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold"
+                                                     :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:border-emerald-700 dark:text-emerald-400' : 'bg-white border-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:border-zinc-600'">
+                                                    {{ ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'][$key] ?? chr(65 + $key) }}
+                                                </div>
+                                                @php
+                                                    $optText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? '');
+                                                @endphp
+                                                <div class="text-[13px] font-medium flex-grow tex2jax_process" data-math-content
+                                                     :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'text-emerald-800 dark:text-emerald-200' : 'text-zinc-700 dark:text-zinc-300'">
+                                                    {!! $optText !!}
+                                                </div>
+                                                <template x-if="showAnswers && !isQuizMode && {{ $isCorrect }}">
+                                                    <flux:icon.check class="w-4 h-4 text-emerald-500 shrink-0" />
+                                                </template>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif(in_array($question->question_type, ['written', 'short', 'cq']))
+                                    <div x-show="showAnswers && !isQuizMode" style="display: none;" class="mt-4 p-4 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl">
+                                            <p class="text-xs font-bold text-emerald-800 dark:text-emerald-400 mb-2 flex items-center gap-1.5"><flux:icon.check-circle class="w-4 h-4" /> উত্তর / সমাধান:</p>
+                                            <div class="text-sm text-zinc-700 dark:text-zinc-300 tex2jax_process" data-math-content>
+                                                @if($question->description)
+                                                    {!! $question->description !!}
+                                                @else
+                                                    (সমাধান দেওয়া হয়নি)
+                                                @endif
+                                            </div>
+                                        </div>
+                                @endif
+                                
+                                <!-- Interactive Explanation Block (Like Practice) -->
+                                @if($question->question_type === 'mcq')
+                                    <div x-data="{ localOpen: false }" 
+                                     x-effect="localOpen = (!isQuizMode && showExplanations && {{ filled($question->description) ? 'true' : 'false' }})" 
+                                     class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
+                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <template x-if="!isQuizMode">
+                                                <button type="button" x-on:click="localOpen = !localOpen" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors">
+                                                    <flux:icon.light-bulb class="w-4 h-4" />
+                                                    <span x-text="localOpen ? 'ব্যাখ্যা লুকান' : 'ব্যাখ্যা দেখুন'"></span>
+                                                    <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="localOpen ? 'rotate-180' : ''" />
+                                                </button>
+                                            </template>
+                                            <template x-if="isQuizMode">
+                                                <div></div> <!-- Empty div to keep flex-between layout for right icons -->
+                                            </template>
+
+                                            <div class="flex items-center gap-4 text-zinc-400 dark:text-zinc-500">
+                                                <div class="flex items-center gap-1.5" title="Views">
+                                                    <flux:icon.eye class="size-[18px]" />
+                                                    <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
+                                                </div>
+                                                <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400" title="Statistics">
+                                                    <flux:icon.chart-pie class="size-[18px]" />
+                                                </button>
+                                                <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                    <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
+                                                </button>
+                                                <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                    <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
+                                                    @if($question->likes_count > 0)
+                                                        <span class="text-xs font-medium">{{ $question->likes_count }}</span>
+                                                    @endif
+                                                </button>
+                                                <button type="button" @click="$dispatch('open-report-modal', { id: {{ $question->id }} })" class="cursor-pointer hover:text-red-500 dark:hover:text-red-400" title="Report Error">
+                                                    <flux:icon.flag class="size-[18px]" />
+                                                </button>
+                                                <button type="button" class="cursor-pointer hover:text-blue-500 dark:hover:text-blue-400" title="Share">
+                                                    <flux:icon.share class="size-[18px]" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div x-show="!isQuizMode && localOpen" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
+                                            @if(filled($question->description))
+                                                <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
+                                                    {!! $question->description !!}
+                                                </div>
+                                            @else
+                                                <div class="space-y-3 text-center">
+                                                    <div wire:loading.remove wire:target="generateAiExplanation({{ $question->id }})">
+                                                        <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
+                                                        <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
+
+                                                        <button
+                                                            type="button"
+                                                            wire:click.prevent="generateAiExplanation({{ $question->id }})"
+                                                            class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 shadow-sm"
+                                                        >
+                                                            <flux:icon.sparkles class="size-3.5" />
+                                                            AI দিয়ে ব্যাখ্যা তৈরি করুন
+                                                        </button>
+
+                                                        @if (session('last_question_id') == $question->id && $aiError)
+                                                            <p class="mt-2 text-xs text-red-500">{{ $aiError }}</p>
+                                                        @endif
+                                                    </div>
+
+                                                    <div wire:loading wire:target="generateAiExplanation({{ $question->id }})" class="py-4">
+                                                        <div class="flex items-center justify-center gap-2 text-violet-600">
+                                                            <flux:icon.arrow-path class="size-5 animate-spin" />
+                                                            <span class="text-sm font-medium">AI ব্যাখ্যা তৈরি করছে... একটু অপেক্ষা করুন</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @empty
+                    <div class="text-center py-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                        <p class="text-zinc-500">কোনো প্রশ্ন পাওয়া যায়নি।</p>
+                    </div>
+                @endforelse
+            </div>
+            
+        </div>
+
+        <!-- Right Sidebar (Cols: 4/12) -->
+        <div class="lg:col-span-4 space-y-6 sticky top-[92px] h-max">
+            
+            <!-- Box 1: Hiring Institution -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
+                <div class="p-5 flex items-center gap-4">
+                    @if($institution->logo_path)
+                        <div class="w-12 h-12 rounded-full border border-zinc-100 flex items-center justify-center p-1 shadow-sm shrink-0">
+                            <img src="{{ Storage::url($institution->logo_path) }}" alt="Logo" class="w-full h-full object-contain rounded-full">
+                        </div>
+                    @else
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                            <flux:icon.building-office-2 class="w-6 h-6 text-emerald-600" />
+                        </div>
+                    @endif
+                    <div>
+                        <p class="text-[11px] font-bold text-emerald-600 mb-0.5">নিয়োগকারী প্রতিষ্ঠান</p>
+                        <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">{{ $institution->name }}</h3>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 divide-x divide-zinc-100 dark:divide-zinc-800 border-t border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <div class="p-4">
+                        <p class="text-[10px] text-zinc-400 font-medium mb-1">পরীক্ষার ধরণ</p>
+                        <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 uppercase">{{ $exam->type }}</p>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-[10px] text-zinc-400 font-medium mb-1">প্রশ্ন সংখ্যা</p>
+                        <p class="text-sm font-bold text-emerald-600">{{ $totalQuestions }} টি</p>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-white dark:bg-zinc-900">
+                    <a href="{{ route('institution.show', $institution->slug) }}" class="block w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-center text-xs font-bold rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/50">
+                        {{ $institution->short_name ?? 'Ministry' }} এর সকল পরীক্ষা &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Box 2: Other Top Institutions -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
+                <div class="flex justify-between items-center p-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
+                    <h3 class="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
+                        <flux:icon.building-office class="w-4 h-4 text-zinc-400" /> অন্যান্য শীর্ষ প্রতিষ্ঠান
+                    </h3>
+                    <a href="{{ route('job-solutions.index', ['tab' => 'organizations']) }}" class="text-[10px] font-bold text-emerald-600 hover:underline">সকল প্রতিষ্ঠান</a>
+                </div>
+                
+                <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    @forelse($otherInstitutions as $otherInst)
+                        <a href="{{ route('institution.show', $otherInst->slug) }}" class="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+                            <div class="flex items-center gap-3">
+                                @if($otherInst->logo_path)
+                                    <div class="w-8 h-8 rounded-full border border-zinc-100 flex items-center justify-center p-0.5 shrink-0 bg-white">
+                                        <img src="{{ Storage::url($otherInst->logo_path) }}" alt="Logo" class="w-full h-full object-contain rounded-full">
+                                    </div>
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                                        <flux:icon.building-office-2 class="w-4 h-4 text-zinc-400" />
+                                    </div>
+                                @endif
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-600 transition-colors">{{ $otherInst->name }}</h4>
+                                    <p class="text-[10px] text-zinc-400 mt-0.5">নিয়োগ পরীক্ষা</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md">
+                                {{ $otherInst->past_exams_count }} টি পরীক্ষা
+                            </span>
+                        </a>
+                    @empty
+                        <div class="p-4 text-center text-xs text-zinc-500">অন্য কোনো প্রতিষ্ঠান নেই</div>
+                    @endforelse
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

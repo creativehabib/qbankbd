@@ -146,6 +146,9 @@
 <script>
     document.addEventListener('livewire:navigated', () => {
         if (window.MathJax && window.MathJax.typesetPromise) {
+            if (window.MathJax.typesetClear) {
+                window.MathJax.typesetClear();
+            }
             window.MathJax.typesetPromise();
         }
     });
@@ -155,6 +158,9 @@
             succeed(() => {
                 requestAnimationFrame(() => {
                     if (window.MathJax && window.MathJax.typesetPromise) {
+                        if (window.MathJax.typesetClear) {
+                            window.MathJax.typesetClear();
+                        }
                         window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err));
                     }
                 });

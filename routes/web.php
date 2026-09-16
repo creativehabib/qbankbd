@@ -73,6 +73,11 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy');
 
+// Public Frontend Routes
+Route::get('/job-solutions', App\Livewire\Students\JobSolutions\Index::class)->name('job-solutions.index');
+
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::patch('/dashboard/question-sets/{questionSet}', [DashboardController::class, 'updateQuestionSet'])->middleware('role:super_admin')->name('dashboard.question-sets.update');
@@ -133,6 +138,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/model-tests', ModelTestIndex::class)->name('admin.model-tests.index');
         Route::get('/admin/model-tests/create', ModelTestCreate::class)->name('admin.model-tests.create');
 
+        // Institutions & Past Exams
+        Route::get('/admin/institutions', \App\Livewire\Admin\Institutions\InstitutionIndex::class)->name('admin.institutions.index');
+        Route::get('/admin/past-exams', \App\Livewire\Admin\PastExams\PastExamIndex::class)->name('admin.past-exams.index');
+        Route::get('/admin/past-exams/{pastExamId}/manage', \App\Livewire\Admin\PastExams\PastExamManager::class)->name('admin.past-exams.manage');
+
         // Admin Settings
         Route::get('/admin/settings', Index::class)->name('admin.settings.index');
         Route::get('/admin/settings/general', GeneralSetting::class)->name('admin.settings.general');
@@ -175,6 +185,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
     Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
+    
     Route::get('/student/goals', GoalSelection::class)->name('student.goals');
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
     Route::get('/student/bookmarks', BookmarkedQuestions::class)->name('student.bookmarks');
@@ -221,3 +232,10 @@ Route::post('/payment/nagad/pay/{package}', [PaymentController::class, 'nagadPay
 Route::get('/payment/nagad/callback', [PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
 
 require __DIR__.'/settings.php';
+
+
+Route::get('/question/{slug}', \App\Livewire\Frontend\QuestionShow::class)->name('question.show');
+
+// Dynamic Institution and Exam Routes (Place at very bottom to prevent overriding)
+Route::get('/{institutionSlug}', App\Livewire\Students\JobSolutions\InstitutionShow::class)->name('institution.show');
+Route::get('/{institutionSlug}/{examSlug}', App\Livewire\Students\JobSolutions\Show::class)->name('job-solutions.show');
