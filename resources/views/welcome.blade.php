@@ -454,7 +454,7 @@
                 <h5 class="font-bold mb-4 text-slate-800 dark:text-slate-200">সহায়তা</h5>
                 <ul class="space-y-3 text-sm text-slate-500 dark:text-slate-400">
                     <li><a href="#" class="transition hover:text-sky-600">সাহায্য কেন্দ্র</a></li>
-                    <li><a href="#" class="transition hover:text-sky-600">গোপনীয়তা নীতি</a></li>
+                    <li><a href="{{ route('privacy') }}" class="transition hover:text-sky-600">গোপনীয়তা নীতি</a></li>
                     <li><a href="#" class="transition hover:text-sky-600">সেবার শর্তাবলী</a></li>
                     <li><a href="#faq" class="transition hover:text-sky-600">সাধারণ জিজ্ঞাসা</a></li>
                 </ul>
