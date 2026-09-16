@@ -90,6 +90,11 @@
                             <flux:label>Total Questions</flux:label>
                             <flux:input type="number" wire:model="total_questions" />
                         </flux:field>
+
+                        <flux:field>
+                            <flux:label>Duration (Minutes)</flux:label>
+                            <flux:input type="number" wire:model="duration" />
+                        </flux:field>
                     </div>
 
                     <div class="flex justify-end gap-2 pt-4">
@@ -112,6 +117,7 @@
                                 <th class="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300">Institution</th>
                                 <th class="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300">Type</th>
                                 <th class="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300">Questions</th>
+                                <th class="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300">Duration (m)</th>
                                 <th class="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -124,6 +130,7 @@
                                         <span class="bg-zinc-100 dark:bg-zinc-700 px-2 py-1 rounded text-xs uppercase font-bold">{{ $exam->type }}</span>
                                     </td>
                                     <td class="px-4 py-4 text-zinc-500 dark:text-zinc-400">{{ $exam->questions()->count() }} / {{ $exam->total_questions ?? '-' }}</td>
+                                    <td class="px-4 py-4 text-zinc-500 dark:text-zinc-400">{{ $exam->duration ?? '-' }}</td>
                                     <td class="px-4 py-4 text-right">
                                         <div class="flex justify-end gap-2">
                                             <flux:button href="{{ route('admin.past-exams.manage', $exam->id) }}" size="sm" variant="outline" icon="document-text">Manage</flux:button>

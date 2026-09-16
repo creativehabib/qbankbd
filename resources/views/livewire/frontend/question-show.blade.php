@@ -2,7 +2,7 @@
     
     <!-- Breadcrumbs -->
     <div class="mb-6">
-        <nav class="flex text-[11px] text-zinc-500 font-medium" aria-label="Breadcrumb">
+        <nav class="flex flex-wrap text-[11px] text-zinc-500 font-medium" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-2">
                 <li class="inline-flex items-center">
                     <a href="/" class="hover:text-emerald-600 flex items-center gap-1">
@@ -52,7 +52,7 @@
                 <!-- Top Emerald Line -->
                 <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
                 
-                <div class="p-6 md:p-8">
+                <div class="p-5 md:p-8">
                     <!-- Meta Row -->
                     
 
@@ -112,7 +112,7 @@
                                         // Handle both old and new formats gracefully
                                         $isCorrect = isset($optionData['is_correct']) ? $optionData['is_correct'] : false;
                                         $optionText = isset($optionData['option_text']) ? $optionData['option_text'] : (is_string($optionData) ? $optionData : '');
-                                        $letter = $optionLetters[$index] ?? chr(65 + $index);
+                                        $letter = $optionLetters[$loop->index] ?? chr(65 + $loop->index);
                                     @endphp
                                     <div class="flex items-center gap-2 rounded-lg border px-3 py-2 {{ $isCorrect ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-900/20' : 'border-zinc-200 bg-white dark:border-zinc-600 dark:bg-zinc-800' }}">
                                         <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold {{ $isCorrect ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200' }}">
@@ -181,23 +181,23 @@
             </div>
 
             <!-- Navigation Buttons -->
-            <div class="flex justify-between items-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
                 @if($prevQuestion)
-                    <a href="{{ route('question.show', $prevQuestion->slug) }}" class="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2 cursor-pointer">
+                    <a href="{{ route('question.show', $prevQuestion->slug) }}" class="justify-center px-4 md:px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2 cursor-pointer">
                         <flux:icon.chevron-left class="w-4 h-4" /> পূর্ববর্তী প্রশ্ন
                     </a>
                 @else
-                    <div class="px-5 py-2.5 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-sm font-bold text-zinc-400 dark:text-zinc-600 cursor-not-allowed flex items-center gap-2">
+                    <div class="justify-center px-4 md:px-5 py-2.5 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-sm font-bold text-zinc-400 dark:text-zinc-600 cursor-not-allowed flex items-center gap-2">
                         <flux:icon.chevron-left class="w-4 h-4" /> পূর্ববর্তী প্রশ্ন
                     </div>
                 @endif
                 
                 @if($nextQuestion)
-                    <a href="{{ route('question.show', $nextQuestion->slug) }}" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md shadow-emerald-600/20 transition-colors flex items-center gap-2 cursor-pointer">
+                    <a href="{{ route('question.show', $nextQuestion->slug) }}" class="justify-center px-4 md:px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md shadow-emerald-600/20 transition-colors flex items-center gap-2 cursor-pointer">
                         পরবর্তী প্রশ্ন <flux:icon.chevron-right class="w-4 h-4" />
                     </a>
                 @else
-                    <div class="px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 text-sm font-bold cursor-not-allowed flex items-center gap-2">
+                    <div class="justify-center px-4 md:px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 text-sm font-bold cursor-not-allowed flex items-center gap-2">
                         পরবর্তী প্রশ্ন <flux:icon.chevron-right class="w-4 h-4" />
                     </div>
                 @endif

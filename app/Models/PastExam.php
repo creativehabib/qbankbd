@@ -10,7 +10,7 @@ class PastExam extends Model
 {
     protected $fillable = [
         'title', 'slug', 'institution_id', 'exam_category_id', 'exam_date', 
-        'grade', 'total_marks', 'total_questions', 'description', 'type'
+        'grade', 'total_marks', 'total_questions', 'duration', 'description', 'type'
     ];
 
     protected $casts = [

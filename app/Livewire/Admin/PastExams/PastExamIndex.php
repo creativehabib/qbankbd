@@ -21,6 +21,7 @@ class PastExamIndex extends Component
     public $grade = '';
     public $total_marks = '';
     public $total_questions = '';
+    public $duration = '';
     public $type = 'mcq';
     
     public $editingId = null;
@@ -36,6 +37,7 @@ class PastExamIndex extends Component
         'grade' => 'nullable|string',
         'total_marks' => 'nullable|integer',
         'total_questions' => 'nullable|integer',
+            'duration' => 'nullable|integer',
         'type' => 'required|in:mcq,cq,short,written,both',
     ];
 
@@ -59,6 +61,7 @@ class PastExamIndex extends Component
         $this->grade = $exam->grade;
         $this->total_marks = $exam->total_marks;
         $this->total_questions = $exam->total_questions;
+        $this->duration = $exam->duration;
         $this->type = $exam->type ?? 'mcq';
         $this->showModal = true;
     }
@@ -77,6 +80,7 @@ class PastExamIndex extends Component
             'grade' => $this->grade,
             'total_marks' => $this->total_marks ?: null,
             'total_questions' => $this->total_questions ?: null,
+            'duration' => $this->duration ?: null,
             'type' => $this->type,
         ];
 

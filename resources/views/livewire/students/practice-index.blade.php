@@ -31,7 +31,7 @@
                     <div class="space-y-6 py-4">
                         <div class="text-center">
                             <flux:icon.academic-cap class="mx-auto mb-3 size-12 text-emerald-500" />
-                            <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ __('মক টেস্ট শুরু করুন') }}</h2>
+                            <h2 class="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">{{ __('মক টেস্ট শুরু করুন') }}</h2>
                             <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ __('নিচের অপশনগুলো থেকে আপনার পছন্দমতো বিষয় নির্বাচন করে নিজেকে যাচাই করুন।') }}</p>
                         </div>
 
@@ -112,7 +112,7 @@
                     @if($level === 'filtered-questions')
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                <h2 class="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">
                                     ফিল্টার করা প্রশ্নসমূহ
                                     <span class="text-sm font-normal text-zinc-400">({{ $filteredQuestions->total() }} টি)</span>
                                 </h2>
