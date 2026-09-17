@@ -212,26 +212,26 @@
                                 প্রতিটি প্রশ্নের সঠিক উত্তরটির পাশে <strong class="mx-1 px-2 py-0.5 bg-green-100 dark:bg-green-800 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 rounded-md shadow-sm">✓ সঠিক</strong> বাটন ক্লিক করুন। এডিট করতে লেখার ওপর ক্লিক করুন।
                             </div>
 
-                            {{-- 🌟 Alpine.js MutationObserver Container for Global MathJax Re-render 🌟 --}}
+                            {{-- 🌟 Alpine.js MutationObserver Container for Global KaTeX Re-render 🌟 --}}
                             <div class="p-5 space-y-5 max-h-[700px] overflow-y-auto" id="processed-questions-container"
                                  x-data="{
                                      init() {
                                          let timeout;
                                          const renderMath = () => {
-                                             if (window.renderMathJax) {
-                                                 window.renderMathJax();
+                                             if (window.renderKatex) {
+                                                 window.renderKatex();
                                              }
                                          };
 
                                          setTimeout(renderMath, 300);
 
                                          const observer = new MutationObserver((mutations) => {
-                                             const isMathJax = mutations.some(m =>
-                                                 (m.target && m.target.className && typeof m.target.className === 'string' && m.target.className.includes('MathJax')) ||
-                                                 (m.addedNodes.length > 0 && m.addedNodes[0].className && typeof m.addedNodes[0].className === 'string' && m.addedNodes[0].className.includes('MathJax'))
+                                             const isKatex = mutations.some(m =>
+                                                 (m.target && m.target.className && typeof m.target.className === 'string' && m.target.className.includes('katex')) ||
+                                                 (m.addedNodes.length > 0 && m.addedNodes[0].className && typeof m.addedNodes[0].className === 'string' && m.addedNodes[0].className.includes('katex'))
                                              );
 
-                                             if (!isMathJax) {
+                                             if (!isKatex) {
                                                  clearTimeout(timeout);
                                                  timeout = setTimeout(renderMath, 150);
                                              }
@@ -266,9 +266,9 @@
                                                     setTimeout(() => { if(!this.isEditing) this.renderMath() }, 100);
                                                 },
                                                 renderMath() {
-                                                    if(window.MathJax) {
+                                                    if(window.renderKatex) {
                                                         this.$nextTick(() => {
-                                                            if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
+                                                            window.renderKatex();
                                                         });
                                                     }
                                                 }
@@ -397,9 +397,9 @@
                                                             setTimeout(() => { if(!this.isEditing) this.renderMath() }, 100);
                                                         },
                                                         renderMath() {
-                                                            if(window.MathJax) {
+                                                            if(window.renderKatex) {
                                                                 this.$nextTick(() => {
-                                                                    if(this.$refs.display) MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.display]);
+                                                                    window.renderKatex();
                                                                 });
                                                             }
                                                         }

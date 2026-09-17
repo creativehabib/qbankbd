@@ -139,13 +139,15 @@ class BulkUpload extends Component
         IMPORTANT RULE 2: Randomly place the correct answer in any of the 4 options. Do NOT always make the first option correct.
         IMPORTANT RULE 3: For tags, ONLY include a competitive exam IF YOU ARE 100% CERTAIN. If not, keep it empty. IMPORTANT: You MUST use strict standardized English formatting for exam tags to prevent duplicates. For BCS: \"[Number]th BCS\" (e.g., \"35th BCS\", \"41st BCS\"). For Primary: \"Primary Teacher [Year]\" (e.g., \"Primary Teacher 2022\"). For NTRCA: \"[Number]th NTRCA\". Do NOT use variations like \"BCS 35th\" or \"৩৫ তম বিসিএস\".
         IMPORTANT RULE 4: For each question, provide a highly descriptive and detailed explanation (ব্যাখ্যা) of 4-6 lines. Explain clearly why the correct answer is right, why the other options are wrong, and provide additional background information to deeply educate the student.
+        IMPORTANT RULE 5: If the question involves mathematics, algebra, geometry, equations, or numbers, you MUST wrap ALL mathematical expressions, variables, formulas, and numbers in TeX delimiters. Use `$` and `$` for inline math, and `$$` and `$$` for display math (e.g., `\$x^2 + y^2 = r^2\$` or `\$\\frac{a}{b}\$`).
+        CRITICAL JSON ESCAPING RULE: Because you are returning a JSON response, you MUST double-escape all TeX backslashes so the JSON is valid. For example, you MUST output `\\\\frac` instead of `\\frac`, `\\\\sqrt` instead of `\\sqrt`, `\\\\times` instead of `\\times`, etc. Failure to double-escape backslashes will cause a JSON parsing error!
         {$avoidRule}
         You MUST return the response STRICTLY as a JSON array in the exact format below, and nothing else (no markdown, no extra text):
         [
             {
-                \"title\": \"এখানে প্রশ্ন থাকবে?\",
+                \"title\": \"১ম প্রশ্নটি এখানে লিখুন?\",
                 \"tags\": [\"40th BCS\", \"Bank Job\"],
-                \"explanation\": \"সঠিক উত্তরের বিস্তারিত ব্যাখ্যা এখানে থাকবে।\",
+                \"explanation\": \"সঠিক উত্তরটি নির্বাচনের বিস্তারিত ব্যাখ্যা এখানে লিখুন।\",
                 \"options\": [
                     {\"option_text\": \"প্রথম অপশন\", \"is_correct\": false},
                     {\"option_text\": \"দ্বিতীয় অপশন\", \"is_correct\": true},
