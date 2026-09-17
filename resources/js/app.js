@@ -25,27 +25,76 @@ window.addEventListener('error', event => {
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'danger' });
 });
 
-// --- MathJax রেন্ডারিং লজিক (একীভূত করা হয়েছে) ---
-window.renderMathJax = function () {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-        // ছোট ডিলে দেওয়া হয়েছে যাতে ডোম (DOM) আপডেট হওয়ার পর্যাপ্ত সময় পায়
-        setTimeout(() => {
-            window.MathJax.typesetPromise()
-                .catch((err) => console.warn('MathJax error:', err));
-        }, 100);
-    }
+// --- MathJax/KaTeX Rendering Hooks ---
+import renderMathInElement from 'katex/dist/contrib/auto-render';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+window.renderKatex = function() {
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "div.ck-editor-container"]
+    });
+
+    // Fallback for old MathJax elements
+    document.querySelectorAll('script[type="math/tex"]').forEach(el => {
+        let tex = el.textContent || el.innerText;
+        let span = document.createElement('span');
+        try {
+            katex.render(tex, span, { displayMode: false, throwOnError: false });
+            el.replaceWith(span);
+        } catch(e) {}
+    });
+    
+    document.querySelectorAll('script[type="math/tex; mode=display"]').forEach(el => {
+        let tex = el.textContent || el.innerText;
+        let div = document.createElement('div');
+        try {
+            katex.render(tex, div, { displayMode: true, throwOnError: false });
+            el.replaceWith(div);
+        } catch(e) {}
+    });
 };
 
-// MathJax এর জন্য ইভেন্ট লিসেনারসমূহ
+// Auto-render on initial load
+setTimeout(window.renderKatex, 100);
+
+window.renderMathJax = function () {
+    setTimeout(() => {
+        window.renderKatex();
+    }, 100);
+};
+
+// MathJax/KaTeX এর জন্য ইভেন্ট লিসেনারসমূহ
 document.addEventListener('livewire:navigated', window.renderMathJax);
 window.addEventListener('practice-content-updated', window.renderMathJax);
 
-// সরাসরি বাটন (যেমন: Explanation) ক্লিক করলে রেন্ডার করার জন্য
-document.addEventListener('click', (e) => {
-    if (e.target.closest('button')) {
-        setTimeout(window.renderMathJax, 400);
-    }
+// Prevent Livewire from overwriting KaTeX rendered math during component updates (prevents flickering)
+document.addEventListener('livewire:initialized', () => {
+    Livewire.hook('morph.updating', ({ el, toEl, skip }) => {
+        if (el.hasAttribute && el.hasAttribute('data-math-content')) {
+            // We only skip if the raw text content is fundamentally the same to allow pagination to work
+            let currentRaw = el.getAttribute('data-raw-math') || el.innerText;
+            let newRaw = toEl.innerText;
+            
+            if (!el.hasAttribute('data-raw-math')) {
+                el.setAttribute('data-raw-math', currentRaw);
+            }
+            
+            if (el.getAttribute('data-raw-math') === newRaw || el.innerHTML.includes('katex')) {
+                skip();
+            }
+        }
+    });
 });
+
+
 
 // --- Flux UI delete confirmation ---
 window.confirmDeleteAction = function (callback) {

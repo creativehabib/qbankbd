@@ -1,4 +1,4 @@
-<div x-data="{ isQuizMode: false, showAnswers: true, showExplanations: false, activeSubjectId: null, showTopicWeightage: false }" class="space-y-6 pb-12">
+<div x-data="{ isQuizMode: false, showAnswers: true, showExplanations: false, showTopicWeightage: false }" class="space-y-6 pb-12">
     <!-- Breadcrumb -->
     <div class="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[13px] text-zinc-500 font-medium w-full">
         <a href="/" class="shrink-0 hover:text-emerald-600 transition-colors flex items-center gap-1"><flux:icon.home class="w-3 h-3 md:w-3.5 md:h-3.5" /> হোম</a>
@@ -129,15 +129,13 @@
 
             <!-- Subject Pills -->
             <div class="flex overflow-x-auto gap-2 py-2 w-full snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <button @click="activeSubjectId = null" 
-                        :class="activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
-                        class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border">
+                <button wire:click="setSubject(null)" 
+                        class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
                     সকল বিষয় ({{ $totalQuestions }})
                 </button>
                 @foreach($subjectsData as $subject)
-                    <button @click="activeSubjectId = {{ $subject['id'] }}" 
-                            :class="activeSubjectId === {{ $subject['id'] }} ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
-                            class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border">
+                    <button wire:click="setSubject({{ $subject['id'] }})" 
+                            class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === $subject['id'] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
                         {{ $subject['name'] }} ({{ $subject['count'] }})
                     </button>
                 @endforeach
@@ -210,7 +208,7 @@
                 @endphp
 
                 @forelse($groupedQuestions as $subId => $groupQs)
-                <div x-show="activeSubjectId === null || activeSubjectId === {{ $subId }}" style="display: none;" x-transition>
+                <div>
                     @php 
                         $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অন্যান্য অংশ';
                         // Add ' অংশ' if it doesn't end with it, just to match screenshot
@@ -312,7 +310,7 @@
                                      class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <template x-if="!isQuizMode">
-                                                <button type="button" x-on:click="localOpen = !localOpen" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors">
+                                                <button type="button" x-on:click="localOpen = !localOpen" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition-colors">
                                                     <flux:icon.light-bulb class="w-4 h-4" />
                                                     <span x-text="localOpen ? 'ব্যাখ্যা লুকান' : 'ব্যাখ্যা দেখুন'"></span>
                                                     <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="localOpen ? 'rotate-180' : ''" />
@@ -390,10 +388,20 @@
                 </div>
                 @empty
                     <div class="text-center py-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
-                        <p class="text-zinc-500">কোনো প্রশ্ন পাওয়া যায়নি।</p>
+                        <p class="text-zinc-500">কোন প্রশ্ন পাওয়া যায়নি।</p>
                     </div>
                 @endforelse
             </div>
+
+            <!-- Infinite Scroll Trigger -->
+            @php
+                $currentTotalCount = $activeSubjectId ? ($subjectsData->firstWhere('id', $activeSubjectId)['count'] ?? 0) : $totalQuestions;
+            @endphp
+            @if($activeQuestions->count() < $currentTotalCount)
+                <div x-intersect.full="$wire.loadMore()" class="flex justify-center py-8">
+                    <flux:icon.arrow-path class="size-8 animate-spin text-emerald-500" />
+                </div>
+            @endif
             
         </div>
 
@@ -476,3 +484,4 @@
         </div>
     </div>
 </div>
+

@@ -141,7 +141,7 @@
                             <div class="flex items-center gap-4 text-zinc-400 dark:text-zinc-500">
                                 <div class="flex items-center gap-1.5" title="Views">
                                     <flux:icon.eye class="size-[18px]" />
-                                    <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views ?? 0 }}</span>
+                                    <span class="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{{ $question->views_count ?? 0 }}</span>
                                 </div>
                                 <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400" title="Statistics">
                                     <flux:icon.chart-pie class="size-[18px]" />

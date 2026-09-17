@@ -128,28 +128,11 @@
 @endif
 
 <script src="/ckeditor/ckeditor.js" type="text/javascript"></script>
-<script>
-    window.MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            processEscapes: true,
-        },
-        options: {
-            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            ignoreHtmlClass: 'tex2jax_ignore',
-            processHtmlClass: 'tex2jax_process'
-        },
-    };
-</script>
-<script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 <script>
     document.addEventListener('livewire:navigated', () => {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            if (window.MathJax.typesetClear) {
-                window.MathJax.typesetClear();
-            }
-            window.MathJax.typesetPromise();
+        if (typeof window.renderKatex === 'function') {
+            window.renderKatex();
         }
     });
 
@@ -157,11 +140,8 @@
         Livewire.hook('commit', ({ succeed }) => {
             succeed(() => {
                 requestAnimationFrame(() => {
-                    if (window.MathJax && window.MathJax.typesetPromise) {
-                        if (window.MathJax.typesetClear) {
-                            window.MathJax.typesetClear();
-                        }
-                        window.MathJax.typesetPromise().catch((err) => console.log('MathJax error: ', err));
+                    if (typeof window.renderKatex === 'function') {
+                        window.renderKatex();
                     }
                 });
             });

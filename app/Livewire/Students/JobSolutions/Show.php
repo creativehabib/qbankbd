@@ -21,6 +21,20 @@ class Show extends Component
     
     
 
+    public int $perPage = 20;
+    public $activeSubjectId = null;
+
+    public function setSubject($id = null): void
+    {
+        $this->activeSubjectId = $id;
+        $this->perPage = 20; // reset pagination when switching tabs
+    }
+
+    public function loadMore(): void
+    {
+        $this->perPage += 20;
+    }
+
     public function mount($institutionSlug, $examSlug)
     {
         $this->institution = Institution::where('slug', $institutionSlug)->firstOrFail();
@@ -70,16 +84,6 @@ class Show extends Component
         }
     }
 
-    public function recordView(int $questionId): void
-    {
-        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
-        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
-
-        if (! Cache::has($cacheKey)) {
-            Question::where('id', $questionId)->increment('views_count');
-            Cache::put($cacheKey, true, now()->addHours(24));
-        }
-    }
 
     public function generateAiExplanation($questionId): void
     {
@@ -118,8 +122,13 @@ class Show extends Component
         // Sort subjects by count descending
         $subjectsData = $subjectsData->sortByDesc('count')->values();
 
-        // Questions for active subject
-        $activeQuestions = $questions;
+        // Filter by subject if one is selected, then paginate
+        if ($this->activeSubjectId) {
+            $filteredQuestions = $questions->where('subject_id', $this->activeSubjectId);
+        } else {
+            $filteredQuestions = $questions;
+        }
+        $activeQuestions = $filteredQuestions->take($this->perPage);
 
         // Calculate Topic Weightage for ALL questions (Independent of active subject)
         $topicWeightage = collect();
@@ -179,3 +188,4 @@ class Show extends Component
         ])->layout('layouts.frontend', ['title' => $this->exam->title]);
     }
 }
+

@@ -48,16 +48,6 @@ class BookmarkedQuestions extends Component
         }
     }
 
-    public function recordView(int $questionId): void
-    {
-        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
-        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
-
-        if (! Cache::has($cacheKey)) {
-            Question::where('id', $questionId)->increment('views_count');
-            Cache::put($cacheKey, true, now()->addHours(24));
-        }
-    }
 
     // --- Fetching Data ---
 
@@ -85,3 +75,4 @@ class BookmarkedQuestions extends Component
         ])->layout('layouts.app', ['title' => 'My Bookmarks']);
     }
 }
+

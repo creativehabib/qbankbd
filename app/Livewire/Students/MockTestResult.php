@@ -95,16 +95,6 @@ class MockTestResult extends Component
         $this->refreshQuestionsData();
     }
 
-    public function recordView(int $questionId): void
-    {
-        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
-        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
-
-        if (! Cache::has($cacheKey)) {
-            Question::where('id', $questionId)->increment('views_count');
-            Cache::put($cacheKey, true, now()->addHours(24));
-        }
-    }
 
     // Livewire এর Hydration সমস্যা সমাধানের জন্য হেল্পার ফাংশন
     private function refreshQuestionsData(): void
@@ -133,3 +123,4 @@ class MockTestResult extends Component
         ])->layout('layouts.app', ['title' => 'Mock Test Result']);
     }
 }
+

@@ -15,6 +15,7 @@
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
         "jquery": "^4.0.0",
+        "katex": "^0.18.7",
         "laravel-vite-plugin": "^3.0.0",
         "tailwindcss": "^4.0.7",
         "tom-select": "^2.5.2",

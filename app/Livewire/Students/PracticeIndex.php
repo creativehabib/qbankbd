@@ -323,16 +323,6 @@ class PracticeIndex extends Component
         $this->dispatch('notify', ['type' => 'success', 'message' => 'রিপোর্ট সফলভাবে জমা হয়েছে! এডমিন দ্রুত এটি যাচাই করবেন।']);
     }
 
-    public function recordView(int $questionId): void
-    {
-        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
-        $cacheKey = "viewed_question_{$questionId}_by_{$viewerId}";
-
-        if (! Cache::has($cacheKey)) {
-            Question::where('id', $questionId)->increment('views_count');
-            Cache::put($cacheKey, true, now()->addHours(24));
-        }
-    }
 
     // --- Data Fetching ---
 
@@ -433,3 +423,4 @@ class PracticeIndex extends Component
         ])->layout('layouts.app', ['title' => 'Practice']);
     }
 }
+

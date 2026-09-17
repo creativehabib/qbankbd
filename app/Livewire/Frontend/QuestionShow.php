@@ -15,8 +15,14 @@ class QuestionShow extends Component
             ->with(['subject', 'chapter', 'topic', 'pastExams'])
             ->firstOrFail();
             
-        // Increment views
-        $this->question->increment('views');
+        // Increment views safely with cache protection
+        $viewerId = auth()->check() ? 'user_'.auth()->id() : 'ip_'.request()->ip();
+        $cacheKey = "viewed_question_{$this->question->id}_by_{$viewerId}";
+
+        if (! \Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            $this->question->increment('views_count');
+            \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addHours(24));
+        }
     }
 
     public function render()

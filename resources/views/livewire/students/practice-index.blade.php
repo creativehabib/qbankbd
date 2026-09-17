@@ -184,7 +184,7 @@
                                             <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                                                    <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
+                                                    <button type="button" x-on:click="openDescription = !openDescription" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 transition">
                                                         <span>Explanation</span>
                                                         <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
                                                     </button>
@@ -379,7 +379,7 @@
                                                 <div x-data="{ openDescription: false }" class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                                                        <button type="button" x-on:click="openDescription = !openDescription" wire:click.once="recordView({{ $question->id }})" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400">
+                                                        <button type="button" x-on:click="openDescription = !openDescription" class="inline-flex w-fit items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400">
                                                             <span>Explanation</span>
                                                             <flux:icon.chevron-down class="size-4 transition-transform" x-bind:class="openDescription ? 'rotate-180' : ''" />
                                                         </button>
