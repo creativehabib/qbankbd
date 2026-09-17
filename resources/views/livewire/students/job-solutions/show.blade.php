@@ -56,24 +56,50 @@
                         </div>
                     </div>
 
-                    <!-- Stats Pills -->
-                    <div class="flex flex-nowrap overflow-x-auto no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] items-center gap-2 md:gap-3 shrink-0 mt-6 md:mt-0 w-full md:w-auto justify-start md:justify-end md:items-end md:flex-col lg:flex-row lg:items-center">
-                        <div class="flex shrink-0 whitespace-nowrap items-center gap-1 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                            <flux:icon.document-text class="w-3.5 h-3.5 md:w-4 md:h-4 text-orange-500" />
-                            <span class="text-[11px] md:text-xs font-medium text-zinc-500 dark:text-zinc-400">পূর্ণমান:</span>
-                            <span class="text-[12px] md:text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ $exam->total_marks ?? '-' }}</span>
+                    <!-- Stats Pills (Desktop - Square Boxes) -->
+                    <div class="hidden md:flex items-center gap-3 shrink-0 mt-0 justify-end">
+                        
+                        <!-- Total Marks -->
+                        <div class="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                            <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-500 leading-none">{{ $exam->total_marks ?? '-' }}</span>
+                            <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-2">পূর্ণমান</span>
                         </div>
                         
-                        <div class="flex shrink-0 whitespace-nowrap items-center gap-1 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                            <flux:icon.question-mark-circle class="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500" />
-                            <span class="text-[11px] md:text-xs font-medium text-zinc-500 dark:text-zinc-400">প্রশ্ন:</span>
-                            <span class="text-[12px] md:text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ $totalQuestions }}</span>
+                        <!-- Total Questions -->
+                        <div class="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                            <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-500 leading-none">{{ $totalQuestions }}</span>
+                            <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-2">মোট প্রশ্ন</span>
                         </div>
 
-                        <div x-show="isQuizMode" style="display: none;" class="flex shrink-0 whitespace-nowrap items-center gap-1 md:gap-2 px-2.5 py-1.5 md:px-4 md:py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm transition-all">
-                            <flux:icon.clock class="w-3.5 h-3.5 md:w-4 md:h-4 text-sky-500" />
-                            <span class="text-[11px] md:text-xs font-medium text-zinc-500 dark:text-zinc-400">সময়:</span>
-                            <span class="text-[12px] md:text-sm font-bold text-zinc-900 dark:text-zinc-100">{{ $exam->duration ?? '-' }}মি.</span>
+                        <!-- Duration (Quiz Mode Only) -->
+                        <div x-show="isQuizMode" style="display: none;" class="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm transition-all">
+                            <div class="flex items-center gap-1 text-sky-600 dark:text-sky-500 leading-none">
+                                <span class="text-2xl font-bold">{{ $exam->duration ?? '-' }}</span>
+                            </div>
+                            <span class="flex items-center gap-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-2">
+                                <flux:icon.clock class="w-3 h-3" /> সময় (মি.)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Stats Pills (Mobile - Horizontal) -->
+                    <div class="flex md:hidden flex-wrap items-center justify-center gap-2 w-full mt-6">
+                        <div class="flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                            <flux:icon.document-text class="w-3.5 h-3.5 text-orange-500" />
+                            <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">পূর্ণমান:</span>
+                            <span class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100">{{ $exam->total_marks ?? '-' }}</span>
+                        </div>
+                        
+                        <div class="flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                            <flux:icon.question-mark-circle class="w-3.5 h-3.5 text-emerald-500" />
+                            <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">প্রশ্ন:</span>
+                            <span class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100">{{ $totalQuestions }}</span>
+                        </div>
+
+                        <div x-show="isQuizMode" style="display: none;" class="flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm transition-all">
+                            <flux:icon.clock class="w-3.5 h-3.5 text-sky-500" />
+                            <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">সময়:</span>
+                            <span class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100">{{ $exam->duration ?? '-' }}মি.</span>
                         </div>
                     </div>
                 </div>
@@ -85,43 +111,42 @@
         <div class="lg:col-span-8 space-y-6">
             
             <!-- Toolbar Row -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 sticky top-[64px] md:top-[72px] z-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-2.5 shadow-sm transition-all">
-                <!-- Modes & Actions (Scrollable on small screens) -->
-                <div class="flex items-center gap-2 w-full overflow-x-auto no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    <!-- Modes -->
-                    <div class="flex shrink-0 bg-slate-50 dark:bg-zinc-800/50 p-1 rounded-full border border-slate-200 dark:border-zinc-700">
-                        <button @click="isQuizMode = false; showAnswers = true; showExplanations = false" 
-                                :class="!isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-                                class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
-                            পড়া
-                        </button>
-                        <button @click="isQuizMode = true; showAnswers = false; showExplanations = false" 
-                                :class="isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-                                class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
-                            কুইজ
-                        </button>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="flex items-center gap-2 shrink-0">
-                        <button @click="showAnswers = !showAnswers" 
-                                :class="showAnswers ? 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
-                                class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
-                            <template x-if="showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye class="w-4 h-4" /> উত্তর: চালু</div></template>
-                            <template x-if="!showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-4 h-4" /> উত্তর: বন্ধ</div></template>
-                        </button>
-                        <button @click="showExplanations = !showExplanations" 
-                                :class="showExplanations ? 'border-indigo-300 text-indigo-600 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
-                                class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
-                            <template x-if="showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4" /> ব্যাখ্যা: চালু</div></template>
-                            <template x-if="!showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4 opacity-50" /> ব্যাখ্যা: বন্ধ</div></template>
-                        </button>
-                    </div>
+            <div class="flex items-center justify-between gap-3 sticky top-[64px] md:top-[72px] z-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-2.5 shadow-sm transition-all overflow-x-auto no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                
+                <!-- Modes -->
+                <div class="flex shrink-0 bg-slate-50 dark:bg-zinc-800/50 p-1 rounded-full border border-slate-200 dark:border-zinc-700">
+                    <button @click="isQuizMode = false; showAnswers = true; showExplanations = false" 
+                            :class="!isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
+                        <span class="md:hidden">পড়া</span>
+                        <span class="hidden md:inline">পড়ার মোড</span>
+                    </button>
+                    <button @click="isQuizMode = true; showAnswers = false; showExplanations = false" 
+                            :class="isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+                            class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
+                        <span class="md:hidden">কুইজ</span>
+                        <span class="hidden md:inline">কুইজ মোড</span>
+                    </button>
                 </div>
 
-                <!-- Share Button -->
-                <div class="flex shrink-0 w-full sm:w-auto justify-end">
-                    <button class="w-9 h-9 flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-zinc-500 hover:text-zinc-900 transition-colors shadow-sm">
+                <!-- Actions & Share -->
+                <div class="flex items-center gap-2 shrink-0 ml-auto">
+                    <!-- Action Buttons -->
+                    <button @click="showAnswers = !showAnswers" 
+                            :class="showAnswers ? 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
+                            class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
+                        <template x-if="showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye class="w-4 h-4" /> <span class="md:hidden">উত্তর: চালু</span><span class="hidden md:inline">উত্তর লুকান</span></div></template>
+                        <template x-if="!showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-4 h-4" /> <span class="md:hidden">উত্তর: বন্ধ</span><span class="hidden md:inline">উত্তর দেখান</span></div></template>
+                    </button>
+                    <button @click="showExplanations = !showExplanations" 
+                            :class="showExplanations ? 'border-indigo-300 text-indigo-600 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
+                            class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
+                        <template x-if="showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4" /> <span class="md:hidden">ব্যাখ্যা: চালু</span><span class="hidden md:inline">ব্যাখ্যা লুকান</span></div></template>
+                        <template x-if="!showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4 opacity-50" /> <span class="md:hidden">ব্যাখ্যা: বন্ধ</span><span class="hidden md:inline">ব্যাখ্যা দেখান</span></div></template>
+                    </button>
+
+                    <!-- Share Button -->
+                    <button class="w-9 h-9 shrink-0 flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-zinc-500 hover:text-zinc-900 transition-colors shadow-sm">
                         <flux:icon.share class="w-4 h-4" />
                     </button>
                 </div>
@@ -208,9 +233,9 @@
                 @endphp
 
                 @forelse($groupedQuestions as $subId => $groupQs)
-                <div>
+                <div wire:key="subject-group-{{ $subId }}">
                     @php 
-                        $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অন্যান্য অংশ';
+                        $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অনির্ধারিত অংশ';
                         // Add ' অংশ' if it doesn't end with it, just to match screenshot
                         if (!str_ends_with($subName, ' অংশ')) {
                             $subName .= ' অংশ';
@@ -232,7 +257,7 @@
                     
                     <div class="space-y-4">
                         @foreach($groupQs as $question)
-                            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
+                            <div wire:key="question-{{ $question->id }}" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
                                 
                                 <!-- Meta row -->
                                 <div class="flex justify-between items-start mb-3">
@@ -254,14 +279,14 @@
                                 </div>
 
                                 <!-- Question Title -->
-                                <div class="text-[15px] font-bold text-zinc-900 dark:text-zinc-100 leading-snug mb-4">
+                                <div class="text-[15px] md:text-lg font-bold text-zinc-900 dark:text-zinc-100 leading-snug mb-4">
                                     @php
                                         $qTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? '');
                                     @endphp
                                     <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-block tex2jax_process" data-math-content>
                                         {!! $qTitle !!} 
                                     </a>
-                                    <span class="text-[10px] font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded ml-1 align-middle inline-block">[{{ $institution->name }}]</span>
+                                    <span class="text-[10px] md:text-xs font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded ml-1 align-middle inline-block">[{{ $institution->name }}]</span>
                                 </div>
                                 
                                 <!-- Options -->
@@ -271,16 +296,16 @@
                                             @php
                                                 $isCorrect = (isset($option['is_correct']) && $option['is_correct']) ? 'true' : 'false';
                                             @endphp
-                                            <div class="flex items-center gap-3 p-3 border rounded-xl transition-all cursor-pointer"
+                                            <div class="flex items-center gap-3 p-3 md:p-3.5 border rounded-xl transition-all cursor-pointer"
                                                  :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 hover:bg-zinc-50'">
-                                                <div class="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold"
+                                                <div class="w-6 h-6 md:w-7 md:h-7 rounded-full border flex items-center justify-center shrink-0 text-xs md:text-[13px] font-bold"
                                                      :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:border-emerald-700 dark:text-emerald-400' : 'bg-white border-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:border-zinc-600'">
                                                     {{ ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'][$loop->index] ?? chr(65 + $loop->index) }}
                                                 </div>
                                                 @php
                                                     $optText = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($option['option_text'] ?? '')) ?? html_entity_decode($option['option_text'] ?? '');
                                                 @endphp
-                                                <div class="text-[13px] font-medium flex-grow tex2jax_process" data-math-content
+                                                <div class="text-[13px] md:text-[15px] font-medium flex-grow tex2jax_process" data-math-content
                                                      :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'text-emerald-800 dark:text-emerald-200' : 'text-zinc-700 dark:text-zinc-300'">
                                                     {!! $optText !!}
                                                 </div>
@@ -293,7 +318,7 @@
                                 @elseif(in_array($question->question_type, ['written', 'short', 'cq']))
                                     <div x-show="showAnswers && !isQuizMode" style="display: none;" class="mt-4 p-4 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl">
                                             <p class="text-xs font-bold text-emerald-800 dark:text-emerald-400 mb-2 flex items-center gap-1.5"><flux:icon.check-circle class="w-4 h-4" /> উত্তর / সমাধান:</p>
-                                            <div class="text-sm text-zinc-700 dark:text-zinc-300 tex2jax_process" data-math-content>
+                                            <div class="text-sm md:text-[15px] text-zinc-700 dark:text-zinc-300 tex2jax_process" data-math-content>
                                                 @if($question->description)
                                                     {!! $question->description !!}
                                                 @else
@@ -348,7 +373,7 @@
 
                                         <div x-show="!isQuizMode && localOpen" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                             @if(filled($question->description))
-                                                <div class="prose prose-sm tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
+                                                <div class="prose prose-sm md:prose-base tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
                                                     {!! $question->description !!}
                                                 </div>
                                             @else
