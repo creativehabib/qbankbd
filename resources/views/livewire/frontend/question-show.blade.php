@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-0 relative">
+<div class="z-0 relative pb-12">
     
     <!-- Breadcrumbs -->
     <div class="mb-6">

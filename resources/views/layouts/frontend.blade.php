@@ -46,7 +46,7 @@
         }
     </script>
     @livewireStyles
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         window.MathJax = {
@@ -82,7 +82,7 @@
 
         document.addEventListener('DOMContentLoaded', window.renderMathJax);
         document.addEventListener('livewire:navigated', window.renderMathJax);
-        
+
         document.addEventListener('livewire:initialized', () => {
             Livewire.hook('commit', ({ succeed }) => {
                 succeed(() => {

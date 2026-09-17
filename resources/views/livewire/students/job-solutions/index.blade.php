@@ -298,6 +298,7 @@
                 @empty
                     <div class="col-span-full py-12 text-center text-slate-500">
                         কোনো প্রতিষ্ঠান পাওয়া যায়নি।
+                    </div>
                 @endforelse
             </div>
             <div class="mt-6">

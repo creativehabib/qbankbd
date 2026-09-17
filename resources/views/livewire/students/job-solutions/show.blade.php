@@ -12,8 +12,7 @@
 
     <!-- Top Header Card -->
             <div class="bg-white dark:bg-zinc-900 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 border-t-4 border-t-teal-500 rounded-2xl p-5 md:p-8 relative overflow-hidden">
-                
-                
+
                 <div class="flex flex-col md:flex-row justify-between gap-6">
                     <div class="flex-grow">
                         <!-- Top Pills -->
@@ -48,7 +47,7 @@
                                     {{ $institution->name }} এর {{ $exam->title }} পদের নিয়োগ পরীক্ষাটি সরকারি চাকরিপ্রার্থীদের জন্য একটি গুরুত্বপূর্ণ পরীক্ষা। এই পরীক্ষায় সাধারণত {{ $exam->type }} পদ্ধতিতে প্রশ্ন এসে থাকে। নিচে সম্পূর্ণ সমাধান দেওয়া হলো।
                                 @endif
                             </div>
-                            
+
                             <button @click="expanded = !expanded" class="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:text-emerald-700 transition-colors">
                                 <span x-text="expanded ? 'সংক্ষিপ্ত করুন' : 'আরও দেখুন'"></span>
                                 <flux:icon.chevron-down class="w-3 h-3 transition-transform" x-bind:class="expanded ? 'rotate-180' : ''" />
@@ -58,13 +57,13 @@
 
                     <!-- Stats Pills (Desktop - Square Boxes) -->
                     <div class="hidden md:flex items-center gap-3 shrink-0 mt-0 justify-end">
-                        
+
                         <!-- Total Marks -->
                         <div class="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                             <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-500 leading-none">{{ $exam->total_marks ?? '-' }}</span>
                             <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-2">পূর্ণমান</span>
                         </div>
-                        
+
                         <!-- Total Questions -->
                         <div class="flex flex-col items-center justify-center w-[88px] h-[88px] rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                             <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-500 leading-none">{{ $totalQuestions }}</span>
@@ -89,7 +88,7 @@
                             <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">পূর্ণমান:</span>
                             <span class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100">{{ $exam->total_marks ?? '-' }}</span>
                         </div>
-                        
+
                         <div class="flex shrink-0 whitespace-nowrap items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                             <flux:icon.question-mark-circle class="w-3.5 h-3.5 text-emerald-500" />
                             <span class="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">প্রশ্ন:</span>
@@ -106,22 +105,22 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         <!-- Left Main Content (Cols: 8/12) -->
         <div class="lg:col-span-8 space-y-6">
-            
+
             <!-- Toolbar Row -->
             <div class="flex items-center justify-between gap-3 sticky top-[64px] md:top-[72px] z-40 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-2.5 shadow-sm transition-all overflow-x-auto no-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                
+
                 <!-- Modes -->
                 <div class="flex shrink-0 bg-slate-50 dark:bg-zinc-800/50 p-1 rounded-full border border-slate-200 dark:border-zinc-700">
-                    <button @click="isQuizMode = false; showAnswers = true; showExplanations = false" 
+                    <button @click="isQuizMode = false; showAnswers = true; showExplanations = false"
                             :class="!isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
                             class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
                         <span class="md:hidden">পড়া</span>
                         <span class="hidden md:inline">পড়ার মোড</span>
                     </button>
-                    <button @click="isQuizMode = true; showAnswers = false; showExplanations = false" 
+                    <button @click="isQuizMode = true; showAnswers = false; showExplanations = false"
                             :class="isQuizMode ? 'bg-white dark:bg-zinc-900 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
                             class="px-4 py-1.5 text-[13px] font-bold rounded-full transition-all text-center">
                         <span class="md:hidden">কুইজ</span>
@@ -132,13 +131,13 @@
                 <!-- Actions & Share -->
                 <div class="flex items-center gap-2 shrink-0 ml-auto">
                     <!-- Action Buttons -->
-                    <button @click="showAnswers = !showAnswers" 
+                    <button @click="showAnswers = !showAnswers"
                             :class="showAnswers ? 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
                             class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
                         <template x-if="showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye class="w-4 h-4" /> <span class="md:hidden">উত্তর: চালু</span><span class="hidden md:inline">উত্তর লুকান</span></div></template>
                         <template x-if="!showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-4 h-4" /> <span class="md:hidden">উত্তর: বন্ধ</span><span class="hidden md:inline">উত্তর দেখান</span></div></template>
                     </button>
-                    <button @click="showExplanations = !showExplanations" 
+                    <button @click="showExplanations = !showExplanations"
                             :class="showExplanations ? 'border-indigo-300 text-indigo-600 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
                             class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
                         <template x-if="showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4" /> <span class="md:hidden">ব্যাখ্যা: চালু</span><span class="hidden md:inline">ব্যাখ্যা লুকান</span></div></template>
@@ -153,13 +152,13 @@
             </div>
 
             <!-- Subject Pills -->
-            <div class="flex overflow-x-auto gap-2 py-2 w-full snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <button wire:click="setSubject(null)" 
+            <div class="flex overflow-x-auto md:flex-wrap gap-2 py-2 w-full snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <button wire:click="setSubject(null)"
                         class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
                     সকল বিষয় ({{ $totalQuestions }})
                 </button>
                 @foreach($subjectsData as $subject)
-                    <button wire:click="setSubject({{ $subject['id'] }})" 
+                    <button wire:click="setSubject({{ $subject['id'] }})"
                             class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === $subject['id'] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
                         {{ $subject['name'] }} ({{ $subject['count'] }})
                     </button>
@@ -183,7 +182,7 @@
                         <flux:icon.chevron-down class="w-4 h-4 transition-transform " x-bind:class="showTopicWeightage ? 'rotate-180' : ''" />
                     </div>
                 </button>
-                
+
                 <div x-show="showTopicWeightage" x-collapse style="display: none;">
                 <div class="p-6 border-t border-emerald-100 dark:border-emerald-900/50 bg-white dark:bg-zinc-900/50">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,7 +197,7 @@
                                         {{ $subject['count'] }} টি ({{ $subject['percentage'] }}%)
                                     </div>
                                 </div>
-                                
+
                                 <!-- Chapters List -->
                                 <div class="space-y-4">
                                     @foreach($subject['chapters'] as $chapter)
@@ -206,7 +205,7 @@
                                             <div class="flex justify-between items-end mb-1.5 text-xs">
                                                 <span class="text-zinc-600 dark:text-zinc-400 font-medium">{{ $chapter['name'] }}</span>
                                                 <span>
-                                                    <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $chapter['count'] }} টি</span> 
+                                                    <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $chapter['count'] }} টি</span>
                                                     <span class="text-zinc-400 text-[11px]">({{ $chapter['percentage'] }}%)</span>
                                                 </span>
                                             </div>
@@ -226,7 +225,7 @@
             </div>
 
             <!-- Questions Area -->
-            <div class="space-y-6 pt-4">
+            <div class="space-y-6">
                 @php
                     $groupedQuestions = $activeQuestions->groupBy('subject_id');
                     $globalQuestionIndex = 1;
@@ -234,14 +233,14 @@
 
                 @forelse($groupedQuestions as $subId => $groupQs)
                 <div wire:key="subject-group-{{ $subId }}">
-                    @php 
+                    @php
                         $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অনির্ধারিত অংশ';
                         // Add ' অংশ' if it doesn't end with it, just to match screenshot
                         if (!str_ends_with($subName, ' অংশ')) {
                             $subName .= ' অংশ';
                         }
                     @endphp
-                    
+
                     <div class="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-2 mt-8 mb-6 relative">
                         <div class="absolute -left-0 top-0 bottom-0 w-1.5 bg-emerald-600 rounded-r-md"></div>
                         <h2 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 pl-4">{{ $subName }}</h2>
@@ -254,11 +253,11 @@
                             </a>
                         @endif
                     </div>
-                    
+
                     <div class="space-y-4">
                         @foreach($groupQs as $question)
                             <div wire:key="question-{{ $question->id }}" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
-                                
+
                                 <!-- Meta row -->
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex gap-2">
@@ -275,7 +274,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    
+
                                 </div>
 
                                 <!-- Question Title -->
@@ -284,11 +283,11 @@
                                         $qTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? '');
                                     @endphp
                                     <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-block tex2jax_process" data-math-content>
-                                        {!! $qTitle !!} 
+                                        {!! $qTitle !!}
                                     </a>
                                     <span class="text-[10px] md:text-xs font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded ml-1 align-middle inline-block">[{{ $institution->name }}]</span>
                                 </div>
-                                
+
                                 <!-- Options -->
                                 @if($question->question_type === 'mcq' && is_array($question->extra_content))
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -327,11 +326,11 @@
                                             </div>
                                         </div>
                                 @endif
-                                
+
                                 <!-- Interactive Explanation Block (Like Practice) -->
                                 @if($question->question_type === 'mcq')
-                                    <div x-data="{ localOpen: false }" 
-                                     x-effect="localOpen = (!isQuizMode && showExplanations && {{ filled($question->description) ? 'true' : 'false' }})" 
+                                    <div x-data="{ localOpen: false }"
+                                     x-effect="localOpen = (!isQuizMode && showExplanations && {{ filled($question->description) ? 'true' : 'false' }})"
                                      class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <template x-if="!isQuizMode">
@@ -427,12 +426,12 @@
                     <flux:icon.arrow-path class="size-8 animate-spin text-emerald-500" />
                 </div>
             @endif
-            
+
         </div>
 
         <!-- Right Sidebar (Cols: 4/12) -->
         <div class="lg:col-span-4 space-y-6 sticky top-[92px] h-max">
-            
+
             <!-- Box 1: Hiring Institution -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
                 <div class="p-5 flex items-center gap-4">
@@ -450,7 +449,7 @@
                         <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">{{ $institution->name }}</h3>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-2 divide-x divide-zinc-100 dark:divide-zinc-800 border-t border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
                     <div class="p-4">
                         <p class="text-[10px] text-zinc-400 font-medium mb-1">পরীক্ষার ধরণ</p>
@@ -461,7 +460,7 @@
                         <p class="text-sm font-bold text-emerald-600">{{ $totalQuestions }} টি</p>
                     </div>
                 </div>
-                
+
                 <div class="p-4 bg-white dark:bg-zinc-900">
                     <a href="{{ route('institution.show', $institution->slug) }}" class="block w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-center text-xs font-bold rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/50">
                         {{ $institution->short_name ?? 'Ministry' }} এর সকল পরীক্ষা &rarr;
@@ -477,7 +476,7 @@
                     </h3>
                     <a href="{{ route('job-solutions.index', ['tab' => 'organizations']) }}" class="text-[10px] font-bold text-emerald-600 hover:underline">সকল প্রতিষ্ঠান</a>
                 </div>
-                
+
                 <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
                     @forelse($otherInstitutions as $otherInst)
                         <a href="{{ route('institution.show', $otherInst->slug) }}" class="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
