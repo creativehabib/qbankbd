@@ -1,19 +1,44 @@
 {
-  "name": "Your App Name",
-  "short_name": "Your App",
-  "icons": [
-    {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+    "name": "Qerobi.Com",
+    "short_name": "Qerobi.com",
+    "description": "Qerobi.com - বাংলাদেশের সেরা চাকরি প্রস্তুতি রিসোর্স প্ল্যাটফর্ম। প্রশ্ন সমাধান, নির্ভুল ব্যাখ্যা ও ক্যারিয়ার গাইড।",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#059669",
+    "theme_color": "#059669",
+    "orientation": "portrait-primary",
+    "lang": "bn",
+    "dir": "ltr",
+    "categories": [
+        "education",
+        "books",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
 }
