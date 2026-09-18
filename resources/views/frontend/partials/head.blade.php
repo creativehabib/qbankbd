@@ -1,5 +1,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="csrf-token" content="{{ csrf_token() }}" />
 
 @php
     $branding = \App\Support\SettingsStore::group('branding');
@@ -14,19 +15,34 @@
     $pageDesc = filled($description ?? null) ? $description : $siteDesc;
     $currentUrl = url()->current();
 
-    $accentColor = $branding['accent_color'] ?? '#3b82f6';
+    $accentColor = $branding['accent_color'] ?? '#059669'; // Default Emerald
     $textColor = $branding['text_color'] ?? '#ffffff';
     $darkBgColor = $branding['dark_bg_color'] ?? '#18181b';
-    $defaultTheme = $branding['default_theme'] ?? 'System';
+    $defaultTheme = $branding['default_theme'] ?? 'system';
 
     $tracking = \App\Support\SettingsStore::group('tracking');
 @endphp
 
+    <!-- Daily Study Streak Hydration -->
+@if(auth()->check())
+    <meta name="streak-user-auth" content="1">
+    <meta name="streak-current" content="{{ auth()->user()->current_streak ?? 0 }}">
+    <meta name="streak-longest" content="{{ auth()->user()->longest_streak ?? 0 }}">
+    <meta name="streak-last-date" content="{{ auth()->user()->last_study_date ?? '' }}">
+@else
+    <meta name="streak-user-auth" content="0">
+    <meta name="streak-current" content="">
+    <meta name="streak-longest" content="">
+    <meta name="streak-last-date" content="">
+@endif
+
+<!-- Basic SEO -->
 <title>{{ $pageTitle }}</title>
 <meta name="title" content="{{ $pageTitle }}">
 <meta name="description" content="{{ $pageDesc }}">
 <meta name="author" content="{{ $appName }}">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="no-index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="{{ $currentUrl }}">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
@@ -34,15 +50,36 @@
 <meta property="og:title" content="{{ $pageTitle }}">
 <meta property="og:description" content="{{ $pageDesc }}">
 <meta property="og:image" content="{{ $ogImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:site_name" content="{{ $appName }}">
+<meta property="og:locale" content="bn_BD">
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="{{ $currentUrl }}">
-<meta property="twitter:title" content="{{ $pageTitle }}">
-<meta property="twitter:description" content="{{ $pageDesc }}">
-<meta property="twitter:image" content="{{ $ogImage }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ $currentUrl }}">
+<meta name="twitter:title" content="{{ $pageTitle }}">
+<meta name="twitter:description" content="{{ $pageDesc }}">
+<meta name="twitter:image" content="{{ $ogImage }}">
 
+<!-- Progressive Web App (PWA) Manifest & Mobile Meta -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="{{ $accentColor }}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="{{ $appName }}">
+
+<!-- Favicons & Icons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+<link rel="icon" href="{{ $favicon }}" sizes="any">
+
+<!-- Tracking Scripts -->
 @if(!empty($tracking['google_analytics_id']))
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ $tracking['google_analytics_id'] }}"></script>
@@ -77,9 +114,7 @@
     {!! $tracking['custom_header_script'] !!}
 @endif
 
-<link rel="icon" href="{{ $favicon }}" sizes="any">
-<link rel="apple-touch-icon" href="{{ $favicon }}">
-
+<!-- Dynamic Colors & Theme CSS -->
 <style>
     :root, .dark {
         --color-accent: {{ $accentColor }};
@@ -129,15 +164,12 @@
         --color-zinc-50:  #f8fafc;
     }
 
-    html.dark body {
-        background-color: var(--color-zinc-950);
-    }
-
-    html.dark .header-dynamic-bg {
-        background-color: color-mix(in srgb, var(--color-zinc-900) 85%, transparent);
-    }
+    html.dark body { background-color: var(--color-zinc-950); }
+    html.dark .header-dynamic-bg { background-color: color-mix(in srgb, var(--color-zinc-900) 85%, transparent); }
+    :root.dark { color-scheme: dark; }
 </style>
 
+<!-- Fonts Setup -->
 @if($primaryFont = setting('primary_font'))
     @php
         $primaryFont = trim($primaryFont);
@@ -171,67 +203,38 @@
     </style>
 @endif
 
-<script src="/ckeditor/ckeditor.js" type="text/javascript"></script>
-
-<script>
-    document.addEventListener('livewire:navigated', () => {
-        if (typeof window.renderKatex === 'function') {
-            window.renderKatex();
-        }
-    });
-
-    document.addEventListener('livewire:initialized', () => {
-        Livewire.hook('commit', ({ succeed }) => {
-            succeed(() => {
-                requestAnimationFrame(() => {
-                    if (typeof window.renderKatex === 'function') {
-                        window.renderKatex();
-                    }
-                });
-            });
-        });
-    });
-</script>
-
+<!-- Asset Compilation -->
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @stack('styles')
 
-<style>
-    :root.dark {
-        color-scheme: dark;
-    }
-</style>
-
+<!-- Standalone Theme Manager (No Flux UI) -->
 <script>
-    window.Flux = {
-        applyAppearance (appearance, saveToStorage = true) {
-            let applyDark = () => document.documentElement.classList.add('dark')
-            let applyLight = () => document.documentElement.classList.remove('dark')
+    // Global Event Delegation for Theme Toggle
+    document.addEventListener('click', function(e) {
+        const toggleBtn = e.target.closest('#theme-toggle');
 
-            if (appearance === 'system') {
-                let media = window.matchMedia('(prefers-color-scheme: dark)')
+        if (toggleBtn) {
+            e.preventDefault();
+            const html = document.documentElement;
 
-                if (saveToStorage) window.localStorage.removeItem('flux.appearance')
-
-                media.matches ? applyDark() : applyLight()
-            } else if (appearance === 'dark') {
-                if (saveToStorage) window.localStorage.setItem('flux.appearance', 'dark')
-
-                applyDark()
-            } else if (appearance === 'light') {
-                if (saveToStorage) window.localStorage.setItem('flux.appearance', 'light')
-
-                applyLight()
+            // ইনস্ট্যান্ট ক্লাস পরিবর্তন এবং লোকাল স্টোরেজে সেভ
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
             }
         }
-    }
+    });
 
-    const userPref = window.localStorage.getItem('flux.appearance') || window.localStorage.getItem('theme');
-    const adminDefault = '{{ strtolower($defaultTheme) }}';
-
-    if (userPref) {
-        window.Flux.applyAppearance(userPref, false);
-    } else {
-        window.Flux.applyAppearance(adminDefault, false);
-    }
+    // পেজ রিলোডে থিম ধরে রাখার জন্য ইনিশিয়াল চেক
+    (function() {
+        try {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        } catch (_) {}
+    })();
 </script>

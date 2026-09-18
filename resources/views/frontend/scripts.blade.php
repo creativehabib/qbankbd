@@ -1,33 +1,4 @@
 <script>
-        // Theme toggle logic
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-        var htmlClasses = document.documentElement.classList;
-        if(htmlClasses.contains('dark')) {
-            htmlClasses.remove('dark');
-            localStorage.setItem('flux.appearance', 'light');
-            localStorage.setItem('color-theme', 'light');
-            document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
-            document.getElementById('theme-toggle-light-icon').classList.add('hidden');
-        } else {
-            htmlClasses.add('dark');
-            localStorage.setItem('flux.appearance', 'dark');
-            localStorage.setItem('color-theme', 'dark');
-            document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
-            document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
-        }
-    });
-
-    // Initialize Theme icon state
-    window.addEventListener('DOMContentLoaded', () => {
-        if(document.documentElement.classList.contains('dark')) {
-            document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
-            document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
-        } else {
-            document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
-            document.getElementById('theme-toggle-light-icon').classList.add('hidden');
-        }
-    });
-
     // Mobile Menu Drawer Logic
     function toggleMobileMenu() {
         const drawer = document.getElementById('mobile-drawer');

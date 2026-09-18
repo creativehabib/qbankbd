@@ -5,7 +5,7 @@
     <title>@yield('title', 'ডিফল্ট সাইট টাইটেল')</title>
     <meta name="description" content="@yield('description', 'ডিফল্ট সাইট ডিসক্রিপশন')">
 
-    @include('partials.head')
+    @include('frontend.partials.head')
 
     <style>
         body, html {
