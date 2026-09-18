@@ -12,7 +12,7 @@
                     subtitle="{{ $examCat->questions_count ?? 0 }} Questions" description='Pick a row to view its details, or click "New exam" to add one.' />
             </div>
         @else
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="save" wire:key="form-{{ $editId ?? 'create' }}" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editId ? 'Edit Exam Category' : 'Create Exam Category' }}</flux:heading>
                 <flux:text class="mt-1">Add or update exam category details.</flux:text>
@@ -42,7 +42,7 @@
 
         <x-modern-list>
             @forelse($examCategories as $examCat)
-                <x-modern-list-item 
+                <x-modern-list-item wire:key="item-{{ $examCat->id }}" 
                     :active="$editId === $examCat->id"
                     icon="academic-cap"
                     title="{{ $examCat->name }}"

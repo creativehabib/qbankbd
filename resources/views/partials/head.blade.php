@@ -6,11 +6,12 @@
     $general = \App\Support\SettingsStore::group('general');
     $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
     $siteDesc = $general['site_description'] ?? 'বাংলাদেশের সেরা ডিজিটাল প্রশ্নভান্ডার ও অনলাইন লার্নিং প্ল্যাটফর্ম।';
-    $favicon = !empty($branding['favicon']) ? (\Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon'])) : '/favicon.ico';
+    $favicon = !empty($branding['favicon']) ? (\Illuminate\Support\Str::startsWith($branding['favicon'], ['http://', 'https://']) ? $branding['favicon'] : asset('storage/'.$branding['favicon'])) : asset('images/favicon.png');
     
     // SEO Meta Tags Dynamic Setup
     $ogImage = !empty($branding['logo_dark']) ? (\Illuminate\Support\Str::startsWith($branding['logo_dark'], ['http://', 'https://']) ? $branding['logo_dark'] : asset('storage/'.$branding['logo_dark'])) : asset('images/og-image.png');
     $pageTitle = filled($title ?? null) ? $title.' - '.$appName : $appName;
+    $pageDesc = filled($description ?? null) ? $description : $siteDesc;
     $currentUrl = url()->current();
 
     $accentColor = $branding['accent_color'] ?? '#3b82f6';
@@ -23,7 +24,7 @@
 
 <title>{{ $pageTitle }}</title>
 <meta name="title" content="{{ $pageTitle }}">
-<meta name="description" content="{{ $siteDesc }}">
+<meta name="description" content="{{ $pageDesc }}">
 <meta name="author" content="{{ $appName }}">
 <meta name="robots" content="index, follow">
 
@@ -31,7 +32,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ $currentUrl }}">
 <meta property="og:title" content="{{ $pageTitle }}">
-<meta property="og:description" content="{{ $siteDesc }}">
+<meta property="og:description" content="{{ $pageDesc }}">
 <meta property="og:image" content="{{ $ogImage }}">
 <meta property="og:site_name" content="{{ $appName }}">
 
@@ -39,7 +40,7 @@
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:url" content="{{ $currentUrl }}">
 <meta property="twitter:title" content="{{ $pageTitle }}">
-<meta property="twitter:description" content="{{ $siteDesc }}">
+<meta property="twitter:description" content="{{ $pageDesc }}">
 <meta property="twitter:image" content="{{ $ogImage }}">
 
 @if(!empty($tracking['google_analytics_id']))
@@ -85,16 +86,55 @@
         --color-accent-content: {{ $accentColor }};
         --color-accent-foreground: {{ $textColor }};
         
+        --color-emerald-50: color-mix(in oklab, {{ $accentColor }} 10%, white);
+        --color-emerald-100: color-mix(in oklab, {{ $accentColor }} 20%, white);
+        --color-emerald-200: color-mix(in oklab, {{ $accentColor }} 40%, white);
+        --color-emerald-300: color-mix(in oklab, {{ $accentColor }} 60%, white);
+        --color-emerald-400: color-mix(in oklab, {{ $accentColor }} 80%, white);
+        --color-emerald-500: {{ $accentColor }};
+        --color-emerald-600: color-mix(in oklab, {{ $accentColor }} 85%, black);
+        --color-emerald-700: color-mix(in oklab, {{ $accentColor }} 70%, black);
+        --color-emerald-800: color-mix(in oklab, {{ $accentColor }} 55%, black);
+        --color-emerald-900: color-mix(in oklab, {{ $accentColor }} 40%, black);
+        --color-emerald-950: color-mix(in oklab, {{ $accentColor }} 25%, black);
+
+        --color-indigo-50: color-mix(in oklab, {{ $accentColor }} 10%, white);
+        --color-indigo-100: color-mix(in oklab, {{ $accentColor }} 20%, white);
+        --color-indigo-200: color-mix(in oklab, {{ $accentColor }} 40%, white);
+        --color-indigo-300: color-mix(in oklab, {{ $accentColor }} 60%, white);
+        --color-indigo-400: color-mix(in oklab, {{ $accentColor }} 80%, white);
+        --color-indigo-500: {{ $accentColor }};
+        --color-indigo-600: color-mix(in oklab, {{ $accentColor }} 85%, black);
+        --color-indigo-700: color-mix(in oklab, {{ $accentColor }} 70%, black);
+        --color-indigo-800: color-mix(in oklab, {{ $accentColor }} 55%, black);
+        --color-indigo-900: color-mix(in oklab, {{ $accentColor }} 40%, black);
+        --color-indigo-950: color-mix(in oklab, {{ $accentColor }} 25%, black);
+        
         --app-dark-active-bg: color-mix(in srgb, var(--color-accent) 15%, transparent);
         --app-dark-active-text: var(--color-accent);
         --app-dark-border: color-mix(in srgb, var(--color-accent) 20%, transparent);
     }
     
+        html.dark {
+        --color-zinc-950: color-mix(in oklab, {{ $darkBgColor }} 50%, #020617);
+        --color-zinc-900: color-mix(in oklab, {{ $darkBgColor }} 15%, #0f172a);
+        --color-zinc-800: color-mix(in oklab, {{ $darkBgColor }} 5%, #1e293b);
+        --color-zinc-700: #334155;
+        --color-zinc-600: #475569;
+        --color-zinc-500: #64748b;
+        --color-zinc-400: #94a3b8;
+        --color-zinc-300: #cbd5e1;
+        --color-zinc-200: #e2e8f0;
+        --color-zinc-100: #f1f5f9;
+        --color-zinc-50:  #f8fafc;
+    }
     html.dark body {
-        background-color: {{ $darkBgColor }};
+        background-color: var(--color-zinc-950);
+    }
+    html.dark .header-dynamic-bg {
+        background-color: color-mix(in srgb, var(--color-zinc-900) 85%, transparent);
     }
 </style>
-
 @if($primaryFont = setting('primary_font'))
     @php
         $primaryFont = trim($primaryFont);
@@ -122,7 +162,7 @@
 @endif
 @if($bodyFontSize = setting('body_font_size'))
     <style>
-        :root { --body-font-size: {{ trim($bodyFontSize) }}; }
+        :root { --body-font-size: {{ trim($bodyFontSize)  }
         body { font-size: var(--body-font-size); }
     </style>
 @endif

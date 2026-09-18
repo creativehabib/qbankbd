@@ -10,20 +10,20 @@
                 <x-modern-empty-state icon="book-open" title="Select a subject" description="Pick a row to view its details, or click 'New subject' to add one." />
             </div>
         @else
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="save" wire:key="form-{{ $editId ?? 'create' }}" class="space-y-4">
                 <div>
                     <flux:heading size="lg">{{ $editId ? 'Edit Subject' : 'Create New Subject' }}</flux:heading>
                     <flux:text class="mt-1">Add the subject details and assign a class.</flux:text>
                 </div>
 
                 <flux:field>
-                    <flux:label>Academic Class</flux:label>
-                    <flux:select wire:model="academic_class_id" placeholder="Choose a class...">
+                    <flux:label class="mb-2">Academic Classes</flux:label>
+                    <div class="grid grid-cols-2 gap-2 mt-2 max-h-48 overflow-y-auto p-2 border border-gray-200 dark:border-gray-700 rounded-lg">
                         @foreach($classes as $class)
-                            <flux:select.option value="{{ $class->id }}">{{ $class->name }}</flux:select.option>
+                            <flux:checkbox wire:model="academic_class_ids" value="{{ $class->id }}" label="{{ $class->name }}" />
                         @endforeach
-                    </flux:select>
-                    <flux:error name="academic_class_id" />
+                    </div>
+                    <flux:error name="academic_class_ids" />
                 </flux:field>
 
                 <flux:field>
@@ -79,11 +79,20 @@
 
         <x-modern-list>
             @forelse($subjects as $subject)
-                <x-modern-list-item 
+                @php
+                    $classes = $subject->academicClasses;
+                    $classNames = 'Global';
+                    if ($classes->isNotEmpty()) {
+                        $classNames = $classes->count() > 2 
+                            ? $classes->take(2)->pluck('name')->join(', ') . ' (+' . ($classes->count() - 2) . ' more)'
+                            : $classes->pluck('name')->join(', ');
+                    }
+                @endphp
+                <x-modern-list-item wire:key="item-{{ $subject->id }}" 
                     :active="$editId === $subject->id"
                     icon="book-open"
                     title="{{ $subject->name }}"
-                    subtitle="{{ $subject->academicClass?->name ?? 'N/A' }} {{ $subject->subject_code ? ' • '.$subject->subject_code : '' }} • {{ $subject->questions_count ?? 0 }} Questions"
+                    subtitle="{{ $classNames }} {{ $subject->subject_code ? ' • '.$subject->subject_code : '' }} • {{ $subject->questions_count ?? 0 }} Questions"
                     editAction="edit({{ $subject->id }})"
                     deleteAction="delete({{ $subject->id }})"
                     :statusBadge="$subject->is_active ? 'Active' : null"

@@ -168,7 +168,7 @@
 
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                                 @foreach($question->tags as $tag)
-                                                    <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">#{{ $tag->name }}</span>
+                                                    <span class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-md font-bold flex items-center gap-1">#{{ $tag->name }}</span>
                                                 @endforeach
                                             </div>
                                             <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -363,7 +363,7 @@
 
                                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                                     @foreach($question->tags as $tag)
-                                                        <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">#{{ $tag->name }}</span>
+                                                        <span class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-md font-bold flex items-center gap-1">#{{ $tag->name }}</span>
                                                     @endforeach
                                                 </div>
 

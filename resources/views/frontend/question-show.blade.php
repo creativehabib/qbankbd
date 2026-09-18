@@ -1,3 +1,9 @@
+@php
+    $qText = trim(html_entity_decode(strip_tags($question->title ?? '')));
+    $qTitle = $qText !== '' ? \Illuminate\Support\Str::limit($qText, 60) : 'প্রশ্ন ও সমাধান';
+    $qDesc = $qText !== '' ? \Illuminate\Support\Str::limit($qText, 160) : 'প্রশ্ন ও বিস্তারিত সমাধান';
+@endphp
+<x-layouts.frontend :title="$qTitle" :description="$qDesc">
 <div class="z-0 relative pb-12">
     
     <!-- Breadcrumbs -->
@@ -36,7 +42,7 @@
                 <li>
                     <div class="flex items-center">
                         <flux:icon.chevron-right class="w-3 h-3 mx-1" />
-                        <span class="text-zinc-700 dark:text-zinc-300 line-clamp-1 max-w-xs">{!! strip_tags($question->title) !!}</span>
+                        <span class="text-zinc-700 dark:text-zinc-300 line-clamp-1 max-w-xs tex2jax_process" data-math-content>{!! strip_tags($question->title) !!}</span>
                     </div>
                 </li>
             </ol>
@@ -57,32 +63,32 @@
                     
 
                     <!-- Question Title -->
-                    <h1 class="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-100 leading-relaxed mb-3">
+                    <h1 class="text-xl md:text-2xl font-bold text-zinc-800 dark:text-zinc-100 leading-relaxed mb-3 tex2jax_process" data-math-content>
                         {!! $question->title !!}
                     </h1>
                     
                     <!-- Tags -->
                     <div class="mt-2 mb-8 flex flex-wrap gap-2 text-xs">
                         @if($question->subject)
-                            <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">
+                            <span class="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2.5 py-1 rounded-md font-bold">
                                 {{ $question->subject->name }}
                             </span>
                         @endif
                         @if($question->chapter)
-                            <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">
+                            <span class="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2.5 py-1 rounded-md font-bold">
                                 {{ $question->chapter->name }}
                             </span>
                         @endif
                         @if(isset($question->tags))
                             @foreach($question->tags as $tag)
-                                <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">
+                                <span class="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 px-2.5 py-1 rounded-md font-bold flex items-center gap-1">
                                     #{{ $tag->name }}
                                 </span>
                             @endforeach
                         @endif
                         @if($question->pastExams && $question->pastExams->count() > 0)
                             @foreach($question->pastExams as $exam)
-                                <span class="rounded-full border border-indigo-200 bg-indigo-50/50 px-2 py-0.5 text-indigo-700 dark:border-indigo-800/50 dark:bg-indigo-900/20 dark:text-indigo-400">
+                                <span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-2.5 py-1 rounded-md font-bold flex items-center gap-1">
                                     #{{ $exam->title }}
                                 </span>
                             @endforeach
@@ -255,3 +261,5 @@
         </div>
     </div>
 </div>
+
+</x-layouts.frontend>

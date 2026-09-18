@@ -41,7 +41,7 @@ class ChapterIndex extends Component
 
     public string $name = '';
 
-    public string $description = '';
+    public ?string $description = '';
 
     public bool $is_active = true;
 
@@ -78,13 +78,14 @@ class ChapterIndex extends Component
     {
         $this->isCreating = false;
         $this->resetValidation();
-        $chapter = Chapter::withCount('questions')->with('subject.academicClass')->findOrFail($id);
+        $chapter = Chapter::withCount('questions')->with('subject.academicClasses')->findOrFail($id);
 
         $this->editId = $chapter->id;
         $this->subject_id = (string) $chapter->subject_id;
-        $this->academic_class_id = (string) ($chapter->subject?->academic_class_id ?? '');
+        $firstClass = $chapter->subject?->academicClasses->first();
+        $this->academic_class_id = $firstClass ? (string) $firstClass->id : '';
         $this->name = $chapter->name;
-        $this->description = $chapter->description;
+        $this->description = $chapter->description ?? '';
         $this->is_active = $chapter->is_active;
         $this->is_premium = $chapter->is_premium;
         $this->image = $chapter->image;
@@ -96,7 +97,7 @@ class ChapterIndex extends Component
     public function save()
     {
         $validated = $this->validate([
-            'academic_class_id' => 'required|exists:academic_classes,id',
+            
             'subject_id' => 'required|exists:subjects,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -105,16 +106,9 @@ class ChapterIndex extends Component
             'image' => 'nullable|string',
         ]);
 
-        $subject = Subject::query()
-            ->whereKey($validated['subject_id'])
-            ->where('academic_class_id', $validated['academic_class_id'])
-            ->first();
+        $subject = Subject::find($validated['subject_id']);
 
-        if (! $subject) {
-            $this->addError('subject_id', 'Please select a subject from the selected class.');
-
-            return;
-        }
+        if (! $subject) { $this->addError('subject_id', 'Invalid subject.'); return; }
 
         $slug = Str::slug($this->name);
         $slugExists = Chapter::where('slug', $slug)->where('id', '!=', $this->editId)->exists();
@@ -180,6 +174,7 @@ class ChapterIndex extends Component
 
         // Open modal via Flux
         $this->showToggleModal = true;
+        $this->dispatch('modal-show', name: 'toggle-confirm');
     }
 
     public function performToggle()
@@ -194,6 +189,7 @@ class ChapterIndex extends Component
 
         $this->toastSuccess('Status updated successfully.');
         $this->showToggleModal = false;
+        $this->dispatch('modal-close', name: 'toggle-confirm');
         $this->toggleTargetId = null;
     }
 
@@ -205,7 +201,7 @@ class ChapterIndex extends Component
 
     public function render()
     {
-        $chapters = Chapter::withCount('questions')->with('subject.academicClass')
+        $chapters = Chapter::withCount('questions')->with('subject.academicClasses')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('description', 'like', '%'.$this->search.'%');
@@ -216,11 +212,13 @@ class ChapterIndex extends Component
             ->paginate($this->perPage);
 
         $subjects = Subject::query()
-            ->with('academicClass')
-            ->when($this->academic_class_id !== '', function ($query): void {
-                $query->where('academic_class_id', $this->academic_class_id);
+            ->with('academicClasses')
+            ->when($this->academic_class_id !== '', function ($query) {
+                $query->whereHas('academicClasses', function ($q) {
+                    $q->where('academic_classes.id', $this->academic_class_id);
+                });
             })
-            ->orderBy(AcademicClass::query()->withCount('questions')->select('name')->whereColumn('academic_classes.id', 'subjects.academic_class_id'))
+            ->orderBy('name')
             ->when($this->sortField === 'name_asc', fn ($q) => $q->orderBy('name', 'asc'))
             ->when($this->sortField === 'name_desc', fn ($q) => $q->orderBy('name', 'desc'))
             ->when($this->sortField === 'default', fn ($q) => $q->latest())

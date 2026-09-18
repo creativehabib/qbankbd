@@ -18,7 +18,7 @@
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Main Form -->
         <div class="flex-1 space-y-6">
-            
+
             <!-- App Name -->
             <flux:card>
                 <div class="mb-4">
@@ -58,37 +58,37 @@
                         <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Full logo (expanded sidebar)</label>
                         <span class="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">Max 400 × 80 px · PNG / JPG / WebP</span>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
+
                         <div class="space-y-2">
-                                                                                                                <x-modern-image-uploader 
-                                label="LIGHT MODE" 
-                                uploadModel="logo_light_upload" 
+                                                                                                                <x-modern-image-uploader
+                                label="LIGHT MODE"
+                                uploadModel="logo_light_upload"
                                 :upload="$logo_light_upload"
-                                existingModel="logo_light" 
+                                existingModel="logo_light"
                                 :existing="$logo_light"
                                 mode="light"
                                 emptyTitle="Drag the app logo or click to browse"
                                 emptyHint="PNG, JPG, or WebP · up to 2048 KB"
-                                previewHeight="h-32" 
-                            />  
+                                previewHeight="h-32"
+                            />
                         </div>
 
 
-                        
+
                         <div class="space-y-2">
-                                                                                                                <x-modern-image-uploader 
-                                label="DARK MODE" 
-                                uploadModel="logo_dark_upload" 
+                                                                                                                <x-modern-image-uploader
+                                label="DARK MODE"
+                                uploadModel="logo_dark_upload"
                                 :upload="$logo_dark_upload"
-                                existingModel="logo_dark" 
+                                existingModel="logo_dark"
                                 :existing="$logo_dark"
                                 mode="dark"
                                 emptyTitle="Drag the app logo or click to browse"
                                 emptyHint="PNG, JPG, or WebP · up to 2048 KB"
-                                previewHeight="h-32" 
-                            />  
+                                previewHeight="h-32"
+                            />
                         </div>
 
                     </div>
@@ -102,37 +102,37 @@
                         <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Collapsed sidebar icon</label>
                         <span class="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">Ideal 80 × 80 px · PNG / JPG / WebP</span>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
+
                         <div class="space-y-2">
-                                                                                                                <x-modern-image-uploader 
-                                label="LIGHT MODE" 
-                                uploadModel="icon_light_upload" 
+                                                                                                                <x-modern-image-uploader
+                                label="LIGHT MODE"
+                                uploadModel="icon_light_upload"
                                 :upload="$icon_light_upload"
-                                existingModel="icon_light" 
+                                existingModel="icon_light"
                                 :existing="$icon_light"
                                 mode="light"
                                 emptyTitle="Drag the icon/mark or click to browse"
                                 emptyHint="PNG, JPG, or WebP · up to 2048 KB"
-                                previewHeight="h-48" 
-                            />  
+                                previewHeight="h-48"
+                            />
                         </div>
 
 
-                        
+
                         <div class="space-y-2">
-                                                                                                                <x-modern-image-uploader 
-                                label="DARK MODE" 
-                                uploadModel="icon_dark_upload" 
+                                                                                                                <x-modern-image-uploader
+                                label="DARK MODE"
+                                uploadModel="icon_dark_upload"
                                 :upload="$icon_dark_upload"
-                                existingModel="icon_dark" 
+                                existingModel="icon_dark"
                                 :existing="$icon_dark"
                                 mode="dark"
                                 emptyTitle="Drag the icon/mark or click to browse"
                                 emptyHint="PNG, JPG, or WebP · up to 2048 KB"
-                                previewHeight="h-48" 
-                            />  
+                                previewHeight="h-48"
+                            />
                         </div>
 
                     </div>
@@ -145,20 +145,20 @@
                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Favicon</h3>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400">The little icon in the browser tab. PNG, JPG, or ICO.</p>
                 </div>
-                
-                
+
+
                 <div>
-                                                                                                <x-modern-image-uploader 
-                                label="" 
-                                uploadModel="favicon_upload" 
+                                                                                                <x-modern-image-uploader
+                                label=""
+                                uploadModel="favicon_upload"
                                 :upload="$favicon_upload"
-                                existingModel="favicon" 
+                                existingModel="favicon"
                                 :existing="$favicon"
                                 mode="auto"
                                 emptyTitle="Drag a favicon or click to browse"
                                 emptyHint="PNG, JPG, or ICO · up to 1024 KB"
-                                previewHeight="h-48" 
-                            />  
+                                previewHeight="h-48"
+                            />
                 </div>
             </flux:card>
 
@@ -187,7 +187,7 @@
                                 ];
                             @endphp
                             @foreach($colors as $color)
-                                <button type="button" wire:click="$set('accent_color', '{{ $color }}')" 
+                                <button type="button" wire:click="$set('accent_color', '{{ $color }}')"
                                         class="w-8 h-8 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-offset-zinc-900
                                         {{ $accent_color === $color ? 'ring-2 ring-accent ring-offset-2 dark:ring-offset-zinc-900' : 'border border-zinc-200 dark:border-zinc-700' }}"
                                         style="background-color: {{ $color }};">
@@ -223,11 +223,11 @@
 
                 <div class="flex items-center gap-4">
                     <div class="flex gap-2">
-                        <button type="button" wire:click="$set('text_color', '#ffffff')" 
+                        <button type="button" wire:click="$set('text_color', '#ffffff')"
                                 class="w-8 h-8 rounded-lg shadow-sm transition-all bg-white border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-offset-zinc-900
                                 {{ $text_color === '#ffffff' ? 'ring-2 ring-zinc-900 dark:ring-white ring-offset-2 dark:ring-offset-zinc-900' : '' }}">
                         </button>
-                        <button type="button" wire:click="$set('text_color', '#000000')" 
+                        <button type="button" wire:click="$set('text_color', '#000000')"
                                 class="w-8 h-8 rounded-lg shadow-sm transition-all bg-black border border-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-offset-zinc-900
                                 {{ $text_color === '#000000' ? 'ring-2 ring-zinc-900 dark:ring-white ring-offset-2 dark:ring-offset-zinc-900' : '' }}">
                         </button>
@@ -256,7 +256,7 @@
                         <div class="flex flex-wrap gap-2">
                             @php
                                 $darkColors = [
-                                    '#18181b', // Zinc 900
+                                    '#020818', // Zinc 900
                                     '#27272a', // Zinc 800
                                     '#0f172a', // Slate 900
                                     '#1e293b', // Slate 800
@@ -268,7 +268,7 @@
                                 ];
                             @endphp
                             @foreach($darkColors as $color)
-                                <button type="button" wire:click="$set('dark_bg_color', '{{ $color }}')" 
+                                <button type="button" wire:click="$set('dark_bg_color', '{{ $color }}')"
                                         class="w-8 h-8 rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-offset-zinc-900
                                         {{ $dark_bg_color === $color ? 'ring-2 ring-accent ring-offset-2 dark:ring-offset-zinc-900' : 'border border-zinc-200 dark:border-zinc-700' }}"
                                         style="background-color: {{ $color }};">
@@ -324,7 +324,7 @@
                 <!-- Light Preview -->
                 <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm relative overflow-hidden">
                     <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4">Light</div>
-                    
+
                     <div class="space-y-4">
                         <div class="flex justify-between items-center bg-zinc-50 p-2 rounded-lg border border-zinc-100">
                             <div class="flex items-center gap-2">
@@ -353,7 +353,7 @@
                 <!-- Dark Preview -->
                 <div class="rounded-xl border border-zinc-700 bg-zinc-950 p-4 shadow-sm relative overflow-hidden">
                     <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Dark</div>
-                    
+
                     <div class="space-y-4">
                         <div class="flex justify-between items-center bg-zinc-900 p-2 rounded-lg border border-zinc-800">
                             <div class="flex items-center gap-2">
@@ -398,7 +398,7 @@
     document.addEventListener('livewire:init', () => {
         Livewire.on('default-theme-updated', (event) => {
             let theme = event.theme || (event[0] && event[0].theme) || (event[0] ? event[0] : null);
-            
+
             if (theme) {
                 window.localStorage.removeItem('flux.appearance');
                 window.localStorage.removeItem('theme');
@@ -416,7 +416,7 @@
             // Reload the page so that CSS variables in <head> and new logos are applied instantly
             setTimeout(() => {
                 window.location.reload();
-            }, 800); 
+            }, 800);
         });
     });
 </script>

@@ -4,25 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qerobi.Com | ডিজিটাল প্রশ্নভান্ডার ও স্মার্ট ক্যারিয়ার প্রস্তুতি</title>
-
-    <!-- Primary Font: Noto Sans Bengali -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Noto Sans Bengali"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-
     <style>
         body, html {
             -webkit-user-select: none;
@@ -45,54 +26,8 @@
             document.documentElement.classList.remove('dark');
         }
     </script>
-    @livewireStyles
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true,
-            },
-            options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-                ignoreHtmlClass: 'tex2jax_ignore',
-                processHtmlClass: 'tex2jax_process'
-            },
-            startup: {
-                typeset: false
-            }
-        };
-    </script>
-    <script defer id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-        window.renderMathJax = function() {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                const elements = Array.from(document.querySelectorAll('.tex2jax_process, [data-math-content]'));
-                if (elements.length > 0) {
-                    // Only clear and typeset the specific elements
-                    if (window.MathJax.typesetClear) {
-                        window.MathJax.typesetClear(elements);
-                    }
-                    window.MathJax.typesetPromise(elements).catch((err) => console.log('MathJax error: ', err));
-                }
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', window.renderMathJax);
-        document.addEventListener('livewire:navigated', window.renderMathJax);
-
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.hook('commit', ({ succeed }) => {
-                succeed(() => {
-                    requestAnimationFrame(() => {
-                        window.renderMathJax();
-                    });
-                });
-            });
-        });
-    </script>
+    @stack('styles')
 </head>
 <body class="bg-slate-50 dark:bg-[#0B1120] text-slate-800 dark:text-slate-200 font-sans antialiased min-h-screen flex flex-col pb-20 lg:pb-0 transition-colors duration-300">
 
@@ -125,7 +60,7 @@
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">প্রশ্ন ব্যাংক</a>
                     <a href="{{ route('job-solutions.index') }}" class="px-4 py-2 rounded-xl {{ request()->is('job-solutions*') || request()->routeIs('job-solutions.*') || request()->routeIs('institution.show') ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600' }}">জব সল্যুশন</a>
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">ভর্তি ও পরীক্ষা</a>
-                    <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">পিডিএফ বই</a>
+                    <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">পিডিএফ বইি</a>
                 </nav>
             </div>
 
@@ -323,8 +258,6 @@
         }
     }
 </script>
-    @livewire('frontend.global-search')
-    @livewireScripts
-    @fluxScripts
+    @stack('scripts')
 </body>
 </html>

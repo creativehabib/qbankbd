@@ -164,6 +164,7 @@ class TopicIndex extends Component
 
         // Open modal via Flux
         $this->showToggleModal = true;
+        $this->dispatch('modal-show', name: 'toggle-confirm');
     }
 
     public function performToggle()
@@ -178,6 +179,7 @@ class TopicIndex extends Component
 
         $this->toastSuccess('Status updated successfully.');
         $this->showToggleModal = false;
+        $this->dispatch('modal-close', name: 'toggle-confirm');
         $this->toggleTargetId = null;
     }
 

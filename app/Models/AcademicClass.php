@@ -38,12 +38,12 @@ class AcademicClass extends Model
 
     public function subjects()
     {
-        return $this->hasMany(Subject::class);
+        return $this->belongsToMany(Subject::class, 'academic_class_subject')->withPivot('custom_name')->withTimestamps();
     }
 
     // রিলেশনশিপ: একটি ক্লাসের অধীনে অনেক প্রশ্ন থাকে
     public function questions()
     {
-        return $this->hasMany(Question::class);
+        return $this->belongsToMany(Question::class, 'academic_class_question')->withTimestamps();
     }
 }

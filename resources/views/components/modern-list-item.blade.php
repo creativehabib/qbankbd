@@ -1,7 +1,7 @@
 @props(['active' => false, 'icon' => 'tag', 'title', 'subtitle' => null, 'editAction' => null, 'deleteAction' => null, 'statusBadge' => null, 'toggleAction' => null, 'toggleState' => false])
 
 <div 
-    @if($editAction) wire:click="{{ $editAction }}" @endif
+    @if($editAction) x-on:click="$wire.{{ $editAction }}" @endif
     {{ $attributes->class([
     'group flex items-center justify-between py-3 px-4 transition-all border-b border-zinc-100 dark:border-zinc-800/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 relative',
     'cursor-pointer' => $editAction,
@@ -52,7 +52,7 @@
         @endif
         
         @if($toggleAction !== null)
-            <button wire:click="{{ $toggleAction }}" type="button" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 {{ $toggleState ? 'bg-accent' : 'bg-zinc-200 dark:bg-zinc-700' }}" role="switch" aria-checked="{{ $toggleState ? 'true' : 'false' }}">
+            <button x-on:click="$wire.{{ $toggleAction }}" type="button" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 {{ $toggleState ? 'bg-accent' : 'bg-zinc-200 dark:bg-zinc-700' }}" role="switch" aria-checked="{{ $toggleState ? 'true' : 'false' }}">
                 <span aria-hidden="true" class="pointer-events-none inline-block size-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $toggleState ? 'translate-x-4' : 'translate-x-0' }}"></span>
             </button>
         @endif
@@ -62,10 +62,10 @@
                 <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="text-zinc-400" />
                 <flux:menu>
                     @if($editAction)
-                        <flux:menu.item icon="pencil-square" wire:click="{{ $editAction }}">Edit</flux:menu.item>
+                        <flux:menu.item icon="pencil-square" x-on:click="$wire.{{ $editAction }}">Edit</flux:menu.item>
                     @endif
                     @if($deleteAction)
-                        <flux:menu.item icon="trash" variant="danger" x-on:click="window.confirmDeleteAction(() => $wire.{{ $deleteAction }})">Delete</flux:menu.item>
+                        <flux:menu.item icon="trash" variant="danger" x-on:click="$dispatch('modal-show', { name: 'delete-confirmation' }); window.pendingDeleteAction = () => $wire.{{ $deleteAction }}">Delete</flux:menu.item>
                     @endif
                 </flux:menu>
             </flux:dropdown>

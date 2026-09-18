@@ -533,7 +533,7 @@ class BulkUpload extends Component
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
-            ->where('academic_class_id', $validated['academic_class_id'])
+            ->whereHas('academicClasses', fn($q) => $q->where('academic_classes.id', $validated['academic_class_id']))
             ->first();
 
         if (! $subject) {
@@ -572,6 +572,7 @@ class BulkUpload extends Component
                     'user_id' => $currentUser?->id,
                 ]);
 
+                $question->academicClasses()->sync([$validated['academic_class_id']]);
                 $question->examCategories()->sync($this->exam_category_ids);
 
                 $globalTagIds = collect($validated['tagIds'] ?? [])->map(fn (mixed $tag): int => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => trim((string) $tag)])->id)->toArray();
@@ -598,7 +599,7 @@ class BulkUpload extends Component
         return view('livewire.admin.questions.bulk-upload', [
             'classes' => AcademicClass::query()->orderBy('name')->get(),
             'subjects' => $this->academic_class_id
-                ? Subject::query()->where('academic_class_id', $this->academic_class_id)->orderBy('name')->get()
+                ? Subject::query()->whereHas('academicClasses', fn($q) => $q->where('academic_classes.id', $this->academic_class_id))->orderBy('name')->get()
                 : collect(),
             'chapters' => $this->subject_id
                 ? Chapter::query()->where('subject_id', $this->subject_id)->orderBy('name')->get()

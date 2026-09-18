@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PackageSeeder::class,
             AccessControlSeeder::class,
             DefaultUsersSeeder::class,
+            BangladeshTaxonomySeeder::class,
         ]);
     }
 }

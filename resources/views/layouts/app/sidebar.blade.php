@@ -514,6 +514,7 @@
 
 @fluxScripts
 @stack('scripts')
+@include('mediamanager::partials.scripts')
 @include('mediamanager::includes.media-modal')
 
 @php

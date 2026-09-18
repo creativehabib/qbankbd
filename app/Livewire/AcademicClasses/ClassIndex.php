@@ -163,7 +163,7 @@ class ClassIndex extends Component
     {
         $class = AcademicClass::query()->withCount('questions')->find($id);
         if ($class) {
-            $hasQuestions = Question::where('academic_class_id', $id)->exists();
+            $hasQuestions = $class->questions()->exists();
             if ($hasQuestions) {
                 $this->toastWarning('This class is attached to questions, so it cannot be deleted. You can deactivate it instead.', 'Cannot Delete');
 
@@ -417,6 +417,7 @@ class ClassIndex extends Component
 
         // Open modal via Flux
         $this->showToggleModal = true;
+        $this->dispatch('modal-show', name: 'toggle-confirm');
     }
 
     public function performToggle()
@@ -431,6 +432,7 @@ class ClassIndex extends Component
 
         $this->toastSuccess('Status updated successfully.');
         $this->showToggleModal = false;
+        $this->dispatch('modal-close', name: 'toggle-confirm');
         $this->toggleTargetId = null;
     }
 

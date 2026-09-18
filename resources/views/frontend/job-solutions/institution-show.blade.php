@@ -1,5 +1,12 @@
+@php
+    $mcqCount = $exams->filter(fn($e) => strtolower($e->type ?? '') === 'mcq')->count();
+    $writtenCount = $exams->filter(fn($e) => strtolower($e->type ?? '') === 'written')->count();
+    $allCount = $exams->count();
+@endphp
+<x-layouts.frontend :title="$institution->name . ' এর সকল পরীক্ষার প্রশ্ন ও সমাধান'" :description="$institution->name . ' কর্তৃক পরিচালিত বিগত সালের সকল পরীক্ষার প্রশ্ন ও পূর্ণাঙ্গ সমাধান।'">
 <div>
     <!-- Breadcrumb -->
+        <div x-data="{ type: 'all', counts: { 'all': {{ $allCount }}, 'mcq': {{ $mcqCount }}, 'written': {{ $writtenCount }} } }">
     <div class="mb-4">
         <nav class="flex text-[11px] text-zinc-500 font-medium" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-2">
@@ -74,22 +81,22 @@
         <div>
             <h2 class="text-lg font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2 mb-1">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 
-                অনুষ্ঠিত নিয়োগ ও প্রশ্ন সমাধান তালিকা ({{ $exams->total() }})
+                অনুষ্ঠিত নিয়োগ ও প্রশ্ন সমাধান তালিকা (<span x-text="counts[type]"></span>)
             </h2>
             <p class="text-xs text-zinc-500">{{ $institution->name }} কর্তৃক পরিচালিত বিগত সালের সকল পরীক্ষার পূর্ণাঙ্গ সমাধান</p>
         </div>
         
         <div class="flex items-center gap-2">
-            <button wire:click="setType('all')" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors {{ $type === 'all' ? 'bg-emerald-600 text-white border border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50' }}">সকল</button>
-            <button wire:click="setType('mcq')" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors {{ $type === 'mcq' ? 'bg-emerald-600 text-white border border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50' }}">MCQ</button>
-            <button wire:click="setType('written')" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors {{ $type === 'written' ? 'bg-emerald-600 text-white border border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50' }}">লিখিত</button>
+            <button @click="type = 'all'" :class="type === 'all' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors border">সকল</button>
+            <button @click="type = 'mcq'" :class="type === 'mcq' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors border">MCQ</button>
+            <button @click="type = 'written'" :class="type === 'written' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'" class="px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors border">লিখিত</button>
         </div>
     </div>
 
     <!-- Exams Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
         @forelse($exams as $exam)
-            <a href="{{ route('job-solutions.show', ['institutionSlug' => $institution->slug, 'examSlug' => $exam->slug]) }}" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm hover:border-emerald-400 hover:shadow-md transition-all flex gap-5 group cursor-pointer">
+            <a x-show="type === 'all' || type === '{{ strtolower($exam->type ?? '') }}'" href="{{ route('job-solutions.show', ['institutionSlug' => $institution->slug, 'examSlug' => $exam->slug]) }}" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm hover:border-emerald-400 hover:shadow-md transition-all flex gap-5 group cursor-pointer">
                 <div class="w-14 h-14 rounded-2xl bg-emerald-50/50 dark:bg-zinc-800 border border-emerald-50 dark:border-zinc-700 flex items-center justify-center shrink-0">
                     <span class="text-emerald-700 dark:text-emerald-400 font-bold text-sm">{{ $exam->exam_date ? $exam->exam_date->format('Y') : 'N/A' }}</span>
                 </div>
@@ -114,13 +121,19 @@
                 </div>
             </a>
         @empty
-            <div class="col-span-1 md:col-span-2 text-center py-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-500">
-                এই ক্যাটাগরিতে কোনো পরীক্ষা পাওয়া যায়নি।
+            <div class="col-span-1 md:col-span-2 flex items-center justify-center min-h-[250px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+                <p class="text-zinc-500 dark:text-zinc-400 font-medium text-[13px] md:text-sm">এই প্রতিষ্ঠানের কোনো পরীক্ষা এখনো যুক্ত করা হয়নি।</p>
             </div>
         @endforelse
+        
+        @if($allCount > 0)
+            <div x-show="counts[type] === 0" x-cloak class="col-span-1 md:col-span-2 flex items-center justify-center min-h-[250px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+                <p class="text-zinc-500 dark:text-zinc-400 font-medium text-[13px] md:text-sm">এই ক্যাটাগরিতে কোনো পরীক্ষা পাওয়া যায়নি।</p>
+            </div>
+        @endif
     </div>
     
-    <div>
-        {{ $exams->links() }}
-    </div>
+    
 </div>
+</div>
+</x-layouts.frontend>

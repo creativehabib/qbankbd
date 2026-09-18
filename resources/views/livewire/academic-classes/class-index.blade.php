@@ -1,7 +1,7 @@
 <x-split-layout>
     <x-slot:header>
         <x-modern-page-header title="Academic Class"
-                    subtitle="{{ $class->questions_count ?? 0 }} Questions" description="Create, search and manage classes from one place." modelName="class"></x-modern-page-header>
+                    subtitle="" description="Create, search and manage classes from one place." modelName="class"></x-modern-page-header>
     </x-slot:header>
 
     <x-slot:form>
@@ -9,25 +9,16 @@
             @if(!$isCreating && !$editingClassId)
             <div>
                 <x-modern-empty-state icon="academic-cap" title="Select a class"
-                    subtitle="{{ $class->questions_count ?? 0 }} Questions" description='Pick a row to view its details, or click "New class" to add one.' />
+                    description='Pick a row to view its details, or click "New class" to add one.' />
             </div>
         @else
-            <form wire:submit="saveClass" class="space-y-4">
+            <form wire:submit="saveClass" wire:key="form-{{ $editingClassId ?? 'create' }}" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editingClassId ? 'Edit Class' : 'Create New Class' }}</flux:heading>
                 <flux:text class="mt-1">Add the class details and availability settings.</flux:text>
             </div>
 
-            <flux:field>
-                <flux:label>Parent Category (Optional)</flux:label>
-                <flux:select wire:model="class_parent_id" placeholder="Select a parent category">
-                    <flux:select.option value="">None (Top-Level Category)</flux:select.option>
-                    @foreach(\App\Models\AcademicClass::whereNull('parent_id')->orderBy('name')->get() as $cat)
-                        <flux:select.option value="{{ $cat->id }}">{{ $cat->name }}</flux:select.option>
-                    @endforeach
-                </flux:select>
-                <flux:error name="class_parent_id" />
-            </flux:field>
+
 
             <flux:field>
                 <flux:label>Class/Category name</flux:label>
@@ -61,11 +52,11 @@
 
         <x-modern-list>
             @forelse($academicClasses as $academicClass)
-                <x-modern-list-item 
+                <x-modern-list-item wire:key="item-{{ $academicClass->id }}" 
                     :active="$editingClassId === $academicClass->id"
                     icon="academic-cap"
                     title="{{ $academicClass->name }}"
-                    subtitle="{{ $class->questions_count ?? 0 }} Questions"
+                    subtitle="{{ $academicClass->questions_count ?? 0 }} Questions"
                     editAction="editClass({{ $academicClass->id }})"
                     deleteAction="deleteClass({{ $academicClass->id }})" toggleAction="toggleActive({{ $academicClass->id }})" :toggleState="$academicClass->is_active"
                 >

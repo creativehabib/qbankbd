@@ -247,15 +247,6 @@
                 </h3>
 
                 <div class="space-y-5">
-                    <div wire:ignore wire:key="class-select-{{ $question->id ?? 'create' }}">
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Class <span class="text-red-500">*</span></label>
-                        <select id="academic_class" class="w-full">
-                            <option value="">-- Select Class --</option>
-                            @foreach($classes as $class) <option value="{{ $class->id }}" @selected($class->id == $academic_class_id)>{{ $class->name }}</option> @endforeach
-                        </select>
-                        @error('academic_class_id')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
-                    </div>
-
                     <div wire:ignore wire:key="subject-select-{{ $question->id ?? 'create' }}">
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Subject <span class="text-red-500">*</span></label>
                         <select id="subject" class="w-full">
@@ -279,6 +270,15 @@
                             <option value="">-- Select Topic --</option>
                             @foreach($topics as $c) <option value="{{ $c->id }}" @selected($c->id == $topic_id)>{{ $c->name }}</option> @endforeach
                         </select>
+                    </div>
+
+                    <div wire:ignore wire:key="class-select-{{ $question->id ?? 'create' }}">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience (Classes) <span class="text-red-500">*</span></label>
+                        <select id="academic_class" class="w-full" multiple>
+                            <option value="">-- Select Class --</option>
+                            @foreach($classes as $class) <option value="{{ $class->id }}" @selected(in_array($class->id, $academic_class_ids))>{{ $class->name }}</option> @endforeach
+                        </select>
+                        @error('academic_class_ids')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -345,17 +345,6 @@
                         </select>
                     </div>
 
-                    <div wire:ignore>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Exam Category</label>
-                        <select id="exam_categories" class="w-full" multiple placeholder="Select Exam (BCS, HSC...)">
-                            @foreach($allExamCategories as $category)
-                                <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('exam_category_ids')<span class="text-xs text-red-500 mt-1.5 block font-medium bg-red-50 dark:bg-red-950 p-2 rounded-lg border border-red-100 dark:border-red-900">{{ $message }}</span>@enderror
-                    </div>
                 </div>
             </div>
 
@@ -385,7 +374,6 @@
         window.tsChapter = window.tsChapter || null;
         window.tsTopic = window.tsTopic || null;
         window.tsTags = window.tsTags || null;
-        window.tsExamCategories = window.tsExamCategories || null;
 
         // 🌟 Helper function to wrap MathJax formulas
         function wrapMathForCKEditor(html) {
@@ -451,7 +439,7 @@
                 };
 
                 const classEl = document.getElementById('academic_class');
-                if (classEl && !classEl.tomselect) window.tsClass = new TomSelect(classEl, {...tsConfig, onChange: (v) => updateLivewire('academic_class_id', v) });
+                if (classEl && !classEl.tomselect) window.tsClass = new TomSelect(classEl, {...tsMultiConfig, onChange: (v) => updateLivewire('academic_class_ids', v) });
 
                 const subjectEl = document.getElementById('subject');
                 if (subjectEl && !subjectEl.tomselect) window.tsSubject = new TomSelect(subjectEl, {...tsConfig, onChange: (v) => updateLivewire('subject_id', v) });
@@ -465,8 +453,6 @@
                 const tagsEl = document.getElementById('tags');
                 if (tagsEl && !tagsEl.tomselect) window.tsTags = new TomSelect(tagsEl, {...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
 
-                const examCategoriesEl = document.getElementById('exam_categories');
-                if (examCategoriesEl && !examCategoriesEl.tomselect) window.tsExamCategories = new TomSelect(examCategoriesEl, { ...tsMultiConfig, create: false, onChange: (v) => updateLivewire('exam_category_ids', v) });
             } else {
                 console.error("TomSelect is not loaded!");
             }
@@ -508,7 +494,6 @@
                 window.tsSubject?.clear(true);
                 window.tsChapter?.clear(true);
                 window.tsTopic?.clear(true);
-                window.tsExamCategories?.clear(true);
             });
 
             window.addEventListener('refresh-editors', () => setTimeout(initEditors, 350));
@@ -526,7 +511,6 @@
                 if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
                 if (window.tsTopic) { window.tsTopic.destroy(); window.tsTopic = null; }
                 if (window.tsTags) { window.tsTags.destroy(); window.tsTags = null; }
-                if (window.tsExamCategories) { window.tsExamCategories.destroy(); window.tsExamCategories = null; }
             });
 
             window.hasRegisteredQuestionEvents = true;

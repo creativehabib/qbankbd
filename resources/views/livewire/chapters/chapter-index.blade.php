@@ -10,7 +10,7 @@
                 <x-modern-empty-state icon="document-text" title="Select a chapter" description='Pick a row to view its details, or click "New chapter" to add one.' />
             </div>
         @else
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="save" wire:key="form-{{ $editId ?? 'create' }}" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editId ? 'Edit Chapter' : 'Create New Chapter' }}</flux:heading>
                 <flux:text class="mt-1">Add the chapter details and assign it to a subject.</flux:text>
@@ -31,7 +31,7 @@
                 <flux:select wire:model="subject_id" placeholder="Choose a subject..." :disabled="$academic_class_id === ''">
                     @foreach($subjects as $subject)
                         <flux:select.option value="{{ $subject->id }}">
-                            {{ $subject->name }} @if($subject->academicClass?->name)({{ $subject->academicClass->name }})@endif
+                            {{ $subject->name }} @if($subject->academicClasses->isNotEmpty()) ({{ $subject->academicClasses->pluck('name')->join(', ') }}) @endif
                         </flux:select.option>
                     @endforeach
                 </flux:select>
@@ -84,11 +84,20 @@
 
         <x-modern-list>
             @forelse($chapters as $chapter)
-                <x-modern-list-item 
+                @php
+                    $classes = $chapter->subject?->academicClasses;
+                    $classNames = '';
+                    if ($classes && $classes->isNotEmpty()) {
+                        $classNames = $classes->count() > 2 
+                            ? ' (' . $classes->take(2)->pluck('name')->join(', ') . ' + ' . ($classes->count() - 2) . ' more)'
+                            : ' (' . $classes->pluck('name')->join(', ') . ')';
+                    }
+                @endphp
+                <x-modern-list-item wire:key="item-{{ $chapter->id }}" 
                     :active="$editId === $chapter->id"
                     icon="document-text"
                     title="{{ $chapter->name }}"
-                    subtitle="{{ $chapter->subject?->name ?? 'N/A' }}{{ $chapter->subject?->academicClass?->name ? ' ('.$chapter->subject->academicClass->name.')' : '' }} • {{ $chapter->questions_count ?? 0 }} Questions"
+                    subtitle="{{ $chapter->subject?->name ?? 'N/A' }}{{ $classNames }} • {{ $chapter->questions_count ?? 0 }} Questions"
                     editAction="edit({{ $chapter->id }})"
                     deleteAction="delete({{ $chapter->id }})"
                     :statusBadge="$chapter->is_active ? 'Active' : null"

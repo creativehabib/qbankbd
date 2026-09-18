@@ -5,7 +5,7 @@
     
     $siteName = $brandingSettings['app_name'] ?? 'প্রশ্নব্যাংক';
     $siteDesc = $generalSettings['site_description'] ?? 'বাংলাদেশের সেরা ডিজিটাল প্রশ্নভান্ডার ও অনলাইন লার্নিং প্ল্যাটফর্ম। বিভিন্ন প্রতিযোগিতামূলক পরীক্ষার প্রস্তুতি নিতে আজই যুক্ত হোন।';
-    $faviconUrl = filled($brandingSettings['favicon'] ?? null) ? asset('storage/' . $brandingSettings['favicon']) : '/favicon.ico';
+    $faviconUrl = filled($brandingSettings['favicon'] ?? null) ? asset('storage/' . $brandingSettings['favicon']) : asset('images/favicon.png');
     $ogImage = filled($brandingSettings['logo_dark'] ?? null) ? asset('storage/' . $brandingSettings['logo_dark']) : asset('images/og-image.png');
     $appUrl = config('app.url');
     $pageTitle = $siteName . ' - ' . 'বাংলাদেশের সেরা ডিজিটাল প্রশ্নভান্ডার';

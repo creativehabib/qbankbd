@@ -17,7 +17,7 @@
             <flux:card>
                 <flux:heading size="lg" class="mb-4">{{ $editingId ? 'Edit Exam' : 'Create Exam' }}</flux:heading>
                 
-                <form wire:submit.prevent="save" class="space-y-4">
+                <form wire:submit.prevent="save" wire:key="form-{{ $editingId ?? 'create' }}" class="space-y-4">
                     <flux:field>
                         <flux:label>Title (e.g. 45th BCS Preliminary)</flux:label>
                         <flux:input wire:model="title" />
@@ -123,7 +123,7 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @forelse($exams as $exam)
-                                <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50">
+                                <tr wire:key="item-{{ $exam->id }}" class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50">
                                     <td class="px-4 py-4 font-medium text-zinc-900 dark:text-zinc-100">{{ $exam->title }}</td>
                                     <td class="px-4 py-4 text-zinc-500 dark:text-zinc-400">{{ $exam->institution?->name ?? '-' }}</td>
                                     <td class="px-4 py-4 text-zinc-500 dark:text-zinc-400">

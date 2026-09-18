@@ -1,4 +1,10 @@
 {
+  "node_modules/@alpinejs/collapse/dist/module.esm.js": {
+    "file": "assets/module.esm-BBejJ6Z_.js",
+    "name": "module.esm",
+    "src": "node_modules/@alpinejs/collapse/dist/module.esm.js",
+    "isDynamicEntry": true
+  },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
     "file": "assets/fa-brands-400-BfBXV7Mm.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
@@ -14,6 +20,12 @@
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
     "file": "assets/fa-v4compatibility-DnhYSyY-.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
+  },
+  "node_modules/alpinejs/dist/module.esm.js": {
+    "file": "assets/module.esm-CHcY14HK.js",
+    "name": "module.esm",
+    "src": "node_modules/alpinejs/dist/module.esm.js",
+    "isDynamicEntry": true
   },
   "node_modules/katex/dist/fonts/KaTeX_AMS-Regular.ttf": {
     "file": "assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
@@ -256,7 +268,7 @@
     "src": "node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-B4BUk7te.css",
+    "file": "assets/app-DnDa0OAz.css",
     "name": "app",
     "names": [
       "app.css"
@@ -271,10 +283,14 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BofFEMz_.js",
+    "file": "assets/app-CXDZsm6W.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "dynamicImports": [
+      "node_modules/alpinejs/dist/module.esm.js",
+      "node_modules/@alpinejs/collapse/dist/module.esm.js"
+    ],
     "css": [
       "assets/app-DQeLlQKP.css"
     ],

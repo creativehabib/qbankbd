@@ -17,7 +17,7 @@
             <flux:card>
                 <flux:heading size="lg" class="mb-4">{{ $editingId ? 'Edit Institution' : 'Create Institution' }}</flux:heading>
                 
-                <form wire:submit.prevent="save" class="space-y-5">
+                <form wire:submit.prevent="save" wire:key="form-{{ $editingId ?? 'create' }}" class="space-y-5">
                     
                     <flux:field>
                         <flux:label>Institution Name</flux:label>
@@ -73,7 +73,7 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @forelse($institutions as $inst)
-                                <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50">
+                                <tr wire:key="item-{{ $inst->id }}" class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50">
                                     <td class="px-4 py-4">
                                         <div class="font-medium text-zinc-900 dark:text-zinc-100">{{ $inst->name }}</div>
                                     </td>

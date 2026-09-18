@@ -20,7 +20,7 @@ class BrandingTheme extends Component
 
     public string $text_color = '#ffffff';
 
-    public string $dark_bg_color = '#18181b';
+    public string $dark_bg_color = '#020818';
 
     public string $default_theme = 'Dark';
 
@@ -99,7 +99,7 @@ class BrandingTheme extends Component
             'footer_text' => trim($validated['footer_text'] ?? ''),
             'accent_color' => trim($validated['accent_color'] ?? '#3b82f6'),
             'text_color' => trim($validated['text_color'] ?? '#ffffff'),
-            'dark_bg_color' => trim($validated['dark_bg_color'] ?? '#18181b'),
+            'dark_bg_color' => trim($validated['dark_bg_color'] ?? '#020818'),
             'default_theme' => trim($validated['default_theme']),
 
             'logo_light' => $this->logo_light,

@@ -2,7 +2,7 @@
     'name' => 'toggle-confirm',
 ])
 
-<flux:modal wire:model="showToggleModal" class="md:w-96">
+<flux:modal name="{{ $name }}" wire:model="showToggleModal" class="md:w-96">
     <div class="flex gap-4">
         <div class="shrink-0">
             <div class="flex size-10 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200/50 dark:border-amber-500/20 text-amber-600 dark:text-amber-500">

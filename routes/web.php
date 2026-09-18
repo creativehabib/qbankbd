@@ -70,11 +70,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', [\App\Http\Controllers\Frontend\FrontendController::class, 'home'])->name('home');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy');
 
 // Public Frontend Routes
-Route::get('/job-solutions', App\Livewire\Students\JobSolutions\Index::class)->name('job-solutions.index');
+Route::get('/job-solutions', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'index'])->name('job-solutions.index');
 
 
 
@@ -231,11 +231,23 @@ Route::post('/payment/ssl/ipn', [PaymentController::class, 'sslIpn'])->name('pay
 Route::post('/payment/nagad/pay/{package}', [PaymentController::class, 'nagadPay'])->name('payment.nagad.pay');
 Route::get('/payment/nagad/callback', [PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
 
+
+// Interaction Routes (AJAX)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/interaction/bookmark/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'toggleBookmark']);
+    Route::post('/interaction/like/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'toggleLike']);
+    Route::post('/interaction/ai-explanation/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'generateAiExplanation']);
+});
+
 require __DIR__.'/settings.php';
 
 
-Route::get('/question/{slug}', \App\Livewire\Frontend\QuestionShow::class)->name('question.show');
+
+Route::get('/search', [\App\Http\Controllers\Frontend\FrontendController::class, 'search'])->name('search');
+Route::get('/search/live', [\App\Http\Controllers\Frontend\FrontendController::class, 'apiSearch'])->name('search.live');
+
+Route::get('/question/{slug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'questionShow'])->name('question.show');
 
 // Dynamic Institution and Exam Routes (Place at very bottom to prevent overriding)
-Route::get('/{institutionSlug}', App\Livewire\Students\JobSolutions\InstitutionShow::class)->name('institution.show');
-Route::get('/{institutionSlug}/{examSlug}', App\Livewire\Students\JobSolutions\Show::class)->name('job-solutions.show');
+Route::get('/{institutionSlug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'institutionShow'])->name('institution.show');
+Route::get('/{institutionSlug}/{examSlug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'show'])->name('job-solutions.show');

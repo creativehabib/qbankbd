@@ -34,7 +34,7 @@ class SubjectIndex extends Component
     // Form Properties
     public $editId = null;
 
-    public $academic_class_id = '';
+    public array $academic_class_ids = [];
 
     public $name = '';
 
@@ -59,7 +59,7 @@ class SubjectIndex extends Component
     {
         $this->isCreating = false;
         $this->reset([
-            'editId', 'academic_class_id', 'name', 'subject_code',
+            'editId', 'academic_class_ids', 'name', 'subject_code',
             'description', 'image',
         ]);
         $this->is_active = true;
@@ -77,10 +77,10 @@ class SubjectIndex extends Component
     {
         $this->isCreating = false;
         $this->resetValidation();
-        $subject = Subject::findOrFail($id);
+        $subject = Subject::with('academicClasses')->findOrFail($id);
 
         $this->editId = $subject->id;
-        $this->academic_class_id = $subject->academic_class_id;
+        $this->academic_class_ids = $subject->academicClasses->pluck('id')->map(fn($id) => (string) $id)->toArray();
         $this->name = $subject->name;
         $this->subject_code = $subject->subject_code;
         $this->description = $subject->description;
@@ -95,7 +95,7 @@ class SubjectIndex extends Component
     public function save()
     {
         $this->validate([
-            'academic_class_id' => 'required|exists:academic_classes,id',
+            'academic_class_ids' => 'required|array', 'academic_class_ids.*' => 'exists:academic_classes,id',
             'name' => 'required|string|max:255',
             'subject_code' => 'nullable|string|max:50',
             'description' => 'nullable|string',
@@ -111,7 +111,6 @@ class SubjectIndex extends Component
         }
 
         $data = [
-            'academic_class_id' => $this->academic_class_id,
             'name' => $this->name,
             'subject_code' => $this->subject_code,
             'slug' => $slug,
@@ -122,13 +121,16 @@ class SubjectIndex extends Component
         ];
 
         if ($this->editId) {
-            Subject::where('id', $this->editId)->update($data);
+            $subject = Subject::find($this->editId); $subject->update($data);
             $message = 'Subject updated successfully!';
         } else {
             $data['uuid'] = (string) Str::uuid();
             $data['order_sequence'] = Subject::max('order_sequence') + 1 ?? 1;
-            Subject::create($data);
+            $subject = Subject::create($data);
             $message = 'Subject created successfully!';
+        }
+        if (isset($subject)) {
+            $subject->academicClasses()->sync($this->academic_class_ids);
         }
 
         // সেভ হওয়ার পর মডাল বন্ধের সিগন্যাল এবং টোস্ট মেসেজ
@@ -165,6 +167,7 @@ class SubjectIndex extends Component
 
         // Open modal via Flux
         $this->showToggleModal = true;
+        $this->dispatch('modal-show', name: 'toggle-confirm');
     }
 
     public function performToggle()
@@ -179,6 +182,7 @@ class SubjectIndex extends Component
 
         $this->toastSuccess('Status updated successfully.');
         $this->showToggleModal = false;
+        $this->dispatch('modal-close', name: 'toggle-confirm');
         $this->toggleTargetId = null;
     }
 
@@ -190,7 +194,7 @@ class SubjectIndex extends Component
 
     public function render()
     {
-        $subjects = Subject::withCount('questions')->with('academicClass')
+        $subjects = Subject::withCount('questions')->with('academicClasses')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%'.$this->search.'%')
                     ->orWhere('subject_code', 'like', '%'.$this->search.'%');

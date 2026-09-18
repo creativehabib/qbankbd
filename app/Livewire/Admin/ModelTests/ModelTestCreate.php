@@ -16,7 +16,7 @@ class ModelTestCreate extends Component
     use WithPagination;
 
     public string $title = '';
-    public string $description = '';
+    public ?string $description = '';
     public int $duration_minutes = 30;
     public float $negative_mark_weight = 0.25;
     public int $total_marks = 0;

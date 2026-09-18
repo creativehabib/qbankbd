@@ -1,10 +1,27 @@
-import $ from 'jquery';
-import TomSelect from 'tom-select';
-import ApexCharts from 'apexcharts';
-import { collapse } from "@alpinejs/collapse";
+import $ from "jquery";
+import TomSelect from "tom-select";
+import ApexCharts from "apexcharts";
 
 // Alpine & Plugins
-Alpine.plugin(collapse);
+if (window.manuallyStartAlpine) {
+    Promise.all([
+        import('alpinejs'),
+        import('@alpinejs/collapse')
+    ]).then(([AlpineModule, collapseModule]) => {
+        const Alpine = AlpineModule.default;
+        window.Alpine = Alpine;
+        Alpine.plugin(collapseModule.default);
+        Alpine.start();
+    });
+} else {
+    import('@alpinejs/collapse').then(collapseModule => {
+        document.addEventListener('alpine:init', () => {
+            if (window.Alpine) {
+                window.Alpine.plugin(collapseModule.default);
+            }
+        });
+    });
+}
 
 // Global Window Objects
 window.TomSelect = TomSelect;
@@ -13,15 +30,15 @@ window.$ = window.jQuery = $;
 
 // --- লাইভওয়্যার টোস্ট ইভেন্টস ---
 window.addEventListener('success', event => {
-    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    let msg = event.detail?.message || (event.detail?.[0] && event.detail[0]?.message);
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'success' });
 });
 window.addEventListener('warning', event => {
-    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    let msg = event.detail?.message || (event.detail?.[0] && event.detail[0]?.message);
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'warning' });
 });
 window.addEventListener('error', event => {
-    let msg = event.detail.message || (event.detail[0] && event.detail[0].message);
+    let msg = event.detail?.message || (event.detail?.[0] && event.detail[0]?.message);
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'danger' });
 });
 
@@ -51,7 +68,7 @@ window.renderKatex = function() {
             el.replaceWith(span);
         } catch(e) {}
     });
-    
+
     document.querySelectorAll('script[type="math/tex; mode=display"]').forEach(el => {
         let tex = el.textContent || el.innerText;
         let div = document.createElement('div');
@@ -60,6 +77,8 @@ window.renderKatex = function() {
             el.replaceWith(div);
         } catch(e) {}
     });
+
+    document.body.classList.remove('math-loading');
 };
 
 // Auto-render on initial load
@@ -82,11 +101,11 @@ document.addEventListener('livewire:initialized', () => {
             // We only skip if the raw text content is fundamentally the same to allow pagination to work
             let currentRaw = el.getAttribute('data-raw-math') || el.innerText;
             let newRaw = toEl.innerText;
-            
+
             if (!el.hasAttribute('data-raw-math')) {
                 el.setAttribute('data-raw-math', currentRaw);
             }
-            
+
             if (el.getAttribute('data-raw-math') === newRaw || el.innerHTML.includes('katex')) {
                 skip();
             }
@@ -99,14 +118,22 @@ document.addEventListener('livewire:initialized', () => {
 // --- Flux UI delete confirmation ---
 window.confirmDeleteAction = function (callback) {
     window.pendingDeleteAction = callback;
-    window.Flux?.modal('delete-confirmation').show();
+    if (window.Flux && typeof window.Flux.modal === 'function') {
+        window.Flux.modal('delete-confirmation').show();
+    } else {
+        document.dispatchEvent(new CustomEvent('modal-show', { bubbles: true, detail: { name: 'delete-confirmation' } }));
+    }
 };
 
 window.confirmPendingDeletion = function () {
     const callback = window.pendingDeleteAction;
 
     window.pendingDeleteAction = null;
-    window.Flux?.modal('delete-confirmation').close();
+    if (window.Flux && typeof window.Flux.modal === 'function') {
+        window.Flux.modal('delete-confirmation').close();
+    } else {
+        document.dispatchEvent(new CustomEvent('modal-close', { bubbles: true, detail: { name: 'delete-confirmation' } }));
+    }
 
     if (typeof callback === 'function') {
         callback();
@@ -117,10 +144,10 @@ window.confirmPendingDeletion = function () {
 window.wrapMathForCKEditor = function(html) {
     if (!html || typeof html !== 'string') return html;
     let cleanHtml = html.replace(/<span class="math-tex">([\s\S]*?)<\/span>/g, '$1');
-    
+
     // Convert $...$ to \(...\)
     cleanHtml = cleanHtml.replace(/(^|[^\\])\$([^\$]+?)\$/g, '$1\\($2\\)');
-    
+
     cleanHtml = cleanHtml.replace(/\\\(([\s\S]*?)\\\)/g, '<span class="math-tex">\\($1\\)</span>');
     cleanHtml = cleanHtml.replace(/\\\[([\s\S]*?)\\\]/g, '<span class="math-tex">\\[$1\\]</span>');
     return cleanHtml;

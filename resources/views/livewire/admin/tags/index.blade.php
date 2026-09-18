@@ -12,7 +12,7 @@
                     subtitle="{{ $tag->questions_count ?? 0 }} Questions" description='Pick a row to view its details, or click "New tag" to add one.' />
             </div>
         @else
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="save" wire:key="form-{{ $editingId ?? 'create' }}" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editingId ? 'Edit Tag' : 'Create Tag' }}</flux:heading>
                 <flux:text class="mt-1">Add or update tag details.</flux:text>
@@ -44,7 +44,7 @@
 
         <x-modern-list>
             @forelse($tags as $tag)
-                <x-modern-list-item 
+                <x-modern-list-item wire:key="item-{{ $tag->id }}" 
                     :active="$editingId === $tag->id"
                     icon="tag"
                     title="{{ $tag->name }}"

@@ -635,15 +635,6 @@
                             </select>
                         </div>
 
-                        <div wire:ignore class="relative z-10">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience</label>
-                            <select id="bulk_exam_categories" class="w-full ts-control" multiple placeholder="Select Exams (e.g. BCS, HSC)">
-                                @foreach($allExamCategories as $category)
-                                    <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('exam_category_ids') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
-                        </div>
                     </div>
 
                 </div>
@@ -691,16 +682,6 @@
                     });
                 }
 
-                if (window.bulkTsExamCategories) { window.bulkTsExamCategories.destroy(); window.bulkTsExamCategories = null; }
-                const examCategoriesEl = document.getElementById('bulk_exam_categories');
-                if (examCategoriesEl && typeof TomSelect !== 'undefined') {
-                    window.bulkTsExamCategories = new TomSelect(examCategoriesEl, {
-                        plugins: ['remove_button', 'dropdown_input'],
-                        persist: false, create: false,
-                        dropdownParent: 'body',
-                        onChange: (v) => @this.set('exam_category_ids', v),
-                    });
-                }
             };
 
             window.initBulkUploadEditor = () => {
@@ -730,7 +711,6 @@
                     try { CKEDITOR.instances['raw_text_editor'].destroy(true); } catch(e) {}
                 }
                 if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
-                if (window.bulkTsExamCategories) { window.bulkTsExamCategories.destroy(); window.bulkTsExamCategories = null; }
             });
 
             window.hasRegisteredBulkUploadEvents = true;

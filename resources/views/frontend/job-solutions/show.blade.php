@@ -1,4 +1,5 @@
-<div x-data="{ isQuizMode: false, showAnswers: true, showExplanations: false, showTopicWeightage: false }" class="space-y-6 pb-12">
+<x-layouts.frontend :title="$exam->title . ' - প্রশ্ন ও সমাধান'" :description="$exam->title . ' এর পূর্ণাঙ্গ প্রশ্ন ও নির্ভুল সমাধান।'">
+<div x-data="examPageData()" class="space-y-6 pb-12">
     <!-- Breadcrumb -->
     <div class="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[13px] text-zinc-500 font-medium w-full">
         <a href="/" class="shrink-0 hover:text-emerald-600 transition-colors flex items-center gap-1"><flux:icon.home class="w-3 h-3 md:w-3.5 md:h-3.5" /> হোম</a>
@@ -11,7 +12,7 @@
     </div>
 
     <!-- Top Header Card -->
-            <div class="bg-white dark:bg-zinc-900 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 border-t-4 border-t-teal-500 rounded-2xl p-5 md:p-8 relative overflow-hidden">
+            <div class="bg-white dark:bg-zinc-900 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 border-t-4 border-t-emerald-500 dark:border-t-emerald-400 rounded-2xl p-5 md:p-8 relative overflow-hidden">
 
                 <div class="flex flex-col md:flex-row justify-between gap-6">
                     <div class="flex-grow">
@@ -39,7 +40,7 @@
                             {{ $exam->title }}
                         </h1>
 
-                        <div x-data="{ expanded: false }">
+                        <div x-data="{ expanded: false}">
                             <div class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4 transition-all duration-300 ease-in-out overflow-hidden" :class="expanded ? 'max-h-[1000px]' : 'max-h-[46px] line-clamp-2'">
                                 @if($exam->description)
                                     {!! $exam->description !!}
@@ -134,14 +135,14 @@
                     <button @click="showAnswers = !showAnswers"
                             :class="showAnswers ? 'border-emerald-300 text-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
                             class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
-                        <template x-if="showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye class="w-4 h-4" /> <span class="md:hidden">উত্তর: চালু</span><span class="hidden md:inline">উত্তর লুকান</span></div></template>
-                        <template x-if="!showAnswers"><div class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-4 h-4" /> <span class="md:hidden">উত্তর: বন্ধ</span><span class="hidden md:inline">উত্তর দেখান</span></div></template>
+                        <div x-show="showAnswers" class="flex items-center gap-1.5"><flux:icon.eye class="w-4 h-4" /> <span class="md:hidden">উত্তর: চালু</span><span class="hidden md:inline">উত্তর লুকান</span></div>
+                        <div x-show="!showAnswers" style="display: none;" class="flex items-center gap-1.5"><flux:icon.eye-slash class="w-4 h-4" /> <span class="md:hidden">উত্তর: বন্ধ</span><span class="hidden md:inline">উত্তর দেখান</span></div>
                     </button>
                     <button @click="showExplanations = !showExplanations"
                             :class="showExplanations ? 'border-indigo-300 text-indigo-600 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/30' : 'border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400'"
                             class="flex items-center gap-1.5 px-4 py-1.5 bg-white dark:bg-zinc-900 border rounded-full text-[13px] font-bold transition-colors shadow-sm">
-                        <template x-if="showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4" /> <span class="md:hidden">ব্যাখ্যা: চালু</span><span class="hidden md:inline">ব্যাখ্যা লুকান</span></div></template>
-                        <template x-if="!showExplanations"><div class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4 opacity-50" /> <span class="md:hidden">ব্যাখ্যা: বন্ধ</span><span class="hidden md:inline">ব্যাখ্যা দেখান</span></div></template>
+                        <div x-show="showExplanations" style="display: none;" class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4" /> <span class="md:hidden">ব্যাখ্যা: চালু</span><span class="hidden md:inline">ব্যাখ্যা লুকান</span></div>
+                        <div x-show="!showExplanations" class="flex items-center gap-1.5"><flux:icon.light-bulb class="w-4 h-4 opacity-50" /> <span class="md:hidden">ব্যাখ্যা: বন্ধ</span><span class="hidden md:inline">ব্যাখ্যা দেখান</span></div>
                     </button>
 
                     <!-- Share Button -->
@@ -153,13 +154,13 @@
 
             <!-- Subject Pills -->
             <div class="flex overflow-x-auto md:flex-wrap gap-2 py-2 w-full snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <button wire:click="setSubject(null)"
-                        class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
+                <button @click="activeSubjectId = null"
+                        class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border " :class="activeSubjectId === null ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
                     সকল বিষয় ({{ $totalQuestions }})
                 </button>
                 @foreach($subjectsData as $subject)
-                    <button wire:click="setSubject({{ $subject['id'] }})"
-                            class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border {{ $activeSubjectId === $subject['id'] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800' }}">
+                    <button @click="activeSubjectId = {{ $subject['id'] }}"
+                            class="shrink-0 snap-start whitespace-nowrap px-3.5 md:px-5 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-bold transition-all border " :class="activeSubjectId === {{ $subject['id'] }} ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
                         {{ $subject['name'] }} ({{ $subject['count'] }})
                     </button>
                 @endforeach
@@ -225,14 +226,14 @@
             </div>
 
             <!-- Questions Area -->
-            <div class="space-y-6">
+            <div class="space-y-6" x-ref="questionsContainer">
                 @php
                     $groupedQuestions = $activeQuestions->groupBy('subject_id');
                     $globalQuestionIndex = 1;
                 @endphp
 
                 @forelse($groupedQuestions as $subId => $groupQs)
-                <div wire:key="subject-group-{{ $subId }}">
+                <div class="subject-group" data-subject-id="{{ $subId }}" x-show="activeSubjectId === null || activeSubjectId === {{ $subId }}">
                     @php
                         $subName = $subjectsData->firstWhere('id', $subId)['name'] ?? 'অনির্ধারিত অংশ';
                         // Add ' অংশ' if it doesn't end with it, just to match screenshot
@@ -241,7 +242,7 @@
                         }
                     @endphp
 
-                    <div class="flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-2 mt-8 mb-6 relative">
+                    <div class="subject-header flex items-center justify-between border-b-2 border-zinc-100 dark:border-zinc-800 pb-2 mt-8 mb-6 relative">
                         <div class="absolute -left-0 top-0 bottom-0 w-1.5 bg-emerald-600 rounded-r-md"></div>
                         <h2 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 pl-4">{{ $subName }}</h2>
                         @php
@@ -256,7 +257,7 @@
 
                     <div class="space-y-4">
                         @foreach($groupQs as $question)
-                            <div wire:key="question-{{ $question->id }}" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
+                            <div class="question-card relative z-10 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 md:p-5 hover:border-emerald-300 dark:hover:border-emerald-800 transition-colors shadow-sm">
 
                                 <!-- Meta row -->
                                 <div class="flex justify-between items-start mb-3">
@@ -280,9 +281,17 @@
                                 <!-- Question Title -->
                                 <div class="text-[15px] md:text-lg font-bold text-zinc-900 dark:text-zinc-100 leading-snug mb-4">
                                     @php
-                                        $qTitle = preg_replace('/^\s*<p[^>]*>(.*)<\/p>\s*$/is', '$1', html_entity_decode($question->title ?? '')) ?? html_entity_decode($question->title ?? '');
+                                        $qTitle = html_entity_decode($question->title ?? '');
+                                        // Convert block elements to inline spans to prevent link hit-box collapse
+                                        $qTitle = preg_replace('/<p[^>]*>/is', '<span>', $qTitle);
+                                        $qTitle = str_replace('</p>', '</span> ', $qTitle);
+                                        $qTitle = preg_replace('/<div[^>]*>/is', '<span>', $qTitle);
+                                        $qTitle = str_replace('</div>', '</span> ', $qTitle);
+                                        // CRITICAL FIX: Remove nested <a> tags from database content to prevent browser auto-closing the outer link
+                                        $qTitle = preg_replace('/<a[^>]*>/is', '', $qTitle);
+                                        $qTitle = str_replace('</a>', '', $qTitle);
                                     @endphp
-                                    <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer inline-block tex2jax_process" data-math-content>
+                                    <a href="{{ route('question.show', $question->slug) }}" class="relative z-20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer tex2jax_process" data-math-content>
                                         {!! $qTitle !!}
                                     </a>
                                     <span class="text-[10px] md:text-xs font-normal text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded ml-1 align-middle inline-block">[{{ $institution->name }}]</span>
@@ -295,10 +304,10 @@
                                             @php
                                                 $isCorrect = (isset($option['is_correct']) && $option['is_correct']) ? 'true' : 'false';
                                             @endphp
-                                            <div class="flex items-center gap-3 p-3 md:p-3.5 border rounded-xl transition-all cursor-pointer"
-                                                 :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 hover:bg-zinc-50'">
-                                                <div class="w-6 h-6 md:w-7 md:h-7 rounded-full border flex items-center justify-center shrink-0 text-xs md:text-[13px] font-bold"
-                                                     :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:border-emerald-700 dark:text-emerald-400' : 'bg-white border-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:border-zinc-600'">
+                                            <div class="group flex items-center gap-3 p-3 md:p-3.5 border rounded-xl transition-all cursor-pointer"
+                                                 :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/30 dark:border-emerald-500 shadow-sm' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'">
+                                                <div class="w-6 h-6 md:w-7 md:h-7 rounded-full border flex items-center justify-center shrink-0 text-xs md:text-[13px] font-bold transition-all"
+                                                     :class="(showAnswers && !isQuizMode && {{ $isCorrect }}) ? 'bg-emerald-500 border-emerald-500 text-white dark:bg-emerald-600 dark:border-emerald-600' : 'bg-white border-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:border-zinc-600 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-500'">
                                                     {{ ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'][$loop->index] ?? chr(65 + $loop->index) }}
                                                 </div>
                                                 @php
@@ -329,7 +338,7 @@
 
                                 <!-- Interactive Explanation Block (Like Practice) -->
                                 @if($question->question_type === 'mcq')
-                                    <div x-data="{ localOpen: false }"
+                                    <div x-data="{ localOpen: false}"
                                      x-effect="localOpen = (!isQuizMode && showExplanations && {{ filled($question->description) ? 'true' : 'false' }})"
                                      class="mt-4 border-t border-zinc-200/60 pt-3 dark:border-zinc-700/60 space-y-3">
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -352,10 +361,10 @@
                                                 <button type="button" class="cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400" title="Statistics">
                                                     <flux:icon.chart-pie class="size-[18px]" />
                                                 </button>
-                                                <button type="button" wire:click="toggleBookmark({{ $question->id }})" class="cursor-pointer {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
+                                                <button type="button" @click="toggleBookmark({{ $question->id }}, $event)" class="cursor-pointer {{ $question->is_bookmarked ? 'text-emerald-600 dark:text-emerald-400' : 'hover:text-emerald-600 dark:hover:text-emerald-400' }}" title="{{ $question->is_bookmarked ? 'Remove Bookmark' : 'Save Bookmark' }}">
                                                     <flux:icon.bookmark class="size-[18px]" variant="{{ $question->is_bookmarked ? 'solid' : 'outline' }}" />
                                                 </button>
-                                                <button type="button" wire:click="toggleLike({{ $question->id }})" class="flex items-center gap-1 cursor-pointer {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
+                                                <button type="button" @click="toggleLike({{ $question->id }}, $event)" class="flex items-center gap-1 cursor-pointer {{ $question->is_liked ? 'text-pink-500' : 'hover:text-pink-500' }}" title="{{ $question->is_liked ? 'Unlike' : 'Like' }}">
                                                     <flux:icon.heart class="size-[18px]" variant="{{ $question->is_liked ? 'solid' : 'outline' }}" />
                                                     @if($question->likes_count > 0)
                                                         <span class="text-xs font-medium">{{ $question->likes_count }}</span>
@@ -370,20 +379,21 @@
                                             </div>
                                         </div>
 
-                                        <div x-show="!isQuizMode && localOpen" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
+                                        <div id="explanation-wrapper-{{ $question->id }}" x-show="!isQuizMode && localOpen" x-collapse x-cloak class="rounded-xl border border-dashed border-zinc-300 p-5 dark:border-zinc-600 mt-3">
                                             @if(filled($question->description))
                                                 <div class="prose prose-sm md:prose-base tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
                                                     {!! $question->description !!}
                                                 </div>
                                             @else
                                                 <div class="space-y-3 text-center">
-                                                    <div wire:loading.remove wire:target="generateAiExplanation({{ $question->id }})">
+                                                    <div>
                                                         <flux:icon.sparkles class="mx-auto size-6 text-violet-500" />
                                                         <p class="font-semibold text-zinc-600 dark:text-zinc-300">{{ __('No explanation yet') }}</p>
 
                                                         <button
                                                             type="button"
-                                                            wire:click.prevent="generateAiExplanation({{ $question->id }})"
+                                                            id="ai-btn-{{ $question->id }}"
+                                                            @click="generateAiExplanation({{ $question->id }})"
                                                             class="mt-2 inline-flex items-center gap-2 rounded-full bg-violet-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-violet-700 shadow-sm"
                                                         >
                                                             <flux:icon.sparkles class="size-3.5" />
@@ -393,13 +403,6 @@
                                                         @if (session('last_question_id') == $question->id && $aiError)
                                                             <p class="mt-2 text-xs text-red-500">{{ $aiError }}</p>
                                                         @endif
-                                                    </div>
-
-                                                    <div wire:loading wire:target="generateAiExplanation({{ $question->id }})" class="py-4">
-                                                        <div class="flex items-center justify-center gap-2 text-violet-600">
-                                                            <flux:icon.arrow-path class="size-5 animate-spin" />
-                                                            <span class="text-sm font-medium">AI ব্যাখ্যা তৈরি করছে... একটু অপেক্ষা করুন</span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             @endif
@@ -415,17 +418,23 @@
                         <p class="text-zinc-500">কোন প্রশ্ন পাওয়া যায়নি।</p>
                     </div>
                 @endforelse
+
+                @if($activeQuestions->count() > 0)
+                <!-- Loading Indicator -->
+                <div class="py-6 text-center" x-cloak>
+                    <div x-show="isLoadingMore" class="flex justify-center items-center gap-2 text-zinc-500">
+                        <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="text-sm font-medium">লোড হচ্ছে...</span>
+                    </div>
+                    <div x-show="!hasMore && !isLoadingMore" class="text-sm font-medium text-zinc-400">
+                        আর কোন প্রশ্ন নেই
+                    </div>
+                </div>
+                @endif
             </div>
 
-            <!-- Infinite Scroll Trigger -->
-            @php
-                $currentTotalCount = $activeSubjectId ? ($subjectsData->firstWhere('id', $activeSubjectId)['count'] ?? 0) : $totalQuestions;
-            @endphp
-            @if($activeQuestions->count() < $currentTotalCount)
-                <div x-intersect.full="$wire.loadMore()" class="flex justify-center py-8">
-                    <flux:icon.arrow-path class="size-8 animate-spin text-emerald-500" />
-                </div>
-            @endif
+            
+            
 
         </div>
 
@@ -509,3 +518,194 @@
     </div>
 </div>
 
+
+<script>
+function examPageData() {
+    return {
+        isQuizMode: false, 
+        showAnswers: true, 
+        showExplanations: false, 
+        showTopicWeightage: false, 
+        activeSubjectId: null,
+        limit: 10,
+        isLoadingMore: false,
+        hasMore: true,
+        isSwitchingTab: false,
+        
+        init() {
+            this.$watch('activeSubjectId', () => {
+                this.limit = 10;
+                this.hasMore = true;
+                this.isSwitchingTab = true;
+                this.$nextTick(() => {
+                    this.updateVisibility();
+                    // Block infinite scroll trigger during DOM resize
+                    setTimeout(() => { this.isSwitchingTab = false; }, 100);
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                if (this.isLoadingMore || !this.hasMore || this.isSwitchingTab) return;
+                
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+                    this.loadMore();
+                }
+            });
+            
+            this.$nextTick(() => {
+                this.updateVisibility();
+                if (window.renderMath) window.renderMath();
+            });
+        },
+        
+        loadMore() {
+            if (!this.hasMore) return;
+            this.isLoadingMore = true;
+            
+            setTimeout(() => {
+                this.limit += 10;
+                this.updateVisibility();
+                this.isLoadingMore = false;
+            }, 300);
+        },
+        
+        updateVisibility() {
+            let container = this.$refs.questionsContainer;
+            if (!container) return;
+            
+            let selector = this.activeSubjectId === null 
+                ? '.subject-group .question-card' 
+                : '.subject-group[data-subject-id="' + this.activeSubjectId + '"] .question-card';
+                
+            let cards = container.querySelectorAll(selector);
+            
+            cards.forEach((card, index) => {
+                if (index < this.limit) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            this.hasMore = cards.length > this.limit;
+            
+            // Hide subject headers if they have no visible questions
+            let groups = container.querySelectorAll('.subject-group');
+            groups.forEach(group => {
+                let groupCards = group.querySelectorAll('.question-card');
+                let hasVisible = false;
+                groupCards.forEach(c => {
+                    if (c.style.display !== 'none') hasVisible = true;
+                });
+                
+                let header = group.querySelector('.subject-header');
+                if (header) {
+                    header.style.display = hasVisible ? 'flex' : 'none';
+                }
+                
+                if (!hasVisible) {
+                    group.classList.add('hidden');
+                } else {
+                    group.classList.remove('hidden');
+                }
+            });
+        },
+        
+        toggleBookmark(questionId, event) {
+            let btn = event.currentTarget;
+            let icon = btn.querySelector('svg');
+            let countSpan = btn.querySelector('.b-count') || btn;
+            
+            fetch('/interaction/bookmark/' + questionId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    if(data.status === 'attached') {
+                        btn.classList.add('text-emerald-600');
+                        btn.classList.remove('text-zinc-400', 'hover:text-emerald-600');
+                        icon.setAttribute('fill', 'currentColor');
+                    } else {
+                        btn.classList.remove('text-emerald-600');
+                        btn.classList.add('text-zinc-400', 'hover:text-emerald-600');
+                        icon.setAttribute('fill', 'none');
+                    }
+                    if(btn.querySelector('.b-count')) {
+                        let t = countSpan.innerText.replace(/[0-9]+/, data.count);
+                        countSpan.innerText = t;
+                    }
+                }
+            });
+        },
+        
+        toggleLike(questionId, event) {
+            let btn = event.currentTarget;
+            let icon = btn.querySelector('svg');
+            let countSpan = btn.querySelector('.l-count') || btn;
+
+            fetch('/interaction/like/' + questionId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    if(data.status === 'attached') {
+                        btn.classList.add('text-blue-600');
+                        btn.classList.remove('text-zinc-400', 'hover:text-blue-600');
+                        icon.setAttribute('fill', 'currentColor');
+                    } else {
+                        btn.classList.remove('text-blue-600');
+                        btn.classList.add('text-zinc-400', 'hover:text-blue-600');
+                        icon.setAttribute('fill', 'none');
+                    }
+                    if(btn.querySelector('.l-count')) {
+                        let t = countSpan.innerText.replace(/[0-9]+/, data.count);
+                        countSpan.innerText = t;
+                    }
+                }
+            });
+        },
+
+        generateAiExplanation(questionId) {
+            let btn = document.getElementById('ai-btn-' + questionId);
+            if(!btn) return;
+            let origText = btn.innerHTML;
+            btn.innerHTML = '<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> Generating...';
+            
+            fetch('/interaction/ai-explanation/' + questionId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    let wrapper = document.getElementById('explanation-wrapper-' + questionId);
+                    if (wrapper) {
+                        wrapper.innerHTML = `
+                            <div class="prose prose-sm md:prose-base tex2jax_process max-w-none text-zinc-700 dark:prose-invert dark:text-zinc-200" data-math-content>
+                                ${data.description}
+                            </div>
+                        `;
+                        if (typeof window.renderKatex === 'function') { window.renderKatex(); } else if (typeof window.renderMath === 'function') {
+                            window.renderMath();
+                        }
+                    }
+                } else {
+                    alert(data.message);
+                    btn.innerHTML = origText;
+                }
+            }).catch(() => {
+                alert('Error generating explanation');
+                btn.innerHTML = origText;
+            });
+        }
+    };
+}
+</script>
+</x-layouts.frontend>

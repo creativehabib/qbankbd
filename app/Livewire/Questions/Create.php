@@ -25,7 +25,7 @@ class Create extends Component
 
     public $subject_id;
 
-    public $academic_class_id;
+    public array $academic_class_ids = [];
 
     public $chapter_id;
 
@@ -62,7 +62,7 @@ class Create extends Component
 
     public function resetFields(): void
     {
-        $this->reset('academic_class_id', 'subject_id', 'chapter_id', 'topic_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq', 'slug', 'exam_category_ids', 'image');
+        $this->reset('academic_class_ids', 'subject_id', 'chapter_id', 'topic_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq', 'slug', 'exam_category_ids', 'image');
         $this->difficulty = 'easy';
         $this->question_type = 'mcq';
         $this->marks = 1;
@@ -244,23 +244,7 @@ class Create extends Component
         $this->dispatch('topicsUpdated', topics: []);
     }
 
-    public function updatedAcademicClassId($value): void
-    {
-        $this->subject_id = null;
-        $this->chapter_id = null;
-        $this->topic_id = null;
-
-        $subjects = Subject::query()
-            ->where('academic_class_id', $value)
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($subject) => ['value' => $subject->id, 'text' => $subject->name])
-            ->all();
-
-        $this->dispatch('subjectsUpdated', subjects: $subjects);
-        $this->dispatch('chaptersUpdated', chapters: []);
-        $this->dispatch('topicsUpdated', topics: []);
-    }
+    
 
     public function updatedChapterId($value)
     {
@@ -274,7 +258,7 @@ class Create extends Component
         $currentUser = auth()->user();
 
         $rules = [
-            'academic_class_id' => 'required|exists:academic_classes,id',
+            'academic_class_ids' => 'required|array', 'academic_class_ids.*' => 'exists:academic_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'nullable|exists:chapters,id',
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
@@ -316,7 +300,7 @@ class Create extends Component
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
-            ->where('academic_class_id', $validated['academic_class_id'])
+            ->whereHas('academicClasses', fn($q) => $q->whereIn('academic_classes.id', $validated['academic_class_ids']))
             ->first();
 
         if (! $subject) {
@@ -356,6 +340,9 @@ class Create extends Component
                 'extra_content' => $extraData,
                 'user_id' => $currentUser?->id,
             ]);
+            if (!empty($this->academic_class_ids)) {
+                $question->academicClasses()->sync($this->academic_class_ids);
+            }
 
             // Tags যুক্ত করা
             if ($this->tagIds) {
@@ -379,12 +366,7 @@ class Create extends Component
 
         return view('livewire.admin.questions.create', [
             'classes' => AcademicClass::query()->orderBy('name')->get(),
-            'subjects' => $this->academic_class_id
-                ? Subject::query()
-                    ->where('academic_class_id', $this->academic_class_id)
-                    ->orderBy('name')
-                    ->get()
-                : collect(),
+            'subjects' => Subject::query()->orderBy('name')->get(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),

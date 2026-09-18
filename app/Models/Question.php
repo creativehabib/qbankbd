@@ -46,19 +46,17 @@ class Question extends Model
                 }
             }
 
-            if ($question->subject_id) {
-                $subject = Subject::query()->find($question->subject_id);
-
-                if ($subject) {
-                    $question->academic_class_id = $subject->academic_class_id;
-                }
-            }
         });
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function academicClasses(): BelongsToMany
+    {
+        return $this->belongsToMany(AcademicClass::class, 'academic_class_question')->withTimestamps();
     }
 
     public function academicClass(): BelongsTo

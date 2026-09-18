@@ -18,7 +18,7 @@
                 <x-modern-empty-state icon="hashtag" title="Select a topic" description='Pick a row to view its details, or click "New topic" to add one.' />
             </div>
         @else
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="save" wire:key="form-{{ $editId ?? 'create' }}" class="space-y-4">
             <div>
                 <flux:heading size="lg">{{ $editId ? 'Edit Topic' : 'Create New Topic' }}</flux:heading>
                 <flux:text class="mt-1">Add a topic and assign it to a subject and chapter.</flux:text>
@@ -71,7 +71,7 @@
 
         <x-modern-list>
             @forelse($topics as $topic)
-                <x-modern-list-item 
+                <x-modern-list-item wire:key="item-{{ $topic->id }}" 
                     :active="$editId === $topic->id"
                     icon="hashtag"
                     title="{{ $topic->name }}"

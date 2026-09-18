@@ -24,6 +24,12 @@ class Subject extends Model
     ];
 
     // রিলেশনশিপ: এই সাবজেক্টটি কোন ক্লাসের
+    public function academicClasses()
+    {
+        return $this->belongsToMany(AcademicClass::class, 'academic_class_subject')->withPivot('custom_name')->withTimestamps();
+    }
+
+    // Legacy relation for compatibility (if needed temporarily)
     public function academicClass()
     {
         return $this->belongsTo(AcademicClass::class);

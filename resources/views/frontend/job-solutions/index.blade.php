@@ -1,3 +1,4 @@
+<x-layouts.frontend title="চাকরির পরীক্ষার প্রশ্ন সমাধান" description="বিসিএস, ব্যাংক, শিক্ষক নিয়োগ ও বিভিন্ন প্রতিষ্ঠানের বিগত পরীক্ষার নির্ভুল সমাধান ও প্রতিষ্ঠান ভিত্তিক প্রশ্ন আর্কাইভ।">
 <div class="space-y-6 pb-12">
     <!-- Header & Tabs (Single Row) -->
     <div class="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/50 rounded-2xl p-6 mb-6 flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -10,15 +11,15 @@
         </div>
         
         <div class="flex gap-1 p-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full w-full sm:w-auto overflow-x-auto shadow-sm shrink-0">
-            <button wire:click="setTab('exams')" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'exams' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
+                        <a href="?tab=exams" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'exams' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
                 <flux:icon.document-check class="w-3.5 h-3.5" /> পরীক্ষা ও সমাধান
-            </button>
-            <button wire:click="setTab('topics')" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'topics' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
+            </a>
+            <a href="?tab=topics" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'topics' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
                 <flux:icon.book-open class="w-3.5 h-3.5" /> বিষয় ও অধ্যায়ভিত্তিক
-            </button>
-            <button wire:click="setTab('organizations')" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'organizations' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
+            </a>
+            <a href="?tab=organizations" class="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-xs transition-all whitespace-nowrap {{ $tab === 'organizations' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 border border-transparent' }}">
                 <flux:icon.building-office-2 class="w-3.5 h-3.5" /> প্রতিষ্ঠান
-            </button>
+            </a>
         </div>
     </div>
 
@@ -113,13 +114,13 @@
                 <div class="mb-6">
                     <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5"><flux:icon.book-open class="w-3.5 h-3.5 text-emerald-600" /> বিষয় নির্বাচন করুন:</p>
                     <div class="flex flex-wrap gap-2.5">
-                        <button wire:click="selectSubject(null)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($subject) ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                        <a href="?tab=topics" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($subject) ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                             সকল বিষয় <span class="px-1.5 py-0.5 rounded text-[9px] {{ is_null($subject) ? 'bg-white/20 text-white' : 'bg-white text-slate-400 dark:bg-slate-700 dark:text-slate-300' }}">{{ $subjects->sum('questions_count') }}</span>
-                        </button>
+                        </a>
                         @foreach($subjects as $subj)
-                            <button wire:click="selectSubject('{{ $subj->slug }}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $subject === $subj->slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                            <a href="?tab=topics&subject={{ $subj->slug }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $subject === $subj->slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                                 {{ $subj->name }} <span class="px-1.5 py-0.5 rounded text-[9px] {{ $subject === $subj->slug ? 'bg-white/20 text-white' : 'bg-white text-slate-400 dark:bg-slate-700 dark:text-slate-300' }}">{{ $subj->questions_count }}</span>
-                            </button>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -129,13 +130,13 @@
                 <div class="mb-6">
                     <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5"><flux:icon.bars-3-bottom-left class="w-3.5 h-3.5 text-emerald-600" /> '{{ $currentSubject->name }}' এর অধ্যায় বা পরিচ্ছেদ:</p>
                     <div class="flex flex-wrap gap-2.5">
-                        <button wire:click="selectChapter(null)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($topic) ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                        <a href="?tab=topics&subject={{ $subject }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($topic) ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                             সকল অধ্যায়
-                        </button>
+                        </a>
                         @foreach($chapters as $chap)
-                            <button wire:click="selectChapter('{{ $chap->slug }}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $topic === $chap->slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                            <a href="?tab=topics&subject={{ $subject }}&topic={{ $chap->slug }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $topic === $chap->slug ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                                 {{ $chap->name }} <span class="px-1.5 py-0.5 rounded text-[9px] {{ $topic === $chap->slug ? 'bg-white/20 text-white' : 'bg-white text-slate-400 dark:bg-slate-700 dark:text-slate-300' }}">{{ $chap->questions_count }}</span>
-                            </button>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -146,13 +147,13 @@
                 <div>
                     <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5"><flux:icon.tag class="w-3.5 h-3.5 text-indigo-600" /> '{{ $currentChapter->name }}' এর সাব-টপিক / বিষয়বস্তু:</p>
                     <div class="flex flex-wrap gap-2.5">
-                        <button wire:click="selectTopic(null)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($sub_topic) ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                        <a href="?tab=topics&subject={{ $subject }}&topic={{ $topic }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ is_null($sub_topic) ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                             সকল সাব-টপিক
-                        </button>
+                        </a>
                         @foreach($topics as $subTop)
-                            <button wire:click="selectTopic('{{ $subTop->slug }}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $sub_topic === $subTop->slug ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
+                            <a href="?tab=topics&subject={{ $subject }}&topic={{ $topic }}&sub_topic={{ $subTop->slug }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors {{ $sub_topic === $subTop->slug ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700' }}">
                                 {{ $subTop->name }} <span class="px-1.5 py-0.5 rounded text-[9px] {{ $sub_topic === $subTop->slug ? 'bg-white/20 text-white' : 'bg-white text-slate-400 dark:bg-slate-700 dark:text-slate-300' }}">{{ $subTop->questions_count }}</span>
-                            </button>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -171,9 +172,9 @@
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">মোট {{ $total_questions }} টি</span>
                 </div>
                 @if($currentSubject || $currentChapter || $currentTopic)
-                    <button wire:click="resetFilters" class="text-[11px] font-bold text-red-500 hover:text-red-600 flex items-center gap-1">
+                    <a href="?tab=topics" class="text-[11px] font-bold text-red-500 hover:text-red-600 flex items-center gap-1">
                         <flux:icon.x-mark class="w-3 h-3" /> ফিল্টার রিসেট
-                    </button>
+                    </a>
                 @endif
             </div>
 
@@ -207,7 +208,16 @@
 
                         <!-- Question Title -->
                         <div class="text-base font-bold text-slate-900 dark:text-slate-100 leading-snug mb-5 flex flex-wrap items-baseline gap-2">
-                            <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer">{!! $question->title !!}</a> 
+                                                        @php
+                                $cleanTitle = html_entity_decode($question->title ?? '');
+                                $cleanTitle = preg_replace('/<p[^>]*>/is', '<span>', $cleanTitle);
+                                $cleanTitle = str_replace('</p>', '</span> ', $cleanTitle);
+                                $cleanTitle = preg_replace('/<div[^>]*>/is', '<span>', $cleanTitle);
+                                $cleanTitle = str_replace('</div>', '</span> ', $cleanTitle);
+                                $cleanTitle = preg_replace('/<a[^>]*>/is', '', $cleanTitle);
+                                $cleanTitle = str_replace('</a>', '', $cleanTitle);
+                            @endphp
+                            <a href="{{ route('question.show', $question->slug) }}" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer tex2jax_process" data-math-content>{!! $cleanTitle !!}</a> 
                             @if($question->pastExams->count() > 0)
                                 <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">
                                     [{{ $question->pastExams->first()->title }}]
@@ -222,15 +232,15 @@
                                     @php
                                         $isCorrect = isset($option['is_correct']) && $option['is_correct'];
                                     @endphp
-                                    <div class="flex items-center gap-3 p-3 border rounded-xl transition-all {{ $isCorrect ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50' }}">
-                                        <div class="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold {{ $isCorrect ? 'bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:border-emerald-700 dark:text-emerald-400' : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-slate-600' }}">{{ ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'][$loop->index] ?? chr(65 + $loop->index) }}</div><span class="text-[13px] font-medium flex-grow {{ $isCorrect ? 'text-emerald-800 dark:text-emerald-200' : 'text-slate-700 dark:text-slate-300' }}">{!! $option['option_text'] !!}</span>@if($isCorrect)<flux:icon.check class="w-4 h-4 text-emerald-500 shrink-0" />@endif
+                                    <div class="flex items-center gap-3 p-3 border rounded-xl transition-all {{ $isCorrect ? 'bg-emerald-50 border-emerald-500 dark:bg-emerald-900/20 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/50' }}">
+                                        <div class="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold {{ $isCorrect ? 'bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:border-emerald-700 dark:text-emerald-400' : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-slate-600' }}">{{ ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ'][$loop->index] ?? chr(65 + $loop->index) }}</div><span class="text-[13px] font-medium flex-grow tex2jax_process {{ $isCorrect ? 'text-emerald-800 dark:text-emerald-200' : 'text-slate-700 dark:text-slate-300' }}" data-math-content>{!! $option['option_text'] !!}</span>@if($isCorrect)<flux:icon.check class="w-4 h-4 text-emerald-500 shrink-0" />@endif
                                     </div>
                                 @endforeach
                             </div>
                         @elseif(in_array($question->question_type, ['written', 'short', 'cq']))
                             <div class="mt-4 p-4 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl">
                                 <p class="text-xs font-bold text-emerald-800 dark:text-emerald-400 mb-2 flex items-center gap-1.5"><flux:icon.check-circle class="w-4 h-4" /> উত্তর / সমাধান:</p>
-                                <div class="text-sm text-slate-700 dark:text-slate-300">
+                                <div class="text-sm text-slate-700 dark:text-slate-300 tex2jax_process" data-math-content>
                                     @if($question->description)
                                         {!! $question->description !!}
                                     @else
@@ -307,3 +317,5 @@
         @endif
     </div>
 </div>
+
+</x-layouts.frontend>
