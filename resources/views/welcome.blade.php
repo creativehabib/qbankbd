@@ -1,289 +1,306 @@
-<x-layouts.frontend title="বাংলাদেশের সেরা ডিজিটাল প্রশ্নভান্ডার" description="বিসিএস, ব্যাংক, শিক্ষক নিয়োগ ও বিভিন্ন প্রতিষ্ঠানের বিগত পরীক্ষার নির্ভুল সমাধান ও প্রতিষ্ঠান ভিত্তিক প্রশ্ন আর্কাইভ।">
-<div class="space-y-12">
+@extends('layouts.frontend')
 
-    <!-- ============================================== -->
-    <!-- CENTERED HERO SECTION (Gradient, No Border) -->
-    <!-- ============================================== -->
-    <section>
-        <!-- Hero Wrapper (Border removed, Gradient added) -->
-        <div class="relative rounded-[2rem] bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-[#121b2a] dark:via-[#0B1120] dark:to-[#0a1922] px-6 py-12 sm:px-10 sm:py-16 overflow-hidden flex flex-col items-center justify-center text-center shadow-sm">
+@section('title', 'বিগত পরীক্ষার প্রশ্ন ও সমাধান — Qerobi')
+@section('description', 'বিসিএস, ব্যাংক, শিক্ষক নিয়োগ ও ভর্তি পরীক্ষার বিগত প্রশ্ন, শিক্ষক-যাচাই করা ব্যাখ্যাসহ সমাধান এবং প্রতিষ্ঠানভিত্তিক প্রশ্ন আর্কাইভ।')
 
-            <!-- Background decorative elements -->
-            <div class="absolute -right-20 -top-20 w-96 h-96 bg-emerald-400/10 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+@section('content')
+    <div class="space-y-14 sm:space-y-20">
 
-            <div class="space-y-6 max-w-3xl mx-auto relative z-10 flex flex-col items-center">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 dark:bg-[#121B2B]/60 backdrop-blur-md border border-emerald-200/50 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm font-bold shadow-sm">
-                        <span class="relative flex h-2.5 w-2.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                        </span>
-                    ✨ স্মার্ট ডিজিটাল প্রশ্নব্যাংক
-                </div>
+        <!-- ============================================== -->
+        <!-- HERO — ruled paper, left aligned, search leads -->
+        <!-- ============================================== -->
+        <section class="relative rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-emerald-50/60 via-white to-teal-50/50 dark:from-[#121b2a] dark:via-[#0B1120] dark:to-[#0a1922] overflow-hidden">
 
-                <!-- Headline -->
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white leading-[1.35] tracking-tight">
-                    স্মার্ট শিক্ষার জন্য <br class="hidden sm:block"/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-300">
-                            ডিজিটাল প্রশ্নভান্ডার
-                        </span>
-                </h1>
+            <!-- Ruled exercise-book lines -->
+            <div class="absolute inset-0 pointer-events-none bg-[repeating-linear-gradient(to_bottom,transparent_0px,transparent_35px,rgba(15,23,42,0.05)_35px,rgba(15,23,42,0.05)_36px)] dark:bg-[repeating-linear-gradient(to_bottom,transparent_0px,transparent_35px,rgba(148,163,184,0.06)_35px,rgba(148,163,184,0.06)_36px)]"></div>
 
-                <!-- Sub-headline -->
-                <p class="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-2xl mx-auto">
-                    নির্ভুল প্রশ্ন সমাধান ও মডেল টেস্টের পাশাপাশি, <span class="text-emerald-600 dark:text-emerald-400 font-bold">আপনার সার্বক্ষণিক সহযোগী টিউটর হিসেবে থাকছে অভিজ্ঞ শিক্ষক</span>। সুতরাং স্মার্ট প্রস্তুতির বিশ্বস্ত ঠিকানা Qerobi.com।
-                </p>
+            <div class="relative grid lg:grid-cols-12 gap-10 px-6 py-10 sm:px-10 sm:py-14">
 
-                <!-- Search Box -->
-                <div class="pt-6 w-full max-w-2xl">
-                    <div class="flex items-center bg-white dark:bg-[#0B1120] border-2 border-slate-200 dark:border-slate-700/80 rounded-2xl p-1.5 focus-within:border-emerald-500 transition-colors shadow-sm">
-                        <div class="pl-4 pr-3 text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
-                        <input type="text" onclick="window.dispatchEvent(new CustomEvent('open-search'))" readonly placeholder="প্রশ্ন, পরীক্ষা বা বিষয় খুঁজুন (যেমন: সমাস, ৫০তম বিসিএস)..." class="w-full bg-transparent text-slate-800 dark:text-white text-sm font-medium focus:outline-none placeholder-slate-400 cursor-pointer">
-                        <button onclick="window.dispatchEvent(new CustomEvent('open-search'))" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-8 py-3.5 rounded-xl text-sm font-bold shadow-md whitespace-nowrap transition-all hover:scale-105 cursor-pointer">অনুসন্ধান</button>
+                <div class="lg:col-span-7">
+                    <p class="flex items-center gap-3 text-[13px] font-semibold text-emerald-600 dark:text-emerald-400 mb-5">
+                        <span class="w-6 h-0.5 bg-emerald-500 rounded-full"></span>
+                        হালনাগাদ ১৮ সেপ্টেম্বর, ২০২৬
+                    </p>
+
+                    <h1 class="text-[2rem] sm:text-5xl lg:text-[3.25rem] font-extrabold text-slate-900 dark:text-white leading-[1.3] tracking-tight">
+                        প্রশ্ন খুঁজুন,<br/>উত্তর মিলিয়ে নিন।
+                    </h1>
+
+                    <p class="mt-5 text-[15px] sm:text-base text-slate-600 dark:text-slate-400 leading-[1.9] max-w-xl">
+                        বিসিএস, ব্যাংক, শিক্ষক নিয়োগ ও ভর্তি পরীক্ষার বিগত প্রশ্ন — প্রতিটি উত্তর শিক্ষক দ্বারা যাচাই করা। ভুল মনে হলে প্রশ্নের নিচেই আপত্তি জানাতে পারবেন।
+                    </p>
+
+                    <!-- Search: the one loud element on the page -->
+                    <div class="mt-9 max-w-xl">
+                        <label for="qb-search" class="block text-[13px] font-semibold text-slate-900 dark:text-slate-300 mb-2">কী খুঁজছেন?</label>
+                        <div class="flex items-stretch border-b-2 border-slate-900 dark:border-slate-600 focus-within:border-emerald-500 dark:focus-within:border-emerald-400 transition-colors">
+                            <input id="qb-search" type="text" readonly
+                                   onclick="window.dispatchEvent(new CustomEvent('open-search'))"
+                                   placeholder="সমাস, ৫০তম বিসিএস, প্রাথমিক শিক্ষক ২০২৪…"
+                                   class="w-full bg-transparent px-1 py-3 text-base sm:text-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none cursor-pointer">
+                            <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-search'))"
+                                    class="shrink-0 px-5 py-3 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-slate-900 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded transition-colors">
+                                খুঁজুন
+                            </button>
+                        </div>
+                        <p class="mt-3 text-[13px] text-slate-500 dark:text-slate-400">
+                            ৩২০টি পরীক্ষার ১২,৪০০+ প্রশ্ন সমাধানসহ সংরক্ষিত।
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-[13px]">
+                            <a href="#" class="font-medium text-slate-700 dark:text-slate-300 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4 hover:decoration-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">শিক্ষক নিয়োগ</a>
+                            <a href="#" class="font-medium text-slate-700 dark:text-slate-300 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4 hover:decoration-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">বিসিএস প্রশ্ন</a>
+                            <a href="#" class="font-medium text-slate-700 dark:text-slate-300 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4 hover:decoration-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">মডেল টেস্ট</a>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Popular Search Tags -->
-                    <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-5 text-xs">
-                        <span class="text-slate-500 font-medium">জনপ্রিয়:</span>
-                        <a href="#" class="px-3 py-1.5 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-500/50 font-medium transition">শিক্ষক নিয়ো</a>
-                        <a href="#" class="px-3 py-1.5 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-500/50 font-medium transition">বিসিএস প্রশ্ন</a>
-                        <a href="#" class="px-3 py-1.5 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-500/50 font-medium transition">মডেল টেস্ট</a>
+                <!-- Quiet live panel: what closes soonest -->
+                <aside class="lg:col-span-5 lg:pl-8 lg:border-l border-slate-200 dark:border-slate-800">
+                    <h2 class="text-[13px] font-bold text-slate-900 dark:text-slate-300 mb-4">আবেদনের সময় ফুরাচ্ছে</h2>
+                    <ul>
+                        <li class="flex items-baseline justify-between gap-4 py-3 border-t border-slate-200 dark:border-slate-800">
+                            <a href="#" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">খাদ্য অধিদপ্তর, উপ-পরিদর্শক</a>
+                            <span class="shrink-0 text-xs font-bold text-rose-600 dark:text-rose-400">আজ শেষ</span>
+                        </li>
+                        <li class="flex items-baseline justify-between gap-4 py-3 border-t border-slate-200 dark:border-slate-800">
+                            <a href="#" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">বাংলাদেশ রেলওয়ে, ওয়েম্যান</a>
+                            <span class="shrink-0 text-xs font-medium text-slate-500 dark:text-slate-400">৪ দিন বাকি</span>
+                        </li>
+                        <li class="flex items-baseline justify-between gap-4 py-3 border-y border-slate-200 dark:border-slate-800">
+                            <a href="#" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">বাংলাদেশ ব্যাংক, অফিসার</a>
+                            <span class="shrink-0 text-xs font-medium text-slate-500 dark:text-slate-400">১০ দিন বাকি</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="inline-block mt-4 text-[13px] font-bold text-slate-900 dark:text-white border-b-2 border-emerald-500 pb-0.5">সব বিজ্ঞপ্তি দেখুন</a>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- WHAT YOU CAN DO — four columns, hairline split -->
+        <!-- ============================================== -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+            <a href="#" class="group bg-white dark:bg-[#121B2B] p-6 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <span class="flex gap-1.5" aria-hidden="true">
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                </span>
+                <h3 class="mt-4 text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">জব সল্যুশন</h3>
+                <p class="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">বিগত পরীক্ষার প্রশ্ন, ব্যাখ্যাসহ উত্তর</p>
+            </a>
+            <a href="#" class="group bg-white dark:bg-[#121B2B] p-6 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <span class="flex gap-1.5" aria-hidden="true">
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                </span>
+                <h3 class="mt-4 text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">প্রশ্ন আর্কাইভ</h3>
+                <p class="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">প্রতিষ্ঠান ও সাল ধরে সাজানো</p>
+            </a>
+            <a href="#" class="group bg-white dark:bg-[#121B2B] p-6 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <span class="flex gap-1.5" aria-hidden="true">
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                </span>
+                <h3 class="mt-4 text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">মডেল টেস্ট</h3>
+                <p class="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">সময় ধরে পরীক্ষা, সঙ্গে সঙ্গে ফল</p>
+            </a>
+            <a href="#" class="group bg-white dark:bg-[#121B2B] p-6 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <span class="flex gap-1.5" aria-hidden="true">
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                    <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                </span>
+                <h3 class="mt-4 text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">শিক্ষকের সহায়তা</h3>
+                <p class="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">আটকে গেলে প্রশ্ন করুন, উত্তর পাবেন</p>
+            </a>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- ARCHIVE INDEX + ACADEMIC -->
+        <!-- ============================================== -->
+        <section class="grid lg:grid-cols-12 gap-10 lg:gap-14">
+
+            <div class="lg:col-span-7">
+                <div class="flex items-baseline justify-between mb-5">
+                    <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">প্রতিষ্ঠানভিত্তিক আর্কাইভ</h2>
+                    <a href="#" class="text-[13px] font-bold text-slate-900 dark:text-white border-b-2 border-emerald-500 pb-0.5">সব দেখুন</a>
+                </div>
+
+                <ul>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-t border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">বাংলাদেশ সিভিল সার্ভিস (বিসিএস)</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">৪৬টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-t border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">সরকারি কর্ম কমিশন (নন-ক্যাডার)</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">৩৮টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-t border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">প্রাথমিক শিক্ষা অধিদপ্তর</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">২৯টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-t border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">বাংলাদেশ ব্যাংক ও সমন্বিত ব্যাংক</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">৫২টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-t border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">মন্ত্রিপরিষদ ও জনপ্রশাসন মন্ত্রণালয়</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">২৪টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="group flex items-baseline justify-between gap-6 px-1 py-4 border-y border-slate-200 dark:border-slate-800 hover:pl-4 hover:bg-slate-50 dark:hover:bg-[#121B2B] transition-all">
+                            <span class="text-[15px] font-semibold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">এনটিআরসিএ (বেসরকারি শিক্ষক নিবন্ধন)</span>
+                            <span class="shrink-0 text-xs text-slate-500 dark:text-slate-400 tabular-nums">১৯টি পরীক্ষা</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="lg:col-span-5">
+                <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-5">একাডেমিক ও ভর্তি</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="#" class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">এসএসসি</h3>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">বোর্ড প্রশ্ন ও অধ্যায়ভিত্তিক টেস্ট</p>
+                    </a>
+                    <a href="#" class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">এইচএসসি</h3>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">সব বোর্ডের বিগত প্রশ্ন সমাধান</p>
+                    </a>
+                    <a href="#" class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">বিশ্ববিদ্যালয় ভর্তি</h3>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">ঢাবি, রাবি, চবি ও গুচ্ছ</p>
+                    </a>
+                    <a href="#" class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">মেডিকেল ও বুয়েট</h3>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">বিগত বছরের প্রশ্ন ও মডেল টেস্ট</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- RECENT SOLUTIONS — answer-script slips -->
+        <!-- ============================================== -->
+        <section>
+            <div class="flex items-baseline justify-between mb-5">
+                <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">সদ্য যুক্ত সমাধান</h2>
+                <a href="#" class="text-[13px] font-bold text-slate-900 dark:text-white border-b-2 border-emerald-500 pb-0.5">সব সমাধান</a>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <a href="#" class="group flex items-stretch rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] overflow-hidden hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                    <div class="flex flex-col justify-center gap-2.5 px-3.5 bg-slate-50 dark:bg-[#0B1120] border-r border-slate-200 dark:border-slate-800" aria-hidden="true">
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- CORE CATEGORIES -->
-    <!-- ============================================== -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="#" class="p-4 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:-translate-y-1 transition-all group flex flex-col items-center text-center sm:flex-row sm:text-left gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-            </div>
-            <div><h3 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-500">জব সল্যুশন</h3><p class="text-[11px] text-slate-500 mt-0.5">বিগত প্রশ্ন সমাধান</p></div>
-        </a>
-        <a href="#" class="p-4 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:-translate-y-1 transition-all group flex flex-col items-center text-center sm:flex-row sm:text-left gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            </div>
-            <div><h3 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-500">প্রশ্ন আর্কাইভ</h3><p class="text-[11px] text-slate-500 mt-0.5">মন্ত্রণালয় ও ব্যাংক</p></div>
-        </a>
-        <a href="#" class="p-4 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:border-rose-500 hover:-translate-y-1 transition-all group flex flex-col items-center text-center sm:flex-row sm:text-left gap-4">
-            <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-            </div>
-            <div><h3 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-rose-500">ক্যারিয়ার ব্লগ</h3><p class="text-[11px] text-slate-500 mt-0.5">প্রস্তুতি ও গাইডলাইন</p></div>
-        </a>
-        <a href="#" class="p-4 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:-translate-y-1 transition-all group flex flex-col items-center text-center sm:flex-row sm:text-left gap-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
-            </div>
-            <div><h3 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-500">প্রস্তুতি টুলস</h3><p class="text-[11px] text-slate-500 mt-0.5">টাইপিং ও অন্যান্য</p></div>
-        </a>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- ACADEMIC & ADMISSION ARCHIVE -->
-    <!-- ============================================== -->
-    <section>
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 flex items-center justify-center">🎓</div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">একাডেমিক ও ভর্তি প্রস্তুতি</h2>
-            </div>
-            <a href="#" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">সব দেখুন &rarr;</a>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-emerald-400 hover:shadow-md transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-emerald-50 dark:bg-slate-800 border-2 border-emerald-100 dark:border-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-2xl">🎒</div>
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">এসএসসি (SSC) প্রস্তুতি</h3>
-                <p class="text-[10px] text-slate-500 mt-1">বোর্ড প্রশ্ন ও অধ্যায়ভিত্তিক টেস্ট</p>
-            </a>
-
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-md transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-blue-50 dark:bg-slate-800 border-2 border-blue-100 dark:border-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-2xl">🎓</div>
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">এইচএসসি (HSC) প্রস্তুতি</h3>
-                <p class="text-[10px] text-slate-500 mt-1">বিগত সালের বোর্ড প্রশ্ন সমাধান</p>
-            </a>
-
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-purple-400 hover:shadow-md transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-purple-50 dark:bg-slate-800 border-2 border-purple-100 dark:border-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-2xl">🏛️</div>
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">বিশ্ববিদ্যালয় ভর্তি</h3>
-                <p class="text-[10px] text-slate-500 mt-1">ঢাবি, রাবি, চবি ও গুচ্ছ প্রশ্নব্যাংক</p>
-            </a>
-
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-rose-400 hover:shadow-md transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-rose-50 dark:bg-slate-800 border-2 border-rose-100 dark:border-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-2xl">⚕️</div>
-                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">মেডিকেল ও ইঞ্জিনিয়ারিং</h3>
-                <p class="text-[10px] text-slate-500 mt-1">বিগত বছরের প্রশ্ন ও মডেল টেস্ট</p>
-            </a>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- TOP ORGANIZATIONS -->
-    <!-- ============================================== -->
-    <section>
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 flex items-center justify-center">🏛️</div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">শীর্ষ প্রতিষ্ঠান ও প্রশ্ন আর্কাইভ</h2>
-            </div>
-            <a href="#" class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">সব দেখুন &rarr;</a>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            <!-- Org Cards -->
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 hover:shadow-lg transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-50 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-xl">🇧🇩</div>
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200">বিসিএস</h3>
-            </a>
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 hover:shadow-lg transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-50 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-xl">🏛️</div>
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200">কর্ম কমিশন</h3>
-            </a>
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 hover:shadow-lg transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-50 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-xl">💼</div>
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200">মন্ত্রীপরিষদ</h3>
-            </a>
-            <a href="#" class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 hover:shadow-lg transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-50 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-xl">🎓</div>
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200">প্রাথমিক শিক্ষা</h3>
-            </a>
-            <a href="#" class="hidden md:block bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 hover:shadow-lg transition-all text-center group">
-                <div class="w-14 h-14 mx-auto rounded-full bg-slate-50 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform text-xl">🏦</div>
-                <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200">ব্যাংক জব</h3>
-            </a>
-            <a href="#" class="hidden md:flex flex-col items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl p-5 border border-dashed border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors text-center group">
-                <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center mb-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </div>
-                <h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-400">সব দেখুন</h3>
-            </a>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- RECENT EXAM SOLUTIONS -->
-    <!-- ============================================== -->
-    <section>
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 flex items-center justify-center">📝</div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">সাম্প্রতিক জব সল্যুশন</h2>
-            </div>
-            <a href="#" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">সব দেখুন &rarr;</a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Solution Card 1 -->
-            <a href="#" class="relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase rounded-md">Ministry</span>
-                        <span class="text-[11px] text-slate-400 flex items-center gap-1">28 Aug, 2026</span>
+                    <div class="flex-1 p-5">
+                        <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-2.5">
+                            <span class="font-semibold text-slate-700 dark:text-slate-300">মন্ত্রিপরিষদ বিভাগ</span>
+                            <span>২৮ আগস্ট, ২০২৬</span>
+                        </div>
+                        <h3 class="text-[17px] font-bold text-slate-900 dark:text-white leading-[1.6] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            কম্পিউটার অপারেটর পদের প্রশ্ন ও সমাধান
+                        </h3>
+                        <p class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[13px] text-slate-500 dark:text-slate-400">
+                            ৬৯টি এমসিকিউ, প্রতিটির ব্যাখ্যাসহ
+                        </p>
                     </div>
-                    <span class="px-2 py-0.5 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 text-[10px] font-bold rounded">MCQ</span>
-                </div>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4 group-hover:text-emerald-500 transition-colors">মন্ত্রীপরিষদ বিভাগ (কম্পিউটার অপারেটর) প্রশ্ন সমাধান</h3>
-                <div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
-                    <div class="text-xs text-slate-500 font-medium">পূর্ণমান: <span class="text-slate-800 dark:text-slate-200 font-bold">69</span></div>
-                    <span class="text-xs font-bold text-emerald-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">সমাধান পড়ুন &rarr;</span>
-                </div>
-            </a>
+                </a>
 
-            <!-- Solution Card 2 -->
-            <a href="#" class="relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-[#121B2B] border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow overflow-hidden group">
-                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500"></div>
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase rounded-md">MOPA</span>
-                        <span class="text-[11px] text-slate-400 flex items-center gap-1">02 Jul, 2026</span>
+                <a href="#" class="group flex items-stretch rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#121B2B] overflow-hidden hover:border-emerald-500 dark:hover:border-emerald-500/60 transition-colors">
+                    <div class="flex flex-col justify-center gap-2.5 px-3.5 bg-slate-50 dark:bg-[#0B1120] border-r border-slate-200 dark:border-slate-800" aria-hidden="true">
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500 bg-emerald-500"></span>
+                        <span class="w-2.5 h-2.5 rounded-full border-2 border-slate-300 dark:border-slate-700"></span>
                     </div>
-                    <span class="px-2 py-0.5 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 text-[10px] font-bold rounded">MCQ</span>
-                </div>
-                <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4 group-hover:text-indigo-500 transition-colors">জনপ্রশাসন মন্ত্রণালয় (ব্যক্তিগত কর্মকর্তা) প্রশ্ন সমাধান</h3>
-                <div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
-                    <div class="text-xs text-slate-500 font-medium">পূর্ণমান: <span class="text-slate-800 dark:text-slate-200 font-bold">100</span></div>
-                    <span class="text-xs font-bold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">সমাধান পড়ুন &rarr;</span>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- RECENT JOB CIRCULARS (চাকরির বিজ্ঞপ্তি) - LAST SECTION -->
-    <!-- ============================================== -->
-    <section>
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-600 flex items-center justify-center">📢</div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">সাম্প্রতিক চাকরির বিজ্ঞপ্তি</h2>
+                    <div class="flex-1 p-5">
+                        <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-2.5">
+                            <span class="font-semibold text-slate-700 dark:text-slate-300">জনপ্রশাসন মন্ত্রণালয়</span>
+                            <span>০২ জুলাই, ২০২৬</span>
+                        </div>
+                        <h3 class="text-[17px] font-bold text-slate-900 dark:text-white leading-[1.6] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            ব্যক্তিগত কর্মকর্তা পদের প্রশ্ন ও সমাধান
+                        </h3>
+                        <p class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[13px] text-slate-500 dark:text-slate-400">
+                            ১০০টি এমসিকিউ, প্রতিটির ব্যাখ্যাসহ
+                        </p>
+                    </div>
+                </a>
             </div>
-            <a href="#" class="text-sm font-semibold text-red-600 dark:text-red-400 hover:underline">সকল বিজ্ঞপ্তি &rarr;</a>
-        </div>
+        </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            <!-- Circular Card 1 -->
-            <div class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-red-400 hover:shadow-lg transition-all group flex flex-col justify-between h-full">
-                <div>
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2.5 py-1 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-bold rounded-md">সরকারি চাকরি</span>
-                        <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                ⏳ শেষ: ২২ সেপ্টে, ২০২৬
-                            </span>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-red-600 transition-colors mb-2">বাংলাদেশ রেলওয়ে (ওয়েম্যান)</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">বাংলাদেশ রেলওয়েতে ওয়েম্যান পদে ১৩৮৫ জনের বিশাল নিয়োগ বিজ্ঞপ্তি প্রকাশ করা হয়েছে। যোগ্য প্রার্থীরা দ্রুত আবেদন করুন...</p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">পদ: ১৩৮৫ জন</span>
-                    <a href="#" class="text-xs font-bold text-white bg-slate-900 dark:bg-red-600 px-3.5 py-2 rounded-lg hover:bg-red-600 transition-colors">বিস্তারিত দেখুন</a>
-                </div>
+        <!-- ============================================== -->
+        <!-- CIRCULARS — notice board rows -->
+        <!-- ============================================== -->
+        <section>
+            <div class="flex items-baseline justify-between mb-5">
+                <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">চলমান নিয়োগ বিজ্ঞপ্তি</h2>
+                <a href="#" class="text-[13px] font-bold text-slate-900 dark:text-white border-b-2 border-emerald-500 pb-0.5">সব বিজ্ঞপ্তি</a>
             </div>
 
-            <!-- Circular Card 2 -->
-            <div class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-lg transition-all group flex flex-col justify-between h-full">
-                <div>
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2.5 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded-md">ব্যাংক জব</span>
-                        <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                ⏳ শেষ: ২৮ সেপ্টে, ২০২৬
-                            </span>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors mb-2">বাংলাদেশ ব্যাংক (অফিসার জেনারেল)</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">বাংলাদেশ ব্যাংকে 'অফিসার (জেনারেল)' পদে নিয়োগের জন্য আগ্রহী প্রার্থীদের কাছ থেকে আবেদন আহ্বান করা হয়েছে...</p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">পদ: ২৫০ জন</span>
-                    <a href="#" class="text-xs font-bold text-white bg-slate-900 dark:bg-blue-600 px-3.5 py-2 rounded-lg hover:bg-blue-600 transition-colors">বিস্তারিত দেখুন</a>
-                </div>
-            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800">
 
-            <!-- Circular Card 3 -->
-            <div class="bg-white dark:bg-[#121B2B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:border-purple-400 hover:shadow-lg transition-all group flex flex-col justify-between h-full">
-                <div>
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-bold rounded-md">মন্ত্রণালয়</span>
-                        <span class="text-[11px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded flex items-center gap-1 animate-pulse">
-                                ⏳ শেষ: আজ
-                            </span>
+                <article class="grid gap-3 md:grid-cols-[8.5rem_1fr_auto] md:items-center md:gap-6 py-5 pl-4 border-b border-slate-200 dark:border-slate-800 border-l-[3px] border-l-rose-500">
+                    <div>
+                        <span class="text-[13px] font-bold text-rose-600 dark:text-rose-400">আজ শেষ</span>
+                        <span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">১৮ সেপ্টেম্বর</span>
                     </div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-purple-600 transition-colors mb-2">খাদ্য অধিদপ্তর (উপ-পরিদর্শক)</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">খাদ্য অধিদপ্তরের অধীনে উপ-খাদ্য পরিদর্শক ও অন্যান্য পদে নতুন নিয়োগ বিজ্ঞপ্তি। দ্রুত আবেদন সম্পন্ন করুন...</p>
-                </div>
-                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">পদ: ৪১০ জন</span>
-                    <a href="#" class="text-xs font-bold text-white bg-slate-900 dark:bg-purple-600 px-3.5 py-2 rounded-lg hover:bg-purple-600 transition-colors">বিস্তারিত দেখুন</a>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">খাদ্য অধিদপ্তর — উপ-খাদ্য পরিদর্শক</h3>
+                        <p class="mt-1 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">৪১০টি পদ। স্নাতক পাস প্রার্থীরা অনলাইনে আবেদন করতে পারবেন।</p>
+                    </div>
+                    <a href="#" class="justify-self-start md:justify-self-end whitespace-nowrap px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-slate-900 dark:bg-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors">আবেদন করুন</a>
+                </article>
 
-</div>
-</x-layouts.frontend>
+                <article class="grid gap-3 md:grid-cols-[8.5rem_1fr_auto] md:items-center md:gap-6 py-5 pl-4 border-b border-slate-200 dark:border-slate-800 border-l-[3px] border-l-transparent">
+                    <div>
+                        <span class="text-[13px] font-bold text-slate-900 dark:text-slate-200">৪ দিন বাকি</span>
+                        <span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">২২ সেপ্টেম্বর</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">বাংলাদেশ রেলওয়ে — ওয়েম্যান</h3>
+                        <p class="mt-1 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">১৩৮৫টি পদ। অষ্টম শ্রেণি পাস হলেই আবেদন করা যাবে।</p>
+                    </div>
+                    <a href="#" class="justify-self-start md:justify-self-end whitespace-nowrap px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-slate-900 dark:bg-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors">আবেদন করুন</a>
+                </article>
+
+                <article class="grid gap-3 md:grid-cols-[8.5rem_1fr_auto] md:items-center md:gap-6 py-5 pl-4 border-b border-slate-200 dark:border-slate-800 border-l-[3px] border-l-transparent">
+                    <div>
+                        <span class="text-[13px] font-bold text-slate-900 dark:text-slate-200">১০ দিন বাকি</span>
+                        <span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">২৮ সেপ্টেম্বর</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">বাংলাদেশ ব্যাংক — অফিসার (জেনারেল)</h3>
+                        <p class="mt-1 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">২৫০টি পদ। প্রিলিমিনারি পরীক্ষা ডিসেম্বরে হওয়ার সম্ভাবনা।</p>
+                    </div>
+                    <a href="#" class="justify-self-start md:justify-self-end whitespace-nowrap px-4 py-2 rounded-lg text-[13px] font-bold text-white bg-slate-900 dark:bg-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors">আবেদন করুন</a>
+                </article>
+
+            </div>
+        </section>
+
+    </div>
+
+@endsection

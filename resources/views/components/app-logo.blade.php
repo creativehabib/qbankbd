@@ -13,22 +13,22 @@
 
 @if($sidebar)
     <a
-        {{ $attributes->class('flex h-10 min-w-0 items-center justify-center in-data-flux-sidebar-collapsed-desktop:w-full') }}
+        {{ $attributes->class('flex h-12 min-w-0 items-center justify-center in-data-flux-sidebar-collapsed-desktop:w-full') }}
         aria-label="{{ $appName }}"
     >
         <span
             data-test="sidebar-full-logo"
-            class="block h-10 w-auto in-data-flux-sidebar-collapsed-desktop:hidden"
+            class="block h-12 w-auto in-data-flux-sidebar-collapsed-desktop:hidden"
         >
             @if($logoLight || $logoDark)
                 @if($logoLight)
-                    <img src="{{ $logoLight }}" class="h-10 w-auto object-contain dark:hidden" alt="{{ $appName }}" />
+                    <img src="{{ $logoLight }}" class="h-12 w-auto object-contain dark:hidden" alt="{{ $appName }}" />
                 @endif
                 @if($logoDark)
-                    <img src="{{ $logoDark }}" class="h-10 w-auto object-contain hidden dark:block" alt="{{ $appName }}" />
+                    <img src="{{ $logoDark }}" class="h-12 w-auto object-contain hidden dark:block" alt="{{ $appName }}" />
                 @endif
             @else
-                <div class="h-10 flex items-center justify-center">
+                <div class="h-12 flex items-center justify-center">
                     <x-app-logo-icon class="h-8 w-auto shrink-0" />
                 </div>
             @endif

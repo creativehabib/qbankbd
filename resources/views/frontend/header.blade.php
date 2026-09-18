@@ -11,8 +11,8 @@
                         $logoLight = !empty($branding['logo_light']) ? (\Illuminate\Support\Str::startsWith($branding['logo_light'], ['http://', 'https://']) ? $branding['logo_light'] : asset('storage/'.$branding['logo_light'])) : asset('images/logo_dark.png');
                         $logoDark = !empty($branding['logo_dark']) ? (\Illuminate\Support\Str::startsWith($branding['logo_dark'], ['http://', 'https://']) ? $branding['logo_dark'] : asset('storage/'.$branding['logo_dark'])) : asset('images/logo_light.png');
                     @endphp
-                    <img src="{{ $logoLight }}" alt="{{ $appName }}" class="h-9 md:h-10 w-auto block dark:hidden">
-                    <img src="{{ $logoDark }}" alt="{{ $appName }}" class="h-9 md:h-10 w-auto hidden dark:block">
+                    <img src="{{ $logoLight }}" alt="{{ $appName }}" class="h-12 md:h-14 w-auto block dark:hidden">
+                    <img src="{{ $logoDark }}" alt="{{ $appName }}" class="h-12 md:h-14 w-auto hidden dark:block">
                 </a>
 
                 <!-- Desktop Nav Links -->
