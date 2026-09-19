@@ -22,12 +22,12 @@
     let deferredPrompt;
     const installBtn = document.getElementById('installPwaBtn');
 
-    // ব্রাউজার যখন PWA ইন্সটল করার জন্য প্রস্তুত হয়, তখন এই ইভেন্ট কল হয়
+    // ব্রাউজার যখন PWA ইন্সটল করার জন্য প্রস্তুত হয়, তখন এই ইভেন্ট কল হয়
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
 
-        // PWA সাপোর্টেড হলে বাটনটি দৃশ্যমান করুন (hidden ক্লাস সরিয়ে দিন)
+        // PWA সাপোর্টেড হলে বাটনটি দৃশ্যমান করুন (hidden ক্লাস সরিয়ে দিন)
         if (installBtn) {
             installBtn.classList.remove('hidden');
         }
@@ -46,14 +46,14 @@
                     console.log('User dismissed the install prompt');
                 }
 
-                // একবার প্রম্পট দেখালে এটি আর ব্যবহার করা যায় না
+                // একবার প্রম্পট দেখালে এটি আর ব্যবহার করা যায় না
                 deferredPrompt = null;
                 installBtn.classList.add('hidden');
             }
         });
     }
 
-    // ইউজার যদি নিজে থেকে অ্যাপ ইন্সটল করে ফেলে, তবে বাটনটি লুকিয়ে ফেলুন
+    // ইউজার যদি নিজে থেকে অ্যাপ ইন্সটল করে ফেলে, তবে বাটনটি লুকিয়ে ফেলুন
     window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
         if (installBtn) {
@@ -61,4 +61,19 @@
         }
         console.log('PWA was installed');
     });
+
+    // ==========================================
+    // Service Worker Registration (এখানে যুক্ত করা হলো)
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(err => {
+                    console.error('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
 </script>

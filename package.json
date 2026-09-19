@@ -9,6 +9,7 @@
     "dependencies": {
         "@alpinejs/collapse": "^3.15.11",
         "@fortawesome/fontawesome-free": "^7.1.0",
+        "@hotwired/turbo": "^8.0.23",
         "@tailwindcss/vite": "^4.1.11",
         "alpinejs": "^3.17.3",
         "apexcharts": "^5.10.4",

@@ -41,7 +41,7 @@
 <meta name="title" content="{{ $pageTitle }}">
 <meta name="description" content="{{ $pageDesc }}">
 <meta name="author" content="{{ $appName }}">
-<meta name="robots" content="no-index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="{{ $currentUrl }}">
 
 <!-- Open Graph / Facebook -->
@@ -167,6 +167,16 @@
     html.dark body { background-color: var(--color-zinc-950); }
     html.dark .header-dynamic-bg { background-color: color-mix(in srgb, var(--color-zinc-900) 85%, transparent); }
     :root.dark { color-scheme: dark; }
+
+    /* Dynamic Text Selection Color */
+    ::selection {
+        background-color: var(--color-accent);
+        color: var(--color-accent-foreground, #ffffff);
+    }
+    ::-moz-selection {
+        background-color: var(--color-accent);
+        color: var(--color-accent-foreground, #ffffff);
+    }
 </style>
 
 <!-- Fonts Setup -->
@@ -204,7 +214,7 @@
 @endif
 
 <!-- Asset Compilation -->
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+@vite(['resources/css/app.css', 'resources/js/frontend-app.js'])
 @stack('styles')
 
 <!-- Standalone Theme Manager (No Flux UI) -->
@@ -228,7 +238,7 @@
         }
     });
 
-    // পেজ রিলোডে থিম ধরে রাখার জন্য ইনিশিয়াল চেক
+    // পেজ রিলোডে থিম ধরে রাখার জন্য ইনিশিয়াল চেক
     (function() {
         try {
             const theme = localStorage.getItem('theme');

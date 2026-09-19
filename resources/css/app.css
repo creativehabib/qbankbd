@@ -136,3 +136,8 @@ select:focus[data-flux-control] {
 }
 
 /* =========================================
+/* Turbo প্রোগ্রেস বারের ডিফল্ট স্টাইল ওভাররাইড */
+.turbo-progress-bar {
+    height: 3px !important;
+    background-color: #10b981 !important;
+}

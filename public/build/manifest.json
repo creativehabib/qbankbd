@@ -1,9 +1,94 @@
 {
-  "node_modules/@alpinejs/collapse/dist/module.esm.js": {
-    "file": "assets/module.esm-BBejJ6Z_.js",
+  "_katex-DQeLlQKP.css": {
+    "file": "assets/katex-DQeLlQKP.css",
+    "src": "_katex-DQeLlQKP.css"
+  },
+  "_katex.min-88Nh4xLm.js": {
+    "file": "assets/katex.min-88Nh4xLm.js",
+    "name": "katex.min",
+    "css": [
+      "assets/katex-DQeLlQKP.css"
+    ],
+    "assets": [
+      "assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+      "assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+      "assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+      "assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+      "assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+      "assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+      "assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+      "assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+      "assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+      "assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+      "assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+      "assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+      "assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+      "assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+      "assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+      "assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+      "assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+      "assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+      "assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+      "assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+      "assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+      "assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+      "assets/KaTeX_Main-Italic-BMLOBm91.woff",
+      "assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+      "assets/KaTeX_Main-Regular-B22Nviop.woff2",
+      "assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+      "assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+      "assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+      "assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+      "assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+      "assets/KaTeX_Math-Italic-t53AETM-.woff2",
+      "assets/KaTeX_Math-Italic-DA0__PXp.woff",
+      "assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+      "assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+      "assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+      "assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+      "assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+      "assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+      "assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+      "assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+      "assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+      "assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+      "assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+      "assets/KaTeX_Script-Regular-D5yQViql.woff",
+      "assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+      "assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+      "assets/KaTeX_Size1-Regular-C195tn64.woff",
+      "assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+      "assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+      "assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+      "assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+      "assets/KaTeX_Size3-Regular-gV2CO0n9.woff2",
+      "assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+      "assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+      "assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+      "assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+      "assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+      "assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+      "assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+      "assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf"
+    ]
+  },
+  "_module.esm-D1fqnq1h.js": {
+    "file": "assets/module.esm-D1fqnq1h.js",
     "name": "module.esm",
-    "src": "node_modules/@alpinejs/collapse/dist/module.esm.js",
-    "isDynamicEntry": true
+    "imports": [
+      "_rolldown-runtime-CmsrGqdA.js"
+    ]
+  },
+  "_module.esm-D_DvBg96.js": {
+    "file": "assets/module.esm-D_DvBg96.js",
+    "name": "module.esm",
+    "imports": [
+      "_rolldown-runtime-CmsrGqdA.js"
+    ]
+  },
+  "_rolldown-runtime-CmsrGqdA.js": {
+    "file": "assets/rolldown-runtime-CmsrGqdA.js",
+    "name": "rolldown-runtime"
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
     "file": "assets/fa-brands-400-BfBXV7Mm.woff2",
@@ -20,12 +105,6 @@
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
     "file": "assets/fa-v4compatibility-DnhYSyY-.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
-  },
-  "node_modules/alpinejs/dist/module.esm.js": {
-    "file": "assets/module.esm-CHcY14HK.js",
-    "name": "module.esm",
-    "src": "node_modules/alpinejs/dist/module.esm.js",
-    "isDynamicEntry": true
   },
   "node_modules/katex/dist/fonts/KaTeX_AMS-Regular.ttf": {
     "file": "assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
@@ -268,7 +347,7 @@
     "src": "node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DdGvBySs.css",
+    "file": "assets/app-DOD5IFSl.css",
     "name": "app",
     "names": [
       "app.css"
@@ -283,78 +362,27 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-CXDZsm6W.js",
+    "file": "assets/app-rTjZYglA.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_katex.min-88Nh4xLm.js"
+    ],
     "dynamicImports": [
-      "node_modules/alpinejs/dist/module.esm.js",
-      "node_modules/@alpinejs/collapse/dist/module.esm.js"
-    ],
-    "css": [
-      "assets/app-DQeLlQKP.css"
-    ],
-    "assets": [
-      "assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
-      "assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
-      "assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
-      "assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
-      "assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
-      "assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
-      "assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
-      "assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
-      "assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
-      "assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
-      "assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
-      "assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
-      "assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
-      "assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
-      "assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
-      "assets/KaTeX_Main-Bold-Cx986IdX.woff2",
-      "assets/KaTeX_Main-Bold-Jm3AIy58.woff",
-      "assets/KaTeX_Main-Bold-waoOVXN0.ttf",
-      "assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
-      "assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
-      "assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
-      "assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
-      "assets/KaTeX_Main-Italic-BMLOBm91.woff",
-      "assets/KaTeX_Main-Italic-3WenGoN9.ttf",
-      "assets/KaTeX_Main-Regular-B22Nviop.woff2",
-      "assets/KaTeX_Main-Regular-Dr94JaBh.woff",
-      "assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
-      "assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
-      "assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
-      "assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
-      "assets/KaTeX_Math-Italic-t53AETM-.woff2",
-      "assets/KaTeX_Math-Italic-DA0__PXp.woff",
-      "assets/KaTeX_Math-Italic-flOr_0UB.ttf",
-      "assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
-      "assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
-      "assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
-      "assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
-      "assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
-      "assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
-      "assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
-      "assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
-      "assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
-      "assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
-      "assets/KaTeX_Script-Regular-D5yQViql.woff",
-      "assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
-      "assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
-      "assets/KaTeX_Size1-Regular-C195tn64.woff",
-      "assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
-      "assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
-      "assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
-      "assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
-      "assets/KaTeX_Size3-Regular-gV2CO0n9.woff2",
-      "assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
-      "assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
-      "assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
-      "assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
-      "assets/KaTeX_Size4-Regular-DWFBv043.ttf",
-      "assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
-      "assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
-      "assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf"
+      "_module.esm-D_DvBg96.js",
+      "_module.esm-D1fqnq1h.js"
+    ]
+  },
+  "resources/js/frontend-app.js": {
+    "file": "assets/frontend-app-UfqNwRtg.js",
+    "name": "frontend-app",
+    "src": "resources/js/frontend-app.js",
+    "isEntry": true,
+    "imports": [
+      "_module.esm-D1fqnq1h.js",
+      "_module.esm-D_DvBg96.js",
+      "_katex.min-88Nh4xLm.js"
     ]
   }
 }
