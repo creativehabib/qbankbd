@@ -2,37 +2,33 @@ import $ from "jquery";
 import TomSelect from "tom-select";
 import ApexCharts from "apexcharts";
 
+// Alpine & Plugins
+if (window.manuallyStartAlpine) {
+    Promise.all([
+        import('alpinejs'),
+        import('@alpinejs/collapse')
+    ]).then(([AlpineModule, collapseModule]) => {
+        const Alpine = AlpineModule.default;
+        window.Alpine = Alpine;
+        Alpine.plugin(collapseModule.default);
+        Alpine.start();
+    });
+} else {
+    import('@alpinejs/collapse').then(collapseModule => {
+        document.addEventListener('alpine:init', () => {
+            if (window.Alpine) {
+                window.Alpine.plugin(collapseModule.default);
+            }
+        });
+    });
+}
+
 // Global Window Objects
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.$ = window.jQuery = $;
 
-// ==========================================
-// ১. Flux UI কাস্টম এলিমেন্ট (ui-modal) কনফ্লিক্ট রোধ (Local Dev / HMR Fix)
-// ==========================================
-if (typeof customElements !== 'undefined') {
-    const originalDefine = customElements.define;
-    customElements.define = function(name, constructor, options) {
-        if (!customElements.get(name)) {
-            originalDefine.call(customElements, name, constructor, options);
-        }
-    };
-}
-
-// ==========================================
-// ২. Alpine & Plugins (Livewire 3 Compatible)
-// ==========================================
-// Livewire 3 নিজেই Alpine চালু করে, তাই ম্যানুয়ালি স্টার্ট না করে শুধু প্লাগিন যুক্ত করা হলো
-import collapse from '@alpinejs/collapse';
-
-document.addEventListener('alpine:init', () => {
-    window.Alpine.plugin(collapse);
-});
-
-
-// ==========================================
-// ৩. লাইভওয়্যার টোস্ট ইভেন্টস
-// ==========================================
+// --- লাইভওয়্যার টোস্ট ইভেন্টস ---
 window.addEventListener('success', event => {
     let msg = event.detail?.message || (event.detail?.[0] && event.detail[0]?.message);
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'success' });
@@ -46,10 +42,7 @@ window.addEventListener('error', event => {
     if (msg && window.Flux) window.Flux.toast({ text: msg, variant: 'danger' });
 });
 
-
-// ==========================================
-// ৪. MathJax/KaTeX Rendering Hooks
-// ==========================================
+// --- MathJax/KaTeX Rendering Hooks ---
 import renderMathInElement from 'katex/dist/contrib/auto-render';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -63,7 +56,7 @@ window.renderKatex = function() {
             {left: '\\(', right: '\\)', display: false}
         ],
         throwOnError: false,
-        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "div.ck-editor-container", "flux:toast"]
+        ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code", "div.ck-editor-container"]
     });
 
     // Fallback for old MathJax elements
@@ -105,6 +98,7 @@ window.addEventListener('practice-content-updated', window.renderMathJax);
 document.addEventListener('livewire:initialized', () => {
     Livewire.hook('morph.updating', ({ el, toEl, skip }) => {
         if (el.hasAttribute && el.hasAttribute('data-math-content')) {
+            // We only skip if the raw text content is fundamentally the same to allow pagination to work
             let currentRaw = el.getAttribute('data-raw-math') || el.innerText;
             let newRaw = toEl.innerText;
 
@@ -120,9 +114,8 @@ document.addEventListener('livewire:initialized', () => {
 });
 
 
-// ==========================================
-// ৫. Flux UI delete confirmation
-// ==========================================
+
+// --- Flux UI delete confirmation ---
 window.confirmDeleteAction = function (callback) {
     window.pendingDeleteAction = callback;
     if (window.Flux && typeof window.Flux.modal === 'function') {
@@ -147,10 +140,7 @@ window.confirmPendingDeletion = function () {
     }
 };
 
-
-// ==========================================
-// ৬. Global CKEditor & MathJax Helpers
-// ==========================================
+// --- Global CKEditor & MathJax Helpers ---
 window.wrapMathForCKEditor = function(html) {
     if (!html || typeof html !== 'string') return html;
     let cleanHtml = html.replace(/<span class="math-tex">([\s\S]*?)<\/span>/g, '$1');

@@ -4,7 +4,7 @@
 @section('description', $exam->title . ' এর পূর্ণাঙ্গ প্রশ্ন ও নির্ভুল সমাধান।')
 
 @section('content')
-    <div x-data="examPageData()" class="space-y-6 pb-12">
+    <div x-data="examPageData()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6 space-y-6 pb-12">
         <!-- Breadcrumb -->
         <div class="flex items-center gap-1.5 md:gap-2 text-[11px] md:text-[13px] text-zinc-500 font-medium w-full">
             <a href="/" class="shrink-0 hover:text-emerald-600 transition-colors flex items-center gap-1"><flux:icon.home class="w-3 h-3 md:w-3.5 md:h-3.5" /> হোম</a>

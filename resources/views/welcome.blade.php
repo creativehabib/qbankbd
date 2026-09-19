@@ -4,7 +4,7 @@
 @section('description', 'বিসিএস, ব্যাংক, শিক্ষক নিয়োগ ও ভর্তি পরীক্ষার বিগত প্রশ্ন, শিক্ষক-যাচাই করা ব্যাখ্যাসহ সমাধান এবং প্রতিষ্ঠানভিত্তিক প্রশ্ন আর্কাইভ।')
 
 @section('content')
-    <div class="space-y-14 sm:space-y-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
 
         <!-- ============================================== -->
         <!-- HERO — ruled paper, left aligned, search leads -->

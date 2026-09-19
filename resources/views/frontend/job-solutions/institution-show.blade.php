@@ -10,7 +10,7 @@
 @endphp
 
 @section('content')
-    <div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
         <!-- Breadcrumb -->
         <div x-data="{ type: 'all', counts: { 'all': {{ $allCount }}, 'mcq': {{ $mcqCount }}, 'written': {{ $writtenCount }} } }">
             <div class="mb-4">

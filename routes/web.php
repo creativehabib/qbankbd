@@ -2,12 +2,19 @@
 
 use App\Http\Controllers\BackupDownloadController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Frontend\InteractionController;
+use App\Http\Controllers\Frontend\JobSolutionController;
+use App\Http\Controllers\Frontend\ToolsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Livewire\AcademicClasses\ClassIndex;
+use App\Livewire\Admin\Institutions\InstitutionIndex;
 use App\Livewire\Admin\ModelTests\ModelTestCreate;
 use App\Livewire\Admin\ModelTests\ModelTestIndex;
 use App\Livewire\Admin\PackageManagement;
+use App\Livewire\Admin\PastExams\PastExamIndex;
+use App\Livewire\Admin\PastExams\PastExamManager;
 use App\Livewire\Admin\Settings\AiSetting;
 use App\Livewire\Admin\Settings\BrandingTheme;
 use App\Livewire\Admin\Settings\EmailSetting;
@@ -70,13 +77,27 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [\App\Http\Controllers\Frontend\FrontendController::class, 'home'])->name('home');
+Route::get('/', [FrontendController::class, 'home'])->name('home');
 Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy');
 
+// Tools Group Route
+Route::prefix('tools')->name('tools.')->group(function () {
+
+    // টুলস এর মূল পেজ (যেখানে সব টুলের তালিকা বা মেনু থাকবে)
+    Route::get('/', [ToolsController::class, 'index'])->name('index');
+
+    // পে-স্কেল ক্যালকুলেটর
+    Route::get('/payscale-calculator', [ToolsController::class, 'payscaleCalculate'])->name('payscale_calculate');
+
+    // ভবিষ্যতে যুক্ত হতে পারে এমন আরও কিছু টুলের উদাহরণ
+    Route::get('/age-calculator', [ToolsController::class, 'ageCalculator'])->name('age_calculator');
+    Route::get('/cgpa-calculator', [ToolsController::class, 'cgpaCalculator'])->name('cgpa_calculator');
+    Route::get('/unit-converter', [ToolsController::class, 'unitConverter'])->name('unit_converter');
+
+});
+
 // Public Frontend Routes
-Route::get('/job-solutions', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'index'])->name('job-solutions.index');
-
-
+Route::get('/job-solutions', [JobSolutionController::class, 'index'])->name('job-solutions.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
@@ -139,9 +160,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/model-tests/create', ModelTestCreate::class)->name('admin.model-tests.create');
 
         // Institutions & Past Exams
-        Route::get('/admin/institutions', \App\Livewire\Admin\Institutions\InstitutionIndex::class)->name('admin.institutions.index');
-        Route::get('/admin/past-exams', \App\Livewire\Admin\PastExams\PastExamIndex::class)->name('admin.past-exams.index');
-        Route::get('/admin/past-exams/{pastExamId}/manage', \App\Livewire\Admin\PastExams\PastExamManager::class)->name('admin.past-exams.manage');
+        Route::get('/admin/institutions', InstitutionIndex::class)->name('admin.institutions.index');
+        Route::get('/admin/past-exams', PastExamIndex::class)->name('admin.past-exams.index');
+        Route::get('/admin/past-exams/{pastExamId}/manage', PastExamManager::class)->name('admin.past-exams.manage');
 
         // Admin Settings
         Route::get('/admin/settings', Index::class)->name('admin.settings.index');
@@ -185,7 +206,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teacher/earnings', MyEarnings::class)->middleware('role:teacher')->name('teacher.earnings');
     Route::get('/teacher/wallet', WalletTransactions::class)->middleware('role:teacher')->name('teacher.wallet');
 
-    
     Route::get('/student/goals', GoalSelection::class)->name('student.goals');
     Route::get('/student/practice', StudentPracticeIndex::class)->name('students.practice.index');
     Route::get('/student/bookmarks', BookmarkedQuestions::class)->name('student.bookmarks');
@@ -231,23 +251,20 @@ Route::post('/payment/ssl/ipn', [PaymentController::class, 'sslIpn'])->name('pay
 Route::post('/payment/nagad/pay/{package}', [PaymentController::class, 'nagadPay'])->name('payment.nagad.pay');
 Route::get('/payment/nagad/callback', [PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
 
-
 // Interaction Routes (AJAX)
 Route::middleware(['auth'])->group(function () {
-    Route::post('/interaction/bookmark/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'toggleBookmark']);
-    Route::post('/interaction/like/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'toggleLike']);
-    Route::post('/interaction/ai-explanation/{id}', [\App\Http\Controllers\Frontend\InteractionController::class, 'generateAiExplanation']);
+    Route::post('/interaction/bookmark/{id}', [InteractionController::class, 'toggleBookmark']);
+    Route::post('/interaction/like/{id}', [InteractionController::class, 'toggleLike']);
+    Route::post('/interaction/ai-explanation/{id}', [InteractionController::class, 'generateAiExplanation']);
 });
 
 require __DIR__.'/settings.php';
 
+Route::get('/search', [FrontendController::class, 'search'])->name('search');
+Route::get('/search/live', [FrontendController::class, 'apiSearch'])->name('search.live');
 
-
-Route::get('/search', [\App\Http\Controllers\Frontend\FrontendController::class, 'search'])->name('search');
-Route::get('/search/live', [\App\Http\Controllers\Frontend\FrontendController::class, 'apiSearch'])->name('search.live');
-
-Route::get('/question/{slug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'questionShow'])->name('question.show');
+Route::get('/question/{slug}', [JobSolutionController::class, 'questionShow'])->name('question.show');
 
 // Dynamic Institution and Exam Routes (Place at very bottom to prevent overriding)
-Route::get('/{institutionSlug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'institutionShow'])->name('institution.show');
-Route::get('/{institutionSlug}/{examSlug}', [\App\Http\Controllers\Frontend\JobSolutionController::class, 'show'])->name('job-solutions.show');
+Route::get('/{institutionSlug}', [JobSolutionController::class, 'institutionShow'])->name('institution.show');
+Route::get('/{institutionSlug}/{examSlug}', [JobSolutionController::class, 'show'])->name('job-solutions.show');

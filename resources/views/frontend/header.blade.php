@@ -21,6 +21,7 @@
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">প্রশ্ন ব্যাংক</a>
                     <a href="{{ route('job-solutions.index') }}" class="px-4 py-2 rounded-xl {{ request()->is('job-solutions*') || request()->routeIs('job-solutions.*') || request()->routeIs('institution.show') ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600' }}">জব সল্যুশন</a>
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">ভর্তি ও পরীক্ষা</a>
+                    <a href="{{ route('tools.payscale_calculate') }}" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">টুলস</a>
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">পিডিএফ বই</a>
                 </nav>
             </div>

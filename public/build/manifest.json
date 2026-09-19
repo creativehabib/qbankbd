@@ -3,8 +3,8 @@
     "file": "assets/katex-DQeLlQKP.css",
     "src": "_katex-DQeLlQKP.css"
   },
-  "_katex.min-88Nh4xLm.js": {
-    "file": "assets/katex.min-88Nh4xLm.js",
+  "_katex.min-ff63WVjW.js": {
+    "file": "assets/katex.min-ff63WVjW.js",
     "name": "katex.min",
     "css": [
       "assets/katex-DQeLlQKP.css"
@@ -71,24 +71,6 @@
       "assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
       "assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf"
     ]
-  },
-  "_module.esm-D1fqnq1h.js": {
-    "file": "assets/module.esm-D1fqnq1h.js",
-    "name": "module.esm",
-    "imports": [
-      "_rolldown-runtime-CmsrGqdA.js"
-    ]
-  },
-  "_module.esm-D_DvBg96.js": {
-    "file": "assets/module.esm-D_DvBg96.js",
-    "name": "module.esm",
-    "imports": [
-      "_rolldown-runtime-CmsrGqdA.js"
-    ]
-  },
-  "_rolldown-runtime-CmsrGqdA.js": {
-    "file": "assets/rolldown-runtime-CmsrGqdA.js",
-    "name": "rolldown-runtime"
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
     "file": "assets/fa-brands-400-BfBXV7Mm.woff2",
@@ -347,7 +329,7 @@
     "src": "node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-gtShpigs.css",
+    "file": "assets/app-G40_kz6w.css",
     "name": "app",
     "names": [
       "app.css"
@@ -362,27 +344,21 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-rTjZYglA.js",
+    "file": "assets/app-BAgBqzgl.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_katex.min-88Nh4xLm.js"
-    ],
-    "dynamicImports": [
-      "_module.esm-D_DvBg96.js",
-      "_module.esm-D1fqnq1h.js"
+      "_katex.min-ff63WVjW.js"
     ]
   },
   "resources/js/frontend-app.js": {
-    "file": "assets/frontend-app-UfqNwRtg.js",
+    "file": "assets/frontend-app-CohNonaq.js",
     "name": "frontend-app",
     "src": "resources/js/frontend-app.js",
     "isEntry": true,
     "imports": [
-      "_module.esm-D1fqnq1h.js",
-      "_module.esm-D_DvBg96.js",
-      "_katex.min-88Nh4xLm.js"
+      "_katex.min-ff63WVjW.js"
     ]
   }
 }
