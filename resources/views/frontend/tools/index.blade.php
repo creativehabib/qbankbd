@@ -593,45 +593,52 @@ $description = 'সরকারি ও বেসরকারি চাকরি 
     </div>
     @push('script')
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            function initToolTabs() {
                 const filterButtons = document.querySelectorAll('.cat-pill');
                 const toolCards = document.querySelectorAll('.tool-card');
 
+                if (filterButtons.length === 0) return;
+
                 filterButtons.forEach(button => {
+                    // ডুপ্লিকেট ইভেন্ট এড়াতে আগের ইভেন্ট রিমুভ করার ব্যবস্থা
+                    button.replaceWith(button.cloneNode(true));
+                });
+
+                // নতুন করে রিকনস্ট্রক্ট করা বাটনগুলোতে ইভেন্ট যুক্ত করা
+                document.querySelectorAll('.cat-pill').forEach(button => {
                     button.addEventListener('click', function() {
                         const targetCategory = this.getAttribute('data-cat');
 
-                        // ১. বাটনগুলোর অ্যাকটিভ/ইনঅ্যাকটিভ স্টাইল পরিবর্তন
-                        filterButtons.forEach(btn => {
-                            // ইনঅ্যাকটিভ স্টাইল যুক্ত করা (অ্যাকটিভ স্টাইল রিমুভ)
+                        document.querySelectorAll('.cat-pill').forEach(btn => {
                             btn.classList.remove('active', 'bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-600');
                             btn.classList.add('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-700', 'dark:text-slate-300', 'hover:border-emerald-500');
                         });
 
-                        // যে বাটনে ক্লিক করা হয়েছে সেটিতে অ্যাকটিভ স্টাইল দেওয়া
                         this.classList.remove('bg-white', 'dark:bg-slate-800', 'border-slate-200', 'dark:border-slate-700', 'text-slate-700', 'dark:text-slate-300', 'hover:border-emerald-500');
                         this.classList.add('active', 'bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-600');
 
-                        // ২. কার্ডগুলো ফিল্টার করা (স্মুথ ফেড অ্যানিমেশনসহ)
-                        toolCards.forEach(card => {
+                        document.querySelectorAll('.tool-card').forEach(card => {
                             const cardCategory = card.getAttribute('data-category');
 
                             if (targetCategory === 'all' || targetCategory === cardCategory) {
-                                // কার্ড দেখানোর লজিক
                                 card.style.display = '';
-                                // ফেড ইন অ্যানিমেশন
                                 card.animate([
                                     { opacity: 0, transform: 'scale(0.95)' },
                                     { opacity: 1, transform: 'scale(1)' }
                                 ], { duration: 300, easing: 'ease-out' });
                             } else {
-                                // কার্ড লুকানোর লজিক
                                 card.style.display = 'none';
                             }
                         });
                     });
                 });
-            });
+            }
+
+            // প্রথম লোডের জন্য
+            document.addEventListener('DOMContentLoaded', initToolTabs);
+
+            // Turbo Drive এক পেজ থেকে অন্য পেজে গেলে এটি রান করবে
+            document.addEventListener('turbo:load', initToolTabs);
         </script>
     @endpush
 @endsection
