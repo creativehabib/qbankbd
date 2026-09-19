@@ -2,10 +2,10 @@
 <html lang="bn" class="scroll-smooth">
 <head>
     <script>window.manuallyStartAlpine = true;</script>
-    <title>@yield('title', 'ডিফল্ট সাইট টাইটেল')</title>
-    <meta name="description" content="@yield('description', 'ডিফল্ট সাইট ডিসক্রিপশন')">
-
-    @include('frontend.partials.head')
+    @include('frontend.partials.head', [
+        'title' => View::hasSection('title') ? View::getSection('title') : null,
+        'description' => View::hasSection('description') ? View::getSection('description') : null
+    ])
 
     <style>
         /* ১. কন্টেন্ট প্রটেকশন (কপি এবং ড্র্যাগ বন্ধ করা) */
@@ -15,7 +15,7 @@
             -ms-user-select: none;
             user-select: none;
         }
-        /* ২. ইনপুট ফিল্ডে সিলেকশন অন রাখা (যাতে আপনার ডায়নামিক থিম কালার দেখা যায়) */
+        /* ২. ইনপুট ফিল্ডে সিলেকশন অন রাখা (যাতে আপনার ডায়নামিক থিম কালার দেখা যায়) */
         input, textarea, select, [contenteditable="true"], .allow-select, .selectable {
             -webkit-user-select: text !important;
             -moz-user-select: text !important;
@@ -64,12 +64,9 @@
 <!-- Sitewide Content Protection & Anti-Inspection Shield -->
 <script>
     window.__SECURITY_CONFIG__ = {
-        disableRightClick: false, // রাইট ক্লিক বন্ধ করতে চাইলে true দিন
-        disableTextCopy: true,    // টেক্সট কপি করা বন্ধ করতে true দিন (বর্তমানে চালু আছে)
-        disableInspect: false,    // Inspect/Developer Tools বন্ধ করতে চাইলে true দিন
-
-        // লারাভেল থেকে ডাইনামিকভাবে চেক করা হচ্ছে ইউজার অ্যাডমিন কিনা
-        // অ্যাডমিন হলে এই রেস্ট্রিকশনগুলো কাজ করবে না
+        disableRightClick: true,
+        disableTextCopy: true,
+        disableInspect: true,
         isAdmin: @json(auth()->check() && auth()->user()->role === 'admin')
     };
 </script>
