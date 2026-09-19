@@ -163,6 +163,20 @@
                         </div>
                         <input type="hidden" id="newBasicPayVal" value="">
                         <input type="hidden" id="newBasicPayDisplay" value="">
+
+                        <!-- Calculation Logic Accordion (Dynamic Math Table) -->
+                        <details class="group mt-3 bg-white/70 dark:bg-slate-900/50 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm cursor-pointer [&_summary::-webkit-details-marker]:hidden">
+                            <summary class="flex items-center justify-between p-3 text-xs font-bold text-emerald-800 dark:text-emerald-400 select-none">
+                                <span class="flex items-center gap-1.5">
+                                    <span>💡</span>
+                                    <span>কীভাবে এই নতুন বেতন নির্ধারণ হলো? (অঙ্কে বিস্তারিত)</span>
+                                </span>
+                                <span class="text-emerald-500 font-bold transition-transform duration-300 group-open:rotate-180">▼</span>
+                            </summary>
+                            <div class="px-3 pb-3 border-t border-emerald-100 dark:border-emerald-800/50 pt-2" id="calculationStepsTable">
+                                <div class="text-[11px] text-slate-500 text-center py-2">প্রথমে ওপরের গ্রেড ও বর্তমান মূল বেতন সিলেক্ট করুন।</div>
+                            </div>
+                        </details>
                     </div>
 
                     <!-- Step 3: Allowance calculation parameters -->
@@ -239,28 +253,28 @@
             <div class="lg:col-span-5 space-y-6">
 
                 <!-- Dark stat panel -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 sm:p-7 rounded-2xl border border-slate-700/80 space-y-5">
-                    <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">বেতন বৃদ্ধি প্রাক্কলন</span>
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">২০১৫ ➔ ২০২৬</span>
+                <div class="bg-emerald-50/40 dark:bg-gradient-to-br dark:from-slate-900 dark:to-slate-800 text-slate-800 dark:text-white p-6 sm:p-7 rounded-2xl border border-emerald-200/60 dark:border-slate-700/80 space-y-5">
+                    <div class="flex items-center justify-between border-b border-emerald-200/80 dark:border-slate-700 pb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">বেতন বৃদ্ধি প্রাক্কলন</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">২০১৫ ➔ ২০২৬</span>
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs sm:text-sm text-slate-300">পূর্বের মূল বেতন:</span>
-                            <span id="sideOldBasic" class="font-bold text-base sm:text-lg text-white">৳ ০</span>
+                            <span class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">পূর্বের মূল বেতন:</span>
+                            <span id="sideOldBasic" class="font-bold text-base sm:text-lg text-slate-800 dark:text-white">৳ ০</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-xs sm:text-sm text-slate-300">নতুন মূল বেতন:</span>
-                            <span id="sideNewBasic" class="font-extrabold text-lg sm:text-xl text-emerald-400">৳ ০</span>
+                            <span class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">নতুন মূল বেতন:</span>
+                            <span id="sideNewBasic" class="font-extrabold text-lg sm:text-xl text-emerald-700 dark:text-emerald-400">৳ ০</span>
                         </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-700">
-                            <span class="text-xs sm:text-sm text-emerald-200 font-bold">মোট মূল বেতন বৃদ্ধি:</span>
-                            <span id="sideDiff" class="font-extrabold text-base sm:text-lg text-emerald-300">৳ ০</span>
+                        <div class="flex items-center justify-between pt-3 border-t border-emerald-200/80 dark:border-slate-700">
+                            <span class="text-xs sm:text-sm text-emerald-800 dark:text-emerald-200 font-bold">মোট মূল বেতন বৃদ্ধি:</span>
+                            <span id="sideDiff" class="font-extrabold text-base sm:text-lg text-emerald-700 dark:text-emerald-300">৳ ০</span>
                         </div>
                     </div>
 
-                    <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 leading-relaxed">
+                    <div class="p-3.5 rounded-xl bg-amber-50 dark:bg-white/5 border border-amber-200/80 dark:border-white/10 text-xs text-amber-900 dark:text-slate-300 leading-relaxed">
                         💡 <strong>জরুরি তথ্য:</strong> প্রস্তাবিত পে স্কেলে ১ম থেকে ২০তম গ্রেডের কর্মচারীদের জন্য ধাপে ধাপে ১০০% বৃদ্ধি সমন্বিত হবে এবং চূড়ান্ত ধাপে বাড়িভাড়াসহ সকল ভাতা নতুন স্কেলে প্রযোজ্য হবে।
                     </div>
                 </div>
@@ -355,94 +369,128 @@
             <!-- 4-Phases Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
 
-                <!-- Phase 1 -->
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between">
+                <!-- Phase 1 (Blue Theme) -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-blue-200 dark:border-blue-900/60 p-5 flex flex-col justify-between relative shadow-sm">
+                    <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">১ম বাস্তবায়ন</span>
                     <div>
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[11px] shrink-0">১</span>
-                            <h4 class="font-extrabold text-slate-900 dark:text-white text-base">১ম পর্যায়</h4>
+                            <span class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-[11px] shrink-0">১</span>
+                            <h4 class="font-extrabold text-blue-900 dark:text-blue-300 text-base">১ম পর্যায়</h4>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 ml-8">জুলাই ২০২৬ - ডিসে ২০২৬</p>
+                        <p class="text-xs text-blue-600 dark:text-blue-400/80 mb-3 ml-8">জুলাই ২০২৬ - ডিসে ২০২৬</p>
 
                         <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
-                            <div class="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 mb-1.5">
+                            <div class="flex justify-between border-b border-blue-100 dark:border-blue-900/50 pb-1.5 mb-1.5">
                                 <span class="font-bold">মূল বেতন:</span>
                                 <span id="p1Basic" class="font-extrabold text-slate-900 dark:text-white">৳ ২৮,৭৭০</span>
                             </div>
-                            <div id="p1AllowancesList"><div class="text-[11px] space-y-1 mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60"><div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div><div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div><div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div><div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div><div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div></div></div>
+                            <div id="p1AllowancesList">
+                                <div class="text-[11px] space-y-1 mt-2 p-2.5 bg-blue-50/50 dark:bg-slate-800/60 rounded-xl border border-blue-100/50 dark:border-slate-700/60">
+                                    <div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div>
+                                    <div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div>
+                                    <div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div>
+                                    <div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div>
+                                    <div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
-                        <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="p1Gross">৳ ৪২,০১২</div>
+                    <div class="mt-4 pt-3 border-t-2 border-blue-200 dark:border-blue-900/60">
+                        <div class="text-[11px] text-blue-700 dark:text-blue-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
+                        <div class="text-xl font-extrabold text-blue-700 dark:text-blue-400" id="p1Gross">৳ ৪২,০১২</div>
                     </div>
                 </div>
 
-                <!-- Phase 2 -->
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between">
+                <!-- Phase 2 (Purple Theme) -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-purple-200 dark:border-purple-900/60 p-5 flex flex-col justify-between shadow-sm">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[11px] shrink-0">২</span>
-                            <h4 class="font-extrabold text-slate-900 dark:text-white text-base">২য় পর্যায়</h4>
+                            <span class="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold text-[11px] shrink-0">২</span>
+                            <h4 class="font-extrabold text-purple-900 dark:text-purple-300 text-base">২য় পর্যায়</h4>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 ml-8">জানু ২০২৭ - জুন ২০২৭</p>
+                        <p class="text-xs text-purple-600 dark:text-purple-400/80 mb-3 ml-8">জানু ২০২৭ - জুন ২০২৭</p>
 
                         <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
-                            <div class="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 mb-1.5">
+                            <div class="flex justify-between border-b border-purple-100 dark:border-purple-900/50 pb-1.5 mb-1.5">
                                 <span class="font-bold">মূল বেতন:</span>
                                 <span id="p2Basic" class="font-extrabold text-slate-900 dark:text-white">৳ ৩২,৯৩৫</span>
                             </div>
-                            <div id="p2AllowancesList"><div class="text-[11px] space-y-1 mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60"><div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div><div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div><div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div><div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div><div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div></div></div>
+                            <div id="p2AllowancesList">
+                                <div class="text-[11px] space-y-1 mt-2 p-2.5 bg-purple-50/50 dark:bg-slate-800/60 rounded-xl border border-purple-100/50 dark:border-slate-700/60">
+                                    <div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div>
+                                    <div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div>
+                                    <div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div>
+                                    <div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div>
+                                    <div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
-                        <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="p2Gross">৳ ৪৬,১৭৭</div>
+                    <div class="mt-4 pt-3 border-t-2 border-purple-200 dark:border-purple-900/60">
+                        <div class="text-[11px] text-purple-700 dark:text-purple-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
+                        <div class="text-xl font-extrabold text-purple-700 dark:text-purple-400" id="p2Gross">৳ ৪৬,১৭৭</div>
                     </div>
                 </div>
 
-                <!-- Phase 3 -->
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between">
+                <!-- Phase 3 (Teal Theme) -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-teal-200 dark:border-teal-900/60 p-5 flex flex-col justify-between shadow-sm">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[11px] shrink-0">৩</span>
-                            <h4 class="font-extrabold text-slate-900 dark:text-white text-base">৩য় পর্যায়</h4>
+                            <span class="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 flex items-center justify-center font-bold text-[11px] shrink-0">৩</span>
+                            <h4 class="font-extrabold text-teal-900 dark:text-teal-300 text-base">৩য় পর্যায়</h4>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 ml-8">জুলাই ২০২৭ - ডিসে ২০২৭</p>
+                        <p class="text-xs text-teal-600 dark:text-teal-400/80 mb-3 ml-8">জুলাই ২০২৭ - ডিসে ২০২৭</p>
 
                         <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
-                            <div class="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 mb-1.5">
+                            <div class="flex justify-between border-b border-teal-100 dark:border-teal-900/50 pb-1.5 mb-1.5">
                                 <span class="font-bold">মূল বেতন (১০০%):</span>
                                 <span id="p3Basic" class="font-extrabold text-slate-900 dark:text-white">৳ ৩৭,১০০</span>
                             </div>
-                            <div id="p3AllowancesList"><div class="text-[11px] space-y-1 mt-2 p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60"><div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div><div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div><div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div><div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div><div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div></div></div>
+                            <div id="p3AllowancesList">
+                                <div class="text-[11px] space-y-1 mt-2 p-2.5 bg-teal-50/50 dark:bg-slate-800/60 rounded-xl border border-teal-100/50 dark:border-slate-700/60">
+                                    <div class="text-slate-500 dark:text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-700 pb-1 font-bold">ভাতাসমূহ (২০১৫ হারে):</div>
+                                    <div class="flex justify-between"><span>বাড়িভাড়া (৫৫%):</span><span class="font-bold">৳ ১১,২৪২</span></div>
+                                    <div class="flex justify-between"><span>চিকিৎসা:</span><span class="font-bold">৳ ১,৫০০</span></div>
+                                    <div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div>
+                                    <div class="flex justify-between mt-1 pt-1 border-t border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-extrabold"><span>মোট ভাতা:</span><span>৳ ১৩,২৪২</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
-                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
-                        <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="p3Gross">৳ ৫০,৩৪২</div>
+                    <div class="mt-4 pt-3 border-t-2 border-teal-200 dark:border-teal-900/60">
+                        <div class="text-[11px] text-teal-700 dark:text-teal-400 font-bold mb-0.5">সর্বমোট বেতন (মাসিক):</div>
+                        <div class="text-xl font-extrabold text-teal-700 dark:text-teal-400" id="p3Gross">৳ ৫০,৩৪২</div>
                     </div>
                 </div>
 
-                <!-- Phase 4 - final, highlighted -->
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-emerald-500 p-5 flex flex-col justify-between relative">
-                    <span class="absolute -top-2.5 right-4 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">✨ নতুন ভাতাসহ পূর্ণাঙ্গ</span>
+                <!-- Phase 4 (Emerald/Green Theme - Final) -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-emerald-500 p-5 flex flex-col justify-between relative shadow-sm">
+                    <span class="absolute -top-2.5 right-4 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">✨ নতুন ভাতাসহ পূর্ণাঙ্গ</span>
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-[11px] shrink-0">৪</span>
                             <h4 class="font-extrabold text-emerald-700 dark:text-emerald-400 text-base">চূড়ান্ত ধাপ</h4>
                         </div>
-                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-3 ml-8 font-semibold">১ জানু ২০২৮ থেকে চলমান</p>
+                        <p class="text-xs text-emerald-600 dark:text-emerald-500/80 mb-3 ml-8 font-semibold">১ জানু ২০২৮ থেকে চলমান</p>
 
                         <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
-                            <div class="flex justify-between border-b border-emerald-100 dark:border-emerald-900/50 pb-1.5 mb-1.5">
+                            <div class="flex justify-between border-b border-emerald-200 dark:border-emerald-800/60 pb-1.5 mb-1.5">
                                 <span class="font-bold">মূল বেতন (১০০%):</span>
                                 <span id="p4Basic" class="font-extrabold text-slate-900 dark:text-white">৳ ৩৭,১০০</span>
                             </div>
-                            <div id="p4AllowancesList"><div class="text-[11px] space-y-1 mt-2 p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60"><div class="text-emerald-800 dark:text-emerald-300 mb-1 border-b border-emerald-200 dark:border-emerald-800/60 pb-1 font-bold">ভাতাসমূহ (২০২৮ নতুন হারে):</div><div class="flex justify-between"><span>নতুন বাড়িভাড়া (৫০%):</span><span class="font-bold">৳ ১৮,৫৫০</span></div><div class="flex justify-between"><span>নতুন চিকিৎসা:</span><span class="font-bold">৳ ৩,০০০</span></div><div class="flex justify-between"><span>মোবাইল ভাতা:</span><span class="font-bold">৳ ১৫০</span></div><div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div><div class="flex justify-between mt-1 pt-1 border-t border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-extrabold"><span>নতুন মোট ভাতা:</span><span>৳ ২২,২০০</span></div></div></div>
+                            <div id="p4AllowancesList">
+                                <div class="text-[11px] space-y-1 mt-2 p-2.5 bg-emerald-50/70 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+                                    <div class="text-emerald-800 dark:text-emerald-400 mb-1 border-b border-emerald-200 dark:border-emerald-800/60 pb-1 font-bold">ভাতাসমূহ (২০২৮ নতুন হারে):</div>
+                                    <div class="flex justify-between"><span>নতুন বাড়িভাড়া (৫০%):</span><span class="font-bold">৳ ১৮,৫৫০</span></div>
+                                    <div class="flex justify-between"><span>নতুন চিকিৎসা:</span><span class="font-bold">৳ ৩,০০০</span></div>
+                                    <div class="flex justify-between"><span>মোবাইল ভাতা:</span><span class="font-bold">৳ ১৫০</span></div>
+                                    <div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ৫০০</span></div>
+                                    <div class="flex justify-between mt-1 pt-1 border-t border-emerald-300 dark:border-emerald-700/60 text-emerald-900 dark:text-emerald-200 font-extrabold"><span>নতুন মোট ভাতা:</span><span>৳ ২২,২০০</span></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -506,7 +554,7 @@
                         <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৫</td><td class="py-2.5 px-3 sm:px-4">৳ ৯,৭০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২২,৮০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১৩,১০০</td><td class="py-2.5 px-3 sm:px-4">১৩৫%</td></tr>
                         <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৬</td><td class="py-2.5 px-3 sm:px-4">৳ ৯,৩০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২১,৯০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১২,৬০০</td><td class="py-2.5 px-3 sm:px-4">১৩৫%</td></tr>
                         <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৭</td><td class="py-2.5 px-3 sm:px-4">৳ ৯,০০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২১,৪০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১২,৪০০</td><td class="py-2.5 px-3 sm:px-4">১৩৭%</td></tr>
-                        <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৮</td><td class="py-2.5 px-3 sm:px-4">৳ ৮,৮০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২১,০০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১২,২০০</td><td class="py-2.5 px-3 sm:px-4">১৩৮%</td></tr>
+                        <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৮</td><td class="py-2.5 px-3 sm:px-4">৳ ۸,৮০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২১,০০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১২,২০০</td><td class="py-2.5 px-3 sm:px-4">১৩৮%</td></tr>
                         <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"><td class="py-2.5 px-3 sm:px-4">গ্রেড ১৯</td><td class="py-2.5 px-3 sm:px-4">৳ ৮,৫০০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২০,৫০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১২,০০০</td><td class="py-2.5 px-3 sm:px-4">১৪১%</td></tr>
                         <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 font-semibold bg-emerald-50/30 dark:bg-emerald-950/20"><td class="py-2.5 px-3 sm:px-4">গ্রেড ২০</td><td class="py-2.5 px-3 sm:px-4">৳ ৮,২৫০</td><td class="py-2.5 px-3 sm:px-4 font-bold text-emerald-600 dark:text-emerald-400">৳ ২০,০০০</td><td class="py-2.5 px-3 sm:px-4">৳ ১১,৭৫০</td><td class="py-2.5 px-3 sm:px-4 text-emerald-600 font-bold">১৪২%</td></tr>
                         </tbody>
@@ -662,4 +710,364 @@
 
         </div>
     </div>
+    @push('script')
+        <script>
+            // ১. ২০১৫ সালের পে-স্কেল অনুযায়ী প্রতিটি গ্রেডের বেসিক বেতনের ধাপ
+            const payScales2015 = {
+                1: [78000],
+                2: [66000, 69300, 72770, 76410],
+                3: [56500, 58760, 61120, 63570, 66120, 68770, 71530, 74400],
+                4: [50000, 52000, 54080, 56250, 58500, 60840, 63280, 65820, 68460, 71200],
+                5: [43000, 44940, 46970, 49090, 51300, 53610, 56030, 58560, 61200, 63960, 66840, 69850],
+                6: [35500, 37280, 39150, 41110, 43170, 45330, 47600, 49980, 52480, 55110, 57870, 60770, 63810, 67010],
+                7: [29000, 30450, 31980, 33580, 35260, 37030, 38890, 40840, 42890, 45040, 47300, 49670, 52160, 54770, 57510],
+                8: [23000, 24150, 25360, 26630, 27970, 29370, 30840, 32390, 34010, 35720, 37510, 39390, 41360, 43430, 45610, 47900, 50300, 52820, 55470],
+                9: [22000, 23100, 24260, 25480, 26760, 28100, 29510, 30990, 32540, 34170, 35880, 37680, 39570, 41550, 43630, 45820, 48120, 50530, 53060],
+                10: [16000, 16800, 17640, 18530, 19460, 20440, 21470, 22550, 23680, 24870, 26120, 27430, 28810, 30260, 31780, 33370, 35040, 36800, 38640],
+                11: [12500, 13130, 13790, 14480, 15210, 15980, 16780, 17620, 18510, 19440, 20420, 21450, 22530, 23660, 24850, 26100, 27410, 28790, 30230, 32240],
+                12: [11300, 11870, 12470, 13100, 13760, 14450, 15180, 15940, 16740, 17580, 18460, 19390, 20360, 21380, 22450, 23580, 24760, 26000, 27300],
+                13: [11000, 11550, 12130, 12740, 13380, 14050, 14760, 15500, 16280, 17100, 17960, 18860, 19810, 20810, 21860, 22960, 24110, 25320, 26590],
+                14: [10200, 10710, 11250, 11820, 12420, 13050, 13710, 14400, 15120, 15880, 16680, 17520, 18400, 19320, 20290, 21310, 22380, 23500, 24680],
+                15: [9700, 10190, 10700, 11240, 11810, 12410, 13040, 13700, 14390, 15110, 15870, 16670, 17510, 18390, 19310, 20280, 21300, 22370, 23490],
+                16: [9300, 9770, 10260, 10780, 11320, 11890, 12490, 13120, 13780, 14470, 15200, 15960, 16760, 17600, 18480, 19410, 20390, 21410, 22490],
+                17: [9000, 9450, 9930, 10430, 10960, 11510, 12090, 12700, 13340, 14010, 14720, 15460, 16240, 17060, 17920, 18820, 19770, 20760, 21800],
+                18: [8800, 9240, 9710, 10200, 10710, 11250, 11820, 12420, 13050, 13710, 14400, 15120, 15880, 16680, 17520, 18400, 19320, 20290, 21310],
+                19: [8500, 8930, 9380, 9850, 10350, 10870, 11420, 12000, 12600, 13230, 13900, 14600, 15330, 16100, 16910, 17760, 18650, 19590, 20570],
+                20: [8250, 8670, 9110, 9570, 10050, 10560, 11090, 11650, 12240, 12860, 13510, 14190, 14900, 15650, 16440, 17270, 18140, 19050, 20010]
+            };
+
+            // ২. গেজেট অনুযায়ী ২০২৬ সালের নতুন পে-স্কেলের সকল ধাপ
+            const payScales2026 = {
+                1: [156000],
+                2: [132000, 135700, 139400, 143200, 147200, 151200, 153000],
+                3: [113000, 117000, 121100, 125300, 129700, 134300, 139000, 143800, 148800],
+                4: [100000, 103500, 107200, 110900, 114800, 118800, 123000, 127300, 131700, 136300, 142400],
+                5: [86000, 89500, 93100, 96800, 100700, 104700, 108900, 113200, 117700, 122500, 127400, 132400, 139700],
+                6: [71000, 74600, 78300, 82200, 86400, 90700, 95200, 100000, 104900, 110200, 115700, 121500, 127600, 134000],
+                7: [58000, 60900, 64000, 67200, 70600, 74100, 77800, 81700, 85800, 90100, 94600, 99300, 104300, 109500, 114900, 120600, 126600],
+                8: [46000, 48300, 50800, 53300, 56000, 58800, 61700, 64800, 68000, 71400, 75000, 78700, 82700, 86800, 91100, 95700, 100500, 105500, 110800],
+                9: [44000, 46200, 48600, 51000, 53500, 56200, 59000, 62100, 65300, 68600, 71700, 75300, 79100, 83000, 87200, 91500, 96100, 100900, 105900],
+                10: [32000, 33600, 35300, 37100, 38900, 40900, 42900, 45100, 47300, 49700, 52200, 54800, 57500, 60400, 63400, 66600, 69900, 73400, 77300],
+                11: [25000, 26300, 27600, 29000, 30400, 32000, 33600, 35200, 37000, 38800, 40800, 42800, 44900, 47200, 49500, 52000, 54600, 57300, 60500],
+                12: [24300, 25500, 26800, 28200, 29600, 31100, 32600, 34200, 36000, 37700, 39600, 41600, 43700, 45900, 48200, 50600, 53100, 55700, 58700],
+                13: [24000, 25200, 26500, 27800, 29200, 30700, 32200, 33800, 35500, 37300, 39100, 41100, 43200, 45300, 47600, 49900, 52400, 55100, 58000],
+                14: [23500, 24700, 26000, 27300, 28600, 30000, 31500, 33100, 34800, 36500, 38300, 40200, 42300, 44400, 46600, 48900, 51300, 53900, 56800],
+                15: [22800, 24000, 25200, 26400, 27800, 29100, 30600, 32100, 33700, 35400, 37200, 39000, 41000, 43000, 45200, 47400, 49800, 52300, 55200],
+                16: [21900, 23000, 24200, 25400, 26700, 28000, 29400, 30900, 32400, 34000, 35700, 37500, 39400, 41300, 43400, 45600, 47900, 50200, 52900],
+                17: [21400, 22500, 23600, 24800, 26100, 27400, 28700, 30200, 31700, 33200, 34900, 36700, 38500, 40400, 42400, 44500, 46700, 49100, 51900],
+                18: [21000, 22100, 23200, 24400, 25600, 26900, 28200, 29600, 31100, 32600, 34300, 36000, 37800, 39600, 41600, 43700, 45900, 48200, 50900],
+                19: [20500, 21600, 22700, 23800, 25000, 26200, 27500, 28900, 30300, 31900, 33400, 35100, 36900, 38700, 40600, 42700, 44800, 47000, 49600],
+                20: [20000, 21000, 22100, 23200, 24400, 25600, 26900, 28200, 29600, 31100, 32600, 34300, 36000, 37800, 39600, 41600, 43700, 45900, 48400]
+            };
+
+            // ৩. হেল্পার ফাংশন: ইংরেজি সংখ্যাকে বাংলায় রূপান্তর
+            function en2bn(num) {
+                return num.toLocaleString('en-IN').replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+            }
+
+            // ৪. কুইক গ্রেড বাটন সিলেক্ট করা
+            function selectQuickGrade(grade, btn) {
+                document.getElementById('grade').value = grade;
+                document.querySelectorAll('.quick-grade-btn').forEach(b => {
+                    b.classList.remove('bg-emerald-600', 'text-white');
+                    b.classList.add('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                });
+                btn.classList.remove('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                btn.classList.add('bg-emerald-600', 'text-white');
+                onGradeChange();
+            }
+
+            // ৫. গ্রেড সিলেক্ট করলে পুরনো ধাপগুলো লোড করা
+            function onGradeChange() {
+                const grade = document.getElementById('grade').value;
+                const basicSelect = document.getElementById('oldBasicPay');
+
+                basicSelect.innerHTML = '<option value="" disabled selected>আপনার বর্তমান মূল বেতন সিলেক্ট করুন</option>';
+                if (grade && payScales2015[grade]) {
+                    payScales2015[grade].forEach((amount, index) => {
+                        basicSelect.innerHTML += `<option value="${amount}">ধাপ ${index + 1}: ৳ ${en2bn(amount)}</option>`;
+                    });
+                    basicSelect.disabled = false;
+                } else {
+                    basicSelect.disabled = true;
+                }
+
+                document.getElementById('previewOldBasic').innerText = '৳০';
+                document.getElementById('previewNewBasic').innerText = '৳০';
+                document.getElementById('previewDiff').innerText = '৳০';
+                document.getElementById('scaleRatioBadge').classList.add('hidden');
+                document.getElementById('calculationStepsTable').innerHTML = '<div class="text-[11px] text-slate-500 text-center py-2">বর্তমান মূল বেতন সিলেক্ট করলে হিসাব দেখা যাবে।</div>';
+            }
+
+            // ৬. গেজেটের অনুচ্ছেদ ৫(খ) অনুযায়ী নতুন মূল বেতন নির্ধারণের লজিক
+            function getNewBasicFromGazetteRules(grade, oldBasic) {
+                if (!payScales2015[grade] || !payScales2026[grade]) return oldBasic;
+
+                let initialOld = payScales2015[grade][0];
+                let initialNew = payScales2026[grade][0];
+
+                // অনুচ্ছেদ ৫(ক): প্রারম্ভিক ধাপে থাকলে নতুন প্রারম্ভিক ধাপেই নির্ধারণ হবে
+                if (oldBasic === initialOld) {
+                    return initialNew;
+                }
+
+                // অনুচ্ছেদ ৫(খ): বর্তমান বেতন ও প্রারম্ভিক বেতনের পার্থক্য নতুন প্রারম্ভিক বেতনের সাথে যোগ করা হবে
+                let difference = oldBasic - initialOld;
+                let targetNewBasic = initialNew + difference;
+
+                let newScaleSteps = payScales2026[grade];
+
+                // অনুচ্ছেদ ৫(খ)(অ ও আ): যোগফল যদি নতুন স্কেলের কোনো ধাপের সমান হয়, তবে সেখানেই নির্ধারিত হবে।
+                // সমান কোনো ধাপ না থাকলে, পরবর্তী উচ্চতর ধাপে বেতন নির্ধারণ করতে হবে।
+                for (let i = 0; i < newScaleSteps.length; i++) {
+                    if (newScaleSteps[i] >= targetNewBasic) {
+                        return newScaleSteps[i];
+                    }
+                }
+
+                // যদি হিসাবকৃত বেতন সর্বোচ্চ ধাপও পার হয়ে যায় (সাধারণত হবে না), তবে সর্বোচ্চ ধাপে ফিক্স করা হলো
+                return newScaleSteps[newScaleSteps.length - 1];
+            }
+
+            // ৭. নতুন বেসিক পে হিসাব ও প্রিভিউ আপডেট (অঙ্কসহ)
+            function calculateNewBasic() {
+                const grade = parseInt(document.getElementById('grade').value);
+                const oldBasic = parseInt(document.getElementById('oldBasicPay').value);
+
+                if (!grade || !oldBasic) return;
+
+                // গেজেটের নিয়ম অনুযায়ী নতুন মূল বেতন নির্ণয়
+                let newBasic = getNewBasicFromGazetteRules(grade, oldBasic);
+                let diff = newBasic - oldBasic;
+                let percentage = Math.round((diff / oldBasic) * 100);
+
+                // UI আপডেট
+                document.getElementById('previewOldBasic').innerText = '৳' + en2bn(oldBasic);
+                document.getElementById('previewNewBasic').innerText = '৳' + en2bn(newBasic);
+                document.getElementById('previewDiff').innerText = '+ ৳' + en2bn(diff);
+
+                const badge = document.getElementById('scaleRatioBadge');
+                badge.innerText = `${en2bn(percentage)}% বৃদ্ধি`;
+                badge.classList.remove('hidden');
+
+                document.getElementById('newBasicPayVal').value = newBasic;
+
+                // অঙ্কের মাধ্যমে টেবিল জেনারেট করা
+                let initialOld = payScales2015[grade][0];
+                let initialNew = payScales2026[grade][0];
+                let difference = oldBasic - initialOld;
+                let targetNewBasic = initialNew + difference;
+
+                let calcHTML = '';
+
+                if (oldBasic === initialOld) {
+                    calcHTML = `
+                    <div class="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800/50 mt-2">
+                        <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed"><strong>অনুচ্ছেদ ৫(ক) অনুযায়ী:</strong> আপনার বর্তমান বেতন (<strong>${en2bn(oldBasic)} টাকা</strong>) প্রারম্ভিক ধাপে থাকায়, ২০২৬ স্কেলের প্রারম্ভিক ধাপেই (<strong>${en2bn(newBasic)} টাকা</strong>) আপনার নতুন বেতন নির্ধারিত হয়েছে।</p>
+                    </div>`;
+                } else {
+                    let isExactMatch = payScales2026[grade].includes(targetNewBasic);
+                    let explanationText = isExactMatch
+                        ? `যেহেতু ২০২৬ স্কেলে <strong>৳${en2bn(targetNewBasic)}</strong> টাকার সমান ধাপ রয়েছে, তাই অনুচ্ছেদ ৫(খ)(অ) অনুযায়ী এই ধাপেই আপনার নতুন বেতন নির্ধারণ করা হয়েছে।`
+                        : `যেহেতু ২০২৬ স্কেলে <strong>৳${en2bn(targetNewBasic)}</strong> টাকার সমান কোনো নির্দিষ্ট ধাপ নেই, তাই অনুচ্ছেদ ৫(খ)(আ) অনুযায়ী পরবর্তী উচ্চতর ধাপে (<strong>৳${en2bn(newBasic)}</strong>) আপনার নতুন বেতন নির্ধারণ করা হয়েছে।`;
+
+                    calcHTML = `
+                    <div class="overflow-x-auto mt-2">
+                        <table class="w-full text-left text-[11px] sm:text-xs border-collapse">
+                            <tbody>
+                                <tr class="border-b border-emerald-100 dark:border-emerald-800/50">
+                                    <td class="py-1.5 font-medium text-slate-600 dark:text-slate-400">বর্তমান মূল বেতন (২০১৫)</td>
+                                    <td class="py-1.5 text-right font-bold text-slate-800 dark:text-slate-200">৳ ${en2bn(oldBasic)}</td>
+                                </tr>
+                                <tr class="border-b border-emerald-100 dark:border-emerald-800/50">
+                                    <td class="py-1.5 font-medium text-rose-600 dark:text-rose-400">(-) বিয়োগ: ২০১৫ স্কেলের প্রারম্ভিক বেতন</td>
+                                    <td class="py-1.5 text-right font-bold text-rose-600 dark:text-rose-400">৳ ${en2bn(initialOld)}</td>
+                                </tr>
+                                <tr class="border-b-2 border-emerald-200 dark:border-emerald-700/60">
+                                    <td class="py-1.5 font-bold text-slate-700 dark:text-slate-300">(=) পার্থক্য (বেতন বৃদ্ধি বাবদ)</td>
+                                    <td class="py-1.5 text-right font-bold text-slate-800 dark:text-slate-200">৳ ${en2bn(difference)}</td>
+                                </tr>
+                                <tr class="border-b border-emerald-100 dark:border-emerald-800/50">
+                                    <td class="py-1.5 font-medium text-emerald-600 dark:text-emerald-400">(+) যোগ: ২০২৬ স্কেলের প্রারম্ভিক বেতন</td>
+                                    <td class="py-1.5 text-right font-bold text-emerald-600 dark:text-emerald-400">৳ ${en2bn(initialNew)}</td>
+                                </tr>
+                                <tr class="border-b border-emerald-200 dark:border-emerald-700/60 bg-emerald-50/50 dark:bg-emerald-900/10">
+                                    <td class="py-2 font-bold text-slate-800 dark:text-slate-200 px-1">(=) প্রাপ্ত যোগফল</td>
+                                    <td class="py-2 text-right font-black text-slate-900 dark:text-white px-1">৳ ${en2bn(targetNewBasic)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="py-2.5 text-[10.5px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                        💡 ${explanationText}
+                                    </td>
+                                </tr>
+                                <tr class="bg-emerald-100/60 dark:bg-emerald-800/40">
+                                    <td class="py-2.5 px-2 font-bold text-emerald-800 dark:text-emerald-300 rounded-l-lg">✅ নির্ধারিত নতুন মূল বেতন:</td>
+                                    <td class="py-2.5 px-2 text-right font-black text-emerald-700 dark:text-emerald-400 text-sm rounded-r-lg">৳ ${en2bn(newBasic)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+                }
+                document.getElementById('calculationStepsTable').innerHTML = calcHTML;
+            }
+
+            // ৮. ২০১৫ সালের বাড়িভাড়া নির্ণয়
+            function getOldHouseRent(basic, area) {
+                let percent = 0, minAmount = 0;
+                if (area === 'dhaka') {
+                    if(basic <= 9700) { percent = 0.65; minAmount = 5000; }
+                    else if(basic <= 16000) { percent = 0.60; minAmount = 6400; }
+                    else if(basic <= 35500) { percent = 0.55; minAmount = 9600; }
+                    else { percent = 0.50; minAmount = 19500; }
+                } else if (area === 'other_city') {
+                    if(basic <= 9700) { percent = 0.60; minAmount = 4500; }
+                    else if(basic <= 16000) { percent = 0.55; minAmount = 5800; }
+                    else if(basic <= 35500) { percent = 0.50; minAmount = 8800; }
+                    else { percent = 0.45; minAmount = 17800; }
+                } else {
+                    if(basic <= 9700) { percent = 0.55; minAmount = 4000; }
+                    else if(basic <= 16000) { percent = 0.50; minAmount = 5300; }
+                    else if(basic <= 35500) { percent = 0.45; minAmount = 8000; }
+                    else { percent = 0.40; minAmount = 16000; }
+                }
+                return Math.max(Math.round(basic * percent), minAmount);
+            }
+
+            // ৯. ২০২৮ সালের প্রস্তাবিত বাড়িভাড়া নির্ণয়
+            function getNewHouseRent(grade, basic, area) {
+                let percent = 0;
+                if (grade >= 16 && grade <= 20) {
+                    percent = (area === 'dhaka') ? 0.60 : (area === 'other_city' ? 0.50 : 0.45);
+                } else if (grade >= 10 && grade <= 15) {
+                    percent = (area === 'dhaka') ? 0.50 : (area === 'other_city' ? 0.40 : 0.35);
+                } else if (grade >= 5 && grade <= 9) {
+                    percent = (area === 'dhaka') ? 0.45 : (area === 'other_city' ? 0.35 : 0.30);
+                } else {
+                    percent = (area === 'dhaka') ? 0.40 : (area === 'other_city' ? 0.30 : 0.25);
+                }
+                return Math.round(basic * percent);
+            }
+
+            // ১০. চূড়ান্ত ক্যালকুলেশন (সাবমিট ইভেন্ট)
+            function calculateSalaryPhases() {
+                const grade = parseInt(document.getElementById('grade').value);
+                const oldBasic = parseInt(document.getElementById('oldBasicPay').value);
+                const newBasic = parseInt(document.getElementById('newBasicPayVal').value);
+
+                if (!grade || !oldBasic || !newBasic) {
+                    alert('অনুগ্রহ করে গ্রেড এবং বর্তমান মূল বেতন নির্বাচন করুন।');
+                    return;
+                }
+
+                const area = document.getElementById('area').value;
+                const children = parseInt(document.getElementById('children').value);
+                const age = document.getElementById('age').value;
+                const cityTransport = document.getElementById('cityTransport').checked;
+                const tiffinProvided = document.getElementById('tiffinProvided').checked;
+
+                const diff = newBasic - oldBasic;
+                document.getElementById('resOldBasic').innerText = '৳ ' + en2bn(oldBasic);
+                document.getElementById('resNewBasic').innerText = '৳ ' + en2bn(newBasic);
+                document.getElementById('resDiff').innerText = '+ ৳ ' + en2bn(diff);
+                document.getElementById('sideOldBasic').innerText = '৳ ' + en2bn(oldBasic);
+                document.getElementById('sideNewBasic').innerText = '৳ ' + en2bn(newBasic);
+                document.getElementById('sideDiff').innerText = '৳ ' + en2bn(diff);
+
+                // গেজেটের অনুচ্ছেদ ১ অনুযায়ী বর্ধিত বেতনের হার
+                let p1Percent = (grade >= 1 && grade <= 9) ? 0.40 : 0.50; // ১ জুলাই ২০২৬ থেকে (১ম-৯ম গ্রেড ৪০%, ১০ম-২০তম ৫০%)
+                let p2Percent = (grade >= 1 && grade <= 9) ? 0.70 : 0.75; // ১ জানুয়ারি ২০২৭ থেকে (১ম-৯ম গ্রেড ৭০%, ১০ম-২০তম ৭৫%)
+
+                let p1Basic = Math.round(oldBasic + (diff * p1Percent));
+                let p2Basic = Math.round(oldBasic + (diff * p2Percent));
+                let p3Basic = newBasic; // ১ জুলাই ২০২৭ থেকে ১০০%
+                let p4Basic = newBasic;
+
+                // Old Allowances (for Phase 1, 2, 3 - গেজেটের অনুচ্ছেদ ৩(ঞ) অনুযায়ী)
+                let oldHR = getOldHouseRent(oldBasic, area);
+                let oldMedical = 1500;
+                let education = children * 500;
+                let oldTotalAllowances = oldHR + oldMedical + education;
+
+                // New Allowances (for Phase 4 - ১ জানুয়ারি ২০২৮ থেকে নতুন হারে)
+                let newHR = getNewHouseRent(grade, newBasic, area);
+                let newMedical = (age === 'under50') ? 3000 : 4000;
+                let tiffin = (grade >= 11 && grade <= 20 && !tiffinProvided) ? 500 : 0;
+                let transport = cityTransport ? 600 : 0;
+                let mobile = (grade <= 5) ? 500 : 150;
+                let newTotalAllowances = newHR + newMedical + education + tiffin + transport + mobile;
+
+                // Update Phase 1
+                document.getElementById('p1Basic').innerText = '৳ ' + en2bn(p1Basic);
+                document.getElementById('p1Gross').innerText = '৳ ' + en2bn(p1Basic + oldTotalAllowances);
+
+                // Update Phase 2
+                document.getElementById('p2Basic').innerText = '৳ ' + en2bn(p2Basic);
+                document.getElementById('p2Gross').innerText = '৳ ' + en2bn(p2Basic + oldTotalAllowances);
+
+                // Update Phase 3
+                document.getElementById('p3Basic').innerText = '৳ ' + en2bn(p3Basic);
+                document.getElementById('p3Gross').innerText = '৳ ' + en2bn(p3Basic + oldTotalAllowances);
+
+                // Update Phase 4
+                document.getElementById('p4Basic').innerText = '৳ ' + en2bn(p4Basic);
+                document.getElementById('p4Gross').innerText = '৳ ' + en2bn(p4Basic + newTotalAllowances);
+
+                // ডাইনামিক ভাতা লিস্ট রেন্ডারিং (Phase 4)
+                let p4AllowancesHTML = `
+            <div class="text-[11px] space-y-1 mt-2 p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60">
+                <div class="text-emerald-800 dark:text-emerald-300 mb-1 border-b border-emerald-200 dark:border-emerald-800/60 pb-1 font-bold">ভাতাসমূহ (২০২৮ নতুন হারে):</div>
+                <div class="flex justify-between"><span>নতুন বাড়িভাড়া:</span><span class="font-bold">৳ ${en2bn(newHR)}</span></div>
+                <div class="flex justify-between"><span>নতুন চিকিৎসা:</span><span class="font-bold">৳ ${en2bn(newMedical)}</span></div>
+                ${education > 0 ? `<div class="flex justify-between"><span>শিক্ষা ভাতা:</span><span class="font-bold">৳ ${en2bn(education)}</span></div>` : ''}
+                ${tiffin > 0 ? `<div class="flex justify-between"><span>টিফিন ভাতা:</span><span class="font-bold">৳ ${en2bn(tiffin)}</span></div>` : ''}
+                ${transport > 0 ? `<div class="flex justify-between"><span>যাতায়াত ভাতা:</span><span class="font-bold">৳ ${en2bn(transport)}</span></div>` : ''}
+                <div class="flex justify-between"><span>মোবাইল ভাতা:</span><span class="font-bold">৳ ${en2bn(mobile)}</span></div>
+                <div class="flex justify-between mt-1 pt-1 border-t border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-extrabold">
+                    <span>নতুন মোট ভাতা:</span><span>৳ ${en2bn(newTotalAllowances)}</span>
+                </div>
+            </div>`;
+                document.getElementById('p4AllowancesList').innerHTML = p4AllowancesHTML;
+
+                // Show Results Area
+                const resultSection = document.getElementById('result');
+                resultSection.classList.remove('hidden');
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // ১১. কপি এবং রিসেট ফাংশন
+            function copySummary() {
+                const text = `আমার ৯ম পে-স্কেল হিসাব:\nপূর্বের মূল বেতন: ${document.getElementById('resOldBasic').innerText}\nনতুন মূল বেতন: ${document.getElementById('resNewBasic').innerText}\nচূড়ান্ত সর্বমোট বেতন: ${document.getElementById('p4Gross').innerText}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    document.getElementById('copyBtnText').innerText = 'কপি হয়েছে!';
+                    setTimeout(() => document.getElementById('copyBtnText').innerText = 'সারাংশ কপি', 2000);
+                });
+            }
+
+            function shareCopyLink(btn) {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const textSpan = btn.querySelector('.share-copy-text');
+                    if(textSpan) {
+                        textSpan.innerText = 'কপি হয়েছে!';
+                        setTimeout(() => textSpan.innerText = 'লিংক কপি', 2000);
+                    }
+                });
+            }
+
+            function resetCalculator() {
+                document.getElementById('salaryForm').reset();
+                document.querySelectorAll('.quick-grade-btn').forEach(b => {
+                    b.classList.remove('bg-emerald-600', 'text-white');
+                    b.classList.add('bg-slate-100', 'text-slate-700', 'dark:bg-slate-800', 'dark:text-slate-300');
+                });
+                document.getElementById('oldBasicPay').innerHTML = '<option value="" disabled selected>👈 প্রথমে ওপরের গ্রেড নির্বাচন করুন</option>';
+                document.getElementById('oldBasicPay').disabled = true;
+                document.getElementById('previewOldBasic').innerText = '৳০';
+                document.getElementById('previewNewBasic').innerText = '৳০';
+                document.getElementById('previewDiff').innerText = '৳০';
+                document.getElementById('scaleRatioBadge').classList.add('hidden');
+                document.getElementById('calculationStepsTable').innerHTML = '<div class="text-[11px] text-slate-500 text-center py-2">বর্তমান মূল বেতন সিলেক্ট করলে হিসাব দেখা যাবে।</div>';
+                document.getElementById('result').classList.add('hidden');
+            }
+        </script>
+    @endpush
 @endsection

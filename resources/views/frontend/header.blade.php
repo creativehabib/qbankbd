@@ -21,7 +21,13 @@
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">প্রশ্ন ব্যাংক</a>
                     <a href="{{ route('job-solutions.index') }}" class="px-4 py-2 rounded-xl {{ request()->is('job-solutions*') || request()->routeIs('job-solutions.*') || request()->routeIs('institution.show') ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600' }}">জব সল্যুশন</a>
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">ভর্তি ও পরীক্ষা</a>
-                    <a href="{{ route('tools.payscale_calculate') }}" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">টুলস</a>
+                    <a href="{{ route('tools.index') }}" class="relative px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 font-medium inline-flex items-center transition-colors">
+                        টুলস
+                        <span class="absolute -top-1 -right-2 flex h-4 items-center">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-50"></span>
+                            <span class="relative inline-flex rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white shadow-sm">নতুন</span>
+                        </span>
+                    </a>
                     <a href="#" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600">পিডিএফ বই</a>
                 </nav>
             </div>

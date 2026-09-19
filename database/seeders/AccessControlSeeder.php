@@ -32,6 +32,7 @@ class AccessControlSeeder extends Seeder
             'tags.create',
             'tags.update',
             'tags.delete',
+            'manage_media',
         ];
 
         foreach ($permissionSlugs as $permissionSlug) {
@@ -51,8 +52,8 @@ class AccessControlSeeder extends Seeder
         $roleMap = [
             'student' => ['questions.read'],
             'teacher' => ['questions.read', 'questions.create', 'questions.update', 'questions.delete', 'exam_categories.manage', 'academic_classes.manage', 'subjects.manage', 'chapters.manage', 'topics.manage', 'tags.create', 'tags.update', 'tags.delete'],
-            'admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'exam_categories.manage', 'academic_classes.manage', 'subjects.manage', 'chapters.manage', 'topics.manage', 'tags.create', 'tags.update', 'tags.delete'],
-            'super_admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'exam_categories.manage', 'academic_classes.manage', 'subjects.manage', 'chapters.manage', 'topics.manage', 'users.manage_roles', 'users.manage_permissions', 'tags.create', 'tags.update', 'tags.delete'],
+            'admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'exam_categories.manage', 'academic_classes.manage', 'subjects.manage', 'chapters.manage', 'topics.manage', 'tags.create', 'tags.update', 'tags.delete', 'menage_media'],
+            'super_admin' => ['questions.read', 'questions.read_all', 'questions.create', 'questions.update', 'questions.delete', 'questions.publish', 'exam_categories.manage', 'academic_classes.manage', 'subjects.manage', 'chapters.manage', 'topics.manage', 'users.manage_roles', 'users.manage_permissions', 'tags.create', 'tags.update', 'tags.delete', 'menage_media'],
         ];
 
         foreach ($roleMap as $roleName => $permissions) {
