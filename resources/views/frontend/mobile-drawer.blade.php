@@ -10,7 +10,7 @@
             <img src="{{ asset('images/logo_dark.png') }}" alt="Logo" class="h-8 w-auto block dark:hidden">
             <img src="{{ asset('images/logo_light.png') }}" alt="Logo" class="h-8 w-auto hidden dark:block">
         </div>
-        <button onclick="toggleMobileMenu()" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">
+        <button aria-label="Open mobile" onclick="toggleMobileMenu()" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
     </div>

@@ -61,7 +61,7 @@
                     <ul>
                         <li class="flex items-baseline justify-between gap-4 py-3 border-t border-slate-200 dark:border-slate-800">
                             <a href="#" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">খাদ্য অধিদপ্তর, উপ-পরিদর্শক</a>
-                            <span class="shrink-0 text-xs font-bold text-rose-600 dark:text-rose-400">আজ শেষ</span>
+                            <span class="text-[13px] font-bold text-rose-700 dark:text-rose-300">আজ শেষ</span>
                         </li>
                         <li class="flex items-baseline justify-between gap-4 py-3 border-t border-slate-200 dark:border-slate-800">
                             <a href="#" class="text-sm font-semibold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">বাংলাদেশ রেলওয়ে, ওয়েম্যান</a>
