@@ -250,7 +250,8 @@
                     <div wire:ignore wire:key="subject-select-{{ $question->id ?? 'create' }}">
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Subject <span class="text-red-500">*</span></label>
                         <select id="subject" class="w-full">
-                            <option value="">-- Select Subject --</option>
+                            <option value=""></option>
+                            
                             @foreach($subjects as $s) <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option> @endforeach
                         </select>
                         @error('subject_id')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
@@ -259,7 +260,8 @@
                     <div wire:ignore wire:key="subsubject-select-{{ $question->id ?? 'create' }}">
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Chapter / Paper</label>
                         <select id="chapter" class="w-full">
-                            <option value="">-- Select Chapter --</option>
+                            <option value=""></option>
+                            
                             @foreach($chapters as $ss) <option value="{{ $ss->id }}" @selected($ss->id == $chapter_id)>{{ $ss->name }}</option> @endforeach
                         </select>
                     </div>
@@ -267,7 +269,8 @@
                     <div wire:ignore wire:key="topic-select-{{ $question->id ?? 'create' }}">
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Topic</label>
                         <select id="topic" class="w-full">
-                            <option value="">-- Select Topic --</option>
+                            <option value=""></option>
+                            
                             @foreach($topics as $c) <option value="{{ $c->id }}" @selected($c->id == $topic_id)>{{ $c->name }}</option> @endforeach
                         </select>
                     </div>
@@ -275,7 +278,8 @@
                     <div wire:ignore wire:key="class-select-{{ $question->id ?? 'create' }}">
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience (Classes) <span class="text-red-500">*</span></label>
                         <select id="academic_class" class="w-full" multiple>
-                            <option value="">-- Select Class --</option>
+                            <option value=""></option>
+                            
                             @foreach($classes as $class) <option value="{{ $class->id }}" @selected(in_array($class->id, $academic_class_ids))>{{ $class->name }}</option> @endforeach
                         </select>
                         @error('academic_class_ids')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
@@ -348,13 +352,16 @@
                 </div>
             </div>
 
-            {{-- Action Buttons --}}
-            <div class="pt-4 lg:pt-0">
-                <button type="submit" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xl font-extrabold rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 tracking-tight">
-                    <svg class="size-6" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"></path></svg>
-                    {{ $buttonText }}
+            {{-- Floating Action Button (FAB) --}}
+            <div class="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-50">
+                <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(79,70,229,0.3)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 border border-indigo-500/20">
+                    <svg class="w-5 h-5" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"></path></svg>
+                    <span>{{ str_contains($buttonText ?? '', 'Update') ? 'Update' : 'Save' }}</span>
                 </button>
             </div>
+            
+            {{-- Spacer so bottom content isn't completely hidden by the FAB on mobile --}}
+            <div class="h-16 lg:hidden w-full"></div>
 
         </div>
     </form>
@@ -412,13 +419,18 @@
             if (typeof TomSelect !== 'undefined') {
 
                 const tsConfig = {
-                    maxOptions: 50,
+                        valueField: 'value',
+                        labelField: 'text',
+                        searchField: 'text',
+                        maxOptions: 50,
                     controlInput: '<input>',
                     render: {
                         option: function(data, escape) {
+                            if (!data.text) return '';
                             return '<div class="py-2 px-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">' + escape(data.text) + '</div>';
                         },
                         item: function(data, escape) {
+                            if (!data.text) return '';
                             return '<div class="py-1 px-1">' + escape(data.text) + '</div>';
                         }
                     }
@@ -439,16 +451,16 @@
                 };
 
                 const classEl = document.getElementById('academic_class');
-                if (classEl && !classEl.tomselect) window.tsClass = new TomSelect(classEl, {...tsMultiConfig, onChange: (v) => updateLivewire('academic_class_ids', v) });
+                if (classEl && !classEl.tomselect) window.tsClass = new TomSelect(classEl, {...tsMultiConfig, placeholder: '-- Select Class --', onChange: (v) => updateLivewire('academic_class_ids', v) });
 
                 const subjectEl = document.getElementById('subject');
-                if (subjectEl && !subjectEl.tomselect) window.tsSubject = new TomSelect(subjectEl, {...tsConfig, onChange: (v) => updateLivewire('subject_id', v) });
+                if (subjectEl && !subjectEl.tomselect) window.tsSubject = new TomSelect(subjectEl, {...tsConfig, placeholder: '-- Select Subject --', onChange: (v) => updateLivewire('subject_id', v) });
 
                 const chapterEl = document.getElementById('chapter');
-                if (chapterEl && !chapterEl.tomselect) window.tsChapter = new TomSelect(chapterEl, {...tsConfig, onChange: (v) => updateLivewire('chapter_id', v) });
+                if (chapterEl && !chapterEl.tomselect) window.tsChapter = new TomSelect(chapterEl, {...tsConfig, placeholder: '-- Select Chapter --', onChange: (v) => updateLivewire('chapter_id', v) });
 
                 const topicEl = document.getElementById('topic');
-                if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, onChange: (v) => updateLivewire('topic_id', v) });
+                if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, placeholder: '-- Select Topic --', onChange: (v) => updateLivewire('topic_id', v) });
 
                 const tagsEl = document.getElementById('tags');
                 if (tagsEl && !tagsEl.tomselect) window.tsTags = new TomSelect(tagsEl, {...tsMultiConfig, onChange: (v) => updateLivewire('tagIds', v) });
@@ -463,8 +475,7 @@
                 if (window.tsSubject) {
                     window.tsSubject.clear(true);
                     window.tsSubject.clearOptions();
-                    window.tsSubject.addOption({value: '', text: '-- Select Subject --'});
-                    window.tsSubject.addOptions(e.detail.subjects);
+                                        window.tsSubject.addOptions(e.detail.subjects);
                     window.tsSubject.refreshOptions(false);
                 }
             });
@@ -473,8 +484,7 @@
                 if (window.tsChapter) {
                     window.tsChapter.clear(true);
                     window.tsChapter.clearOptions();
-                    window.tsChapter.addOption({value: '', text: '-- Select Chapter --'});
-                    window.tsChapter.addOptions(e.detail.chapters);
+                                        window.tsChapter.addOptions(e.detail.chapters);
                     window.tsChapter.refreshOptions(false);
                 }
             });
@@ -483,8 +493,7 @@
                 if (window.tsTopic) {
                     window.tsTopic.clear(true);
                     window.tsTopic.clearOptions();
-                    window.tsTopic.addOption({value: '', text: '-- Select Topic --'});
-                    window.tsTopic.addOptions(e.detail.topics);
+                                        window.tsTopic.addOptions(e.detail.topics);
                     window.tsTopic.refreshOptions(false);
                 }
             });

@@ -14,8 +14,9 @@
 
             {{-- Header --}}
             <div class="px-6 py-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 shadow-sm border border-indigo-200 dark:border-indigo-800">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 shadow-sm border border-indigo-200 dark:border-indigo-800">
                         <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
@@ -28,6 +29,17 @@
                         </p>
                     </div>
                 </div>
+                
+                {{-- New Question Button --}}
+                <div class="shrink-0 self-start sm:self-auto">
+                    <a href="{{ route('questions.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-200">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288m144-144H112"></path>
+                        </svg>
+                        New Question
+                    </a>
+                </div>
+            </div>
             </div>
 
             <div class="flex flex-col lg:flex-row gap-8 p-6 lg:p-8">
@@ -451,56 +463,52 @@
                 {{-- ── Right Column: Settings Sidebar ── --}}
                 <div class="w-full lg:w-[350px] xl:w-[400px] shrink-0 space-y-6 order-1 lg:order-2 lg:sticky lg:top-24">
 
-                    {{-- Categorization Card --}}
-                    <div wire:key="categorization-card" class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30 p-6 rounded-2xl border border-indigo-100 dark:border-indigo-900 shadow-sm space-y-5 transition hover:shadow-md">
-                        <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2 uppercase tracking-wider border-b border-indigo-100 dark:border-indigo-800 pb-3">
-                            <div class="p-1.5 bg-indigo-200 dark:bg-indigo-800/50 text-indigo-700 dark:text-indigo-300 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                                        {{-- Categorization Card --}}
+                    <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-gray-900 dark:to-purple-950/30 p-7 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
+                        <h3 class="text-sm font-bold text-gray-950 dark:text-white uppercase tracking-wider flex items-center gap-2.5 pb-3 border-b dark:border-gray-800">
+                            <div class="p-1.5 bg-indigo-100 dark:bg-indigo-950 rounded-md text-indigo-600 dark:text-indigo-400">
+                                <svg class="size-5" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M496 128v16a8 8 0 0 1-8 8h-24v12c0 6.627-5.373 12-12 12H60c-6.627 0-12-5.373-12-12v-12H24a8 8 0 0 1-8-8v-16a8 8 0 0 1 8-8h22.758c5.441-26.657 20.301-49.851 40.718-67.653C104.992 40.404 115.309 32 128 32h256c12.691 0 23.008 8.404 40.524 20.347C444.941 70.149 459.801 93.343 465.242 120H488a8 8 0 0 1 8 8zM176 80c-8.837 0-16 7.163-16 16v16h256v-16c0-8.837-7.163-16-16-16H176zm-56 304h272v108c0 6.627-5.373 12-12 12H132c-6.627 0-12-5.373-12-12V384zm316-208H76c-6.627 0-12 5.373-12 12v152c0 6.627 5.373 12 12 12h360c6.627 0 12-5.373 12-12V188c0-6.627-5.373-12-12-12z"></path></svg>
                             </div>
-                            Categorization <span class="text-red-500">*</span>
+                            Categorization
                         </h3>
 
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">শ্রেণি</label>
-                                <select wire:model.live="academic_class_id" class="w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 transition shadow-sm">
-                                    <option value="">-- Select Class --</option>
-                                    @foreach($classes as $class)
-                                        <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                    @endforeach
+                        <div class="space-y-5">
+                            <div wire:ignore wire:key="subject-select-bulk">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Subject <span class="text-red-500">*</span></label>
+                                <select id="subject" class="w-full">
+                            <option value=""></option>
+                                    
+                                    @foreach($subjects as $s) <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option> @endforeach
                                 </select>
-                                @error('academic_class_id') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
+                                @error('subject_id')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">বিষয়</label>
-                                <select wire:model.live="subject_id" class="w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50 shadow-sm" @disabled(! $academic_class_id)>
-                                    <option value="">-- Select Subject --</option>
-                                    @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('subject_id') <p class="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/50 p-2 rounded-lg mt-1">{{ $message }}</p> @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">অধ্যায় <span class="text-indigo-400 font-medium">(ঐচ্ছিক)</span></label>
-                                <select wire:model.live="chapter_id" class="w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50 shadow-sm" @disabled(! $subject_id)>
-                                    <option value="">-- Select Chapter --</option>
-                                    @foreach($chapters as $chapter)
-                                        <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
-                                    @endforeach
+                            <div wire:ignore wire:key="subsubject-select-bulk">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Chapter / Paper</label>
+                                <select id="chapter" class="w-full">
+                            <option value=""></option>
+                                    
+                                    @foreach($chapters as $ss) <option value="{{ $ss->id }}" @selected($ss->id == $chapter_id)>{{ $ss->name }}</option> @endforeach
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">টপিক <span class="text-indigo-400 font-medium">(ঐচ্ছিক)</span></label>
-                                <select wire:model="topic_id" class="w-full rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50 shadow-sm" @disabled(! $chapter_id)>
-                                    <option value="">-- Select Topic --</option>
-                                    @foreach($topics as $topic)
-                                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
-                                    @endforeach
+                            <div wire:ignore wire:key="topic-select-bulk">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Topic</label>
+                                <select id="topic" class="w-full">
+                            <option value=""></option>
+                                    
+                                    @foreach($topics as $c) <option value="{{ $c->id }}" @selected($c->id == $topic_id)>{{ $c->name }}</option> @endforeach
                                 </select>
+                            </div>
+
+                            <div wire:ignore wire:key="class-select-bulk">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Target Audience (Classes) <span class="text-red-500">*</span></label>
+                                <select id="academic_class" class="w-full" multiple>
+                            <option value=""></option>
+                                    
+                                    @foreach($classes as $class) <option value="{{ $class->id }}" @selected(in_array($class->id, $academic_class_ids))>{{ $class->name }}</option> @endforeach
+                                </select>
+                                @error('academic_class_ids')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
                             </div>
                         </div>
                     </div>
@@ -628,7 +636,7 @@
 
                         <div wire:ignore class="relative z-20">
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Tags <span class="text-indigo-400 font-medium text-xs ml-1">(Type & Enter)</span></label>
-                            <select id="bulk_tags" class="w-full ts-control" multiple>
+                            <select id="bulk_tags" class="w-full" multiple>
                                 @foreach($allTags as $tag)
                                     <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
                                 @endforeach
@@ -670,19 +678,97 @@
         }
 
         if (!window.hasRegisteredBulkUploadEvents) {
+            
+            window.updateLivewire = (property, value) => {
+                if (Array.isArray(value)) {
+                    @this.set(property, value);
+                } else if (value === '' || value === null) {
+                    @this.set(property, null);
+                } else {
+                    @this.set(property, value);
+                }
+            };
+
             window.initBulkUploadTomSelect = () => {
+                // Tags
                 if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
                 const tagsEl = document.getElementById('bulk_tags');
                 if (tagsEl && typeof TomSelect !== 'undefined') {
                     window.bulkTsTags = new TomSelect(tagsEl, {
                         plugins: ['remove_button', 'dropdown_input'],
-                        persist: false, create: true,
-                        dropdownParent: 'body',
+                        persist: false,
+                        create: true,
+                        maxOptions: 50,
+                        valueField: 'value',
+                        labelField: 'text',
+                        searchField: 'text',
                         onChange: (v) => @this.set('tagIds', v),
                     });
                 }
 
+                // Categorization
+                if (typeof TomSelect !== 'undefined') {
+                    const tsConfig = {
+                        valueField: 'value',
+                        labelField: 'text',
+                        searchField: 'text',
+                        maxOptions: 50,
+                        controlInput: '<input>',
+                        render: {
+                            option: function(data, escape) {
+                                return '<div class="py-2 px-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">' + escape(data.text) + '</div>';
+                            },
+                            item: function(data, escape) {
+                                return '<div class="py-1 px-1">' + escape(data.text) + '</div>';
+                            }
+                        }
+                    };
+
+                    const tsMultiConfig = {
+                        ...tsConfig,
+                        plugins: ['remove_button'],
+                    };
+
+                    const classEl = document.getElementById('academic_class');
+                    if (classEl && !classEl.tomselect) window.tsClass = new TomSelect(classEl, {...tsMultiConfig, placeholder: '-- Select Class --', onChange: (v) => window.updateLivewire('academic_class_ids', v) });
+
+                    const subjectEl = document.getElementById('subject');
+                    if (subjectEl && !subjectEl.tomselect) window.tsSubject = new TomSelect(subjectEl, {...tsConfig, placeholder: '-- Select Subject --', onChange: (v) => window.updateLivewire('subject_id', v) });
+
+                    const chapterEl = document.getElementById('chapter');
+                    if (chapterEl && !chapterEl.tomselect) window.tsChapter = new TomSelect(chapterEl, {...tsConfig, placeholder: '-- Select Chapter --', onChange: (v) => window.updateLivewire('chapter_id', v) });
+
+                    const topicEl = document.getElementById('topic');
+                    if (topicEl && !topicEl.tomselect) window.tsTopic = new TomSelect(topicEl, {...tsConfig, placeholder: '-- Select Topic --', onChange: (v) => window.updateLivewire('topic_id', v) });
+                }
             };
+
+            window.addEventListener('subjectsUpdated', e => {
+                if (window.tsSubject) {
+                    window.tsSubject.clear(true);
+                    window.tsSubject.clearOptions();
+                                        window.tsSubject.addOptions(e.detail.subjects);
+                    window.tsSubject.refreshOptions(false);
+                }
+            });
+
+            window.addEventListener('chaptersUpdated', e => {
+                if (window.tsChapter) {
+                    window.tsChapter.clear(true);
+                    window.tsChapter.clearOptions();
+                                        window.tsChapter.addOptions(e.detail.chapters);
+                    window.tsChapter.refreshOptions(false);
+                }
+            });
+
+            window.addEventListener('topicsUpdated', e => {
+                if (window.tsTopic) {
+                    window.tsTopic.clear(true);
+                    window.tsTopic.clearOptions();
+                                        window.tsTopic.addOptions(e.detail.topics);
+                    window.tsTopic.refreshOptions(false);
+                }
+            });
 
             window.initBulkUploadEditor = () => {
                 if (window.initGlobalCkEditor) {
@@ -711,6 +797,10 @@
                     try { CKEDITOR.instances['raw_text_editor'].destroy(true); } catch(e) {}
                 }
                 if (window.bulkTsTags) { window.bulkTsTags.destroy(); window.bulkTsTags = null; }
+                if (window.tsClass) { window.tsClass.destroy(); window.tsClass = null; }
+                if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
+                if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
+                if (window.tsTopic) { window.tsTopic.destroy(); window.tsTopic = null; }
             });
 
             window.hasRegisteredBulkUploadEvents = true;

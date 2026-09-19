@@ -37,7 +37,7 @@ class BulkUpload extends Component
 
     use WithFileUploads;
 
-    public ?int $academic_class_id = null;
+    public array $academic_class_ids = [];
 
     public ?int $subject_id = null;
 
@@ -67,22 +67,37 @@ class BulkUpload extends Component
     public bool $isGeneratingAi = false;
 
     // ... (আপনার আগের updatedAcademicClassId, updatedSubjectId ইত্যাদি সব ফাংশন আগের মতোই থাকবে) ...
-    public function updatedAcademicClassId(): void
+    public function updatedAcademicClassIds($value = null): void
     {
         $this->subject_id = null;
         $this->chapter_id = null;
         $this->topic_id = null;
+        
+        $subjects = count($this->academic_class_ids) > 0
+            ? Subject::query()->whereHas('academicClasses', fn($q) => $q->whereIn('academic_classes.id', $this->academic_class_ids))->orderBy('name')->get()->map(fn ($s) => ['value' => $s->id, 'text' => $s->name])->all()
+            : Subject::query()->orderBy('name')->get()->map(fn ($s) => ['value' => $s->id, 'text' => $s->name])->all();
+            
+        $this->dispatch('subjectsUpdated', subjects: $subjects);
+        $this->dispatch('chaptersUpdated', chapters: []);
+        $this->dispatch('topicsUpdated', topics: []);
     }
 
-    public function updatedSubjectId(): void
+    public function updatedSubjectId($value): void
     {
         $this->chapter_id = null;
         $this->topic_id = null;
+        
+        $chapters = $value ? Chapter::where('subject_id', $value)->orderBy('name')->get()->map(fn ($s) => ['value' => $s->id, 'text' => $s->name])->all() : [];
+        $this->dispatch('chaptersUpdated', chapters: $chapters);
+        $this->dispatch('topicsUpdated', topics: []);
     }
 
-    public function updatedChapterId(): void
+    public function updatedChapterId($value): void
     {
         $this->topic_id = null;
+        
+        $topics = $value ? Topic::where('chapter_id', $value)->orderBy('name')->get()->map(fn ($c) => ['value' => $c->id, 'text' => $c->name])->all() : [];
+        $this->dispatch('topicsUpdated', topics: $topics);
     }
 
     public function removeProcessedQuestion(int $index): void
@@ -502,7 +517,8 @@ class BulkUpload extends Component
         abort_unless(auth()->user()?->hasPermission('questions.create'), 403);
 
         $validated = $this->validate([
-            'academic_class_id' => 'required|exists:academic_classes,id',
+            'academic_class_ids' => 'required|array|min:1',
+            'academic_class_ids.*' => 'exists:academic_classes,id',
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'nullable|exists:chapters,id',
             'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
@@ -533,7 +549,7 @@ class BulkUpload extends Component
 
         $subject = Subject::query()
             ->whereKey($validated['subject_id'])
-            ->whereHas('academicClasses', fn($q) => $q->where('academic_classes.id', $validated['academic_class_id']))
+            ->whereHas('academicClasses', fn($q) => $q->whereIn('academic_classes.id', $validated['academic_class_ids']))
             ->first();
 
         if (! $subject) {
@@ -572,7 +588,7 @@ class BulkUpload extends Component
                     'user_id' => $currentUser?->id,
                 ]);
 
-                $question->academicClasses()->sync([$validated['academic_class_id']]);
+                $question->academicClasses()->sync($validated['academic_class_ids']);
                 $question->examCategories()->sync($this->exam_category_ids);
 
                 $globalTagIds = collect($validated['tagIds'] ?? [])->map(fn (mixed $tag): int => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => trim((string) $tag)])->id)->toArray();
@@ -598,9 +614,9 @@ class BulkUpload extends Component
     {
         return view('livewire.admin.questions.bulk-upload', [
             'classes' => AcademicClass::query()->orderBy('name')->get(),
-            'subjects' => $this->academic_class_id
-                ? Subject::query()->whereHas('academicClasses', fn($q) => $q->where('academic_classes.id', $this->academic_class_id))->orderBy('name')->get()
-                : collect(),
+            'subjects' => count($this->academic_class_ids) > 0
+                ? Subject::query()->whereHas('academicClasses', fn($q) => $q->whereIn('academic_classes.id', $this->academic_class_ids))->orderBy('name')->get()
+                : Subject::query()->orderBy('name')->get(),
             'chapters' => $this->subject_id
                 ? Chapter::query()->where('subject_id', $this->subject_id)->orderBy('name')->get()
                 : collect(),
