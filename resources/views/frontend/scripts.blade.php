@@ -19,8 +19,9 @@
         }
     }
 
-    let deferredPrompt;
-    const installBtn = document.getElementById('installPwaBtn');
+    // Turbo Drive এর কনফ্লিক্ট এড়াতে var ব্যবহার করা হলো
+    var deferredPrompt = null;
+    var installBtn = document.getElementById('installPwaBtn');
 
     // ব্রাউজার যখন PWA ইন্সটল করার জন্য প্রস্তুত হয়, তখন এই ইভেন্ট কল হয়
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -63,7 +64,7 @@
     });
 
     // ==========================================
-    // Service Worker Registration (এখানে যুক্ত করা হলো)
+    // Service Worker Registration
     // ==========================================
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

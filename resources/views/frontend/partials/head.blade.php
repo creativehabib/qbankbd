@@ -43,6 +43,8 @@
 <meta name="author" content="{{ $appName }}">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <link rel="canonical" href="{{ $currentUrl }}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
