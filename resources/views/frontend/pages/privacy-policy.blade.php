@@ -3,9 +3,12 @@
     $brandingSettings = \App\Support\SettingsStore::group('branding');
 
     $siteName = $brandingSettings['app_name'] ?? 'প্রশ্নব্যাংক';
-    $pageTitle = 'গোপনীয়তা নীতি - ' . $siteName;
+    $pageTitle = 'গোপনীয়তা নীতি ';
+    $description = 'কেরোবি ডটকম ব্যবহারকারীদের ব্যক্তিগত তথ্যের নিরাপত্তা ও গোপনীয়তা রক্ষার অঙ্গীকার।';
 @endphp
 @extends('layouts.frontend')
+@section('title', $pageTitle)
+@section('description', '')
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
         <div class="rounded-3xl border border-sky-200/60 bg-white p-8 shadow-sm dark:border-sky-700/30 dark:bg-[#13172b] md:p-12">
