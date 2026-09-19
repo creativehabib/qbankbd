@@ -18,4 +18,47 @@
             document.body.classList.remove('overflow-hidden');
         }
     }
+
+    let deferredPrompt;
+    const installBtn = document.getElementById('installPwaBtn');
+
+    // ব্রাউজার যখন PWA ইন্সটল করার জন্য প্রস্তুত হয়, তখন এই ইভেন্ট কল হয়
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // PWA সাপোর্টেড হলে বাটনটি দৃশ্যমান করুন (hidden ক্লাস সরিয়ে দিন)
+        if (installBtn) {
+            installBtn.classList.remove('hidden');
+        }
+    });
+
+    // বাটনে ক্লিক করলে প্রম্পট দেখাবে
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt !== null) {
+                deferredPrompt.prompt(); // ইন্সটল প্রম্পট উইন্ডো ওপেন হবে
+
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User installed the PWA');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+
+                // একবার প্রম্পট দেখালে এটি আর ব্যবহার করা যায় না
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            }
+        });
+    }
+
+    // ইউজার যদি নিজে থেকে অ্যাপ ইন্সটল করে ফেলে, তবে বাটনটি লুকিয়ে ফেলুন
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        if (installBtn) {
+            installBtn.classList.add('hidden');
+        }
+        console.log('PWA was installed');
+    });
 </script>
