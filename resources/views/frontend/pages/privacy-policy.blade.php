@@ -1,33 +1,13 @@
 @php
     $generalSettings = \App\Support\SettingsStore::group('general');
     $brandingSettings = \App\Support\SettingsStore::group('branding');
-    
+
     $siteName = $brandingSettings['app_name'] ?? 'প্রশ্নব্যাংক';
     $pageTitle = 'গোপনীয়তা নীতি - ' . $siteName;
 @endphp
-<!DOCTYPE html>
-<html lang="bn" class="h-full scroll-smooth">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $pageTitle }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="min-h-full bg-[#f5f3ee] text-slate-900 transition-colors duration-300 dark:bg-[#0d0f1a] dark:text-slate-100">
-
-<header class="fixed inset-x-0 top-0 z-50 border-b border-sky-200/50 bg-[#f5f3ee]/90 backdrop-blur-lg dark:border-sky-700/30 dark:bg-[#0d0f1a]/90">
-    <nav class="mx-auto flex h-17 w-full max-w-7xl items-center justify-between px-4 lg:px-8">
-        <a href="{{ route('home') }}" class="flex items-center gap-3 text-sky-600 dark:text-sky-400">
-            <x-app-logo-icon />
-        </a>
-        <div class="flex items-center gap-3">
-            <a href="{{ route('home') }}" class="text-sm font-semibold text-slate-600 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400">হোমপেজে ফিরে যান</a>
-        </div>
-    </nav>
-</header>
-
-<main class="pt-24 pb-16">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+@extends('layouts.frontend')
+@section('content')
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6">
         <div class="rounded-3xl border border-sky-200/60 bg-white p-8 shadow-sm dark:border-sky-700/30 dark:bg-[#13172b] md:p-12">
             <h1 class="mb-2 text-3xl font-bold text-slate-900 dark:text-slate-100">গোপনীয়তা নীতি (Privacy Policy)</h1>
             <p class="mb-8 text-sm text-slate-500 dark:text-slate-400">সর্বশেষ আপডেট: {{ now()->format('d M, Y') }}</p>
@@ -79,16 +59,4 @@
             </div>
         </div>
     </div>
-</main>
-
-<footer class="border-t border-sky-200/60 bg-white py-8 px-4 dark:border-sky-700/30 dark:bg-[#13172b]">
-    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-slate-500 dark:text-slate-400 sm:flex-row">
-        <p>© {{ date('Y') }} {{ $siteName }}। সর্বস্বত্ব সংরক্ষিত।</p>
-        <div class="flex gap-4">
-            <a href="{{ route('home') }}" class="hover:text-sky-600 dark:hover:text-sky-400">হোমপেজ</a>
-        </div>
-    </div>
-</footer>
-
-</body>
-</html>
+@endsection

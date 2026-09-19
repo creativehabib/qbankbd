@@ -54,7 +54,7 @@
             <div class="grid grid-cols-2 gap-2">
                 <a href="#" class="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-600 dark:text-slate-400 text-[11px]">আমাদের সম্পর্কে <span class="text-slate-500">&rsaquo;</span></a>
                 <a href="#" class="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-600 dark:text-slate-400 text-[11px]">ব্যবহারের শর্তাবলী <span class="text-slate-500">&rsaquo;</span></a>
-                <a href="#" class="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-600 dark:text-slate-400 text-[11px]">গোপনীয়তা নীতি <span class="text-slate-500">&rsaquo;</span></a>
+                <a href="{{ route('pages.privacy') }}" class="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-600 dark:text-slate-400 text-[11px]">গোপনীয়তা নীতি <span class="text-slate-500">&rsaquo;</span></a>
                 <a href="#" class="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-600 dark:text-slate-400 text-[11px]">যোগাযোগ <span class="text-slate-500">&rsaquo;</span></a>
             </div>
         </div>

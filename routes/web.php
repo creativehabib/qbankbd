@@ -78,7 +78,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
-Route::view('/privacy-policy', 'pages.privacy-policy')->name('privacy');
 
 // Tools Group Route
 Route::prefix('tools')->name('tools.')->group(function () {
@@ -94,6 +93,11 @@ Route::prefix('tools')->name('tools.')->group(function () {
     Route::get('/cgpa-calculator', [ToolsController::class, 'cgpaCalculator'])->name('cgpa_calculator');
     Route::get('/unit-converter', [ToolsController::class, 'unitConverter'])->name('unit_converter');
 
+});
+
+// Pages Group Route
+Route::prefix('pages')->name('pages.')->group(function () {
+    Route::view('/privacy-policy', 'frontend.pages.privacy-policy')->name('privacy');
 });
 
 // Public Frontend Routes
