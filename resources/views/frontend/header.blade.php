@@ -4,7 +4,7 @@
 
             <!-- Logo & Brand -->
             <div class="flex items-center gap-6">
-                                                <a href="/" class="group inline-flex items-center">
+                <a href="/" class="group inline-flex items-center">
                     @php
                         $branding = \App\Support\SettingsStore::group('branding');
                         $appName = $branding['app_name'] ?? config('app.name', 'Question Bank');
@@ -53,7 +53,7 @@
                 </button>
 
                 <!-- Mobile Login Icon -->
-                <button class="sm:hidden p-2 rounded-xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <button aria-label="User profile" class="sm:hidden p-2 rounded-xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </button>
             </div>
