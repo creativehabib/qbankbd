@@ -55,7 +55,7 @@
             isAdmin: @json(auth()->check() && auth()->user()->role === 'admin')
         };
     </script>
-    <script src="{{ asset('/security-shield.js') }}"></script>
+    <script src="{{ asset('/security-shield.js') }}" defer></script>
     @stack('script')
 </body>
 </html>
