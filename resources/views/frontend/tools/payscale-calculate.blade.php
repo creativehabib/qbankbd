@@ -677,28 +677,28 @@
                     <span>অন্যান্য সহায়ক ক্যারিয়ার টুলস</span>
                 </h3>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                    <a href="/tools/age-calculator" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
+                    <a href="{{ route('tools.age_calculator') }}" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
                         <span class="text-xl mb-1">🎂</span>
                         <div>
                             <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">বয়স ক্যালকুলেটর</div>
                             <div class="text-[11px] text-slate-400">১৮-৩২ বছর যাচাই</div>
                         </div>
                     </a>
-                    <a href="/tools/negative-marking-calculator" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
+                    <a href="#" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
                         <span class="text-xl mb-1">🎯</span>
                         <div>
                             <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">নেগেটিভ মার্কিং</div>
                             <div class="text-[11px] text-slate-400">বিসিএস ও প্রাথমিক</div>
                         </div>
                     </a>
-                    <a href="/tools/cv-maker" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
+                    <a href="#" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
                         <span class="text-xl mb-1">📄</span>
                         <div>
                             <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">সিভি মেকার</div>
                             <div class="text-[11px] text-slate-400">ফ্রি পিডিএফ ডাউনলোড</div>
                         </div>
                     </a>
-                    <a href="/tools/photo-resizer" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
+                    <a href="#" class="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-colors group flex flex-col justify-between">
                         <span class="text-xl mb-1">🖼️</span>
                         <div>
                             <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-emerald-600">ছবি ও স্বাক্ষর রিসাইজার</div>
